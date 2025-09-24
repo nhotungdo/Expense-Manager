@@ -4760,11 +4760,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
+      "projectUniqueName": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
       "projectName": "MyExpense",
-      "projectPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
+      "projectPath": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
       "packagesPath": "C:\\Users\\MY PC\\.nuget\\packages\\",
-      "outputPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\obj\\",
+      "outputPath": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4850,7 +4850,7 @@
       "code": "NU1603",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "MyExpense depends on Microsoft.AspNetCore.Authentication.Google (>= 8.0.9) but Microsoft.AspNetCore.Authentication.Google 8.0.9 was not found. Microsoft.AspNetCore.Authentication.Google 8.0.10 was resolved instead.",
+      "message": "MyExpense depends on Microsoft.AspNetCore.Authentication.Google (>= 8.0.9) but Microsoft.AspNetCore.Authentication.Google 8.0.9 was not found. An approximate best match of Microsoft.AspNetCore.Authentication.Google 8.0.10 was resolved.",
       "libraryId": "Microsoft.AspNetCore.Authentication.Google",
       "targetGraphs": [
         "net8.0"

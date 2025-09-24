@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "H0rC7+QXsZw=",
+  "dgSpecHash": "/56TkX/iQX8=",
   "success": false,
-  "projectFilePath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
+  "projectFilePath": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
@@ -89,10 +89,8 @@
     {
       "code": "NU1603",
       "level": "Warning",
-      "message": "MyExpense depends on Microsoft.AspNetCore.Authentication.Google (>= 8.0.9) but Microsoft.AspNetCore.Authentication.Google 8.0.9 was not found. Microsoft.AspNetCore.Authentication.Google 8.0.10 was resolved instead.",
-      "projectPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
       "warningLevel": 1,
-      "filePath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
+      "message": "MyExpense depends on Microsoft.AspNetCore.Authentication.Google (>= 8.0.9) but Microsoft.AspNetCore.Authentication.Google 8.0.9 was not found. An approximate best match of Microsoft.AspNetCore.Authentication.Google 8.0.10 was resolved.",
       "libraryId": "Microsoft.AspNetCore.Authentication.Google",
       "targetGraphs": [
         "net8.0"
@@ -102,8 +100,6 @@
       "code": "NU1102",
       "level": "Error",
       "message": "Unable to find package Microsoft.AspNetCore.Authentication.Cookies with version (>= 8.0.9)\r\n  - Found 32 version(s) in nuget.org [ Nearest version: 2.3.0 ]\r\n  - Found 0 version(s) in Microsoft Visual Studio Offline Packages\r\n  - Found 0 version(s) in C:\\Program Files\\dotnet\\library-packs",
-      "projectPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
-      "filePath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
       "libraryId": "Microsoft.AspNetCore.Authentication.Cookies",
       "targetGraphs": [
         "net8.0"
