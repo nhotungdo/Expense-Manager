@@ -1,6 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=ExpenseManager
-    username: sa
-    password: 123
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
