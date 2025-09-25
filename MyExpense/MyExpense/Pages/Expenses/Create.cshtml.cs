@@ -1,0 +1,90 @@
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using MyExpense.Models;
+
+namespace MyExpense.Pages.Expenses
+{
+    public class CreateModel : PageModel
+    {
+        private readonly ExpenseManagerContext _db;
+
+        public CreateModel(ExpenseManagerContext db)
+        {
+            _db = db;
+        }
+
+        [BindProperty]
+        public CreateExpenseInput Input { get; set; } = new();
+
+        public IEnumerable<SelectListItem> CategoryOptions { get; set; } = Enumerable.Empty<SelectListItem>();
+
+        public async Task OnGetAsync()
+        {
+            await LoadCategoriesAsync();
+            if (Input.ExpenseDate == default)
+                Input.ExpenseDate = DateOnly.FromDateTime(DateTime.Today);
+            if (string.IsNullOrEmpty(Input.Currency))
+                Input.Currency = "VND";
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var userIdStr = User.FindFirst("app:userId")?.Value;
+            if (string.IsNullOrEmpty(userIdStr)) return RedirectToPage("/Account/Login");
+            var userId = long.Parse(userIdStr);
+
+            if (!ModelState.IsValid)
+            {
+                await LoadCategoriesAsync();
+                return Page();
+            }
+
+            var entity = new Expense
+            {
+                UserId = userId,
+                CategoryId = Input.CategoryId,
+                Amount = Input.Amount,
+                Currency = Input.Currency,
+                Note = Input.Note,
+                ExpenseDate = Input.ExpenseDate,
+                CreatedAt = DateTime.UtcNow
+            };
+            _db.Expenses.Add(entity);
+            await _db.SaveChangesAsync();
+            return RedirectToPage("/Expenses/Index");
+        }
+
+        private async Task LoadCategoriesAsync()
+        {
+            var userIdStr = User.FindFirst("app:userId")?.Value;
+            long.TryParse(userIdStr, out var userId);
+            var cats = await _db.Categories
+                .Where(c => c.UserId == null || c.UserId == userId)
+                .OrderBy(c => c.Type).ThenBy(c => c.Name)
+                .ToListAsync();
+            CategoryOptions = cats.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = $"{c.Name} ({c.Type})"
+            });
+        }
+
+        public class CreateExpenseInput
+        {
+            [Required]
+            public DateOnly ExpenseDate { get; set; }
+            public long? CategoryId { get; set; }
+            [Range(0.01, double.MaxValue)]
+            public decimal Amount { get; set; }
+            [Required]
+            public string Currency { get; set; } = "VND";
+            public string? Note { get; set; }
+        }
+    }
+}
+
+

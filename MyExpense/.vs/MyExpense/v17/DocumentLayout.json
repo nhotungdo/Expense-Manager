@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|f:\\ojt-review\\myexpense\\expense-manager\\myexpense\\myexpense\\myexpense.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|solutionrelative:myexpense\\myexpense.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|f:\\ojt-review\\myexpense\\expense-manager\\myexpense\\myexpense\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|solutionrelative:myexpense\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|f:\\ojt-review\\myexpense\\expense-manager\\myexpense\\myexpense\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|solutionrelative:myexpense\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -29,10 +37,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|f:\\ojt-review\\myexpense\\expense-manager\\myexpense\\myexpense\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|solutionrelative:myexpense\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|f:\\ojt-review\\myexpense\\expense-manager\\myexpense\\myexpense\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{5D38661E-9B11-4477-BA07-79B5876B638C}|MyExpense\\MyExpense.csproj|solutionrelative:myexpense\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 14,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -86,20 +90,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "_ViewStart.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\_ViewStart.cshtml",
-              "RelativeDocumentMoniker": "MyExpense\\Pages\\_ViewStart.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\_ViewStart.cshtml",
-              "RelativeToolTip": "MyExpense\\Pages\\_ViewStart.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-24T14:38:39.249Z",
+              "DocumentIndex": 0,
+              "Title": "MyExpense",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
+              "RelativeDocumentMoniker": "MyExpense\\MyExpense.csproj",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
+              "RelativeToolTip": "MyExpense\\MyExpense.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-09-25T07:16:03.381Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "Index.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\Index.cshtml",
               "RelativeDocumentMoniker": "MyExpense\\Pages\\Index.cshtml",
@@ -107,12 +111,11 @@
               "RelativeToolTip": "MyExpense\\Pages\\Index.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-24T14:38:37.939Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-24T14:38:37.939Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "Profile.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\Account\\Profile.cshtml",
               "RelativeDocumentMoniker": "MyExpense\\Pages\\Account\\Profile.cshtml",
@@ -120,12 +123,11 @@
               "RelativeToolTip": "MyExpense\\Pages\\Account\\Profile.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-24T14:38:36.311Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-24T14:38:36.311Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "Logout.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\Account\\Logout.cshtml",
               "RelativeDocumentMoniker": "MyExpense\\Pages\\Account\\Logout.cshtml",
@@ -133,25 +135,24 @@
               "RelativeToolTip": "MyExpense\\Pages\\Account\\Logout.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-24T14:38:35.598Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-24T14:38:35.598Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "Login.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\Account\\Login.cshtml",
               "RelativeDocumentMoniker": "MyExpense\\Pages\\Account\\Login.cshtml",
               "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\Account\\Login.cshtml",
               "RelativeToolTip": "MyExpense\\Pages\\Account\\Login.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-09-24T14:38:34.669Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "AccessDenied.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\Account\\AccessDenied.cshtml",
               "RelativeDocumentMoniker": "MyExpense\\Pages\\Account\\AccessDenied.cshtml",
@@ -159,12 +160,11 @@
               "RelativeToolTip": "MyExpense\\Pages\\Account\\AccessDenied.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-24T14:38:33.766Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-24T14:38:33.766Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "Program.cs",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Program.cs",
               "RelativeDocumentMoniker": "MyExpense\\Program.cs",
@@ -172,12 +172,11 @@
               "RelativeToolTip": "MyExpense\\Program.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAAAAAkAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-24T14:06:53.243Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-24T14:06:53.243Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 1,
               "Title": "appsettings.json",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\appsettings.json",
               "RelativeDocumentMoniker": "MyExpense\\appsettings.json",
@@ -187,6 +186,18 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-09-24T13:38:38.747Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "MyExpense\\Pages\\_ViewStart.cshtml",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\Pages\\_ViewStart.cshtml",
+              "RelativeToolTip": "MyExpense\\Pages\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-24T14:38:39.249Z"
             }
           ]
         }

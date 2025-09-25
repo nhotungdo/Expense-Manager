@@ -113,7 +113,10 @@ app.MapGet("/account/login", () => Results.Redirect("/Account/Login")).AllowAnon
 
 app.MapGet("/account/google", async context =>
 {
-    await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+    await context.ChallengeAsync(
+        GoogleDefaults.AuthenticationScheme,
+        new AuthenticationProperties { RedirectUri = "/Account/Profile" }
+    );
 }).AllowAnonymous();
 
 app.MapPost("/account/signout", async context =>

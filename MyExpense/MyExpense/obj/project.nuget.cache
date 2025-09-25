@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "/56TkX/iQX8=",
-  "success": false,
-  "projectFilePath": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
+  "dgSpecHash": "O599Zr0l5pE=",
+  "success": true,
+  "projectFilePath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MyExpense\\MyExpense\\MyExpense.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
-    "C:\\Users\\MY PC\\.nuget\\packages\\microsoft.aspnetcore.authentication.google\\8.0.10\\microsoft.aspnetcore.authentication.google.8.0.10.nupkg.sha512",
+    "C:\\Users\\MY PC\\.nuget\\packages\\microsoft.aspnetcore.authentication.google\\8.0.20\\microsoft.aspnetcore.authentication.google.8.0.20.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\microsoft.build.framework\\17.8.3\\microsoft.build.framework.17.8.3.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\microsoft.build.locator\\1.7.8\\microsoft.build.locator.1.7.8.nupkg.sha512",
@@ -85,25 +85,5 @@
     "C:\\Users\\MY PC\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "MyExpense depends on Microsoft.AspNetCore.Authentication.Google (>= 8.0.9) but Microsoft.AspNetCore.Authentication.Google 8.0.9 was not found. An approximate best match of Microsoft.AspNetCore.Authentication.Google 8.0.10 was resolved.",
-      "libraryId": "Microsoft.AspNetCore.Authentication.Google",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    },
-    {
-      "code": "NU1102",
-      "level": "Error",
-      "message": "Unable to find package Microsoft.AspNetCore.Authentication.Cookies with version (>= 8.0.9)\r\n  - Found 32 version(s) in nuget.org [ Nearest version: 2.3.0 ]\r\n  - Found 0 version(s) in Microsoft Visual Studio Offline Packages\r\n  - Found 0 version(s) in C:\\Program Files\\dotnet\\library-packs",
-      "libraryId": "Microsoft.AspNetCore.Authentication.Cookies",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    }
-  ]
+  "logs": []
 }

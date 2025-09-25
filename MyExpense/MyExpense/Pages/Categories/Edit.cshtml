@@ -1,0 +1,31 @@
+@page "{id:long}"
+@model MyExpense.Pages.Categories.EditModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "Sửa danh mục";
+}
+
+<h2>Sửa danh mục</h2>
+
+<form method="post" class="mt-3">
+    <input type="hidden" asp-for="Input.Id" />
+    <div class="mb-3">
+        <label class="form-label">Tên</label>
+        <input asp-for="Input.Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Loại</label>
+        <select asp-for="Input.Type" class="form-select">
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+        </select>
+    </div>
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" asp-for="IsShared" />
+        <label class="form-check-label">Dùng chung (tất cả user)</label>
+    </div>
+    <button class="btn btn-primary" type="submit">Lưu</button>
+    <a class="btn btn-outline-secondary" href="/Categories">Hủy</a>
+</form>
+
+

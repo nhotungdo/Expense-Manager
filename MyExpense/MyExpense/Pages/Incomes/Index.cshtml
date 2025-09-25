@@ -1,0 +1,54 @@
+@page
+@model MyExpense.Pages.Incomes.IndexModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "Thu nhập";
+}
+
+<h2 class="mb-3">Thu nhập</h2>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input type="date" class="form-control" name="from" value="@Model.FromStr" />
+    </div>
+    <div class="col-auto">
+        <input type="date" class="form-control" name="to" value="@Model.ToStr" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-secondary" type="submit">Lọc</button>
+        <a class="btn btn-outline-secondary" href="/Incomes">Reset</a>
+    </div>
+    <div class="col text-end">
+        <a class="btn btn-primary" href="/Incomes/Create">Thêm thu nhập</a>
+    </div>
+    <div class="col-12 text-muted small">Tổng: <strong>@Model.TotalAmount.ToString("N2")</strong> @Model.Currency</div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ngày</th>
+            <th>Danh mục</th>
+            <th class="text-end">Số tiền</th>
+            <th>Ghi chú</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var i in Model.Items)
+{
+        <tr>
+            <td>@i.IncomeDate.ToString("yyyy-MM-dd")</td>
+            <td>@(i.Category?.Name ?? "-")</td>
+            <td class="text-end">@i.Amount.ToString("N2") @i.Currency</td>
+            <td>@i.Note</td>
+            <td class="text-nowrap">
+                <a class="btn btn-sm btn-outline-primary" href="/Incomes/Edit/@i.Id">Sửa</a>
+                <a class="btn btn-sm btn-outline-danger" href="/Incomes/Delete/@i.Id">Xóa</a>
+            </td>
+        </tr>
+}
+    </tbody>
+}</table>
+
+
