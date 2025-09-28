@@ -1,0 +1,164 @@
+@page
+@model MoneyTracker.Pages.LoginModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MoneyTracker</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .login-body {
+            padding: 2rem;
+        }
+        .btn-google {
+            background: #db4437;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-google:hover {
+            background: #c23321;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .welcome-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card">
+                    <div class="login-header">
+                        <div class="logo">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h2 class="mb-0">MoneyTracker</h2>
+                        <p class="welcome-text mb-0">Quản lý tài chính cá nhân thông minh</p>
+                    </div>
+                    <div class="login-body">
+                        <div class="text-center mb-4">
+                            <h4>Chào mừng trở lại!</h4>
+                            <p class="text-muted">Đăng nhập để tiếp tục quản lý tài chính</p>
+                        </div>
+
+                        <button class="btn btn-google mb-3" onclick="loginWithGoogle()">
+                            <i class="fab fa-google me-2"></i>
+                            Đăng nhập với Google
+                        </button>
+
+                        <div class="text-center">
+                            <small class="text-muted">
+                                Bằng cách đăng nhập, bạn đồng ý với 
+                                <a href="#" class="text-primary">Điều khoản sử dụng</a> 
+                                và 
+                                <a href="#" class="text-primary">Chính sách bảo mật</a>
+                            </small>
+                        </div>
+
+                        <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;">
+                            <!-- Error messages will be shown here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <small class="text-white">
+                        © 2025 MoneyTracker. Tất cả quyền được bảo lưu.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function loginWithGoogle() {
+            // Redirect to Google OAuth
+            window.location.href = '/api/auth/google-login';
+        }
+
+        // Check if user is already logged in
+        $(document).ready(function() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // Verify token is still valid
+                fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/Dashboard';
+                    } else {
+                        localStorage.removeItem('authToken');
+                    }
+                })
+                .catch(() => {
+                    localStorage.removeItem('authToken');
+                });
+            }
+        });
+
+        // Handle OAuth callback
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const error = urlParams.get('error');
+
+        if (token) {
+            localStorage.setItem('authToken', token);
+            window.location.href = '/Dashboard';
+        } else if (error) {
+            showError('Đăng nhập thất bại: ' + error);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

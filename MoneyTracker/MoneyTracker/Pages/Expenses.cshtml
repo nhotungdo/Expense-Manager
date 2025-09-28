@@ -1,0 +1,388 @@
+@page
+@model MoneyTracker.Pages.ExpensesModel
+@{
+    ViewData["Title"] = "Quản Lý Chi Tiêu";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Quản Lý Chi Tiêu</h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#expenseModal">
+                    <i class="fas fa-plus"></i> Thêm Chi Tiêu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Từ ngày</label>
+                            <input type="date" class="form-control" id="startDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Đến ngày</label>
+                            <input type="date" class="form-control" id="endDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Danh mục</label>
+                            <select class="form-control" id="categoryFilter">
+                                <option value="">Tất cả danh mục</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" id="searchTerm" placeholder="Nhập từ khóa...">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button class="btn btn-primary" onclick="applyFilters()">
+                                <i class="fas fa-search"></i> Lọc
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expenses Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="expensesTable">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Danh mục</th>
+                                    <th>Số tiền</th>
+                                    <th>Ghi chú</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Expenses will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal fade" id="expenseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="expenseModalTitle">Thêm Chi Tiêu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm">
+                    <input type="hidden" id="expenseId">
+                    <div class="mb-3">
+                        <label class="form-label">Số tiền *</label>
+                        <input type="number" class="form-control" id="amount" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Danh mục *</label>
+                        <select class="form-control" id="categoryId" required>
+                            <option value="">Chọn danh mục</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ngày *</label>
+                        <input type="date" class="form-control" id="expenseDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="note" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveExpense()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let expenses = [];
+        let categories = [];
+
+        $(document).ready(function() {
+            loadCategories();
+            loadExpenses();
+        });
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/category?type=Expense', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    categories = await response.json();
+                    populateCategorySelects();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        function populateCategorySelects() {
+            const categoryFilter = document.getElementById('categoryFilter');
+            const categoryId = document.getElementById('categoryId');
+            
+            // Clear existing options
+            categoryFilter.innerHTML = '<option value="">Tất cả danh mục</option>';
+            categoryId.innerHTML = '<option value="">Chọn danh mục</option>';
+            
+            categories.forEach(category => {
+                const option1 = new Option(category.name, category.id);
+                const option2 = new Option(category.name, category.id);
+                categoryFilter.add(option1);
+                categoryId.add(option2);
+            });
+        }
+
+        async function loadExpenses() {
+            try {
+                const response = await fetch('/api/expense', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    expenses = await response.json();
+                    displayExpenses();
+                }
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+            }
+        }
+
+        function displayExpenses() {
+            const tbody = document.querySelector('#expensesTable tbody');
+            tbody.innerHTML = '';
+
+            if (expenses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có chi tiêu nào</td></tr>';
+                return;
+            }
+
+            expenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(expense.expenseDate)}</td>
+                    <td>${expense.categoryName}</td>
+                    <td class="text-danger">${formatCurrency(expense.amount)}</td>
+                    <td>${expense.note || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editExpense(${expense.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteExpense(${expense.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function applyFilters() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const categoryId = document.getElementById('categoryFilter').value;
+            const searchTerm = document.getElementById('searchTerm').value;
+
+            let filteredExpenses = expenses;
+
+            if (startDate) {
+                filteredExpenses = filteredExpenses.filter(e => new Date(e.expenseDate) >= new Date(startDate));
+            }
+            if (endDate) {
+                filteredExpenses = filteredExpenses.filter(e => new Date(e.expenseDate) <= new Date(endDate));
+            }
+            if (categoryId) {
+                filteredExpenses = filteredExpenses.filter(e => e.categoryId == categoryId);
+            }
+            if (searchTerm) {
+                filteredExpenses = filteredExpenses.filter(e => 
+                    e.note?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    e.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            displayFilteredExpenses(filteredExpenses);
+        }
+
+        function displayFilteredExpenses(filteredExpenses) {
+            const tbody = document.querySelector('#expensesTable tbody');
+            tbody.innerHTML = '';
+
+            if (filteredExpenses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có chi tiêu nào phù hợp</td></tr>';
+                return;
+            }
+
+            filteredExpenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(expense.expenseDate)}</td>
+                    <td>${expense.categoryName}</td>
+                    <td class="text-danger">${formatCurrency(expense.amount)}</td>
+                    <td>${expense.note || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editExpense(${expense.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteExpense(${expense.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('searchTerm').value = '';
+            displayExpenses();
+        }
+
+        function openExpenseModal(expense = null) {
+            const modal = new bootstrap.Modal(document.getElementById('expenseModal'));
+            const title = document.getElementById('expenseModalTitle');
+            const form = document.getElementById('expenseForm');
+
+            if (expense) {
+                title.textContent = 'Sửa Chi Tiêu';
+                document.getElementById('expenseId').value = expense.id;
+                document.getElementById('amount').value = expense.amount;
+                document.getElementById('categoryId').value = expense.categoryId;
+                document.getElementById('expenseDate').value = expense.expenseDate.split('T')[0];
+                document.getElementById('note').value = expense.note || '';
+            } else {
+                title.textContent = 'Thêm Chi Tiêu';
+                form.reset();
+                document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            }
+
+            modal.show();
+        }
+
+        async function saveExpense() {
+            const form = document.getElementById('expenseForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const expenseData = {
+                amount: parseFloat(document.getElementById('amount').value),
+                categoryId: parseInt(document.getElementById('categoryId').value),
+                expenseDate: document.getElementById('expenseDate').value,
+                note: document.getElementById('note').value
+            };
+
+            const expenseId = document.getElementById('expenseId').value;
+            const url = expenseId ? `/api/expense/${expenseId}` : '/api/expense';
+            const method = expenseId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(expenseData)
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('expenseModal'));
+                    modal.hide();
+                    loadExpenses();
+                } else {
+                    alert('Có lỗi xảy ra khi lưu chi tiêu');
+                }
+            } catch (error) {
+                console.error('Error saving expense:', error);
+                alert('Có lỗi xảy ra khi lưu chi tiêu');
+            }
+        }
+
+        function editExpense(id) {
+            const expense = expenses.find(e => e.id === id);
+            if (expense) {
+                openExpenseModal(expense);
+            }
+        }
+
+        async function deleteExpense(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa chi tiêu này?')) {
+                try {
+                    const response = await fetch(`/api/expense/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + getToken()
+                        }
+                    });
+
+                    if (response.ok) {
+                        loadExpenses();
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa chi tiêu');
+                    }
+                } catch (error) {
+                    console.error('Error deleting expense:', error);
+                    alert('Có lỗi xảy ra khi xóa chi tiêu');
+                }
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        // Make functions globally available
+        window.openExpenseModal = openExpenseModal;
+    </script>
+}

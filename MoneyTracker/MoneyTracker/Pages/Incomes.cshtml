@@ -1,0 +1,388 @@
+@page
+@model MoneyTracker.Pages.IncomesModel
+@{
+    ViewData["Title"] = "Quản Lý Thu Nhập";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Quản Lý Thu Nhập</h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#incomeModal">
+                    <i class="fas fa-plus"></i> Thêm Thu Nhập
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Từ ngày</label>
+                            <input type="date" class="form-control" id="startDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Đến ngày</label>
+                            <input type="date" class="form-control" id="endDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Danh mục</label>
+                            <select class="form-control" id="categoryFilter">
+                                <option value="">Tất cả danh mục</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" id="searchTerm" placeholder="Nhập từ khóa...">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button class="btn btn-primary" onclick="applyFilters()">
+                                <i class="fas fa-search"></i> Lọc
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incomes Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="incomesTable">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Danh mục</th>
+                                    <th>Số tiền</th>
+                                    <th>Ghi chú</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Incomes will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Income Modal -->
+<div class="modal fade" id="incomeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="incomeModalTitle">Thêm Thu Nhập</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="incomeForm">
+                    <input type="hidden" id="incomeId">
+                    <div class="mb-3">
+                        <label class="form-label">Số tiền *</label>
+                        <input type="number" class="form-control" id="amount" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Danh mục *</label>
+                        <select class="form-control" id="categoryId" required>
+                            <option value="">Chọn danh mục</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ngày *</label>
+                        <input type="date" class="form-control" id="incomeDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="note" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveIncome()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let incomes = [];
+        let categories = [];
+
+        $(document).ready(function() {
+            loadCategories();
+            loadIncomes();
+        });
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/category?type=Income', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    categories = await response.json();
+                    populateCategorySelects();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        function populateCategorySelects() {
+            const categoryFilter = document.getElementById('categoryFilter');
+            const categoryId = document.getElementById('categoryId');
+            
+            // Clear existing options
+            categoryFilter.innerHTML = '<option value="">Tất cả danh mục</option>';
+            categoryId.innerHTML = '<option value="">Chọn danh mục</option>';
+            
+            categories.forEach(category => {
+                const option1 = new Option(category.name, category.id);
+                const option2 = new Option(category.name, category.id);
+                categoryFilter.add(option1);
+                categoryId.add(option2);
+            });
+        }
+
+        async function loadIncomes() {
+            try {
+                const response = await fetch('/api/income', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    incomes = await response.json();
+                    displayIncomes();
+                }
+            } catch (error) {
+                console.error('Error loading incomes:', error);
+            }
+        }
+
+        function displayIncomes() {
+            const tbody = document.querySelector('#incomesTable tbody');
+            tbody.innerHTML = '';
+
+            if (incomes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có thu nhập nào</td></tr>';
+                return;
+            }
+
+            incomes.forEach(income => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(income.incomeDate)}</td>
+                    <td>${income.categoryName}</td>
+                    <td class="text-success">${formatCurrency(income.amount)}</td>
+                    <td>${income.note || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editIncome(${income.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function applyFilters() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const categoryId = document.getElementById('categoryFilter').value;
+            const searchTerm = document.getElementById('searchTerm').value;
+
+            let filteredIncomes = incomes;
+
+            if (startDate) {
+                filteredIncomes = filteredIncomes.filter(i => new Date(i.incomeDate) >= new Date(startDate));
+            }
+            if (endDate) {
+                filteredIncomes = filteredIncomes.filter(i => new Date(i.incomeDate) <= new Date(endDate));
+            }
+            if (categoryId) {
+                filteredIncomes = filteredIncomes.filter(i => i.categoryId == categoryId);
+            }
+            if (searchTerm) {
+                filteredIncomes = filteredIncomes.filter(i => 
+                    i.note?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    i.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            displayFilteredIncomes(filteredIncomes);
+        }
+
+        function displayFilteredIncomes(filteredIncomes) {
+            const tbody = document.querySelector('#incomesTable tbody');
+            tbody.innerHTML = '';
+
+            if (filteredIncomes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có thu nhập nào phù hợp</td></tr>';
+                return;
+            }
+
+            filteredIncomes.forEach(income => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(income.incomeDate)}</td>
+                    <td>${income.categoryName}</td>
+                    <td class="text-success">${formatCurrency(income.amount)}</td>
+                    <td>${income.note || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editIncome(${income.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('searchTerm').value = '';
+            displayIncomes();
+        }
+
+        function openIncomeModal(income = null) {
+            const modal = new bootstrap.Modal(document.getElementById('incomeModal'));
+            const title = document.getElementById('incomeModalTitle');
+            const form = document.getElementById('incomeForm');
+
+            if (income) {
+                title.textContent = 'Sửa Thu Nhập';
+                document.getElementById('incomeId').value = income.id;
+                document.getElementById('amount').value = income.amount;
+                document.getElementById('categoryId').value = income.categoryId;
+                document.getElementById('incomeDate').value = income.incomeDate.split('T')[0];
+                document.getElementById('note').value = income.note || '';
+            } else {
+                title.textContent = 'Thêm Thu Nhập';
+                form.reset();
+                document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
+            }
+
+            modal.show();
+        }
+
+        async function saveIncome() {
+            const form = document.getElementById('incomeForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const incomeData = {
+                amount: parseFloat(document.getElementById('amount').value),
+                categoryId: parseInt(document.getElementById('categoryId').value),
+                incomeDate: document.getElementById('incomeDate').value,
+                note: document.getElementById('note').value
+            };
+
+            const incomeId = document.getElementById('incomeId').value;
+            const url = incomeId ? `/api/income/${incomeId}` : '/api/income';
+            const method = incomeId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(incomeData)
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('incomeModal'));
+                    modal.hide();
+                    loadIncomes();
+                } else {
+                    alert('Có lỗi xảy ra khi lưu thu nhập');
+                }
+            } catch (error) {
+                console.error('Error saving income:', error);
+                alert('Có lỗi xảy ra khi lưu thu nhập');
+            }
+        }
+
+        function editIncome(id) {
+            const income = incomes.find(i => i.id === id);
+            if (income) {
+                openIncomeModal(income);
+            }
+        }
+
+        async function deleteIncome(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa thu nhập này?')) {
+                try {
+                    const response = await fetch(`/api/income/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + getToken()
+                        }
+                    });
+
+                    if (response.ok) {
+                        loadIncomes();
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa thu nhập');
+                    }
+                } catch (error) {
+                    console.error('Error deleting income:', error);
+                    alert('Có lỗi xảy ra khi xóa thu nhập');
+                }
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        // Make functions globally available
+        window.openIncomeModal = openIncomeModal;
+    </script>
+}

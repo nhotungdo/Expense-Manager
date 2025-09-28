@@ -1,0 +1,438 @@
+@page
+@model MoneyTracker.Pages.CategoriesModel
+@{
+    ViewData["Title"] = "Quản Lý Danh Mục";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Quản Lý Danh Mục</h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                    <i class="fas fa-plus"></i> Thêm Danh Mục
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="categoryTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="expense-tab" data-bs-toggle="tab" data-bs-target="#expense" type="button" role="tab">
+                                <i class="fas fa-credit-card"></i> Chi Tiêu
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="income-tab" data-bs-toggle="tab" data-bs-target="#income" type="button" role="tab">
+                                <i class="fas fa-dollar-sign"></i> Thu Nhập
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="global-tab" data-bs-toggle="tab" data-bs-target="#global" type="button" role="tab">
+                                <i class="fas fa-globe"></i> Toàn Cục
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="tab-content" id="categoryTabContent">
+                <!-- Expense Categories -->
+                <div class="tab-pane fade show active" id="expense" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Danh Mục Chi Tiêu</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="expenseCategoriesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên danh mục</th>
+                                            <th>Loại</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Expense categories will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Income Categories -->
+                <div class="tab-pane fade" id="income" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Danh Mục Thu Nhập</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="incomeCategoriesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên danh mục</th>
+                                            <th>Loại</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Income categories will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Categories -->
+                <div class="tab-pane fade" id="global" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Danh Mục Toàn Cục</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="globalCategoriesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên danh mục</th>
+                                            <th>Loại</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Global categories will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalTitle">Thêm Danh Mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryId">
+                    <div class="mb-3">
+                        <label class="form-label">Tên danh mục *</label>
+                        <input type="text" class="form-control" id="categoryName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Loại *</label>
+                        <select class="form-control" id="categoryType" required>
+                            <option value="">Chọn loại</option>
+                            <option value="Expense">Chi tiêu</option>
+                            <option value="Income">Thu nhập</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isGlobal">
+                            <label class="form-check-label" for="isGlobal">
+                                Danh mục toàn cục (chỉ Admin)
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveCategory()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let categories = [];
+        let currentType = 'Expense';
+
+        $(document).ready(function() {
+            loadCategories();
+            
+            // Handle tab changes
+            $('#categoryTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                const target = $(e.target).attr('data-bs-target');
+                if (target === '#expense') {
+                    currentType = 'Expense';
+                    displayCategories('Expense');
+                } else if (target === '#income') {
+                    currentType = 'Income';
+                    displayCategories('Income');
+                } else if (target === '#global') {
+                    currentType = 'Global';
+                    loadGlobalCategories();
+                }
+            });
+        });
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/category', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    categories = await response.json();
+                    displayCategories('Expense');
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        async function loadGlobalCategories() {
+            try {
+                const response = await fetch('/api/category/global', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const globalCategories = await response.json();
+                    displayGlobalCategories(globalCategories);
+                }
+            } catch (error) {
+                console.error('Error loading global categories:', error);
+            }
+        }
+
+        function displayCategories(type) {
+            const filteredCategories = categories.filter(c => c.type === type);
+            const tableId = type === 'Expense' ? 'expenseCategoriesTable' : 'incomeCategoriesTable';
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+
+            if (filteredCategories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Không có danh mục nào</td></tr>';
+                return;
+            }
+
+            filteredCategories.forEach(category => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${category.name}</td>
+                    <td><span class="badge ${category.type === 'Expense' ? 'bg-danger' : 'bg-success'}">${category.type}</span></td>
+                    <td>${formatDate(category.createdAt)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editCategory(${category.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function displayGlobalCategories(globalCategories) {
+            const tbody = document.querySelector('#globalCategoriesTable tbody');
+            tbody.innerHTML = '';
+
+            if (globalCategories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Không có danh mục toàn cục nào</td></tr>';
+                return;
+            }
+
+            globalCategories.forEach(category => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${category.name}</td>
+                    <td><span class="badge ${category.type === 'Expense' ? 'bg-danger' : 'bg-success'}">${category.type}</span></td>
+                    <td>${formatDate(category.createdAt)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editGlobalCategory(${category.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteGlobalCategory(${category.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openCategoryModal(category = null) {
+            const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+            const title = document.getElementById('categoryModalTitle');
+            const form = document.getElementById('categoryForm');
+
+            if (category) {
+                title.textContent = 'Sửa Danh Mục';
+                document.getElementById('categoryId').value = category.id;
+                document.getElementById('categoryName').value = category.name;
+                document.getElementById('categoryType').value = category.type;
+                document.getElementById('isGlobal').checked = category.isGlobal;
+            } else {
+                title.textContent = 'Thêm Danh Mục';
+                form.reset();
+                document.getElementById('categoryType').value = currentType;
+            }
+
+            modal.show();
+        }
+
+        async function saveCategory() {
+            const form = document.getElementById('categoryForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const categoryData = {
+                name: document.getElementById('categoryName').value,
+                type: document.getElementById('categoryType').value,
+                isGlobal: document.getElementById('isGlobal').checked
+            };
+
+            const categoryId = document.getElementById('categoryId').value;
+            let url, method;
+
+            if (categoryId) {
+                // Update existing category
+                if (categoryData.isGlobal) {
+                    url = `/api/admin/global-categories/${categoryId}`;
+                } else {
+                    url = `/api/category/${categoryId}`;
+                }
+                method = 'PUT';
+            } else {
+                // Create new category
+                if (categoryData.isGlobal) {
+                    url = '/api/admin/global-categories';
+                } else {
+                    url = '/api/category';
+                }
+                method = 'POST';
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(categoryData)
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+                    modal.hide();
+                    loadCategories();
+                    if (currentType === 'Global') {
+                        loadGlobalCategories();
+                    }
+                } else {
+                    alert('Có lỗi xảy ra khi lưu danh mục');
+                }
+            } catch (error) {
+                console.error('Error saving category:', error);
+                alert('Có lỗi xảy ra khi lưu danh mục');
+            }
+        }
+
+        function editCategory(id) {
+            const category = categories.find(c => c.id === id);
+            if (category) {
+                openCategoryModal(category);
+            }
+        }
+
+        function editGlobalCategory(id) {
+            // This would need to fetch the global category details
+            // For now, we'll just show an alert
+            alert('Chức năng sửa danh mục toàn cục sẽ được cập nhật');
+        }
+
+        async function deleteCategory(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
+                try {
+                    const response = await fetch(`/api/category/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + getToken()
+                        }
+                    });
+
+                    if (response.ok) {
+                        loadCategories();
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa danh mục');
+                    }
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                    alert('Có lỗi xảy ra khi xóa danh mục');
+                }
+            }
+        }
+
+        async function deleteGlobalCategory(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa danh mục toàn cục này?')) {
+                try {
+                    const response = await fetch(`/api/admin/global-categories/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + getToken()
+                        }
+                    });
+
+                    if (response.ok) {
+                        loadGlobalCategories();
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa danh mục toàn cục');
+                    }
+                } catch (error) {
+                    console.error('Error deleting global category:', error);
+                    alert('Có lỗi xảy ra khi xóa danh mục toàn cục');
+                }
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        // Make functions globally available
+        window.openCategoryModal = openCategoryModal;
+    </script>
+}

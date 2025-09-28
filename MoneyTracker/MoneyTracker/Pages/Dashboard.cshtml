@@ -1,0 +1,312 @@
+@page
+@model MoneyTracker.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Tổng Thu Nhập
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalIncome">0 VND</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Tổng Chi Tiêu
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalExpenses">0 VND</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-credit-card fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Tài Sản Ròng
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="netWorth">0 VND</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-wallet fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Tiết Kiệm Tháng
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="monthlySavings">0 VND</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-piggy-bank fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Expenses by Category Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Chi Tiêu Theo Danh Mục</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="expensesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Giao Dịch Gần Đây</h6>
+                </div>
+                <div class="card-body">
+                    <div id="recentTransactions">
+                        <!-- Recent transactions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Suggestions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Gợi Ý AI</h6>
+                    <button class="btn btn-primary btn-sm" onclick="generateAiSuggestion()">
+                        <i class="fas fa-magic"></i> Tạo Gợi Ý Mới
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="aiSuggestions">
+                        <!-- AI suggestions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let expensesChart;
+
+        $(document).ready(function() {
+            loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/dashboard', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateSummaryCards(data);
+                    updateExpensesChart(data.expensesByCategory);
+                    updateRecentTransactions(data.recentTransactions);
+                    updateAiSuggestions(data.aiSuggestions);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        function updateSummaryCards(data) {
+            document.getElementById('totalIncome').textContent = formatCurrency(data.totalIncome);
+            document.getElementById('totalExpenses').textContent = formatCurrency(data.totalExpenses);
+            document.getElementById('netWorth').textContent = formatCurrency(data.netWorth);
+            document.getElementById('monthlySavings').textContent = formatCurrency(data.monthlySavings);
+        }
+
+        function updateExpensesChart(expensesByCategory) {
+            const ctx = document.getElementById('expensesChart').getContext('2d');
+            
+            if (expensesChart) {
+                expensesChart.destroy();
+            }
+
+            const labels = Object.keys(expensesByCategory);
+            const data = Object.values(expensesByCategory);
+            const colors = generateColors(labels.length);
+
+            expensesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRecentTransactions(transactions) {
+            const container = document.getElementById('recentTransactions');
+            container.innerHTML = '';
+
+            if (transactions.length === 0) {
+                container.innerHTML = '<p class="text-muted">Không có giao dịch gần đây</p>';
+                return;
+            }
+
+            transactions.forEach(transaction => {
+                const transactionDiv = document.createElement('div');
+                transactionDiv.className = 'd-flex align-items-center mb-3';
+                
+                const iconClass = transaction.type === 'Income' ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
+                const amountClass = transaction.type === 'Income' ? 'text-success' : 'text-danger';
+                
+                transactionDiv.innerHTML = `
+                    <div class="mr-3">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            ${transaction.category}
+                        </div>
+                        <div class="text-xs text-gray-600">
+                            ${formatDate(transaction.date)}
+                        </div>
+                    </div>
+                    <div class="text-xs font-weight-bold ${amountClass}">
+                        ${formatCurrency(transaction.amount)}
+                    </div>
+                `;
+                
+                container.appendChild(transactionDiv);
+            });
+        }
+
+        function updateAiSuggestions(suggestions) {
+            const container = document.getElementById('aiSuggestions');
+            container.innerHTML = '';
+
+            if (suggestions.length === 0) {
+                container.innerHTML = '<p class="text-muted">Không có gợi ý nào</p>';
+                return;
+            }
+
+            suggestions.forEach(suggestion => {
+                const suggestionDiv = document.createElement('div');
+                suggestionDiv.className = 'alert alert-info';
+                suggestionDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <i class="fas fa-lightbulb mr-2"></i>
+                            ${suggestion.suggestion}
+                        </div>
+                        <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
+                    </div>
+                `;
+                container.appendChild(suggestionDiv);
+            });
+        }
+
+        async function generateAiSuggestion() {
+            try {
+                const response = await fetch('/api/dashboard/generate-ai-suggestion', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    loadDashboardData(); // Reload to show new suggestion
+                }
+            } catch (error) {
+                console.error('Error generating AI suggestion:', error);
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        function generateColors(count) {
+            const colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+            ];
+            return colors.slice(0, count);
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken');
+        }
+    </script>
+}
