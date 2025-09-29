@@ -1,86 +1,130 @@
 @page
 @model MoneyTracker.Pages.IndexModel
 @{
-    ViewData["Title"] = "MoneyTracker - Quản lý Chi tiêu Thông minh";
+    ViewData["Title"] = "MoneyTracker - Quản Lý Tài Chính Thông Minh";
     Layout = null;
 }
 
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/index.css" />
-</head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
 
+        body {
+            font-family: 'Inter', sans-serif;
+            padding-top: 76px;
+        }
+
+        .hero-section {
+            min-height: 90vh;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-hero {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary-hero {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .preview-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .preview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        @@media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <span class="logo-icon">💰</span>
-                MoneyTracker
-            </div>
-            <div class="nav-buttons">
-                <a href="#" class="btn btn-outline" onclick="showLogin()">Đăng nhập</a>
-                <a href="#" class="btn btn-primary" onclick="showRegister()">Đăng ký</a>
+    <nav class="navbar navbar-expand-lg fixed-top shadow-sm" style="background: rgba(255, 255, 255, 0.95);">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="#home">
+                <i class="fas fa-wallet me-2"></i>MoneyTracker
+            </a>
+            <div class="d-flex gap-3">
+                <a href="#demo" class="btn btn-outline-primary">Demo</a>
+                <a href="/Login" class="btn btn-primary">
+                    <i class="fab fa-google me-2"></i>Đăng nhập
+                </a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">Quản lý tài chính thông minh</h1>
-                <p class="hero-subtitle">
-                    Theo dõi chi tiêu, lập kế hoạch ngân sách và đạt được mục tiêu tài chính của bạn một cách dễ dàng
-                    với MoneyTracker.
-                </p>
-                <ul class="hero-features">
-                    <li>Theo dõi thu chi tự động</li>
-                    <li>Phân tích chi tiêu thông minh</li>
-                    <li>Báo cáo chi tiết trực quan</li>
-                    <li>Đặt mục tiêu tiết kiệm</li>
-                </ul>
-                <div class="hero-cta">
-                    <a href="#" class="btn btn-cta btn-primary" onclick="showRegister()">Bắt đầu miễn phí</a>
-                    <a href="#features" class="btn btn-cta btn-outline">Tìm hiểu thêm</a>
+    <section class="hero-section" id="home">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">Quản lý tài chính thông minh với AI</h1>
+                    <p class="fs-5 mb-4 opacity-75">
+                        Khám phá hệ thống quản lý tài chính hoàn chỉnh với Dashboard, Chi tiêu, Thu nhập, Danh mục và AI thông minh.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <a href="/Login" class="btn-hero btn-primary-hero">
+                            <i class="fab fa-google"></i>
+                            Bắt đầu với Google
+                        </a>
+                        <a href="#demo" class="btn-hero" style="background: transparent; color: white; border: 2px solid rgba(255, 255, 255, 0.3);">
+                            <i class="fas fa-play"></i>
+                            Xem Demo
+                        </a>
+                    </div>
                 </div>
-            </div>
-            <div class="hero-visual">
-                <div class="phone-mockup">
-                    <div class="mockup-screen">
-                        <div class="mockup-header">
-                            <h3>💰 Dashboard</h3>
-                        </div>
-                        <div class="mockup-stats">
-                            <div class="mockup-stat">
-                                <div class="stat-icon" style="color: #4CAF50;">💰</div>
-                                <div class="stat-value" style="color: #4CAF50;">25.5M</div>
-                                <div class="stat-label">Thu nhập</div>
+                <div class="col-lg-6">
+                    <div style="background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px);">
+                        <h4 class="mb-3"><i class="fas fa-chart-pie me-2"></i>Dashboard Preview</h4>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 12px; text-align: center;">
+                                    <div class="fs-5 fw-bold text-success">25.5M ₫</div>
+                                    <small>Thu nhập</small>
+                                </div>
                             </div>
-                            <div class="mockup-stat">
-                                <div class="stat-icon" style="color: #f44336;">💸</div>
-                                <div class="stat-value" style="color: #f44336;">18.7M</div>
-                                <div class="stat-label">Chi tiêu</div>
+                            <div class="col-6">
+                                <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 12px; text-align: center;">
+                                    <div class="fs-5 fw-bold text-danger">18.7M ₫</div>
+                                    <small>Chi tiêu</small>
+                                </div>
                             </div>
-                            <div class="mockup-stat">
-                                <div class="stat-icon" style="color: #2196F3;">💎</div>
-                                <div class="stat-value" style="color: #2196F3;">6.8M</div>
-                                <div class="stat-label">Còn lại</div>
-                            </div>
-                            <div class="mockup-stat">
-                                <div class="stat-icon" style="color: #FF9800;">🏦</div>
-                                <div class="stat-value" style="color: #FF9800;">45.2M</div>
-                                <div class="stat-label">Tiết kiệm</div>
-                            </div>
-                        </div>
-                        <div
-                            style="background: #f0f0f0; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666; font-style: italic;">
-                            📊 Biểu đồ chi tiêu
                         </div>
                     </div>
                 </div>
@@ -88,189 +132,521 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="features-container">
-            <h2 class="features-title">Tại sao chọn MoneyTracker?</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-icon">📊</span>
-                    <h3 class="feature-title">Phân tích thông minh</h3>
-                    <p class="feature-description">
-                        AI phân tích thói quen chi tiêu và đưa ra lời khuyên cá nhân hóa để bạn tiết kiệm hiệu quả hơn.
-                    </p>
+    <!-- Interactive Demo Section -->
+    <section class="py-5" id="demo">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">Trải nghiệm hệ thống</h2>
+                    <p class="lead text-muted">Khám phá giao diện và chức năng của từng module</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🔐</span>
-                    <h3 class="feature-title">Bảo mật tuyệt đối</h3>
-                    <p class="feature-description">
-                        Mã hóa end-to-end, xác thực 2 lớp và tuân thủ các tiêu chuẩn bảo mật cao nhất.
-                    </p>
+            </div>
+            
+            <!-- Feature Tabs -->
+            <ul class="nav nav-pills nav-fill mb-4" id="featureTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#dashboard-preview">
+                        <i class="fas fa-chart-line me-2"></i>Dashboard
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#expenses-preview">
+                        <i class="fas fa-wallet me-2"></i>Chi Tiêu
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#incomes-preview">
+                        <i class="fas fa-coins me-2"></i>Thu Nhập
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#categories-preview">
+                        <i class="fas fa-tags me-2"></i>Danh Mục
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Dashboard Preview -->
+                <div class="tab-pane fade show active" id="dashboard-preview">
+                    <div class="card preview-card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Dashboard</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-4">
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body text-center py-3">
+                                            <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                            <h6>Thu Nhập</h6>
+                                            <h5>25.5M ₫</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="card bg-danger text-white">
+                                        <div class="card-body text-center py-3">
+                                            <i class="fas fa-credit-card fa-2x mb-2"></i>
+                                            <h6>Chi Tiêu</h6>
+                                            <h5>18.7M ₫</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="card bg-info text-white">
+                                        <div class="card-body text-center py-3">
+                                            <i class="fas fa-wallet fa-2x mb-2"></i>
+                                            <h6>Tài Sản</h6>
+                                            <h5>6.8M ₫</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="card bg-warning text-white">
+                                        <div class="card-body text-center py-3">
+                                            <i class="fas fa-piggy-bank fa-2x mb-2"></i>
+                                            <h6>Tiết Kiệm</h6>
+                                            <h5>27%</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="bg-light p-4 rounded">
+                                        <canvas id="demoChart" height="200"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>Giao dịch gần đây</h6>
+                                    <div class="list-group">
+                                        <div class="list-group-item d-flex justify-content-between">
+                                            <span><i class="fas fa-coffee text-warning me-2"></i>Cà phê</span>
+                                            <span class="text-danger fw-bold">-45,000 ₫</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between">
+                                            <span><i class="fas fa-bus text-info me-2"></i>Xe buýt</span>
+                                            <span class="text-danger fw-bold">-15,000 ₫</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between">
+                                            <span><i class="fas fa-dollar-sign text-success me-2"></i>Lương</span>
+                                            <span class="text-success fw-bold">+15,000,000 ₫</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- AI Suggestions Preview -->
+                                    <div class="mt-4">
+                                        <h6><i class="fas fa-robot me-2"></i>Gợi Ý AI</h6>
+                                        <div class="alert alert-warning alert-sm">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            Chi tiêu 'Ăn uống' chiếm 35% - hãy tiết kiệm!
+                                        </div>
+                                        <div class="alert alert-success alert-sm">
+                                            <i class="fas fa-thumbs-up me-2"></i>
+                                            Tuyệt vời! Tiết kiệm được 27% thu nhập.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">📱</span>
-                    <h3 class="feature-title">Đa nền tảng</h3>
-                    <p class="feature-description">
-                        Sử dụng mọi lúc mọi nơi với ứng dụng web, mobile và desktop. Đồng bộ real-time.
-                    </p>
+
+                <!-- Expenses Preview -->
+                <div class="tab-pane fade" id="expenses-preview">
+                    <div class="card preview-card">
+                        <div class="card-header bg-danger text-white d-flex justify-content-between">
+                            <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Quản Lý Chi Tiêu</h5>
+                            <button class="btn btn-light btn-sm demo-btn">
+                                <i class="fas fa-plus me-2"></i>Thêm Chi Tiêu
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Filters Preview -->
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Từ ngày</label>
+                                    <input type="date" class="form-control" value="2024-01-01" disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Đến ngày</label>
+                                    <input type="date" class="form-control" value="2024-12-31" disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Danh mục</label>
+                                    <select class="form-control" disabled>
+                                        <option>Tất cả danh mục</option>
+                                        <option>Ăn uống</option>
+                                        <option>Di chuyển</option>
+                                        <option>Mua sắm</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control" placeholder="Nhập từ khóa..." disabled>
+                                </div>
+                            </div>
+                            
+                            <!-- Expenses Table Preview -->
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Ngày</th>
+                                            <th>Danh mục</th>
+                                            <th>Số tiền</th>
+                                            <th>Ghi chú</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>25/12/2024</td>
+                                            <td><span class="badge bg-warning">Ăn uống</span></td>
+                                            <td class="text-danger fw-bold">-450,000 ₫</td>
+                                            <td>Tiệc Giáng sinh</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>24/12/2024</td>
+                                            <td><span class="badge bg-info">Di chuyển</span></td>
+                                            <td class="text-danger fw-bold">-85,000 ₫</td>
+                                            <td>Xăng xe</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>23/12/2024</td>
+                                            <td><span class="badge bg-success">Mua sắm</span></td>
+                                            <td class="text-danger fw-bold">-1,250,000 ₫</td>
+                                            <td>Quần áo mùa đông</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🎯</span>
-                    <h3 class="feature-title">Mục tiêu thông minh</h3>
-                    <p class="feature-description">
-                        Đặt mục tiêu tiết kiệm, theo dõi tiến độ và nhận thông báo nhắc nhở thông minh.
-                    </p>
+
+                <!-- Incomes Preview -->
+                <div class="tab-pane fade" id="incomes-preview">
+                    <div class="card preview-card">
+                        <div class="card-header bg-success text-white d-flex justify-content-between">
+                            <h5 class="mb-0"><i class="fas fa-coins me-2"></i>Quản Lý Thu Nhập</h5>
+                            <button class="btn btn-light btn-sm demo-btn">
+                                <i class="fas fa-plus me-2"></i>Thêm Thu Nhập
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Ngày</th>
+                                            <th>Danh mục</th>
+                                            <th>Số tiền</th>
+                                            <th>Ghi chú</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>01/12/2024</td>
+                                            <td><span class="badge bg-primary">Lương</span></td>
+                                            <td class="text-success fw-bold">+15,000,000 ₫</td>
+                                            <td>Lương tháng 12</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>15/12/2024</td>
+                                            <td><span class="badge bg-info">Freelance</span></td>
+                                            <td class="text-success fw-bold">+5,000,000 ₫</td>
+                                            <td>Dự án web</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>20/12/2024</td>
+                                            <td><span class="badge bg-warning">Đầu tư</span></td>
+                                            <td class="text-success fw-bold">+2,500,000 ₫</td>
+                                            <td>Cổ tức chứng khoán</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🏦</span>
-                    <h3 class="feature-title">Kết nối ngân hàng</h3>
-                    <p class="feature-description">
-                        Tự động đồng bộ với 50+ ngân hàng và ví điện tử lớn tại Việt Nam.
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">📈</span>
-                    <h3 class="feature-title">Báo cáo chi tiết</h3>
-                    <p class="feature-description">
-                        Báo cáo trực quan với biểu đồ đẹp mắt, xuất PDF/Excel và chia sẻ dễ dàng.
-                    </p>
+
+                <!-- Categories Preview -->
+                <div class="tab-pane fade" id="categories-preview">
+                    <div class="card preview-card">
+                        <div class="card-header bg-warning text-white d-flex justify-content-between">
+                            <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Quản Lý Danh Mục</h5>
+                            <button class="btn btn-light btn-sm demo-btn">
+                                <i class="fas fa-plus me-2"></i>Thêm Danh Mục
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Category Type Tabs -->
+                            <ul class="nav nav-tabs mb-3">
+                                <li class="nav-item">
+                                    <button class="nav-link active">
+                                        <i class="fas fa-credit-card me-2"></i>Chi Tiêu
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link">
+                                        <i class="fas fa-dollar-sign me-2"></i>Thu Nhập
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link">
+                                        <i class="fas fa-globe me-2"></i>Toàn Cục
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Tên danh mục</th>
+                                            <th>Loại</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="fas fa-utensils me-2 text-warning"></i>Ăn uống</td>
+                                            <td><span class="badge bg-danger">Expense</span></td>
+                                            <td>01/01/2024</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-car me-2 text-info"></i>Di chuyển</td>
+                                            <td><span class="badge bg-danger">Expense</span></td>
+                                            <td>01/01/2024</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-briefcase me-2 text-primary"></i>Lương</td>
+                                            <td><span class="badge bg-success">Income</span></td>
+                                            <td>01/01/2024</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-laptop-code me-2 text-info"></i>Freelance</td>
+                                            <td><span class="badge bg-success">Income</span></td>
+                                            <td>01/01/2024</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary demo-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger demo-btn"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-            <h2 class="modal-title">Đăng nhập</h2>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Email hoặc số điện thoại</label>
-                    <input type="text" class="form-input" placeholder="example@email.com" required>
+    <!-- Features Overview -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">Tính năng đầy đủ</h2>
+                    <p class="lead text-muted">Hệ thống quản lý tài chính hoàn chỉnh với AI</p>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Mật khẩu</label>
-                    <input type="password" class="form-input" placeholder="••••••••" required>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-chart-line fa-lg"></i>
+                            </div>
+                            <h5 class="fw-bold">Dashboard Thông Minh</h5>
+                            <p class="text-muted">Biểu đồ trực quan, thống kê chi tiết, xu hướng tài chính</p>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn-submit">Đăng nhập</button>
-                <div class="form-divider">
-                    <span>hoặc</span>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-wallet fa-lg"></i>
+                            </div>
+                            <h5 class="fw-bold">Quản Lý Chi Tiêu</h5>
+                            <p class="text-muted">CRUD chi tiêu, filters nâng cao, phân loại danh mục</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-switch">
-                    Chưa có tài khoản? <a href="#" onclick="showRegister()">Đăng ký ngay</a>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-coins fa-lg"></i>
+                            </div>
+                            <h5 class="fw-bold">Theo Dõi Thu Nhập</h5>
+                            <p class="text-muted">Quản lý nguồn thu, tính toán tỷ lệ tiết kiệm</p>
+                        </div>
+                    </div>
                 </div>
-            </form>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-robot fa-lg"></i>
+                            </div>
+                            <h5 class="fw-bold">AI Suggestions</h5>
+                            <p class="text-muted">Gợi ý thông minh, cảnh báo ngân sách, phân tích chi tiêu</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-envelope fa-lg"></i>
+                            </div>
+                            <h5 class="fw-bold">Email Reports</h5>
+                            <p class="text-muted">Báo cáo hàng tháng, cảnh báo chi tiêu qua email</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-crown fa-lg"></i>
+                            </div>
+                            <h5 class="fw-bold">Admin Dashboard</h5>
+                            <p class="text-muted">Quản lý users, global categories, system monitoring</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Register Modal -->
-    <div class="modal" id="registerModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-            <h2 class="modal-title">Đăng ký</h2>
-            <form id="registerForm">
-                <div class="form-group">
-                    <label class="form-label">Họ tên</label>
-                    <input type="text" class="form-input" placeholder="Nguyễn Văn A" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" placeholder="example@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Số điện thoại</label>
-                    <input type="tel" class="form-input" placeholder="0123456789" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Mật khẩu</label>
-                    <input type="password" class="form-input" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-submit">Tạo tài khoản</button>
-                <div class="form-divider">
-                    <span>hoặc</span>
-                </div>
-                <div class="form-switch">
-                    Đã có tài khoản? <a href="#" onclick="showLogin()">Đăng nhập</a>
-                </div>
-            </form>
+    <!-- CTA Section -->
+    <section class="py-5" style="background: var(--gradient-primary); color: white;">
+        <div class="container text-center">
+            <h2 class="display-5 fw-bold mb-3">Sẵn sàng bắt đầu?</h2>
+            <p class="fs-5 mb-4">Đăng nhập ngay để trải nghiệm đầy đủ tính năng</p>
+            <a href="/Login" class="btn-hero btn-primary-hero">
+                <i class="fab fa-google"></i>
+                Đăng nhập với Google
+            </a>
         </div>
-    </div>
+    </section>
 
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-white">
+        <div class="container text-center">
+            <p class="mb-1">&copy; 2024 MoneyTracker. Tất cả quyền được bảo lưu.</p>
+            <p class="mb-0 small text-muted">
+                Được phát triển với <i class="fas fa-heart text-danger"></i> bằng ASP.NET Core 8.0
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Modal functions
-        function showLogin() {
-            document.getElementById('registerModal').classList.remove('active');
-            document.getElementById('loginModal').classList.add('active');
-        }
-
-        function showRegister() {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('registerModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('registerModal').classList.remove('active');
-        }
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function (e) {
-            const loginModal = document.getElementById('loginModal');
-            const registerModal = document.getElementById('registerModal');
-
-            if (e.target === loginModal) {
-                closeModal();
-            }
-            if (e.target === registerModal) {
-                closeModal();
+        // Initialize demo chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('demoChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Ăn uống', 'Di chuyển', 'Mua sắm', 'Giải trí'],
+                        datasets: [{
+                            data: [35, 20, 25, 20],
+                            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
             }
         });
 
-        // Form submissions
-        document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            alert('🎉 Đăng nhập thành công!\n\nBạn sẽ được chuyển đến dashboard để bắt đầu quản lý chi tiêu.');
-            closeModal();
-            // Redirect to login page
-            window.location.href = '/Login';
+        // Demo button interactions
+        document.querySelectorAll('.demo-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tooltip = document.createElement('div');
+                tooltip.className = 'position-absolute bg-primary text-white px-3 py-2 rounded';
+                tooltip.style.top = '-50px';
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translateX(-50%)';
+                tooltip.style.zIndex = '1000';
+                tooltip.textContent = 'Đăng nhập để sử dụng';
+                
+                this.style.position = 'relative';
+                this.appendChild(tooltip);
+                
+                setTimeout(() => tooltip.remove(), 2000);
+            });
         });
 
-        document.getElementById('registerForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            alert('🎉 Đăng ký thành công!\n\nChào mừng bạn đến với MoneyTracker!\nHãy bắt đầu hành trình quản lý tài chính thông minh.');
-            closeModal();
-            // Redirect to login page
-            window.location.href = '/Login';
-        });
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-                navbar.style.color = '#333';
-                navbar.querySelector('.logo').style.color = '#667eea';
-            } else {
-                navbar.style.background = 'rgba(255, 255, 255, 0.1)';
-                navbar.querySelector('.logo').style.color = 'white';
-            }
-        });
-
-        // Smooth scroll for anchor links
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+                document.querySelector(this.getAttribute('href'))?.scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
     </script>
 </body>
-
 </html>

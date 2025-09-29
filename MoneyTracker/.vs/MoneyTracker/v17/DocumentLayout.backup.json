@@ -18,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 12,
+          "SelectedChildIndex": 11,
           "Children": [
             {
               "$type": "Bookmark",
@@ -62,21 +62,17 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:41:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
-            },
-            {
-              "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "MoneyTracker",
+              "Title": "MoneyTracker.csproj",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj",
               "RelativeDocumentMoniker": "MoneyTracker\\MoneyTracker.csproj",
               "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj",
               "RelativeToolTip": "MoneyTracker\\MoneyTracker.csproj",
-              "ViewState": "AgIAAAIAAAAAAAAAAAAAwBwAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2025-09-28T15:21:05.527Z",
               "EditorCaption": ""

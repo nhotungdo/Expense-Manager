@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj": {}
+    "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj": {}
   },
   "projects": {
-    "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj": {
+    "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj",
+        "projectUniqueName": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj",
         "projectName": "MoneyTracker",
-        "projectPath": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj",
+        "projectPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\MoneyTracker.csproj",
         "packagesPath": "C:\\Users\\MY PC\\.nuget\\packages\\",
-        "outputPath": "f:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\",
+        "outputPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -54,9 +54,9 @@
               "target": "Package",
               "version": "[12.0.1, )"
             },
-            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+            "Google.Apis.Auth": {
               "target": "Package",
-              "version": "[12.0.1, )"
+              "version": "[1.68.0, )"
             },
             "MailKit": {
               "target": "Package",
@@ -83,10 +83,6 @@
             "Microsoft.Extensions.Http": {
               "target": "Package",
               "version": "[8.0.0, )"
-            },
-            "MimeKit": {
-              "target": "Package",
-              "version": "[4.3.0, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
