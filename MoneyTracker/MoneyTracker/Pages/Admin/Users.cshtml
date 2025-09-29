@@ -1,0 +1,375 @@
+@page
+@model MoneyTracker.Pages.Admin.UsersModel
+@{
+    ViewData["Title"] = "Quản Lý Người Dùng";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Quản Lý Người Dùng</h1>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="exportUsers()">
+                        <i class="fas fa-download"></i> Xuất Excel
+                    </button>
+                    <button class="btn btn-success" onclick="refreshData()">
+                        <i class="fas fa-refresh"></i> Làm mới
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" id="searchTerm" placeholder="Tên, email...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Vai trò</label>
+                            <select class="form-control" id="roleFilter">
+                                <option value="">Tất cả</option>
+                                <option value="USER">User</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-control" id="statusFilter">
+                                <option value="">Tất cả</option>
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Vô hiệu hóa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Từ ngày</label>
+                            <input type="date" class="form-control" id="fromDate">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Đến ngày</label>
+                            <input type="date" class="form-control" id="toDate">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button class="btn btn-primary" onclick="loadUsers()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Thông tin</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Đăng nhập cuối</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chỉnh sửa người dùng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId">
+                    <div class="mb-3">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="editUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Họ tên</label>
+                        <input type="text" class="form-control" id="editFullName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vai trò</label>
+                        <select class="form-control" id="editRole" required>
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editEnabled">
+                            <label class="form-check-label" for="editEnabled">
+                                Tài khoản hoạt động
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let users = [];
+
+        $(document).ready(function() {
+            loadUsers();
+        });
+
+        async function loadUsers() {
+            try {
+                const params = new URLSearchParams();
+                
+                const searchTerm = document.getElementById('searchTerm').value;
+                if (searchTerm) params.append('searchTerm', searchTerm);
+                
+                const role = document.getElementById('roleFilter').value;
+                if (role) params.append('role', role);
+                
+                const enabled = document.getElementById('statusFilter').value;
+                if (enabled) params.append('enabled', enabled);
+                
+                const fromDate = document.getElementById('fromDate').value;
+                if (fromDate) params.append('createdFrom', fromDate);
+                
+                const toDate = document.getElementById('toDate').value;
+                if (toDate) params.append('createdTo', toDate);
+
+                const response = await fetch(`/api/admin/users?${params.toString()}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    users = await response.json();
+                    displayUsers(users);
+                } else if (response.status === 403) {
+                    alert('Bạn không có quyền truy cập chức năng này');
+                } else {
+                    alert('Có lỗi xảy ra khi tải dữ liệu');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                alert('Có lỗi xảy ra khi tải dữ liệu');
+            }
+        }
+
+        function displayUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <img src="${user.pictureUrl || '/images/default-avatar.png'}" 
+                             alt="Avatar" class="rounded-circle" width="40" height="40">
+                    </td>
+                    <td>
+                        <div>
+                            <strong>${user.fullName || user.username}</strong><br>
+                            <small class="text-muted">${user.email}</small><br>
+                            <small class="text-muted">@${user.username}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-${user.role === 'ADMIN' ? 'danger' : 'primary'}">
+                            ${user.role}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-${user.enabled ? 'success' : 'secondary'}">
+                            ${user.enabled ? 'Hoạt động' : 'Vô hiệu hóa'}
+                        </span>
+                    </td>
+                    <td>
+                        ${user.lastLogin ? formatDateTime(user.lastLogin) : 'Chưa đăng nhập'}
+                    </td>
+                    <td>
+                        ${formatDateTime(user.createdAt)}
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(${user.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-${user.enabled ? 'warning' : 'success'}" 
+                                    onclick="toggleUserStatus(${user.id}, ${user.enabled})">
+                                <i class="fas fa-${user.enabled ? 'ban' : 'check'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUsername').value = user.username;
+            document.getElementById('editFullName').value = user.fullName || '';
+            document.getElementById('editRole').value = user.role;
+            document.getElementById('editEnabled').checked = user.enabled;
+
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+        }
+
+        async function saveUser() {
+            const form = document.getElementById('editUserForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const userId = document.getElementById('editUserId').value;
+            const userData = {
+                username: document.getElementById('editUsername').value,
+                fullName: document.getElementById('editFullName').value,
+                role: document.getElementById('editRole').value,
+                enabled: document.getElementById('editEnabled').checked
+            };
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                    modal.hide();
+                    loadUsers();
+                } else {
+                    alert('Có lỗi xảy ra khi cập nhật người dùng');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                alert('Có lỗi xảy ra khi cập nhật người dùng');
+            }
+        }
+
+        async function toggleUserStatus(userId, currentStatus) {
+            const action = currentStatus ? 'vô hiệu hóa' : 'kích hoạt';
+            if (!confirm(`Bạn có chắc chắn muốn ${action} người dùng này?`)) {
+                return;
+            }
+
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            const userData = {
+                username: user.username,
+                fullName: user.fullName,
+                role: user.role,
+                enabled: !currentStatus
+            };
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    loadUsers();
+                } else {
+                    alert(`Có lỗi xảy ra khi ${action} người dùng`);
+                }
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                alert(`Có lỗi xảy ra khi ${action} người dùng`);
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    loadUsers();
+                } else {
+                    const errorText = await response.text();
+                    alert(errorText || 'Có lỗi xảy ra khi xóa người dùng');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Có lỗi xảy ra khi xóa người dùng');
+            }
+        }
+
+        function refreshData() {
+            loadUsers();
+        }
+
+        function exportUsers() {
+            // TODO: Implement export functionality
+            alert('Chức năng xuất Excel sẽ được cập nhật');
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleString('vi-VN');
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken') || '';
+        }
+    </script>
+}

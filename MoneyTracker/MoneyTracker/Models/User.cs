@@ -34,4 +34,6 @@ public partial class User
     public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
 
     public virtual ICollection<Income> Incomes { get; set; } = new List<Income>();
+
+    public virtual ICollection<Email> Emails { get; set; } = new List<Email>();
 }

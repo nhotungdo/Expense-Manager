@@ -65,3 +65,16 @@ CREATE TABLE ai_suggestions (
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- Bảng email notifications (optional)
+CREATE TABLE emails (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    subject NVARCHAR(255) NOT NULL,         -- tiêu đề email
+    body NVARCHAR(MAX) NOT NULL,            -- nội dung email
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING' 
+        CHECK (status IN ('PENDING','SENT','FAILED')),
+    sent_at DATETIME NULL,                  -- thời gian gửi thành công
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
