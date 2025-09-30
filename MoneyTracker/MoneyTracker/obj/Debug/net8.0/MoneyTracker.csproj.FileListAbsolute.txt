@@ -176,7 +176,6 @@ F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\MoneyTracker.pdb
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\ASql.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\AutoMapper.dll
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Azure.Core.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Azure.Identity.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
@@ -397,3 +396,8 @@ F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.pdb
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.genruntimeconfig.cache
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\ref\MoneyTracker.dll
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Google.Apis.dll
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Google.Apis.Auth.dll
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Google.Apis.Core.dll
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\System.Management.dll
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Management.dll

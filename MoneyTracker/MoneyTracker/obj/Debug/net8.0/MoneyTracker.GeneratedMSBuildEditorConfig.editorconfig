@@ -42,12 +42,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXhwZW5zZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Incomes.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5jb21lcy5jc2h0bWw=
+[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/HomePage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZVBhZ2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Incomes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5jb21lcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Login.cshtml]

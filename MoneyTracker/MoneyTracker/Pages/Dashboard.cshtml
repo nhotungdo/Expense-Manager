@@ -4,83 +4,174 @@
     ViewData["Title"] = "Dashboard";
 }
 
+<style>
+    :root {
+        --primary: #2563eb;
+        --success: #16a34a;
+        --danger: #dc2626;
+        --warning: #f59e0b;
+        --muted: #6b7280;
+    }
+
+    .page-title {
+        font-weight: 700;
+        letter-spacing: 0.2px;
+    }
+
+    .stat-card {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, .08);
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #fff;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #34d399 0%, #16a34a 100%);
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .8px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .card-modern {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .06);
+    }
+
+    .card-modern .card-header {
+        border: 0;
+        background: #fff;
+        padding: 1rem 1.25rem;
+        font-weight: 700;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 320px;
+    }
+
+    .list-transaction {
+        gap: 12px;
+    }
+
+    .list-transaction .tx-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tx-income {
+        background: rgba(22, 163, 74, .1);
+        color: #16a34a;
+    }
+
+    .tx-expense {
+        background: rgba(220, 38, 38, .1);
+        color: #dc2626;
+    }
+
+
+    }
+</style>
+
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="h3 mb-4">Dashboard</h1>
+    <div class="row align-items-center mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="page-title h3 mb-0">Dashboard</h1>
+            <div class="d-none d-md-flex gap-2">
+                <a class="btn btn-outline-primary btn-sm" href="/Expenses"><i class="fas fa-minus-circle me-1"></i> Thêm
+                    Chi tiêu</a>
+                <a class="btn btn-primary btn-sm" href="/Incomes"><i class="fas fa-plus-circle me-1"></i> Thêm Thu
+                    nhập</a>
+            </div>
         </div>
     </div>
 
     <!-- Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Tổng Thu Nhập
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalIncome">0 VND</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                        </div>
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3 h-100">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Tổng Thu Nhập</div>
+                        <div class="stat-value" id="totalIncome">0 VND</div>
                     </div>
+                    <div class="stat-icon bg-gradient-primary"><i class="fas fa-dollar-sign"></i></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Tổng Chi Tiêu
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalExpenses">0 VND</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-credit-card fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3 h-100">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Tổng Chi Tiêu</div>
+                        <div class="stat-value" id="totalExpenses">0 VND</div>
                     </div>
+                    <div class="stat-icon bg-gradient-warning"><i class="fas fa-credit-card"></i></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Tài Sản Ròng
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="netWorth">0 VND</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-wallet fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3 h-100">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Tài Sản Ròng</div>
+                        <div class="stat-value" id="netWorth">0 VND</div>
                     </div>
+                    <div class="stat-icon bg-gradient-info"><i class="fas fa-wallet"></i></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Tiết Kiệm Tháng
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="monthlySavings">0 VND</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-piggy-bank fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3 h-100">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Tiết Kiệm Tháng</div>
+                        <div class="stat-value" id="monthlySavings">0 VND</div>
                     </div>
+                    <div class="stat-icon bg-gradient-success"><i class="fas fa-piggy-bank"></i></div>
                 </div>
             </div>
         </div>
@@ -90,12 +181,10 @@
     <div class="row">
         <!-- Expenses by Category Chart -->
         <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Chi Tiêu Theo Danh Mục</h6>
-                </div>
+            <div class="card card-modern mb-4">
+                <div class="card-header">Chi Tiêu Theo Danh Mục</div>
                 <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
+                    <div class="chart-container">
                         <canvas id="expensesChart"></canvas>
                     </div>
                 </div>
@@ -104,14 +193,10 @@
 
         <!-- Recent Transactions -->
         <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Giao Dịch Gần Đây</h6>
-                </div>
+            <div class="card card-modern mb-4">
+                <div class="card-header">Giao Dịch Gần Đây</div>
                 <div class="card-body">
-                    <div id="recentTransactions">
-                        <!-- Recent transactions will be loaded here -->
-                    </div>
+                    <div id="recentTransactions"></div>
                 </div>
             </div>
         </div>
@@ -120,17 +205,14 @@
     <!-- AI Suggestions -->
     <div class="row">
         <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Gợi Ý AI</h6>
-                    <button class="btn btn-primary btn-sm" onclick="generateAiSuggestion()">
-                        <i class="fas fa-magic"></i> Tạo Gợi Ý Mới
-                    </button>
+            <div class="card card-modern mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Gợi Ý AI</span>
+                    <button class="btn btn-primary btn-sm" onclick="generateAiSuggestion()"><i
+                            class="fas fa-magic me-1"></i> Tạo Gợi Ý Mới</button>
                 </div>
                 <div class="card-body">
-                    <div id="aiSuggestions">
-                        <!-- AI suggestions will be loaded here -->
-                    </div>
+                    <div id="aiSuggestions"></div>
                 </div>
             </div>
         </div>
@@ -142,7 +224,7 @@
     <script>
         let expensesChart;
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             loadDashboardData();
         });
 
@@ -175,7 +257,7 @@
 
         function updateExpensesChart(expensesByCategory) {
             const ctx = document.getElementById('expensesChart').getContext('2d');
-            
+
             if (expensesChart) {
                 expensesChart.destroy();
             }
@@ -218,27 +300,27 @@
             transactions.forEach(transaction => {
                 const transactionDiv = document.createElement('div');
                 transactionDiv.className = 'd-flex align-items-center mb-3';
-                
+
                 const iconClass = transaction.type === 'Income' ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
                 const amountClass = transaction.type === 'Income' ? 'text-success' : 'text-danger';
-                
+
                 transactionDiv.innerHTML = `
-                    <div class="mr-3">
-                        <i class="fas ${iconClass}"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            ${transaction.category}
-                        </div>
-                        <div class="text-xs text-gray-600">
-                            ${formatDate(transaction.date)}
-                        </div>
-                    </div>
-                    <div class="text-xs font-weight-bold ${amountClass}">
-                        ${formatCurrency(transaction.amount)}
-                    </div>
-                `;
-                
+                                <div class="mr-3">
+                                    <i class="fas ${iconClass}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        ${transaction.category}
+                                    </div>
+                                    <div class="text-xs text-gray-600">
+                                        ${formatDate(transaction.date)}
+                                    </div>
+                                </div>
+                                <div class="text-xs font-weight-bold ${amountClass}">
+                                    ${formatCurrency(transaction.amount)}
+                                </div>
+                            `;
+
                 container.appendChild(transactionDiv);
             });
         }
@@ -256,14 +338,14 @@
                 const suggestionDiv = document.createElement('div');
                 suggestionDiv.className = 'alert alert-info';
                 suggestionDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <i class="fas fa-lightbulb mr-2"></i>
-                            ${suggestion.suggestion}
-                        </div>
-                        <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
-                    </div>
-                `;
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <i class="fas fa-lightbulb mr-2"></i>
+                                        ${suggestion.suggestion}
+                                    </div>
+                                    <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
+                                </div>
+                            `;
                 container.appendChild(suggestionDiv);
             });
         }

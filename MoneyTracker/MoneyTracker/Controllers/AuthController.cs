@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,13 +26,24 @@ namespace MoneyTracker.Controllers
             _logger = logger;
         }
 
+        [HttpGet("google-login")]
+        public IActionResult GoogleLoginInfo()
+        {
+            // When users open the API URL directly in the browser (GET),
+            // guide them to the proper login page instead of returning 405.
+            return Redirect("/Login");
+        }
+
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto request)
         {
             try
             {
                 // Verify Google token
-                var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken);
+                var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new[] { _configuration["GoogleAuth:ClientId"] }
+                });
 
                 if (payload == null)
                 {
@@ -60,6 +72,11 @@ namespace MoneyTracker.Controllers
                 }
                 else
                 {
+                    if (!user.Enabled)
+                    {
+                        return BadRequest("Tài khoản đã bị vô hiệu hóa");
+                    }
+
                     // Update last login and user info
                     user.LastLogin = DateTime.UtcNow;
                     user.UpdatedAt = DateTime.UtcNow;
@@ -109,33 +126,41 @@ namespace MoneyTracker.Controllers
         }
 
         [HttpGet("me")]
+        [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var userId = GetCurrentUserId();
-            if (userId == null)
+            try
             {
-                return Unauthorized();
-            }
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                {
+                    return Unauthorized();
+                }
 
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null || !user.Enabled)
+                {
+                    return Unauthorized();
+                }
 
-            return Ok(new UserDto
+                return Ok(new UserDto
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    PictureUrl = user.PictureUrl,
+                    Role = user.Role,
+                    Enabled = user.Enabled,
+                    CreatedAt = user.CreatedAt,
+                    LastLogin = user.LastLogin
+                });
+            }
+            catch (Exception ex)
             {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FullName = user.FullName,
-                PictureUrl = user.PictureUrl,
-                Role = user.Role,
-                Enabled = user.Enabled,
-                LastLogin = user.LastLogin,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
-            });
+                _logger.LogError(ex, "Error getting current user");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         private string GenerateJwtToken(User user)

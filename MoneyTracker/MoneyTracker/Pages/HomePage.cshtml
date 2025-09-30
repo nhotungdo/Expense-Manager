@@ -1,0 +1,155 @@
+@page
+@model MoneyTracker.Pages.HomePageModel
+@{
+    ViewData["Title"] = "MoneyTracker - Quản Lý Tài Chính";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root { --primary: #2563eb; --gradient: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); }
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+        .hero { min-height: 85vh; background: var(--gradient); color: #fff; display:flex; align-items:center; }
+        .hero-title { font-weight: 800; letter-spacing:.3px; }
+        .feature-card { border:0; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,.06); transition:transform .2s ease; }
+        .feature-card:hover { transform: translateY(-4px); }
+        .feature-icon { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; }
+        .ic-green{ background:#10b981; } .ic-red{ background:#ef4444; } .ic-blue{ background:#3b82f6; } .ic-yellow{ background:#f59e0b; }
+        .cta { background:#0f172a; color:#fff; }
+        @media (max-width:768px){ .hero{ min-height: 70vh; } }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="/HomePage"><i class="fas fa-wallet me-2"></i>MoneyTracker</a>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-primary" href="#features">Tính năng</a>
+                <a class="btn btn-primary" href="/Login"><i class="fab fa-google me-2"></i>Đăng nhập</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container py-5">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <h1 class="hero-title display-4 mb-3">Quản lý tài chính thông minh, đơn giản và trực quan</h1>
+                    <p class="lead mb-4">Theo dõi thu - chi, danh mục, biểu đồ và gợi ý AI. Sẵn sàng cho mọi thiết bị.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/Login" class="btn btn-light btn-lg"><i class="fab fa-google me-2"></i>Đăng nhập với Google</a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">Khám phá tính năng</a>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="bg-white bg-opacity-10 rounded-4 p-4 border border-white border-opacity-25">
+                        <div class="d-flex justify-content-between text-white-50 mb-2">
+                            <span>Thu nhập</span><span id="demoIncome">25.5M ₫</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-white-50 mb-2">
+                            <span>Chi tiêu</span><span id="demoExpense">18.7M ₫</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-white-50">
+                            <span>Tiết kiệm</span><span id="demoSave">27%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Tính năng chính</h2>
+                <p class="text-muted">Toàn bộ chức năng cốt lõi của MoneyTracker</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon ic-blue mb-3"><i class="fas fa-chart-line"></i></div>
+                            <h5 class="fw-bold">Dashboard</h5>
+                            <p class="text-muted mb-3">Tổng quan thu chi, biểu đồ, xu hướng.</p>
+                            <a href="/Dashboard" class="btn btn-outline-primary btn-sm feature-link">Mở</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon ic-red mb-3"><i class="fas fa-wallet"></i></div>
+                            <h5 class="fw-bold">Chi tiêu</h5>
+                            <p class="text-muted mb-3">Ghi chép, lọc, quản lý chi tiết chi tiêu.</p>
+                            <a href="/Expenses" class="btn btn-outline-primary btn-sm feature-link">Mở</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon ic-green mb-3"><i class="fas fa-coins"></i></div>
+                            <h5 class="fw-bold">Thu nhập</h5>
+                            <p class="text-muted mb-3">Theo dõi nguồn thu, thống kê theo tháng.</p>
+                            <a href="/Incomes" class="btn btn-outline-primary btn-sm feature-link">Mở</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon ic-yellow mb-3"><i class="fas fa-tags"></i></div>
+                            <h5 class="fw-bold">Danh mục</h5>
+                            <p class="text-muted mb-3">Quản lý danh mục thu/chi linh hoạt.</p>
+                            <a href="/Categories" class="btn btn-outline-primary btn-sm feature-link">Mở</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta py-5">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-2">Sẵn sàng bắt đầu?</h2>
+            <p class="text-white-50 mb-4">Đăng nhập để sử dụng đầy đủ các tính năng của MoneyTracker</p>
+            <a href="/Login" class="btn btn-light btn-lg"><i class="fab fa-google me-2"></i>Đăng nhập với Google</a>
+        </div>
+    </section>
+
+    <footer class="py-4 bg-white text-center">
+        <div class="container">
+            <small class="text-muted">© 2025 MoneyTracker</small>
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Nếu chưa đăng nhập, vô hiệu hóa link tính năng và chuyển đến Login
+        document.querySelectorAll('.feature-link').forEach(el => {
+            el.addEventListener('click', function (e) {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    e.preventDefault();
+                    window.location.href = '/Login';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+

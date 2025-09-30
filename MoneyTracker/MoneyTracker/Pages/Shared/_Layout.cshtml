@@ -153,6 +153,12 @@
         });
 
         function checkAuthentication() {
+            // Don't redirect if we're on HomePage or Login page
+            const currentPath = window.location.pathname;
+            if (currentPath === '/HomePage' || currentPath === '/Login') {
+                return;
+            }
+
             const token = localStorage.getItem('authToken');
             if (!token) {
                 window.location.href = '/Login';

@@ -67,13 +67,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddHttpContextAccessor();
 
-// Add Google Auth
-builder.Services.AddAuthentication()
-    .AddGoogle(options =>
-    {
-        options.ClientId = builder.Configuration["GoogleAuth:ClientId"]!;
-        options.ClientSecret = builder.Configuration["GoogleAuth:ClientSecret"]!;
-    });
+// Google Auth configuration is handled in JWT configuration above
 
 var app = builder.Build();
 
@@ -96,8 +90,11 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 
-// Default route to Index page
-app.MapGet("/", () => Results.Redirect("/Index"));
+// Default route to HomePage
+app.MapGet("/", () => Results.Redirect("/HomePage"));
+
+// Redirect Dashboard to HomePage
+app.MapGet("/Dashboard", () => Results.Redirect("/HomePage"));
 
 // Ensure database is created
 using (var scope = app.Services.CreateScope())

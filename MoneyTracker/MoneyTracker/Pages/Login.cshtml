@@ -7,6 +7,7 @@
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,6 +22,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .login-card {
             background: white;
             border-radius: 15px;
@@ -29,15 +31,18 @@
             max-width: 400px;
             width: 100%;
         }
+
         .login-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 2rem;
             text-align: center;
         }
+
         .login-body {
             padding: 2rem;
         }
+
         .btn-google {
             background: #db4437;
             border: none;
@@ -48,21 +53,25 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
+
         .btn-google:hover {
             background: #c23321;
             color: white;
             transform: translateY(-2px);
         }
+
         .logo {
             font-size: 2.5rem;
             margin-bottom: 1rem;
         }
+
         .welcome-text {
             font-size: 1.1rem;
             opacity: 0.9;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="row justify-content-center">
@@ -81,16 +90,22 @@
                             <p class="text-muted">Đăng nhập để tiếp tục quản lý tài chính</p>
                         </div>
 
-                        <button class="btn btn-google mb-3" onclick="loginWithGoogle()">
-                            <i class="fab fa-google me-2"></i>
-                            Đăng nhập với Google
-                        </button>
+                        <div id="g_id_onload" data-client_id="@Model.GoogleClientId"
+                            data-callback="handleCredentialResponse" data-auto_prompt="false">
+                        </div>
+
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="g_id_signin" data-type="standard" data-shape="rectangular"
+                                data-theme="filled_blue" data-text="signin_with" data-size="large"
+                                data-logo_alignment="left">
+                            </div>
+                        </div>
 
                         <div class="text-center">
                             <small class="text-muted">
-                                Bằng cách đăng nhập, bạn đồng ý với 
-                                <a href="#" class="text-primary">Điều khoản sử dụng</a> 
-                                và 
+                                Bằng cách đăng nhập, bạn đồng ý với
+                                <a href="#" class="text-primary">Điều khoản sử dụng</a>
+                                và
                                 <a href="#" class="text-primary">Chính sách bảo mật</a>
                             </small>
                         </div>
@@ -112,15 +127,53 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script>
-        function loginWithGoogle() {
-            // Redirect to Google OAuth
-            window.location.href = '/api/auth/google-login';
+        // Google Sign-In callback function
+        async function handleCredentialResponse(response) {
+            try {
+
+                const result = await fetch('/api/auth/google-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        idToken: response.credential
+                    })
+                });
+
+                if (result.ok) {
+                    const data = await result.json();
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
+                    setTimeout(() => {
+                        window.location.href = '/Dashboard';
+                    }, 1000);
+                } else {
+                    const errorData = await result.text();
+                    showError('Đăng nhập thất bại: ' + errorData);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
+            } finally {
+            }
         }
 
+        // Initialize Google Sign-In when page loads
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: '@Model.GoogleClientId',
+                callback: handleCredentialResponse
+            });
+        };
+
         // Check if user is already logged in
-        $(document).ready(function() {
+        $(document).ready(function () {
             const token = localStorage.getItem('authToken');
             if (token) {
                 // Verify token is still valid
@@ -129,36 +182,37 @@
                         'Authorization': 'Bearer ' + token
                     }
                 })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = '/Dashboard';
-                    } else {
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/Dashboard';
+                        } else {
+                            localStorage.removeItem('authToken');
+                            localStorage.removeItem('user');
+                        }
+                    })
+                    .catch(() => {
                         localStorage.removeItem('authToken');
-                    }
-                })
-                .catch(() => {
-                    localStorage.removeItem('authToken');
-                });
+                        localStorage.removeItem('user');
+                    });
             }
         });
 
-        // Handle OAuth callback
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const error = urlParams.get('error');
-
-        if (token) {
-            localStorage.setItem('authToken', token);
-            window.location.href = '/Dashboard';
-        } else if (error) {
-            showError('Đăng nhập thất bại: ' + error);
-        }
-
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>' + message;
             errorDiv.style.display = 'block';
+            errorDiv.className = 'alert alert-danger mt-3';
         }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + message;
+            errorDiv.style.display = 'block';
+            errorDiv.className = 'alert alert-success mt-3';
+        }
+
+        // No explicit loading UI required because GIS button handles states
     </script>
 </body>
+
 </html>

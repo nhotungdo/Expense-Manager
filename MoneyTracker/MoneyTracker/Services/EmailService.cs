@@ -132,7 +132,7 @@ namespace MoneyTracker.Services
                     .ToListAsync();
 
                 // Generate HTML report
-                var htmlBody = GenerateMonthlyReportHtml(user, monthlyIncome, monthlyExpenses, expensesByCategory, currentMonth, currentYear);
+                var htmlBody = GenerateMonthlyReportHtml(user, monthlyIncome, monthlyExpenses, expensesByCategory.Cast<object>().ToList(), currentMonth, currentYear);
 
                 var subject = $"Báo cáo tài chính tháng {currentMonth}/{currentYear} - MoneyTracker";
 
@@ -186,14 +186,17 @@ namespace MoneyTracker.Services
         }
 
         private string GenerateMonthlyReportHtml(User user, decimal monthlyIncome, decimal monthlyExpenses,
-            List<dynamic> expensesByCategory, int month, int year)
+            List<object> expensesByCategory, int month, int year)
         {
             var savings = monthlyIncome - monthlyExpenses;
             var savingsRate = monthlyIncome > 0 ? (savings / monthlyIncome) * 100 : 0;
 
             var categoryRows = string.Join("", expensesByCategory.Select(c =>
-                $"<tr><td style='padding: 8px; border-bottom: 1px solid #dee2e6;'>{c.Category}</td>" +
-                $"<td style='padding: 8px; border-bottom: 1px solid #dee2e6; text-align: right;'>{c.Amount:C0}</td></tr>"));
+            {
+                dynamic item = c;
+                return $"<tr><td style='padding: 8px; border-bottom: 1px solid #dee2e6;'>{item.Category}</td>" +
+                       $"<td style='padding: 8px; border-bottom: 1px solid #dee2e6; text-align: right;'>{item.Amount:C0}</td></tr>";
+            }));
 
             return $@"
             <html>

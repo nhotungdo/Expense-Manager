@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "zkQsGzZ6P9//wrrMmeG+OIF8JudT9hBcmU3r0Mbfkn8=",
+  "Hash": "6i9BpWHN9iN4X4ia+GTqEn+HXfImPnDQR6zXV5sBRbg=",
   "Source": "MoneyTracker",
   "BasePath": "_content/MoneyTracker",
   "Mode": "Default",
@@ -91,6 +91,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\index.css"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\landing.css",
+      "SourceId": "MoneyTracker",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\",
+      "BasePath": "_content/MoneyTracker",
+      "RelativePath": "css/landing.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\landing.css"
     },
     {
       "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\site.css",
