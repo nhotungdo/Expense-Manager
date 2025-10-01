@@ -5,6 +5,7 @@ namespace MoneyTracker.Models.DTOs
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty; // "Income" or "Expense"
+        public string? Description { get; set; }
         public long UserId { get; set; }
         public bool IsGlobal { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -14,6 +15,7 @@ namespace MoneyTracker.Models.DTOs
     {
         public string Name { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty; // "Income" or "Expense"
+        public string? Description { get; set; }
         public bool IsGlobal { get; set; } = false;
     }
 
@@ -21,5 +23,6 @@ namespace MoneyTracker.Models.DTOs
     {
         public string Name { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty; // "Income" or "Expense"
+        public string? Description { get; set; }
     }
 }

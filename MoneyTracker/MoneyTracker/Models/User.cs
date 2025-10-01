@@ -27,6 +27,28 @@ public partial class User
 
     public DateTime? UpdatedAt { get; set; }
 
+    public string? PhoneNumber { get; set; }
+
+    public DateOnly? DateOfBirth { get; set; }
+
+    public string? Gender { get; set; }
+
+    public string? Address { get; set; }
+
+    public string Language { get; set; } = "vi";
+
+    public string DefaultCurrency { get; set; } = "VND";
+
+    public string Timezone { get; set; } = "Asia/Ho_Chi_Minh";
+
+    public string Theme { get; set; } = "light";
+
+    public bool EmailNotifications { get; set; } = true;
+
+    public bool PushNotifications { get; set; } = true;
+
+    public string? Password { get; set; }
+
     public virtual ICollection<AiSuggestion> AiSuggestions { get; set; } = new List<AiSuggestion>();
 
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();

@@ -11,6 +11,8 @@ public partial class Category
 
     public string Type { get; set; } = null!;
 
+    public string? Description { get; set; }
+
     public long? UserId { get; set; }
 
     public DateTime? CreatedAt { get; set; }

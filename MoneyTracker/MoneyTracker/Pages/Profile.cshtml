@@ -1,0 +1,436 @@
+@page
+@model MoneyTracker.Pages.ProfileModel
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân - MoneyTracker";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Hồ sơ cá nhân</h1>
+                    <p class="text-muted mb-0">Quản lý thông tin và cài đặt tài khoản của bạn</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="refreshProfile()">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                    <button class="btn btn-primary" onclick="saveProfile()">
+                        <i class="fas fa-save"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tên đăng nhập</label>
+                                <input type="text" class="form-control" id="username" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" readonly>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" id="fullName">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="phoneNumber">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" id="dateOfBirth">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Giới tính</label>
+                                <select class="form-control" id="gender">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                    <option value="Other">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <textarea class="form-control" id="address" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cog me-2"></i>Cài đặt tài khoản
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="settingsForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ngôn ngữ</label>
+                                <select class="form-control" id="language">
+                                    <option value="vi">Tiếng Việt</option>
+                                    <option value="en">English</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tiền tệ mặc định</label>
+                                <select class="form-control" id="defaultCurrency">
+                                    <option value="VND">VND - Đồng Việt Nam</option>
+                                    <option value="USD">USD - Đô la Mỹ</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Múi giờ</label>
+                                <select class="form-control" id="timezone">
+                                    <option value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh (GMT+7)</option>
+                                    <option value="UTC">UTC (GMT+0)</option>
+                                    <option value="America/New_York">America/New_York (GMT-5)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Chế độ hiển thị</label>
+                                <select class="form-control" id="theme">
+                                    <option value="light">Sáng</option>
+                                    <option value="dark">Tối</option>
+                                    <option value="auto">Tự động</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications">
+                                <label class="form-check-label" for="emailNotifications">
+                                    Nhận thông báo qua email
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="pushNotifications">
+                                <label class="form-check-label" for="pushNotifications">
+                                    Nhận thông báo đẩy
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Picture and Stats -->
+        <div class="col-md-4">
+            <!-- Profile Picture -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-image me-2"></i>Ảnh đại diện
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <img id="profilePicture" src="/images/default-avatar.png" 
+                             alt="Profile Picture" class="rounded-circle" width="120" height="120">
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm" onclick="changeProfilePicture()">
+                        <i class="fas fa-camera me-2"></i>Thay đổi ảnh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Account Statistics -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Thống kê tài khoản
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-primary" id="totalTransactions">0</h4>
+                            <small class="text-muted">Giao dịch</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success" id="accountAge">0</h4>
+                            <small class="text-muted">Ngày tham gia</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-info" id="totalCategories">0</h4>
+                            <small class="text-muted">Danh mục</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-warning" id="aiSuggestions">0</h4>
+                            <small class="text-muted">Gợi ý AI</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Bảo mật
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-warning" onclick="changePassword()">
+                            <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                        </button>
+                        <button class="btn btn-outline-info" onclick="viewLoginHistory()">
+                            <i class="fas fa-history me-2"></i>Lịch sử đăng nhập
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="deleteAccount()">
+                            <i class="fas fa-trash me-2"></i>Xóa tài khoản
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Đổi mật khẩu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu hiện tại</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu mới</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Xác nhận mật khẩu mới</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="savePassword()">Đổi mật khẩu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let profileData = {};
+
+        $(document).ready(function () {
+            loadProfileData();
+        });
+
+        async function loadProfileData() {
+            try {
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    profileData = await response.json();
+                    updateProfileUI();
+                } else if (response.status === 401) {
+                    window.location.href = '/Login';
+                } else {
+                    alert('Có lỗi xảy ra khi tải thông tin hồ sơ');
+                }
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+                alert('Có lỗi xảy ra khi tải thông tin hồ sơ');
+            }
+        }
+
+        function updateProfileUI() {
+            // Update profile form
+            document.getElementById('username').value = profileData.username || '';
+            document.getElementById('email').value = profileData.email || '';
+            document.getElementById('fullName').value = profileData.fullName || '';
+            document.getElementById('phoneNumber').value = profileData.phoneNumber || '';
+            document.getElementById('dateOfBirth').value = profileData.dateOfBirth || '';
+            document.getElementById('gender').value = profileData.gender || '';
+            document.getElementById('address').value = profileData.address || '';
+
+            // Update settings form
+            document.getElementById('language').value = profileData.language || 'vi';
+            document.getElementById('defaultCurrency').value = profileData.defaultCurrency || 'VND';
+            document.getElementById('timezone').value = profileData.timezone || 'Asia/Ho_Chi_Minh';
+            document.getElementById('theme').value = profileData.theme || 'light';
+            document.getElementById('emailNotifications').checked = profileData.emailNotifications || false;
+            document.getElementById('pushNotifications').checked = profileData.pushNotifications || false;
+
+            // Update profile picture
+            if (profileData.pictureUrl) {
+                document.getElementById('profilePicture').src = profileData.pictureUrl;
+            }
+
+            // Update statistics
+            document.getElementById('totalTransactions').textContent = profileData.totalTransactions || 0;
+            document.getElementById('accountAge').textContent = profileData.accountAge || 0;
+            document.getElementById('totalCategories').textContent = profileData.totalCategories || 0;
+            document.getElementById('aiSuggestions').textContent = profileData.aiSuggestions || 0;
+        }
+
+        async function saveProfile() {
+            const profileForm = document.getElementById('profileForm');
+            const settingsForm = document.getElementById('settingsForm');
+
+            if (!profileForm.checkValidity() || !settingsForm.checkValidity()) {
+                profileForm.reportValidity();
+                settingsForm.reportValidity();
+                return;
+            }
+
+            const profileData = {
+                fullName: document.getElementById('fullName').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                gender: document.getElementById('gender').value,
+                address: document.getElementById('address').value,
+                language: document.getElementById('language').value,
+                defaultCurrency: document.getElementById('defaultCurrency').value,
+                timezone: document.getElementById('timezone').value,
+                theme: document.getElementById('theme').value,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                pushNotifications: document.getElementById('pushNotifications').checked
+            };
+
+            try {
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                if (response.ok) {
+                    alert('Cập nhật hồ sơ thành công');
+                    loadProfileData();
+                } else {
+                    alert('Có lỗi xảy ra khi cập nhật hồ sơ');
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('Có lỗi xảy ra khi cập nhật hồ sơ');
+            }
+        }
+
+        function changeProfilePicture() {
+            // TODO: Implement profile picture upload
+            alert('Chức năng thay đổi ảnh đại diện sẽ được cập nhật');
+        }
+
+        function changePassword() {
+            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            modal.show();
+        }
+
+        async function savePassword() {
+            const form = document.getElementById('changePasswordForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('Mật khẩu xác nhận không khớp');
+                return;
+            }
+
+            const passwordData = {
+                currentPassword: document.getElementById('currentPassword').value,
+                newPassword: newPassword
+            };
+
+            try {
+                const response = await fetch('/api/profile/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(passwordData)
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                    modal.hide();
+                    form.reset();
+                    alert('Đổi mật khẩu thành công');
+                } else {
+                    alert('Có lỗi xảy ra khi đổi mật khẩu');
+                }
+            } catch (error) {
+                console.error('Error changing password:', error);
+                alert('Có lỗi xảy ra khi đổi mật khẩu');
+            }
+        }
+
+        function viewLoginHistory() {
+            // TODO: Implement login history view
+            alert('Chức năng xem lịch sử đăng nhập sẽ được cập nhật');
+        }
+
+        function deleteAccount() {
+            if (confirm('Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác.')) {
+                // TODO: Implement account deletion
+                alert('Chức năng xóa tài khoản sẽ được cập nhật');
+            }
+        }
+
+        function refreshProfile() {
+            loadProfileData();
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken') || '';
+        }
+    </script>
+}

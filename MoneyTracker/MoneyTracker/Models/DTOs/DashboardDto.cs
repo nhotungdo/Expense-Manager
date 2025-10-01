@@ -27,7 +27,7 @@ namespace MoneyTracker.Models.DTOs
     public class RecentTransaction
     {
         public long Id { get; set; }
-        public string Type { get; set; } = string.Empty; // "Income" or "Expense"
+        public string Type { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public string Category { get; set; } = string.Empty;
         public DateTime Date { get; set; }

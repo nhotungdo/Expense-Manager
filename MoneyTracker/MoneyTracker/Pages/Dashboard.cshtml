@@ -1,219 +1,435 @@
 @page
 @model MoneyTracker.Pages.DashboardModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Dashboard - MoneyTracker";
 }
 
-<style>
-    :root {
-        --primary: #2563eb;
-        --success: #16a34a;
-        --danger: #dc2626;
-        --warning: #f59e0b;
-        --muted: #6b7280;
-    }
+@section Styles {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        .dashboard-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .financial-overview-card {
+            color: white;
+        }
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .income-card {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        }
+        .expense-card {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        .ratio-card {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .transaction-type-badge {
+            font-size: 0.9rem;
+            padding: 0.4em 0.75em;
+        }
+        .transaction-amount {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .ai-suggestion {
+            background: #fff3cd;
+            border-left: 4px solid #ffeeba;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .quick-action-btn {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .quick-action-btn:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+    </style>
+}
 
-    .page-title {
-        font-weight: 700;
-        letter-spacing: 0.2px;
-    }
-
-    .stat-card {
-        border: 0;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, .08);
-    }
-
-    .stat-icon {
-        width: 44px;
-        height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        color: #fff;
-    }
-
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
-    }
-
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #34d399 0%, #16a34a 100%);
-    }
-
-    .bg-gradient-info {
-        background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
-    }
-
-    .bg-gradient-warning {
-        background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
-    }
-
-    .stat-label {
-        font-size: .85rem;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: .8px;
-    }
-
-    .stat-value {
-        font-size: 1.4rem;
-        font-weight: 700;
-    }
-
-    .card-modern {
-        border: 0;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, .06);
-    }
-
-    .card-modern .card-header {
-        border: 0;
-        background: #fff;
-        padding: 1rem 1.25rem;
-        font-weight: 700;
-    }
-
-    .chart-container {
-        position: relative;
-        height: 320px;
-    }
-
-    .list-transaction {
-        gap: 12px;
-    }
-
-    .list-transaction .tx-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .tx-income {
-        background: rgba(22, 163, 74, .1);
-        color: #16a34a;
-    }
-
-    .tx-expense {
-        background: rgba(220, 38, 38, .1);
-        color: #dc2626;
-    }
-
-
-    }
-</style>
-
-<div class="container-fluid">
-    <div class="row align-items-center mb-3">
-        <div class="col-12 d-flex justify-content-between align-items-center">
-            <h1 class="page-title h3 mb-0">Dashboard</h1>
-            <div class="d-none d-md-flex gap-2">
-                <a class="btn btn-outline-primary btn-sm" href="/Expenses"><i class="fas fa-minus-circle me-1"></i> Thêm
-                    Chi tiêu</a>
-                <a class="btn btn-primary btn-sm" href="/Incomes"><i class="fas fa-plus-circle me-1"></i> Thêm Thu
-                    nhập</a>
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 text-gradient">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">Tổng quan tài chính cá nhân của bạn</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt me-1"></i> Làm mới
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="showAddTransactionModal()">
+                        <i class="fas fa-plus me-1"></i> Thêm giao dịch
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card p-3 h-100">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Tổng Thu Nhập</div>
-                        <div class="stat-value" id="totalIncome">0 VND</div>
+    <!-- Financial Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card balance-card financial-overview-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white-50 mb-2">
+                                <i class="fas fa-wallet me-1"></i>Số dư hiện tại
+                            </h6>
+                            <h3 class="mb-0 fw-bold" id="currentBalance">0 ₫</h3>
+                            <small class="text-white-50">Tổng tài sản</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                                <i class="fas fa-wallet fa-2x text-white"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-icon bg-gradient-primary"><i class="fas fa-dollar-sign"></i></div>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card p-3 h-100">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Tổng Chi Tiêu</div>
-                        <div class="stat-value" id="totalExpenses">0 VND</div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card income-card financial-overview-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white-50 mb-2">
+                                <i class="fas fa-arrow-up me-1"></i>Thu nhập tháng này
+                            </h6>
+                            <h3 class="mb-0 fw-bold" id="monthlyIncome">0 ₫</h3>
+                            <small class="text-white-50">Tổng thu nhập</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                                <i class="fas fa-arrow-up fa-2x text-white"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-icon bg-gradient-warning"><i class="fas fa-credit-card"></i></div>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card p-3 h-100">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Tài Sản Ròng</div>
-                        <div class="stat-value" id="netWorth">0 VND</div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card expense-card financial-overview-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white-50 mb-2">
+                                <i class="fas fa-arrow-down me-1"></i>Chi tiêu tháng này
+                            </h6>
+                            <h3 class="mb-0 fw-bold" id="monthlyExpenses">0 ₫</h3>
+                            <small class="text-white-50">Tổng chi tiêu</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                                <i class="fas fa-arrow-down fa-2x text-white"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-icon bg-gradient-info"><i class="fas fa-wallet"></i></div>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card p-3 h-100">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Tiết Kiệm Tháng</div>
-                        <div class="stat-value" id="monthlySavings">0 VND</div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card ratio-card financial-overview-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white-50 mb-2">
+                                <i class="fas fa-percentage me-1"></i>Tỷ lệ chi tiêu
+                            </h6>
+                            <h3 class="mb-0 fw-bold" id="expenseRatio">0%</h3>
+                            <small class="text-white-50">So với thu nhập</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                                <i class="fas fa-percentage fa-2x text-white"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-icon bg-gradient-success"><i class="fas fa-piggy-bank"></i></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Charts Row -->
-    <div class="row">
-        <!-- Expenses by Category Chart -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card card-modern mb-4">
-                <div class="card-header">Chi Tiêu Theo Danh Mục</div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="expensesChart"></canvas>
+    <div class="row mb-4">
+        <!-- Expenses by Category Pie Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-card shadow-soft">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="fas fa-chart-pie me-2 text-primary"></i>Chi tiêu theo danh mục
+                        </h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="exportChart('pie')">Xuất biểu đồ</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="refreshChart('pie')">Làm mới</a></li>
+                            </ul>
+                        </div>
                     </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="chart-container">
+                        <canvas id="expensesPieChart"></canvas>
+                    </div>
+                    <div id="pieChartLegend" class="mt-3 text-center"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Transactions -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card card-modern mb-4">
-                <div class="card-header">Giao Dịch Gần Đây</div>
-                <div class="card-body">
-                    <div id="recentTransactions"></div>
+        <!-- Monthly Trends Line Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-card shadow-soft">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="fas fa-chart-line me-2 text-success"></i>Xu hướng thu chi 6 tháng
+                        </h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="exportChart('line')">Xuất biểu đồ</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="refreshChart('line')">Làm mới</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="chart-container">
+                        <canvas id="monthlyTrendsChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- AI Suggestions -->
+    <!-- Recent Transactions and AI Suggestions -->
+    <div class="row mb-4">
+        <!-- Recent Transactions -->
+        <div class="col-lg-8 mb-4">
+            <div class="card dashboard-card shadow-soft">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="fas fa-history me-2 text-info"></i>Giao dịch gần nhất
+                        </h5>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadRecentTransactions()" title="Làm mới">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <a href="/Expenses" class="btn btn-sm btn-primary">
+                                <i class="fas fa-external-link-alt me-1"></i>Xem tất cả
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 py-3 px-4">
+                                        <i class="fas fa-tag me-1"></i>Loại
+                                    </th>
+                                    <th class="border-0 py-3 px-4">
+                                        <i class="fas fa-money-bill me-1"></i>Số tiền
+                                    </th>
+                                    <th class="border-0 py-3 px-4">
+                                        <i class="fas fa-folder me-1"></i>Danh mục
+                                    </th>
+                                    <th class="border-0 py-3 px-4">
+                                        <i class="fas fa-calendar me-1"></i>Ngày
+                                    </th>
+                                    <th class="border-0 py-3 px-4">
+                                        <i class="fas fa-sticky-note me-1"></i>Ghi chú
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTransactionsTable">
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Suggestions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card dashboard-card shadow-soft">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="fas fa-robot me-2 text-warning"></i>Gợi ý AI
+                        </h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="generateAISuggestion()" title="Tạo gợi ý mới">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div id="aiSuggestionsList">
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-spinner fa-spin me-2"></i>Đang tải gợi ý...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
     <div class="row">
         <div class="col-12">
-            <div class="card card-modern mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Gợi Ý AI</span>
-                    <button class="btn btn-primary btn-sm" onclick="generateAiSuggestion()"><i
-                            class="fas fa-magic me-1"></i> Tạo Gợi Ý Mới</button>
+            <div class="card dashboard-card shadow-soft">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 text-dark">
+                        <i class="fas fa-bolt me-2 text-primary"></i>Thao tác nhanh
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <div id="aiSuggestions"></div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <button class="btn quick-action-btn w-100 h-100 border-danger text-danger" onclick="showAddExpenseModal()">
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                    <i class="fas fa-minus-circle fa-3x mb-3"></i>
+                                    <h6 class="mb-2 fw-bold">Thêm chi tiêu</h6>
+                                    <small class="text-muted">Ghi chép khoản chi</small>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <button class="btn quick-action-btn w-100 h-100 border-success text-success" onclick="showAddIncomeModal()">
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                    <i class="fas fa-plus-circle fa-3x mb-3"></i>
+                                    <h6 class="mb-2 fw-bold">Thêm thu nhập</h6>
+                                    <small class="text-muted">Ghi chép khoản thu</small>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <a href="/Categories" class="btn quick-action-btn w-100 h-100 border-primary text-primary text-decoration-none" onclick="return true;">
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                    <i class="fas fa-tags fa-3x mb-3"></i>
+                                    <h6 class="mb-2 fw-bold">Quản lý danh mục</h6>
+                                    <small class="text-muted">Tùy chỉnh phân loại</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <a href="/Profile" class="btn quick-action-btn w-100 h-100 border-secondary text-secondary text-decoration-none" onclick="return true;">
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                    <i class="fas fa-user-cog fa-3x mb-3"></i>
+                                    <h6 class="mb-2 fw-bold">Cài đặt tài khoản</h6>
+                                    <small class="text-muted">Thông tin cá nhân</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Transaction Modal -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm giao dịch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="transactionTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="expense-tab" data-bs-toggle="tab" data-bs-target="#expense" type="button" role="tab">
+                            <i class="fas fa-minus-circle text-danger me-2"></i>Chi tiêu
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="income-tab" data-bs-toggle="tab" data-bs-target="#income" type="button" role="tab">
+                            <i class="fas fa-plus-circle text-success me-2"></i>Thu nhập
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="transactionTabContent">
+                    <div class="tab-pane fade show active" id="expense" role="tabpanel">
+                        <form id="addExpenseForm">
+                            <div class="mb-3">
+                                <label class="form-label">Số tiền</label>
+                                <input type="number" class="form-control" id="expenseAmount" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Danh mục</label>
+                                <select class="form-control" id="expenseCategory" required>
+                                    <option value="">Chọn danh mục</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ngày</label>
+                                <input type="date" class="form-control" id="expenseDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ghi chú</label>
+                                <textarea class="form-control" id="expenseNote" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="income" role="tabpanel">
+                        <form id="addIncomeForm">
+                            <div class="mb-3">
+                                <label class="form-label">Số tiền</label>
+                                <input type="number" class="form-control" id="incomeAmount" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Danh mục</label>
+                                <select class="form-control" id="incomeCategory" required>
+                                    <option value="">Chọn danh mục</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ngày</label>
+                                <input type="date" class="form-control" id="incomeDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ghi chú</label>
+                                <textarea class="form-control" id="incomeNote" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveTransaction()">Lưu</button>
             </div>
         </div>
     </div>
@@ -222,11 +438,10 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let expensesChart;
+        let dashboardData = {};
+        let expensesPieChart = null;
+        let monthlyTrendsChart = null;
 
-        $(document).ready(function () {
-            loadDashboardData();
-        });
 
         async function loadDashboardData() {
             try {
@@ -237,43 +452,52 @@
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    updateSummaryCards(data);
-                    updateExpensesChart(data.expensesByCategory);
-                    updateRecentTransactions(data.recentTransactions);
-                    updateAiSuggestions(data.aiSuggestions);
+                    dashboardData = await response.json();
+                    updateDashboardUI();
+                    createCharts();
+                    loadRecentTransactions();
+                    loadAISuggestions();
+                } else if (response.status === 401) {
+                    window.location.href = '/Login';
+                } else {
+                    alert('Có lỗi xảy ra khi tải dữ liệu dashboard');
                 }
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
+                alert('Có lỗi xảy ra khi tải dữ liệu dashboard');
             }
         }
 
-        function updateSummaryCards(data) {
-            document.getElementById('totalIncome').textContent = formatCurrency(data.totalIncome);
-            document.getElementById('totalExpenses').textContent = formatCurrency(data.totalExpenses);
-            document.getElementById('netWorth').textContent = formatCurrency(data.netWorth);
-            document.getElementById('monthlySavings').textContent = formatCurrency(data.monthlySavings);
+        function updateDashboardUI() {
+            // Update financial overview cards
+            document.getElementById('currentBalance').textContent = formatCurrency(dashboardData.netWorth || 0);
+            document.getElementById('monthlyIncome').textContent = formatCurrency(dashboardData.monthlyIncome || 0);
+            document.getElementById('monthlyExpenses').textContent = formatCurrency(dashboardData.monthlyExpenses || 0);
+            
+            const expenseRatio = dashboardData.monthlyIncome > 0 
+                ? ((dashboardData.monthlyExpenses / dashboardData.monthlyIncome) * 100).toFixed(1)
+                : 0;
+            document.getElementById('expenseRatio').textContent = expenseRatio + '%';
         }
 
-        function updateExpensesChart(expensesByCategory) {
-            const ctx = document.getElementById('expensesChart').getContext('2d');
-
-            if (expensesChart) {
-                expensesChart.destroy();
+        function createCharts() {
+            // Expenses Pie Chart
+            const expensesCtx = document.getElementById('expensesPieChart').getContext('2d');
+            if (expensesPieChart) {
+                expensesPieChart.destroy();
             }
-
-            const labels = Object.keys(expensesByCategory);
-            const data = Object.values(expensesByCategory);
-            const colors = generateColors(labels.length);
-
-            expensesChart = new Chart(ctx, {
-                type: 'doughnut',
+            
+            const expensesData = dashboardData.expensesByCategory || [];
+            expensesPieChart = new Chart(expensesCtx, {
+                type: 'pie',
                 data: {
-                    labels: labels,
+                    labels: expensesData.map(item => item.category),
                     datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderWidth: 2
+                        data: expensesData.map(item => item.amount),
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+                        ]
                     }]
                 },
                 options: {
@@ -286,71 +510,231 @@
                     }
                 }
             });
+
+            // Monthly Trends Line Chart
+            const trendsCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
+            if (monthlyTrendsChart) {
+                monthlyTrendsChart.destroy();
+            }
+            
+            const trendsData = dashboardData.monthlyTrends || [];
+            monthlyTrendsChart = new Chart(trendsCtx, {
+                type: 'line',
+                data: {
+                    labels: trendsData.map(item => item.month),
+                    datasets: [{
+                        label: 'Thu nhập',
+                        data: trendsData.map(item => item.income),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Chi tiêu',
+                        data: trendsData.map(item => item.expenses),
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         }
 
-        function updateRecentTransactions(transactions) {
-            const container = document.getElementById('recentTransactions');
-            container.innerHTML = '';
+        async function loadRecentTransactions() {
+            const transactions = dashboardData.recentTransactions || [];
+            const tbody = document.getElementById('recentTransactionsTable');
+            tbody.innerHTML = '';
 
             if (transactions.length === 0) {
-                container.innerHTML = '<p class="text-muted">Không có giao dịch gần đây</p>';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-3 d-block"></i>
+                            <div>Chưa có giao dịch nào</div>
+                            <small>Hãy thêm giao dịch đầu tiên của bạn</small>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
             transactions.forEach(transaction => {
-                const transactionDiv = document.createElement('div');
-                transactionDiv.className = 'd-flex align-items-center mb-3';
-
-                const iconClass = transaction.type === 'Income' ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
-                const amountClass = transaction.type === 'Income' ? 'text-success' : 'text-danger';
-
-                transactionDiv.innerHTML = `
-                                <div class="mr-3">
-                                    <i class="fas ${iconClass}"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        ${transaction.category}
-                                    </div>
-                                    <div class="text-xs text-gray-600">
-                                        ${formatDate(transaction.date)}
-                                    </div>
-                                </div>
-                                <div class="text-xs font-weight-bold ${amountClass}">
-                                    ${formatCurrency(transaction.amount)}
-                                </div>
-                            `;
-
-                container.appendChild(transactionDiv);
+                const row = document.createElement('tr');
+                row.className = 'transaction-row';
+                row.innerHTML = `
+                    <td class="py-3 px-4">
+                        <span class="badge transaction-type-badge bg-${transaction.type === 'Income' ? 'success' : 'danger'}">
+                            <i class="fas fa-${transaction.type === 'Income' ? 'arrow-up' : 'arrow-down'} me-1"></i>
+                            ${transaction.type === 'Income' ? 'Thu nhập' : 'Chi tiêu'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="transaction-amount ${transaction.type === 'Income' ? 'text-success' : 'text-danger'}">
+                            ${transaction.type === 'Income' ? '+' : '-'}${formatCurrency(transaction.amount)}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-folder me-1"></i>${transaction.category}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <small class="text-muted">${formatDate(transaction.date)}</small>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="${transaction.note || ''}">
+                            ${transaction.note || '-'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
-        function updateAiSuggestions(suggestions) {
-            const container = document.getElementById('aiSuggestions');
+        async function loadAISuggestions() {
+            const suggestions = dashboardData.aiSuggestions || [];
+            const container = document.getElementById('aiSuggestionsList');
             container.innerHTML = '';
 
             if (suggestions.length === 0) {
-                container.innerHTML = '<p class="text-muted">Không có gợi ý nào</p>';
+                container.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-robot fa-3x mb-3 text-warning"></i>
+                        <div class="mb-2">Chưa có gợi ý nào</div>
+                        <small>Nhấn nút <i class="fas fa-magic"></i> để tạo gợi ý mới</small>
+                    </div>
+                `;
                 return;
             }
 
-            suggestions.forEach(suggestion => {
+            suggestions.forEach((suggestion, index) => {
                 const suggestionDiv = document.createElement('div');
-                suggestionDiv.className = 'alert alert-info';
+                suggestionDiv.className = 'ai-suggestion mb-3';
                 suggestionDiv.innerHTML = `
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <i class="fas fa-lightbulb mr-2"></i>
-                                        ${suggestion.suggestion}
-                                    </div>
-                                    <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
-                                </div>
-                            `;
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-warning bg-opacity-20 rounded-circle p-2">
+                                <i class="fas fa-lightbulb text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-2 small">${suggestion.suggestion}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>${formatDate(suggestion.createdAt)}
+                            </small>
+                        </div>
+                    </div>
+                `;
                 container.appendChild(suggestionDiv);
             });
         }
 
-        async function generateAiSuggestion() {
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const categories = await response.json();
+                    const expenseSelect = document.getElementById('expenseCategory');
+                    const incomeSelect = document.getElementById('incomeCategory');
+                    
+                    expenseSelect.innerHTML = '<option value="">Chọn danh mục</option>';
+                    incomeSelect.innerHTML = '<option value="">Chọn danh mục</option>';
+                    
+                    categories.forEach(category => {
+                        const option1 = new Option(category.name, category.id);
+                        const option2 = new Option(category.name, category.id);
+                        expenseSelect.add(option1);
+                        incomeSelect.add(option2);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseDate').value = today;
+            document.getElementById('incomeDate').value = today;
+        }
+
+        function showAddTransactionModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addTransactionModal'));
+            modal.show();
+        }
+
+        function showAddExpenseModal() {
+            showAddTransactionModal();
+            document.getElementById('expense-tab').click();
+        }
+
+        function showAddIncomeModal() {
+            showAddTransactionModal();
+            document.getElementById('income-tab').click();
+        }
+
+        async function saveTransaction() {
+            const activeTab = document.querySelector('#transactionTabs .nav-link.active');
+            const isExpense = activeTab.id === 'expense-tab';
+            
+            const form = isExpense ? document.getElementById('addExpenseForm') : document.getElementById('addIncomeForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const transactionData = {
+                amount: parseFloat(isExpense ? document.getElementById('expenseAmount').value : document.getElementById('incomeAmount').value),
+                categoryId: parseInt(isExpense ? document.getElementById('expenseCategory').value : document.getElementById('incomeCategory').value),
+                note: isExpense ? document.getElementById('expenseNote').value : document.getElementById('incomeNote').value
+            };
+
+            if (isExpense) {
+                transactionData.expenseDate = document.getElementById('expenseDate').value;
+            } else {
+                transactionData.incomeDate = document.getElementById('incomeDate').value;
+            }
+
+            try {
+                const endpoint = isExpense ? '/api/expenses' : '/api/incomes';
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(transactionData)
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addTransactionModal'));
+                    modal.hide();
+                    form.reset();
+                    setDefaultDates();
+                    loadDashboardData();
+                } else {
+                    alert('Có lỗi xảy ra khi lưu giao dịch');
+                }
+            } catch (error) {
+                console.error('Error saving transaction:', error);
+                alert('Có lỗi xảy ra khi lưu giao dịch');
+            }
+        }
+
+        async function generateAISuggestion() {
             try {
                 const response = await fetch('/api/dashboard/generate-ai-suggestion', {
                     method: 'POST',
@@ -360,11 +744,18 @@
                 });
 
                 if (response.ok) {
-                    loadDashboardData(); // Reload to show new suggestion
+                    loadDashboardData();
+                } else {
+                    alert('Có lỗi xảy ra khi tạo gợi ý AI');
                 }
             } catch (error) {
                 console.error('Error generating AI suggestion:', error);
+                alert('Có lỗi xảy ra khi tạo gợi ý AI');
             }
+        }
+
+        function refreshDashboard() {
+            loadDashboardData();
         }
 
         function formatCurrency(amount) {
@@ -375,20 +766,68 @@
         }
 
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('vi-VN');
-        }
-
-        function generateColors(count) {
-            const colors = [
-                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
-            ];
-            return colors.slice(0, count);
+            return new Date(dateString).toLocaleDateString('vi-VN');
         }
 
         function getToken() {
-            return localStorage.getItem('authToken');
+            return localStorage.getItem('authToken') || '';
         }
+
+        function exportChart(chartType) {
+            // TODO: Implement chart export functionality
+            alert(`Chức năng xuất biểu đồ ${chartType} sẽ được cập nhật`);
+        }
+
+        function refreshChart(chartType) {
+            if (chartType === 'pie') {
+                if (expensesPieChart) {
+                    expensesPieChart.destroy();
+                }
+                createCharts();
+            } else if (chartType === 'line') {
+                if (monthlyTrendsChart) {
+                    monthlyTrendsChart.destroy();
+                }
+                createCharts();
+            }
+        }
+
+        // Add loading animation
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <div class="mt-2 text-muted">Đang tải dữ liệu...</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Add fade-in animation to cards
+        function animateCards() {
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        }
+
+        // Initialize dashboard with animation
+        $(document).ready(function () {
+            loadDashboardData().then(() => {
+                animateCards();
+            });
+            loadCategories();
+            setDefaultDates();
+        });
     </script>
 }

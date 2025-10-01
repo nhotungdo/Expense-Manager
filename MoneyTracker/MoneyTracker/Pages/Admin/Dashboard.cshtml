@@ -1,0 +1,751 @@
+@page
+@model MoneyTracker.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard - MoneyTracker";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .btn-group .btn {
+            margin-right: 5px;
+        }
+        .modal-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .modal-footer .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Admin Dashboard</h1>
+                    <p class="text-muted mb-0">Quản lý hệ thống và người dùng</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="refreshAdminDashboard()">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                    <button class="btn btn-success" onclick="exportSystemReport()">
+                        <i class="fas fa-download"></i> Xuất báo cáo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-white-50">Tổng người dùng</h6>
+                            <h3 class="mb-0" id="totalUsers">0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-white-50">User hoạt động</h6>
+                            <h3 class="mb-0" id="activeUsers">0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-check fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-white-50">User mới (7 ngày)</h6>
+                            <h3 class="mb-0" id="newUsers">0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-plus fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-white-50">Gợi ý AI</h6>
+                            <h3 class="mb-0" id="totalAISuggestions">0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-robot fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- User Registration Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Đăng ký người dùng theo tháng
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="userRegistrationChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Activity Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Hoạt động hệ thống
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="systemActivityChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Sections -->
+    <div class="row mb-4">
+        <!-- User Management -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users me-2"></i>Quản lý người dùng
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadUsers()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <a href="/Admin/Users" class="btn btn-sm btn-primary">Xem tất cả</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Tên</th>
+                                    <th>Email</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Suggestions Monitoring -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-robot me-2"></i>Gợi ý AI gần nhất
+                    </h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadAISuggestions()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="aiSuggestionsList">
+                        <!-- AI suggestions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Management -->
+    <div class="row mb-4">
+        <!-- Global Categories Management -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tags me-2"></i>Quản lý danh mục toàn cục
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadGlobalCategories()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="showAddCategoryModal()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tên danh mục</th>
+                                    <th>Loại</th>
+                                    <th>Mô tả</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="globalCategoriesTable">
+                                <!-- Global categories will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Logs -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>Nhật ký hệ thống
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadSystemLogs()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="downloadLogs()">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Loại</th>
+                                    <th>Mô tả</th>
+                                </tr>
+                            </thead>
+                            <tbody id="systemLogsTable">
+                                <!-- System logs will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>Thao tác quản trị
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="/Admin/Users" class="btn btn-outline-primary w-100 h-100 text-decoration-none">
+                                <i class="fas fa-users fa-2x mb-2"></i><br>
+                                Quản lý người dùng
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-success w-100 h-100" onclick="showAddCategoryModal()">
+                                <i class="fas fa-tags fa-2x mb-2"></i><br>
+                                Thêm danh mục
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-info w-100 h-100" onclick="loadSystemLogs()">
+                                <i class="fas fa-clipboard-list fa-2x mb-2"></i><br>
+                                Xem nhật ký
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-warning w-100 h-100" onclick="exportSystemReport()">
+                                <i class="fas fa-file-export fa-2x mb-2"></i><br>
+                                Xuất báo cáo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm danh mục toàn cục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="mb-3">
+                        <label class="form-label">Tên danh mục</label>
+                        <input type="text" class="form-control" id="categoryName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Loại</label>
+                        <select class="form-control" id="categoryType" required>
+                            <option value="">Chọn loại</option>
+                            <option value="Expense">Chi tiêu</option>
+                            <option value="Income">Thu nhập</option>
+                            <option value="Both">Cả hai</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="categoryDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveCategory()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let adminDashboardData = {};
+        let userRegistrationChart = null;
+        let systemActivityChart = null;
+
+        $(document).ready(function () {
+            loadAdminDashboardData();
+        });
+
+        async function loadAdminDashboardData() {
+            try {
+                const response = await fetch('/api/admin/dashboard', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    adminDashboardData = await response.json();
+                    updateAdminDashboardUI();
+                    createAdminCharts();
+                    loadUsers();
+                    loadAISuggestions();
+                    loadGlobalCategories();
+                    loadSystemLogs();
+                } else if (response.status === 401) {
+                    window.location.href = '/Login';
+                } else if (response.status === 403) {
+                    alert('Bạn không có quyền truy cập chức năng này');
+                    window.location.href = '/Dashboard';
+                } else {
+                    alert('Có lỗi xảy ra khi tải dữ liệu admin dashboard');
+                }
+            } catch (error) {
+                console.error('Error loading admin dashboard data:', error);
+                alert('Có lỗi xảy ra khi tải dữ liệu admin dashboard');
+            }
+        }
+
+        function updateAdminDashboardUI() {
+            document.getElementById('totalUsers').textContent = adminDashboardData.totalUsers || 0;
+            document.getElementById('activeUsers').textContent = adminDashboardData.activeUsers || 0;
+            document.getElementById('newUsers').textContent = adminDashboardData.newUsers || 0;
+            document.getElementById('totalAISuggestions').textContent = adminDashboardData.totalAISuggestions || 0;
+        }
+
+        function createAdminCharts() {
+            // User Registration Chart
+            const registrationCtx = document.getElementById('userRegistrationChart').getContext('2d');
+            if (userRegistrationChart) {
+                userRegistrationChart.destroy();
+            }
+            
+            const registrationData = adminDashboardData.userRegistrationData || [];
+            userRegistrationChart = new Chart(registrationCtx, {
+                type: 'line',
+                data: {
+                    labels: registrationData.map(item => item.month),
+                    datasets: [{
+                        label: 'Đăng ký mới',
+                        data: registrationData.map(item => item.count),
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // System Activity Chart
+            const activityCtx = document.getElementById('systemActivityChart').getContext('2d');
+            if (systemActivityChart) {
+                systemActivityChart.destroy();
+            }
+            
+            const activityData = adminDashboardData.systemActivityData || [];
+            systemActivityChart = new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: activityData.map(item => item.type),
+                    datasets: [{
+                        label: 'Số lượng',
+                        data: activityData.map(item => item.count),
+                        backgroundColor: [
+                            '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users?limit=5', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const users = await response.json();
+                    displayUsers(users);
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function displayUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có người dùng nào</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <img src="${user.pictureUrl || '/images/default-avatar.png'}" 
+                             alt="Avatar" class="rounded-circle" width="32" height="32">
+                    </td>
+                    <td>
+                        <div>
+                            <strong>${user.fullName || user.username}</strong><br>
+                            <small class="text-muted">@@${user.username}</small>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span class="badge bg-${user.role === 'ADMIN' ? 'danger' : 'primary'}">
+                            ${user.role}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-${user.enabled ? 'success' : 'secondary'}">
+                            ${user.enabled ? 'Hoạt động' : 'Vô hiệu hóa'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(${user.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-${user.enabled ? 'warning' : 'success'}" 
+                                    onclick="toggleUserStatus(${user.id}, ${user.enabled})">
+                                <i class="fas fa-${user.enabled ? 'ban' : 'check'}"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function loadAISuggestions() {
+            try {
+                const response = await fetch('/api/admin/ai-suggestions?limit=5', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    displayAISuggestions(suggestions);
+                }
+            } catch (error) {
+                console.error('Error loading AI suggestions:', error);
+            }
+        }
+
+        function displayAISuggestions(suggestions) {
+            const container = document.getElementById('aiSuggestionsList');
+            container.innerHTML = '';
+
+            if (suggestions.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">Chưa có gợi ý AI nào</p>';
+                return;
+            }
+
+            suggestions.forEach(suggestion => {
+                const suggestionDiv = document.createElement('div');
+                suggestionDiv.className = 'alert alert-info mb-2';
+                suggestionDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <i class="fas fa-lightbulb me-2"></i>
+                            ${suggestion.suggestion}
+                        </div>
+                        <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
+                    </div>
+                `;
+                container.appendChild(suggestionDiv);
+            });
+        }
+
+        async function loadGlobalCategories() {
+            try {
+                const response = await fetch('/api/admin/categories', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const categories = await response.json();
+                    displayGlobalCategories(categories);
+                }
+            } catch (error) {
+                console.error('Error loading global categories:', error);
+            }
+        }
+
+        function displayGlobalCategories(categories) {
+            const tbody = document.getElementById('globalCategoriesTable');
+            tbody.innerHTML = '';
+
+            if (categories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Chưa có danh mục nào</td></tr>';
+                return;
+            }
+
+            categories.forEach(category => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${category.name}</td>
+                    <td>
+                        <span class="badge bg-${category.type === 'Income' ? 'success' : category.type === 'Expense' ? 'danger' : 'info'}">
+                            ${category.type}
+                        </span>
+                    </td>
+                    <td>${category.description || '-'}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${category.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function loadSystemLogs() {
+            try {
+                const response = await fetch('/api/admin/system-logs?limit=10', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const logs = await response.json();
+                    displaySystemLogs(logs);
+                }
+            } catch (error) {
+                console.error('Error loading system logs:', error);
+            }
+        }
+
+        function displaySystemLogs(logs) {
+            const tbody = document.getElementById('systemLogsTable');
+            tbody.innerHTML = '';
+
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Chưa có nhật ký nào</td></tr>';
+                return;
+            }
+
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDateTime(log.timestamp)}</td>
+                    <td>
+                        <span class="badge bg-${getLogTypeColor(log.type)}">
+                            ${log.type}
+                        </span>
+                    </td>
+                    <td>${log.description}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showAddCategoryModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+            modal.show();
+        }
+
+        async function saveCategory() {
+            const form = document.getElementById('addCategoryForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const categoryData = {
+                name: document.getElementById('categoryName').value,
+                type: document.getElementById('categoryType').value,
+                description: document.getElementById('categoryDescription').value
+            };
+
+            try {
+                const response = await fetch('/api/admin/categories', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(categoryData)
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
+                    modal.hide();
+                    form.reset();
+                    loadGlobalCategories();
+                } else {
+                    alert('Có lỗi xảy ra khi lưu danh mục');
+                }
+            } catch (error) {
+                console.error('Error saving category:', error);
+                alert('Có lỗi xảy ra khi lưu danh mục');
+            }
+        }
+
+        function refreshAdminDashboard() {
+            loadAdminDashboardData();
+        }
+
+        function exportSystemReport() {
+            // TODO: Implement export functionality
+            alert('Chức năng xuất báo cáo sẽ được cập nhật');
+        }
+
+        function downloadLogs() {
+            // TODO: Implement log download
+            alert('Chức năng tải nhật ký sẽ được cập nhật');
+        }
+
+        function getLogTypeColor(type) {
+            switch (type) {
+                case 'INFO': return 'info';
+                case 'WARNING': return 'warning';
+                case 'ERROR': return 'danger';
+                case 'SUCCESS': return 'success';
+                default: return 'secondary';
+            }
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('vi-VN');
+        }
+
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString('vi-VN');
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken') || '';
+        }
+    </script>
+}

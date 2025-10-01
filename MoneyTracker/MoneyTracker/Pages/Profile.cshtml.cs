@@ -6,18 +6,18 @@ using System.Security.Claims;
 namespace MoneyTracker.Pages
 {
     [Authorize]
-    public class DashboardModel : PageModel
+    public class ProfileModel : PageModel
     {
-        private readonly ILogger<DashboardModel> _logger;
+        private readonly ILogger<ProfileModel> _logger;
 
-        public DashboardModel(ILogger<DashboardModel> logger)
+        public ProfileModel(ILogger<ProfileModel> logger)
         {
             _logger = logger;
         }
 
         public void OnGet()
         {
-            // Dashboard page initialization
+            // Profile page initialization
         }
 
         public string GetCurrentUserId()

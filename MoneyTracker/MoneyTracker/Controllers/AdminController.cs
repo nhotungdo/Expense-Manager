@@ -8,7 +8,7 @@ using MoneyTracker.Models.DTOs;
 namespace MoneyTracker.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/admin")]
     [Authorize(Roles = "ADMIN")]
     public class AdminController : ControllerBase
     {
@@ -21,350 +21,398 @@ namespace MoneyTracker.Controllers
             _logger = logger;
         }
 
-        [HttpGet("users")]
-        public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto filter)
+        [HttpGet("dashboard")]
+        public async Task<IActionResult> GetAdminDashboardData()
         {
-            var query = _context.Users.AsQueryable();
-
-            // Apply filters
-            if (!string.IsNullOrEmpty(filter.SearchTerm))
+            try
             {
-                query = query.Where(u => u.Username.Contains(filter.SearchTerm) ||
-                                        u.Email.Contains(filter.SearchTerm) ||
-                                        (u.FullName != null && u.FullName.Contains(filter.SearchTerm)));
-            }
+                // Get total users
+                var totalUsers = await _context.Users.CountAsync();
 
-            if (!string.IsNullOrEmpty(filter.Role))
-            {
-                query = query.Where(u => u.Role == filter.Role.ToUpper());
-            }
+                // Get active users (enabled = true)
+                var activeUsers = await _context.Users.CountAsync(u => u.Enabled);
 
-            if (filter.Enabled.HasValue)
-            {
-                query = query.Where(u => u.Enabled == filter.Enabled.Value);
-            }
+                // Get new users in last 7 days
+                var sevenDaysAgo = DateTime.UtcNow.AddDays(-7);
+                var newUsers = await _context.Users.CountAsync(u => u.CreatedAt >= sevenDaysAgo);
 
-            if (filter.CreatedFrom.HasValue)
-            {
-                query = query.Where(u => u.CreatedAt >= filter.CreatedFrom.Value);
-            }
+                // Get total AI suggestions
+                var totalAISuggestions = await _context.AiSuggestions.CountAsync();
 
-            if (filter.CreatedTo.HasValue)
-            {
-                query = query.Where(u => u.CreatedAt <= filter.CreatedTo.Value);
-            }
+                // Get user registration data for last 6 months
+                var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
+                var userRegistrationData = await _context.Users
+                    .Where(u => u.CreatedAt.HasValue && u.CreatedAt >= sixMonthsAgo)
+                    .GroupBy(u => new { u.CreatedAt!.Value.Year, u.CreatedAt!.Value.Month })
+                    .Select(g => new
+                    {
+                        month = $"{g.Key.Year}-{g.Key.Month:D2}",
+                        count = g.Count()
+                    })
+                    .OrderBy(x => x.month)
+                    .ToListAsync();
 
-            var users = await query
-                .OrderByDescending(u => u.CreatedAt)
-                .Select(u => new UserDto
+                // Get system activity data
+                var systemActivityData = new[]
                 {
-                    Id = u.Id,
-                    Username = u.Username,
-                    Email = u.Email,
-                    FullName = u.FullName,
-                    PictureUrl = u.PictureUrl,
-                    Role = u.Role,
-                    Enabled = u.Enabled,
-                    LastLogin = u.LastLogin,
-                    CreatedAt = u.CreatedAt,
-                    UpdatedAt = u.UpdatedAt
-                })
-                .ToListAsync();
+                    new { type = "Tổng giao dịch", count = await _context.Expenses.CountAsync() + await _context.Incomes.CountAsync() },
+                    new { type = "Danh mục", count = await _context.Categories.CountAsync() },
+                    new { type = "Gợi ý AI", count = await _context.AiSuggestions.CountAsync() },
+                    new { type = "Email gửi", count = await _context.Emails.CountAsync() }
+                };
 
-            return Ok(users);
+                var dashboardData = new
+                {
+                    totalUsers,
+                    activeUsers,
+                    newUsers,
+                    totalAISuggestions,
+                    userRegistrationData,
+                    systemActivityData
+                };
+
+                return Ok(dashboardData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting admin dashboard data");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers([FromQuery] string? searchTerm = null,
+            [FromQuery] string? role = null,
+            [FromQuery] bool? enabled = null,
+            [FromQuery] DateTime? createdFrom = null,
+            [FromQuery] DateTime? createdTo = null,
+            [FromQuery] int limit = 50)
+        {
+            try
+            {
+                var query = _context.Users.AsQueryable();
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query = query.Where(u => u.Username.Contains(searchTerm) ||
+                                           u.Email.Contains(searchTerm) ||
+                                           (u.FullName != null && u.FullName.Contains(searchTerm)));
+                }
+
+                if (!string.IsNullOrEmpty(role))
+                {
+                    query = query.Where(u => u.Role == role);
+                }
+
+                if (enabled.HasValue)
+                {
+                    query = query.Where(u => u.Enabled == enabled.Value);
+                }
+
+                if (createdFrom.HasValue)
+                {
+                    query = query.Where(u => u.CreatedAt >= createdFrom.Value);
+                }
+
+                if (createdTo.HasValue)
+                {
+                    query = query.Where(u => u.CreatedAt <= createdTo.Value);
+                }
+
+                var users = await query
+                    .OrderByDescending(u => u.CreatedAt)
+                    .Take(limit)
+                    .Select(u => new UserDto
+                    {
+                        Id = u.Id,
+                        Username = u.Username,
+                        Email = u.Email,
+                        FullName = u.FullName,
+                        Role = u.Role,
+                        Enabled = u.Enabled,
+                        PictureUrl = u.PictureUrl,
+                        LastLogin = u.LastLogin,
+                        CreatedAt = u.CreatedAt
+                    })
+                    .ToListAsync();
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting users");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpGet("users/{id}")]
         public async Task<IActionResult> GetUser(long id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _context.Users
+                    .Where(u => u.Id == id)
+                    .Select(u => new UserDto
+                    {
+                        Id = u.Id,
+                        Username = u.Username,
+                        Email = u.Email,
+                        FullName = u.FullName,
+                        Role = u.Role,
+                        Enabled = u.Enabled,
+                        PictureUrl = u.PictureUrl,
+                        LastLogin = u.LastLogin,
+                        CreatedAt = u.CreatedAt
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                return Ok(user);
             }
-
-            var userDto = new UserDto
+            catch (Exception ex)
             {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FullName = user.FullName,
-                PictureUrl = user.PictureUrl,
-                Role = user.Role,
-                Enabled = user.Enabled,
-                LastLogin = user.LastLogin,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
-            };
-
-            return Ok(userDto);
+                _logger.LogError(ex, "Error getting user {UserId}", id);
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPut("users/{id}")]
-        public async Task<IActionResult> UpdateUser(long id, [FromBody] UpdateUserDto updateUserDto)
+        public async Task<IActionResult> UpdateUser(long id, [FromBody] UpdateUserDto userDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+                user.Username = userDto.Username;
+                user.FullName = userDto.FullName;
+                user.Role = userDto.Role;
+                user.Enabled = userDto.Enabled;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Updated user {UserId} by admin {AdminId}", id, GetCurrentUserId());
+
+                return Ok(new { message = "User updated successfully" });
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error updating user {UserId}", id);
+                return StatusCode(500, "Internal server error");
             }
-
-            user.Username = updateUserDto.Username;
-            user.FullName = updateUserDto.FullName;
-            user.PictureUrl = updateUserDto.PictureUrl;
-            user.Role = updateUserDto.Role.ToUpper();
-            user.Enabled = updateUserDto.Enabled;
-            user.UpdatedAt = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
-
-            var currentUserId = GetCurrentUserId();
-            _logger.LogInformation("Admin {AdminId} updated user {UserId}", currentUserId, user.Id);
-
-            return NoContent();
         }
 
         [HttpDelete("users/{id}")]
         public async Task<IActionResult> DeleteUser(long id)
         {
-            var currentUserId = GetCurrentUserId();
-            if (currentUserId == id)
+            try
             {
-                return BadRequest("Cannot delete your own account");
-            }
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+                // Check if user has transactions
+                var hasTransactions = await _context.Expenses.AnyAsync(e => e.UserId == id) ||
+                                    await _context.Incomes.AnyAsync(i => i.UserId == id);
+
+                if (hasTransactions)
+                {
+                    return BadRequest("Cannot delete user with existing transactions. Disable the user instead.");
+                }
+
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Deleted user {UserId} by admin {AdminId}", id, GetCurrentUserId());
+
+                return Ok(new { message = "User deleted successfully" });
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error deleting user {UserId}", id);
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            _logger.LogInformation("Admin {AdminId} deleted user {UserId}", currentUserId, user.Id);
-
-            return NoContent();
         }
 
-        [HttpGet("global-categories")]
+        [HttpGet("categories")]
         public async Task<IActionResult> GetGlobalCategories()
         {
-            var categories = await _context.Categories
-                .Where(c => c.UserId == null)
-                .OrderBy(c => c.Type)
-                .ThenBy(c => c.Name)
-                .Select(c => new CategoryDto
+            try
+            {
+                var categories = await _context.Categories
+                    .OrderBy(c => c.Name)
+                    .Select(c => new CategoryDto
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Type = c.Type,
+                        Description = c.Description,
+                        UserId = c.UserId ?? 0,
+                        IsGlobal = c.UserId == null,
+                        CreatedAt = c.CreatedAt ?? DateTime.UtcNow
+                    })
+                    .ToListAsync();
+
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting global categories");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("categories")]
+        public async Task<IActionResult> CreateGlobalCategory([FromBody] CreateCategoryDto categoryDto)
+        {
+            try
+            {
+                var category = new Category
                 {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Type = c.Type,
-                    UserId = 0,
-                    IsGlobal = true,
-                    CreatedAt = c.CreatedAt ?? DateTime.UtcNow
-                })
-                .ToListAsync();
+                    Name = categoryDto.Name,
+                    Type = categoryDto.Type,
+                    Description = categoryDto.Description,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-            return Ok(categories);
+                _context.Categories.Add(category);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Created global category {CategoryName} by admin {AdminId}",
+                    categoryDto.Name, GetCurrentUserId());
+
+                return Ok(new { message = "Category created successfully", categoryId = category.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating global category");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        [HttpPost("global-categories")]
-        public async Task<IActionResult> CreateGlobalCategory([FromBody] CreateCategoryDto createCategoryDto)
+        [HttpPut("categories/{id}")]
+        public async Task<IActionResult> UpdateGlobalCategory(long id, [FromBody] UpdateCategoryDto categoryDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var category = await _context.Categories.FindAsync(id);
+                if (category == null)
+                {
+                    return NotFound("Category not found");
+                }
+
+                category.Name = categoryDto.Name;
+                category.Type = categoryDto.Type;
+                category.Description = categoryDto.Description;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Updated global category {CategoryId} by admin {AdminId}",
+                    id, GetCurrentUserId());
+
+                return Ok(new { message = "Category updated successfully" });
             }
-
-            // Validate type
-            if (createCategoryDto.Type.ToUpper() != "EXPENSE" && createCategoryDto.Type.ToUpper() != "INCOME")
+            catch (Exception ex)
             {
-                return BadRequest("Type must be either 'EXPENSE' or 'INCOME'");
+                _logger.LogError(ex, "Error updating global category {CategoryId}", id);
+                return StatusCode(500, "Internal server error");
             }
-
-            // Check if global category with same name exists
-            var existingCategory = await _context.Categories
-                .FirstOrDefaultAsync(c => c.Name.ToLower() == createCategoryDto.Name.ToLower() &&
-                                         c.Type.ToUpper() == createCategoryDto.Type.ToUpper() &&
-                                         c.UserId == null);
-
-            if (existingCategory != null)
-            {
-                return BadRequest("Global category with this name already exists");
-            }
-
-            var category = new Category
-            {
-                Name = createCategoryDto.Name,
-                Type = createCategoryDto.Type.ToUpper(),
-                UserId = null, // Global category
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-
-            var currentUserId = GetCurrentUserId();
-            _logger.LogInformation("Admin {AdminId} created global category {CategoryId}", currentUserId, category.Id);
-
-            var categoryDto = new CategoryDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Type = category.Type,
-                UserId = 0,
-                IsGlobal = true,
-                CreatedAt = category.CreatedAt ?? DateTime.UtcNow
-            };
-
-            return CreatedAtAction(nameof(GetGlobalCategories), categoryDto);
         }
 
-        [HttpPut("global-categories/{id}")]
-        public async Task<IActionResult> UpdateGlobalCategory(long id, [FromBody] UpdateCategoryDto updateCategoryDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == null);
-
-            if (category == null)
-            {
-                return NotFound("Global category not found");
-            }
-
-            // Validate type
-            if (updateCategoryDto.Type.ToUpper() != "EXPENSE" && updateCategoryDto.Type.ToUpper() != "INCOME")
-            {
-                return BadRequest("Type must be either 'EXPENSE' or 'INCOME'");
-            }
-
-            category.Name = updateCategoryDto.Name;
-            category.Type = updateCategoryDto.Type.ToUpper();
-
-            await _context.SaveChangesAsync();
-
-            var currentUserId = GetCurrentUserId();
-            _logger.LogInformation("Admin {AdminId} updated global category {CategoryId}", currentUserId, category.Id);
-
-            return NoContent();
-        }
-
-        [HttpDelete("global-categories/{id}")]
+        [HttpDelete("categories/{id}")]
         public async Task<IActionResult> DeleteGlobalCategory(long id)
         {
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == null);
-
-            if (category == null)
+            try
             {
-                return NotFound("Global category not found");
+                var category = await _context.Categories.FindAsync(id);
+                if (category == null)
+                {
+                    return NotFound("Category not found");
+                }
+
+                // Check if category is being used
+                var isUsed = await _context.Expenses.AnyAsync(e => e.CategoryId == id) ||
+                           await _context.Incomes.AnyAsync(i => i.CategoryId == id);
+
+                if (isUsed)
+                {
+                    return BadRequest("Cannot delete category that is being used by transactions");
+                }
+
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Deleted global category {CategoryId} by admin {AdminId}",
+                    id, GetCurrentUserId());
+
+                return Ok(new { message = "Category deleted successfully" });
             }
-
-            // Check if category is being used
-            var hasExpenses = await _context.Expenses.AnyAsync(e => e.CategoryId == id);
-            var hasIncomes = await _context.Incomes.AnyAsync(i => i.CategoryId == id);
-
-            if (hasExpenses || hasIncomes)
+            catch (Exception ex)
             {
-                return BadRequest("Cannot delete global category that is being used");
+                _logger.LogError(ex, "Error deleting global category {CategoryId}", id);
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
-            var currentUserId = GetCurrentUserId();
-            _logger.LogInformation("Admin {AdminId} deleted global category {CategoryId}", currentUserId, category.Id);
-
-            return NoContent();
         }
 
         [HttpGet("ai-suggestions")]
-        public async Task<IActionResult> GetAiSuggestions([FromQuery] AiSuggestionFilterDto filter)
+        public async Task<IActionResult> GetAISuggestions([FromQuery] int limit = 10)
         {
-            var query = _context.AiSuggestions.Include(a => a.User).AsQueryable();
-
-            // Apply filters
-            if (filter.UserId.HasValue)
+            try
             {
-                query = query.Where(a => a.UserId == filter.UserId.Value);
-            }
+                var suggestions = await _context.AiSuggestions
+                    .Include(a => a.User)
+                    .OrderByDescending(a => a.CreatedAt)
+                    .Take(limit)
+                    .Select(a => new AiSuggestionDto
+                    {
+                        Id = a.Id,
+                        UserId = a.UserId,
+                        UserName = a.User.Username,
+                        Suggestion = a.Suggestion,
+                        CreatedAt = a.CreatedAt ?? DateTime.UtcNow
+                    })
+                    .ToListAsync();
 
-            if (filter.CreatedFrom.HasValue)
+                return Ok(suggestions);
+            }
+            catch (Exception ex)
             {
-                query = query.Where(a => a.CreatedAt >= filter.CreatedFrom.Value);
+                _logger.LogError(ex, "Error getting AI suggestions");
+                return StatusCode(500, "Internal server error");
             }
-
-            if (filter.CreatedTo.HasValue)
-            {
-                query = query.Where(a => a.CreatedAt <= filter.CreatedTo.Value);
-            }
-
-            var suggestions = await query
-                .OrderByDescending(a => a.CreatedAt)
-                .Select(a => new AiSuggestionDto
-                {
-                    Id = a.Id,
-                    Suggestion = a.Suggestion,
-                    UserId = a.UserId,
-                    CreatedAt = a.CreatedAt ?? DateTime.UtcNow
-                })
-                .ToListAsync();
-
-            return Ok(suggestions);
         }
 
-        [HttpGet("statistics")]
-        public async Task<IActionResult> GetSystemStatistics()
+        [HttpGet("system-logs")]
+        public IActionResult GetSystemLogs([FromQuery] int limit = 50)
         {
-            var totalUsers = await _context.Users.CountAsync();
-            var activeUsers = await _context.Users.CountAsync(u => u.Enabled);
-            var totalExpenses = await _context.Expenses.CountAsync();
-            var totalIncomes = await _context.Incomes.CountAsync();
-            var totalCategories = await _context.Categories.CountAsync();
-            var globalCategories = await _context.Categories.CountAsync(c => c.UserId == null);
-
-            var stats = new
+            try
             {
-                TotalUsers = totalUsers,
-                ActiveUsers = activeUsers,
-                TotalExpenses = totalExpenses,
-                TotalIncomes = totalIncomes,
-                TotalCategories = totalCategories,
-                GlobalCategories = globalCategories,
-                UserRegistrationsByMonth = await GetUserRegistrationsByMonth()
-            };
-
-            return Ok(stats);
-        }
-
-        private async Task<Dictionary<string, int>> GetUserRegistrationsByMonth()
-        {
-            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
-
-            var registrations = await _context.Users
-                .Where(u => u.CreatedAt >= sixMonthsAgo)
-                .GroupBy(u => new { u.CreatedAt!.Value.Year, u.CreatedAt.Value.Month })
-                .Select(g => new
+                // This is a simplified version. In a real application, you would have a proper logging system
+                var logs = new List<object>
                 {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Count = g.Count()
-                })
-                .ToListAsync();
+                    new { timestamp = DateTime.UtcNow.AddHours(-1), type = "INFO", description = "User logged in" },
+                    new { timestamp = DateTime.UtcNow.AddHours(-2), type = "INFO", description = "New expense added" },
+                    new { timestamp = DateTime.UtcNow.AddHours(-3), type = "WARNING", description = "High spending detected" },
+                    new { timestamp = DateTime.UtcNow.AddHours(-4), type = "INFO", description = "AI suggestion generated" },
+                    new { timestamp = DateTime.UtcNow.AddHours(-5), type = "SUCCESS", description = "User registration completed" }
+                };
 
-            return registrations.ToDictionary(
-                r => $"{r.Year}-{r.Month:D2}",
-                r => r.Count
-            );
+                return Ok(logs.Take(limit));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting system logs");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         private long? GetCurrentUserId()

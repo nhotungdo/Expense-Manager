@@ -23,14 +23,6 @@ namespace MoneyTracker.Models.DTOs
         public string Role { get; set; } = "USER";
     }
 
-    public class UpdateUserDto
-    {
-        public string Username { get; set; } = string.Empty;
-        public string? FullName { get; set; }
-        public string? PictureUrl { get; set; }
-        public string Role { get; set; } = string.Empty;
-        public bool Enabled { get; set; }
-    }
 
     public class UserFilterDto
     {

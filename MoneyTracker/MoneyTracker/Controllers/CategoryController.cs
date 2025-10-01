@@ -43,6 +43,7 @@ namespace MoneyTracker.Controllers
                     Id = c.Id,
                     Name = c.Name,
                     Type = c.Type,
+                    Description = c.Description,
                     UserId = c.UserId ?? 0,
                     IsGlobal = c.UserId == null,
                     CreatedAt = c.CreatedAt ?? DateTime.UtcNow
@@ -63,6 +64,7 @@ namespace MoneyTracker.Controllers
                     Id = c.Id,
                     Name = c.Name,
                     Type = c.Type,
+                    Description = c.Description,
                     UserId = 0,
                     IsGlobal = true,
                     CreatedAt = c.CreatedAt ?? DateTime.UtcNow
@@ -91,6 +93,7 @@ namespace MoneyTracker.Controllers
                 Id = category.Id,
                 Name = category.Name,
                 Type = category.Type,
+                Description = category.Description,
                 UserId = category.UserId ?? 0,
                 IsGlobal = category.UserId == null,
                 CreatedAt = category.CreatedAt ?? DateTime.UtcNow
@@ -131,6 +134,7 @@ namespace MoneyTracker.Controllers
             {
                 Name = createCategoryDto.Name,
                 Type = createCategoryDto.Type.ToUpper(),
+                Description = createCategoryDto.Description,
                 UserId = createCategoryDto.IsGlobal ? null : userId,
                 CreatedAt = DateTime.UtcNow
             };
@@ -145,6 +149,7 @@ namespace MoneyTracker.Controllers
                 Id = category.Id,
                 Name = category.Name,
                 Type = category.Type,
+                Description = category.Description,
                 UserId = category.UserId ?? 0,
                 IsGlobal = category.UserId == null,
                 CreatedAt = category.CreatedAt ?? DateTime.UtcNow
@@ -192,6 +197,7 @@ namespace MoneyTracker.Controllers
 
             category.Name = updateCategoryDto.Name;
             category.Type = updateCategoryDto.Type.ToUpper();
+            category.Description = updateCategoryDto.Description;
 
             await _context.SaveChangesAsync();
 

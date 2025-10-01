@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 
-namespace MoneyTracker.Pages
+namespace MoneyTracker.Pages.Admin
 {
     [Authorize]
     public class DashboardModel : PageModel
@@ -17,7 +17,7 @@ namespace MoneyTracker.Pages
 
         public void OnGet()
         {
-            // Dashboard page initialization
+            // Admin Dashboard page initialization
         }
 
         public string GetCurrentUserId()
@@ -33,6 +33,11 @@ namespace MoneyTracker.Pages
         public string GetCurrentUserName()
         {
             return User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+        }
+
+        public bool IsAdmin()
+        {
+            return User.IsInRole("ADMIN");
         }
     }
 }

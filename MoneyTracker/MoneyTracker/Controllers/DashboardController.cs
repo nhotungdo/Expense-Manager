@@ -202,6 +202,86 @@ namespace MoneyTracker.Controllers
             return Ok(report);
         }
 
+        [HttpGet("budget-analysis")]
+        public async Task<IActionResult> GetBudgetAnalysis()
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var currentMonth = DateTime.UtcNow.Month;
+            var currentYear = DateTime.UtcNow.Year;
+
+            var monthlyIncome = await _context.Incomes
+                .Where(i => i.UserId == userId &&
+                           i.IncomeDate.Month == currentMonth &&
+                           i.IncomeDate.Year == currentYear)
+                .SumAsync(i => i.Amount);
+
+            var monthlyExpenses = await _context.Expenses
+                .Where(e => e.UserId == userId &&
+                           e.ExpenseDate.Month == currentMonth &&
+                           e.ExpenseDate.Year == currentYear)
+                .SumAsync(e => e.Amount);
+
+            var expenseRatio = monthlyIncome > 0 ? (monthlyExpenses / monthlyIncome) * 100 : 0;
+            var savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100 : 0;
+
+            var analysis = new
+            {
+                MonthlyIncome = monthlyIncome,
+                MonthlyExpenses = monthlyExpenses,
+                ExpenseRatio = Math.Round(expenseRatio, 2),
+                SavingsRate = Math.Round(savingsRate, 2),
+                BudgetStatus = expenseRatio switch
+                {
+                    > 90 => "Critical",
+                    > 80 => "Warning",
+                    > 70 => "Caution",
+                    _ => "Good"
+                },
+                Recommendations = GetBudgetRecommendations(expenseRatio, savingsRate)
+            };
+
+            return Ok(analysis);
+        }
+
+        [HttpGet("spending-trends")]
+        public async Task<IActionResult> GetSpendingTrends([FromQuery] int months = 6)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var startDate = DateTime.UtcNow.AddMonths(-months);
+            var endDate = DateTime.UtcNow;
+
+            var trends = await _context.Expenses
+                .Where(e => e.UserId == userId &&
+                           e.ExpenseDate >= DateOnly.FromDateTime(startDate) &&
+                           e.ExpenseDate <= DateOnly.FromDateTime(endDate))
+                .Include(e => e.Category)
+                .GroupBy(e => new { e.ExpenseDate.Year, e.ExpenseDate.Month })
+                .Select(g => new
+                {
+                    Month = $"{g.Key.Year}-{g.Key.Month:D2}",
+                    TotalAmount = g.Sum(e => e.Amount),
+                    TransactionCount = g.Count(),
+                    Categories = g.GroupBy(e => e.Category!.Name)
+                        .Select(cg => new
+                        {
+                            Category = cg.Key,
+                            Amount = cg.Sum(e => e.Amount),
+                            Percentage = 0.0 // Will be calculated on client side
+                        })
+                        .OrderByDescending(c => c.Amount)
+                        .Take(5)
+                        .ToList()
+                })
+                .OrderBy(t => t.Month)
+                .ToListAsync();
+
+            return Ok(trends);
+        }
+
         [HttpPost("generate-ai-suggestion")]
         public async Task<IActionResult> GenerateAiSuggestion()
         {
@@ -286,6 +366,45 @@ namespace MoneyTracker.Controllers
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return long.TryParse(userIdClaim, out var userId) ? userId : null;
+        }
+
+        private List<string> GetBudgetRecommendations(decimal expenseRatio, decimal savingsRate)
+        {
+            var recommendations = new List<string>();
+
+            if (expenseRatio > 90)
+            {
+                recommendations.Add("Cảnh báo: Chi tiêu đã vượt quá 90% thu nhập. Cần cắt giảm chi tiêu ngay lập tức.");
+                recommendations.Add("Hãy xem xét các khoản chi tiêu không cần thiết và tạm dừng các mua sắm lớn.");
+            }
+            else if (expenseRatio > 80)
+            {
+                recommendations.Add("Cảnh báo: Chi tiêu đã vượt quá 80% thu nhập. Cần kiểm soát chi tiêu tốt hơn.");
+                recommendations.Add("Hãy lập danh sách ưu tiên cho các khoản chi tiêu và cắt giảm những thứ không quan trọng.");
+            }
+            else if (expenseRatio > 70)
+            {
+                recommendations.Add("Chú ý: Chi tiêu đã vượt quá 70% thu nhập. Cần theo dõi chi tiêu cẩn thận hơn.");
+                recommendations.Add("Hãy đặt mục tiêu tiết kiệm ít nhất 20% thu nhập mỗi tháng.");
+            }
+            else
+            {
+                recommendations.Add("Tuyệt vời! Bạn đang quản lý chi tiêu tốt.");
+                if (savingsRate > 20)
+                {
+                    recommendations.Add("Tỷ lệ tiết kiệm của bạn rất tốt. Hãy xem xét đầu tư số tiền tiết kiệm này.");
+                }
+                else if (savingsRate > 10)
+                {
+                    recommendations.Add("Tỷ lệ tiết kiệm khá tốt. Hãy cố gắng tăng lên 20% để có tương lai tài chính vững chắc.");
+                }
+                else
+                {
+                    recommendations.Add("Hãy cố gắng tăng tỷ lệ tiết kiệm lên ít nhất 10-20% thu nhập.");
+                }
+            }
+
+            return recommendations;
         }
     }
 }
