@@ -1,10 +1,44 @@
-﻿-- Tạo database
-CREATE DATABASE ExpenseManager;
+﻿-- ========================================
+-- MoneyTracker Database - Complete Setup
+-- ========================================
+-- Tạo database hoàn chỉnh với cấu trúc tối ưu cho Entity Framework
+-- Gộp từ: demo1_Expense.sql + FixDatabaseStructure.sql + UpdateColumnNamesForEF.sql
+
+-- Tạo database
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'ExpenseManager')
+BEGIN
+    CREATE DATABASE ExpenseManager;
+    PRINT 'Created ExpenseManager database';
+END
 GO
+
 USE ExpenseManager;
 GO
 
+-- Drop existing tables if they exist (in correct order due to foreign keys)
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'emails')
+    DROP TABLE emails;
+
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'ai_suggestions')
+    DROP TABLE ai_suggestions;
+
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'expenses')
+    DROP TABLE expenses;
+
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'incomes')
+    DROP TABLE incomes;
+
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'categories')
+    DROP TABLE categories;
+
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'users')
+    DROP TABLE users;
+
+PRINT 'Dropped existing tables (if any)';
+
+-- ========================================
 -- Bảng users (login bằng Google, không cần mật khẩu)
+-- ========================================
 CREATE TABLE users (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     google_id VARCHAR(255) NOT NULL UNIQUE,         -- ID Google duy nhất
@@ -31,7 +65,11 @@ CREATE TABLE users (
     password VARCHAR(255)                           -- mật khẩu (optional)
 );
 
+PRINT 'Created users table';
+
+-- ========================================
 -- Bảng categories (chi tiêu / thu nhập, có thể global hoặc riêng user)
+-- ========================================
 CREATE TABLE categories (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -42,7 +80,11 @@ CREATE TABLE categories (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+PRINT 'Created categories table';
+
+-- ========================================
 -- Bảng expenses (chi tiêu)
+-- ========================================
 CREATE TABLE expenses (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -56,7 +98,11 @@ CREATE TABLE expenses (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
+PRINT 'Created expenses table';
+
+-- ========================================
 -- Bảng incomes (thu nhập)
+-- ========================================
 CREATE TABLE incomes (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -70,7 +116,11 @@ CREATE TABLE incomes (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
+PRINT 'Created incomes table';
+
+-- ========================================
 -- Bảng gợi ý từ AI
+-- ========================================
 CREATE TABLE ai_suggestions (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -79,7 +129,11 @@ CREATE TABLE ai_suggestions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+PRINT 'Created ai_suggestions table';
+
+-- ========================================
 -- Bảng email notifications (optional)
+-- ========================================
 CREATE TABLE emails (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -92,48 +146,230 @@ CREATE TABLE emails (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+PRINT 'Created emails table';
+
+-- ========================================
+-- Tạo indexes để tối ưu hiệu suất
+-- ========================================
+CREATE INDEX IX_users_google_id ON users(google_id);
+CREATE INDEX IX_users_email ON users(email);
+CREATE INDEX IX_expenses_user_id ON expenses(user_id);
+CREATE INDEX IX_expenses_category_id ON expenses(category_id);
+CREATE INDEX IX_expenses_expense_date ON expenses(expense_date);
+CREATE INDEX IX_incomes_user_id ON incomes(user_id);
+CREATE INDEX IX_incomes_category_id ON incomes(category_id);
+CREATE INDEX IX_incomes_income_date ON incomes(income_date);
+CREATE INDEX IX_categories_user_id ON categories(user_id);
+CREATE INDEX IX_categories_type ON categories(type);
+CREATE INDEX IX_ai_suggestions_user_id ON ai_suggestions(user_id);
+CREATE INDEX IX_emails_user_id ON emails(user_id);
+CREATE INDEX IX_emails_status ON emails(status);
+
+PRINT 'Created performance indexes';
+
+-- ========================================
 -- Thêm dữ liệu mẫu
--- Thêm categories mặc định (global)
+-- ========================================
+
+-- Thêm categories mặc định (global) - Cải tiến với 18 danh mục
 INSERT INTO categories (name, type, description, user_id) VALUES
-('Ăn uống', 'EXPENSE', 'Chi phí ăn uống hàng ngày', NULL),
-('Đi lại', 'EXPENSE', 'Chi phí vận chuyển, xăng xe', NULL),
-('Giải trí', 'EXPENSE', 'Chi phí giải trí, du lịch', NULL),
-('Mua sắm', 'EXPENSE', 'Chi phí mua sắm cá nhân', NULL),
-('Y tế', 'EXPENSE', 'Chi phí khám chữa bệnh', NULL),
-('Học tập', 'EXPENSE', 'Chi phí học tập, sách vở', NULL),
-('Lương', 'INCOME', 'Thu nhập từ lương', NULL),
-('Thưởng', 'INCOME', 'Thu nhập từ thưởng', NULL),
-('Đầu tư', 'INCOME', 'Thu nhập từ đầu tư', NULL),
-('Kinh doanh', 'INCOME', 'Thu nhập từ kinh doanh', NULL);
+-- Danh mục Chi tiêu (10 loại)
+('Ăn uống', 'EXPENSE', 'Chi phí ăn uống, nhà hàng, cafe', NULL),
+('Giao thông', 'EXPENSE', 'Xăng xe, taxi, xe bus, grab', NULL),
+('Mua sắm', 'EXPENSE', 'Quần áo, giày dép, đồ dùng cá nhân', NULL),
+('Giải trí', 'EXPENSE', 'Xem phim, du lịch, game, sách', NULL),
+('Sức khỏe', 'EXPENSE', 'Khám bệnh, thuốc men, gym, spa', NULL),
+('Hóa đơn', 'EXPENSE', 'Điện, nước, internet, điện thoại', NULL),
+('Giáo dục', 'EXPENSE', 'Học phí, sách vở, khóa học', NULL),
+('Nhà cửa', 'EXPENSE', 'Tiền thuê nhà, sửa chữa, đồ dùng gia đình', NULL),
+('Bảo hiểm', 'EXPENSE', 'Bảo hiểm y tế, xe, nhà', NULL),
+('Khác', 'EXPENSE', 'Các chi phí khác', NULL),
+-- Danh mục Thu nhập (8 loại)
+('Lương', 'INCOME', 'Lương chính từ công việc', NULL),
+('Thưởng', 'INCOME', 'Thưởng hiệu suất, lễ tết', NULL),
+('Freelance', 'INCOME', 'Thu nhập từ công việc tự do', NULL),
+('Đầu tư', 'INCOME', 'Lợi nhuận từ đầu tư, cổ tức', NULL),
+('Kinh doanh', 'INCOME', 'Thu nhập từ kinh doanh', NULL),
+('Cho thuê', 'INCOME', 'Thu nhập từ cho thuê nhà, xe', NULL),
+('Quà tặng', 'INCOME', 'Tiền quà, hỗ trợ từ gia đình', NULL),
+('Khác', 'INCOME', 'Các nguồn thu nhập khác', NULL);
 
--- Thêm user mẫu
+PRINT 'Inserted 18 default categories (10 expense + 8 income)';
+
+-- Thêm user mẫu để test
 INSERT INTO users (google_id, username, email, full_name, picture_url, role, enabled, phone_number, language, default_currency, timezone, theme) VALUES
-('google_123456789', 'admin', 'admin@example.com', 'Administrator', 'https://example.com/avatar1.jpg', 'ADMIN', 1, '0123456789', 'vi', 'VND', 'Asia/Ho_Chi_Minh', 'light'),
-('google_987654321', 'user1', 'user1@example.com', 'Nguyễn Văn A', 'https://example.com/avatar2.jpg', 'USER', 1, '0987654321', 'vi', 'VND', 'Asia/Ho_Chi_Minh', 'dark'),
-('google_111222333', 'user2', 'user2@example.com', 'Trần Thị B', 'https://example.com/avatar3.jpg', 'USER', 1, '0912345678', 'en', 'USD', 'America/New_York', 'light');
+('google_admin_123', 'admin', 'admin@moneytracker.com', 'Administrator', 'https://lh3.googleusercontent.com/a/default-admin', 'ADMIN', 1, '0123456789', 'vi', 'VND', 'Asia/Ho_Chi_Minh', 'light'),
+('google_user1_456', 'nguyenvana', 'nguyenvana@gmail.com', 'Nguyễn Văn A', 'https://lh3.googleusercontent.com/a/default-user1', 'USER', 1, '0987654321', 'vi', 'VND', 'Asia/Ho_Chi_Minh', 'dark'),
+('google_user2_789', 'tranthib', 'tranthib@gmail.com', 'Trần Thị B', 'https://lh3.googleusercontent.com/a/default-user2', 'USER', 1, '0912345678', 'vi', 'VND', 'Asia/Ho_Chi_Minh', 'light');
 
--- Thêm expenses mẫu
+PRINT 'Inserted 3 sample users (1 admin + 2 users)';
+
+-- Thêm expenses mẫu với danh mục mới
 INSERT INTO expenses (user_id, category_id, amount, currency, note, expense_date) VALUES
-(2, 1, 50000, 'VND', 'Ăn trưa tại quán cơm', '2024-01-15'),
-(2, 2, 30000, 'VND', 'Xăng xe máy', '2024-01-15'),
-(2, 3, 200000, 'VND', 'Xem phim rạp', '2024-01-14'),
-(3, 1, 75000, 'VND', 'Ăn tối với bạn', '2024-01-15'),
-(3, 4, 500000, 'VND', 'Mua quần áo', '2024-01-13');
+-- User 2 (Nguyễn Văn A) - Tháng hiện tại
+(2, 1, 85000, 'VND', 'Ăn trưa tại quán cơm gần văn phòng', CAST(GETDATE() AS DATE)),
+(2, 2, 150000, 'VND', 'Xăng xe máy Honda Wave', CAST(DATEADD(day, -1, GETDATE()) AS DATE)),
+(2, 4, 350000, 'VND', 'Xem phim Avengers với bạn gái', CAST(DATEADD(day, -2, GETDATE()) AS DATE)),
+(2, 3, 1200000, 'VND', 'Mua áo khoác mùa đông Uniqlo', CAST(DATEADD(day, -3, GETDATE()) AS DATE)),
+(2, 6, 800000, 'VND', 'Hóa đơn điện tháng này', CAST(DATEADD(day, -5, GETDATE()) AS DATE)),
+(2, 5, 500000, 'VND', 'Khám răng định kỳ', CAST(DATEADD(day, -7, GETDATE()) AS DATE)),
+-- User 3 (Trần Thị B) - Tháng hiện tại  
+(3, 1, 120000, 'VND', 'Ăn tối buffet lẩu với gia đình', CAST(GETDATE() AS DATE)),
+(3, 3, 2500000, 'VND', 'Mua túi xách Louis Vuitton', CAST(DATEADD(day, -1, GETDATE()) AS DATE)),
+(3, 7, 3000000, 'VND', 'Học phí khóa tiếng Anh IELTS', CAST(DATEADD(day, -4, GETDATE()) AS DATE)),
+(3, 8, 500000, 'VND', 'Mua đồ trang trí nhà mới', CAST(DATEADD(day, -6, GETDATE()) AS DATE));
 
--- Thêm incomes mẫu
+PRINT 'Inserted 10 sample expenses';
+
+-- Thêm incomes mẫu với danh mục mới
 INSERT INTO incomes (user_id, category_id, amount, currency, note, income_date) VALUES
-(2, 7, 15000000, 'VND', 'Lương tháng 1', '2024-01-01'),
-(2, 8, 2000000, 'VND', 'Thưởng cuối năm', '2024-01-10'),
-(3, 7, 12000000, 'VND', 'Lương tháng 1', '2024-01-01'),
-(3, 9, 5000000, 'VND', 'Lãi đầu tư', '2024-01-12');
+-- User 2 (Nguyễn Văn A)
+(2, 11, 18000000, 'VND', 'Lương tháng hiện tại - Developer', CAST(DATEADD(day, -25, GETDATE()) AS DATE)),
+(2, 12, 3000000, 'VND', 'Thưởng hoàn thành dự án', CAST(DATEADD(day, -10, GETDATE()) AS DATE)),
+(2, 13, 2500000, 'VND', 'Freelance thiết kế website', CAST(DATEADD(day, -5, GETDATE()) AS DATE)),
+-- User 3 (Trần Thị B)
+(3, 11, 15000000, 'VND', 'Lương tháng hiện tại - Marketing', CAST(DATEADD(day, -25, GETDATE()) AS DATE)),
+(3, 14, 8000000, 'VND', 'Lợi nhuận đầu tư chứng khoán', CAST(DATEADD(day, -15, GETDATE()) AS DATE)),
+(3, 17, 1500000, 'VND', 'Tiền quà sinh nhật từ gia đình', CAST(DATEADD(day, -8, GETDATE()) AS DATE));
 
--- Thêm AI suggestions mẫu
+PRINT 'Inserted 6 sample incomes';
+
+-- Thêm AI suggestions mẫu thông minh hơn
 INSERT INTO ai_suggestions (user_id, suggestion, created_at) VALUES
-(2, 'Bạn đã chi tiêu 80% thu nhập tháng này. Hãy cân nhắc tiết kiệm hơn.', '2024-01-15'),
-(2, 'Chi phí ăn uống của bạn tăng 20% so với tháng trước. Có thể cân nhắc nấu ăn tại nhà.', '2024-01-14'),
-(3, 'Thu nhập của bạn ổn định. Có thể cân nhắc đầu tư thêm.', '2024-01-13');
+(2, 'Tuyệt vời! Bạn đã tiết kiệm được 23.5% thu nhập tháng này. Hãy xem xét đầu tư số tiền này vào quỹ tương hỗ hoặc tiết kiệm ngân hàng.', CAST(DATEADD(hour, -2, GETDATE()) AS DATETIME)),
+(2, 'Chi tiêu cho danh mục "Mua sắm" chiếm 28% tổng chi tiêu. Bạn có thể cân nhắc giảm bớt việc mua sắm không cần thiết để tăng tỷ lệ tiết kiệm.', CAST(DATEADD(hour, -6, GETDATE()) AS DATETIME)),
+(2, 'Thu nhập từ Freelance của bạn đang tăng trưởng tốt. Hãy cân nhắc mở rộng hoạt động này để tăng thu nhập thụ động.', CAST(DATEADD(day, -1, GETDATE()) AS DATETIME)),
+(3, 'Cảnh báo: Chi tiêu tháng này đã vượt quá 85% thu nhập. Hãy cân nhắc cắt giảm chi tiêu không cần thiết, đặc biệt là danh mục "Mua sắm".', CAST(DATEADD(hour, -1, GETDATE()) AS DATETIME)),
+(3, 'Thu nhập từ đầu tư của bạn rất ấn tượng! Với 8 triệu lợi nhuận, bạn có thể cân nhắc đa dạng hóa danh mục đầu tư.', CAST(DATEADD(hour, -4, GETDATE()) AS DATETIME));
+
+PRINT 'Inserted 5 smart AI suggestions';
 
 -- Thêm emails mẫu
-INSERT INTO emails (user_id, subject, body, status, created_at) VALUES
-(2, 'Chào mừng đến với MoneyTracker', 'Cảm ơn bạn đã đăng ký sử dụng MoneyTracker!', 'SENT', '2024-01-01'),
-(3, 'Báo cáo chi tiêu tháng 1', 'Tổng chi tiêu tháng 1: 2,500,000 VND', 'PENDING', '2024-01-15');
+INSERT INTO emails (user_id, subject, body, status, sent_at, created_at) VALUES
+(2, 'Chào mừng đến với MoneyTracker!', 'Xin chào Nguyễn Văn A,<br><br>Cảm ơn bạn đã đăng ký sử dụng MoneyTracker! Chúng tôi rất vui được đồng hành cùng bạn trong hành trình quản lý tài chính thông minh.<br><br>Hãy bắt đầu bằng việc thêm giao dịch đầu tiên của bạn!', 'SENT', CAST(DATEADD(day, -30, GETDATE()) AS DATETIME), CAST(DATEADD(day, -30, GETDATE()) AS DATETIME)),
+(2, 'Báo cáo tài chính tháng này', 'Tổng thu nhập: 23,500,000 VND<br>Tổng chi tiêu: 18,085,000 VND<br>Tiết kiệm: 5,415,000 VND (23.5%)<br><br>Chúc mừng! Bạn đã đạt mục tiêu tiết kiệm 20%.', 'PENDING', NULL, CAST(GETDATE() AS DATETIME)),
+(3, 'Chào mừng đến với MoneyTracker!', 'Xin chào Trần Thị B,<br><br>Cảm ơn bạn đã tham gia MoneyTracker! Chúng tôi sẽ giúp bạn quản lý tài chính hiệu quả hơn.', 'SENT', CAST(DATEADD(day, -25, GETDATE()) AS DATETIME), CAST(DATEADD(day, -25, GETDATE()) AS DATETIME)),
+(3, 'Cảnh báo chi tiêu cao', 'Bạn đã chi tiêu 85% thu nhập tháng này. Hãy cân nhắc điều chỉnh ngân sách để đảm bảo tài chính ổn định.', 'PENDING', NULL, CAST(DATEADD(hour, -1, GETDATE()) AS DATETIME));
+
+PRINT 'Inserted 4 sample emails';
+
+-- ========================================
+-- Hoàn tất thiết lập database
+-- ========================================
+PRINT '';
+PRINT '========================================';
+PRINT 'MoneyTracker Database Setup Completed!';
+PRINT '========================================';
+PRINT 'Summary:';
+PRINT '- 6 tables created with proper indexes';
+PRINT '- 18 default categories (10 expense + 8 income)';
+PRINT '- 3 sample users (1 admin + 2 users)';
+PRINT '- 10 sample expenses with realistic data';
+PRINT '- 6 sample incomes from various sources';
+PRINT '- 5 smart AI suggestions';
+PRINT '- 4 sample email notifications';
+PRINT '';
+PRINT 'Ready for Google Authentication!';
+PRINT 'Entity Framework mapping: snake_case (DB) ↔ PascalCase (C#)';
+PRINT '';
+
+-- ========================================
+-- Kiểm tra và sửa lỗi cột thiếu (nếu có)
+-- ========================================
+PRINT 'Checking for any missing columns...';
+
+-- Kiểm tra các cột có thể bị thiếu và thêm nếu cần
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'date_of_birth')
+BEGIN
+    ALTER TABLE users ADD date_of_birth DATE;
+    PRINT 'Added missing date_of_birth column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'default_currency')
+BEGIN
+    ALTER TABLE users ADD default_currency VARCHAR(10) DEFAULT 'VND';
+    PRINT 'Added missing default_currency column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'email_notifications')
+BEGIN
+    ALTER TABLE users ADD email_notifications BIT DEFAULT 1;
+    PRINT 'Added missing email_notifications column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'phone_number')
+BEGIN
+    ALTER TABLE users ADD phone_number VARCHAR(20);
+    PRINT 'Added missing phone_number column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'push_notifications')
+BEGIN
+    ALTER TABLE users ADD push_notifications BIT DEFAULT 1;
+    PRINT 'Added missing push_notifications column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'address')
+BEGIN
+    ALTER TABLE users ADD address NVARCHAR(500);
+    PRINT 'Added missing address column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'gender')
+BEGIN
+    ALTER TABLE users ADD gender VARCHAR(10) CHECK (gender IN ('MALE','FEMALE','OTHER'));
+    PRINT 'Added missing gender column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'language')
+BEGIN
+    ALTER TABLE users ADD language VARCHAR(10) DEFAULT 'vi';
+    PRINT 'Added missing language column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'timezone')
+BEGIN
+    ALTER TABLE users ADD timezone VARCHAR(50) DEFAULT 'Asia/Ho_Chi_Minh';
+    PRINT 'Added missing timezone column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'theme')
+BEGIN
+    ALTER TABLE users ADD theme VARCHAR(10) DEFAULT 'light' CHECK (theme IN ('light','dark'));
+    PRINT 'Added missing theme column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'password')
+BEGIN
+    ALTER TABLE users ADD password VARCHAR(255);
+    PRINT 'Added missing password column';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('categories') AND name = 'description')
+BEGIN
+    ALTER TABLE categories ADD description NVARCHAR(500);
+    PRINT 'Added missing description column to categories table';
+END
+
+PRINT 'Column validation completed!';
+
+-- ========================================
+-- Hiển thị cấu trúc bảng cuối cùng
+-- ========================================
+PRINT '';
+PRINT 'Final users table structure:';
+SELECT 
+    COLUMN_NAME,
+    DATA_TYPE,
+    CHARACTER_MAXIMUM_LENGTH,
+    IS_NULLABLE,
+    COLUMN_DEFAULT
+FROM INFORMATION_SCHEMA.COLUMNS 
+WHERE TABLE_NAME = 'users' 
+ORDER BY ORDINAL_POSITION;
+
+PRINT '';
+PRINT '========================================';
+PRINT 'MoneyTracker Database Setup COMPLETED!';
+PRINT 'All columns validated and ready for use!';
+PRINT '========================================';
