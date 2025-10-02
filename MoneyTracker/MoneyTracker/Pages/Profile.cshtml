@@ -35,21 +35,35 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- Google Account Info -->
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fab fa-google fa-2x me-3 text-primary"></i>
+                            <div>
+                                <h6 class="mb-1">Tài khoản Google</h6>
+                                <small>Thông tin cơ bản được đồng bộ từ tài khoản Google của bạn</small>
+                            </div>
+                        </div>
+                    </div>
+
                     <form id="profileForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tên đăng nhập</label>
                                 <input type="text" class="form-control" id="username" readonly>
+                                <small class="text-muted">Từ Google Account</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" readonly>
+                                <small class="text-muted">Từ Google Account</small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Họ và tên</label>
                                 <input type="text" class="form-control" id="fullName">
+                                <small class="text-muted">Có thể chỉnh sửa từ Google Account</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Số điện thoại</label>
@@ -155,8 +169,8 @@
                 </div>
                 <div class="card-body text-center">
                     <div class="mb-3">
-                        <img id="profilePicture" src="/images/default-avatar.png" 
-                             alt="Profile Picture" class="rounded-circle" width="120" height="120">
+                        <img id="profilePicture" src="/images/default-avatar.png" alt="Profile Picture"
+                            class="rounded-circle" width="120" height="120">
                     </div>
                     <button class="btn btn-outline-primary btn-sm" onclick="changeProfilePicture()">
                         <i class="fas fa-camera me-2"></i>Thay đổi ảnh
@@ -204,12 +218,16 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-warning mb-3">
+                        <small><i class="fas fa-info-circle me-2"></i>Bạn đang sử dụng đăng nhập Google. Một số tính
+                            năng bảo mật được quản lý bởi Google.</small>
+                    </div>
                     <div class="d-grid gap-2">
-                        <button class="btn btn-outline-warning" onclick="changePassword()">
-                            <i class="fas fa-key me-2"></i>Đổi mật khẩu
-                        </button>
                         <button class="btn btn-outline-info" onclick="viewLoginHistory()">
                             <i class="fas fa-history me-2"></i>Lịch sử đăng nhập
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="manageGoogleAccount()">
+                            <i class="fab fa-google me-2"></i>Quản lý tài khoản Google
                         </button>
                         <button class="btn btn-outline-danger" onclick="deleteAccount()">
                             <i class="fas fa-trash me-2"></i>Xóa tài khoản
@@ -364,9 +382,8 @@
             alert('Chức năng thay đổi ảnh đại diện sẽ được cập nhật');
         }
 
-        function changePassword() {
-            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
-            modal.show();
+        function manageGoogleAccount() {
+            window.open('https://myaccount.google.com/', '_blank');
         }
 
         async function savePassword() {

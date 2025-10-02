@@ -86,6 +86,9 @@ namespace MoneyTracker.Controllers
 
                 await _context.SaveChangesAsync();
 
+                // Check if this is a new user (first login)
+                var isNewUser = user.LastLogin == null || user.CreatedAt?.Date == DateTime.UtcNow.Date;
+
                 // Generate JWT token
                 var token = GenerateJwtToken(user);
 
@@ -94,6 +97,7 @@ namespace MoneyTracker.Controllers
                 return Ok(new AuthResponseDto
                 {
                     Token = token,
+                    IsNewUser = isNewUser,
                     User = new UserDto
                     {
                         Id = user.Id,
@@ -206,6 +210,7 @@ namespace MoneyTracker.Controllers
     public class AuthResponseDto
     {
         public string Token { get; set; } = string.Empty;
+        public bool IsNewUser { get; set; }
         public UserDto User { get; set; } = null!;
     }
 }

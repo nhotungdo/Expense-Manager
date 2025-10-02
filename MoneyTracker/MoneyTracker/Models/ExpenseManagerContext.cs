@@ -63,6 +63,9 @@ public partial class ExpenseManagerContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .HasColumnName("description");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -162,14 +165,26 @@ public partial class ExpenseManagerContext : DbContext
             entity.HasIndex(e => e.GoogleId, "UQ__users__CCBDE7DCBD977897").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Address)
+                .HasMaxLength(500)
+                .HasColumnName("address");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
+            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
+            entity.Property(e => e.DefaultCurrency)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("VND")
+                .HasColumnName("default_currency");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("email");
+            entity.Property(e => e.EmailNotifications)
+                .HasDefaultValue(true)
+                .HasColumnName("email_notifications");
             entity.Property(e => e.Enabled)
                 .HasDefaultValue(true)
                 .HasColumnName("enabled");
@@ -177,23 +192,53 @@ public partial class ExpenseManagerContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("full_name");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("gender");
             entity.Property(e => e.GoogleId)
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("google_id");
+            entity.Property(e => e.Language)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("vi")
+                .HasColumnName("language");
             entity.Property(e => e.LastLogin)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("last_login");
+            entity.Property(e => e.Password)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("password");
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("phone_number");
             entity.Property(e => e.PictureUrl)
                 .HasMaxLength(500)
                 .IsUnicode(false)
                 .HasColumnName("picture_url");
+            entity.Property(e => e.PushNotifications)
+                .HasDefaultValue(true)
+                .HasColumnName("push_notifications");
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasDefaultValue("USER")
                 .HasColumnName("role");
+            entity.Property(e => e.Theme)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("light")
+                .HasColumnName("theme");
+            entity.Property(e => e.Timezone)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValue("Asia/Ho_Chi_Minh")
+                .HasColumnName("timezone");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
@@ -202,6 +247,37 @@ public partial class ExpenseManagerContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("username");
+        });
+
+        modelBuilder.Entity<Email>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__emails__3213E83F");
+
+            entity.ToTable("emails");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Body).HasColumnName("body");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.SentAt)
+                .HasColumnType("datetime")
+                .HasColumnName("sent_at");
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValue("PENDING")
+                .HasColumnName("status");
+            entity.Property(e => e.Subject)
+                .HasMaxLength(255)
+                .HasColumnName("subject");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Emails)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__emails__user_id");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -17,40 +17,15 @@
   },
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
-    "Method": "GetAiSuggestions",
-    "RelativePath": "api/Admin/ai-suggestions",
+    "Method": "GetAISuggestions",
+    "RelativePath": "api/admin/ai-suggestions",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "UserId",
-        "Type": "System.Nullable\u00601[[System.Int64, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "Type",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "IsRead",
-        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "IsApplied",
-        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "CreatedFrom",
-        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "CreatedTo",
-        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Name": "limit",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
@@ -59,7 +34,7 @@
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
     "Method": "GetGlobalCategories",
-    "RelativePath": "api/Admin/global-categories",
+    "RelativePath": "api/admin/categories",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -69,13 +44,13 @@
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
     "Method": "CreateGlobalCategory",
-    "RelativePath": "api/Admin/global-categories",
+    "RelativePath": "api/admin/categories",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "createCategoryDto",
+        "Name": "categoryDto",
         "Type": "MoneyTracker.Models.DTOs.CreateCategoryDto",
         "IsRequired": true
       }
@@ -85,7 +60,7 @@
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
     "Method": "UpdateGlobalCategory",
-    "RelativePath": "api/Admin/global-categories/{id}",
+    "RelativePath": "api/admin/categories/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -96,7 +71,7 @@
         "IsRequired": true
       },
       {
-        "Name": "updateCategoryDto",
+        "Name": "categoryDto",
         "Type": "MoneyTracker.Models.DTOs.UpdateCategoryDto",
         "IsRequired": true
       }
@@ -106,7 +81,7 @@
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
     "Method": "DeleteGlobalCategory",
-    "RelativePath": "api/Admin/global-categories/{id}",
+    "RelativePath": "api/admin/categories/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -121,8 +96,8 @@
   },
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
-    "Method": "GetSystemStatistics",
-    "RelativePath": "api/Admin/statistics",
+    "Method": "GetAdminDashboardData",
+    "RelativePath": "api/admin/dashboard",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -131,35 +106,56 @@
   },
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
-    "Method": "GetUsers",
-    "RelativePath": "api/Admin/users",
+    "Method": "GetSystemLogs",
+    "RelativePath": "api/admin/system-logs",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "SearchTerm",
+        "Name": "limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.AdminController",
+    "Method": "GetUsers",
+    "RelativePath": "api/admin/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "searchTerm",
         "Type": "System.String",
         "IsRequired": false
       },
       {
-        "Name": "Role",
+        "Name": "role",
         "Type": "System.String",
         "IsRequired": false
       },
       {
-        "Name": "Enabled",
+        "Name": "enabled",
         "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       },
       {
-        "Name": "CreatedFrom",
+        "Name": "createdFrom",
         "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       },
       {
-        "Name": "CreatedTo",
+        "Name": "createdTo",
         "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "limit",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
@@ -168,7 +164,7 @@
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
     "Method": "GetUser",
-    "RelativePath": "api/Admin/users/{id}",
+    "RelativePath": "api/admin/users/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -184,7 +180,7 @@
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
     "Method": "UpdateUser",
-    "RelativePath": "api/Admin/users/{id}",
+    "RelativePath": "api/admin/users/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -195,7 +191,7 @@
         "IsRequired": true
       },
       {
-        "Name": "updateUserDto",
+        "Name": "userDto",
         "Type": "MoneyTracker.Models.DTOs.UpdateUserDto",
         "IsRequired": true
       }
@@ -205,7 +201,7 @@
   {
     "ContainingType": "MoneyTracker.Controllers.AdminController",
     "Method": "DeleteUser",
-    "RelativePath": "api/Admin/users/{id}",
+    "RelativePath": "api/admin/users/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -371,6 +367,16 @@
   },
   {
     "ContainingType": "MoneyTracker.Controllers.DashboardController",
+    "Method": "GetBudgetAnalysis",
+    "RelativePath": "api/Dashboard/budget-analysis",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.DashboardController",
     "Method": "GenerateAiSuggestion",
     "RelativePath": "api/Dashboard/generate-ai-suggestion",
     "HttpMethod": "POST",
@@ -395,6 +401,22 @@
       {
         "Name": "year",
         "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.DashboardController",
+    "Method": "GetSpendingTrends",
+    "RelativePath": "api/Dashboard/spending-trends",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "months",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
@@ -616,6 +638,126 @@
         "Name": "id",
         "Type": "System.Int64",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.OnboardingController",
+    "Method": "CheckSetupStatus",
+    "RelativePath": "api/Onboarding/check-setup",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.OnboardingController",
+    "Method": "GetDefaultCategories",
+    "RelativePath": "api/Onboarding/default-categories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.OnboardingController",
+    "Method": "SetupDefaultCategories",
+    "RelativePath": "api/Onboarding/setup-default-categories",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.ProfileController",
+    "Method": "GetProfile",
+    "RelativePath": "api/profile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.ProfileController",
+    "Method": "UpdateProfile",
+    "RelativePath": "api/profile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "profileDto",
+        "Type": "MoneyTracker.Models.DTOs.UpdateProfileDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.ProfileController",
+    "Method": "DeleteAccount",
+    "RelativePath": "api/profile/account",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deleteDto",
+        "Type": "MoneyTracker.Models.DTOs.DeleteAccountDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.ProfileController",
+    "Method": "ChangePassword",
+    "RelativePath": "api/profile/change-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "passwordDto",
+        "Type": "MoneyTracker.Models.DTOs.ChangePasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.ProfileController",
+    "Method": "GetLoginHistory",
+    "RelativePath": "api/profile/login-history",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTracker.Controllers.ProfileController",
+    "Method": "UploadAvatar",
+    "RelativePath": "api/profile/upload-avatar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

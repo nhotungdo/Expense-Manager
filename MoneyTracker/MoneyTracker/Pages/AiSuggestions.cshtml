@@ -1,0 +1,486 @@
+@page
+@model MoneyTracker.Pages.AiSuggestionsModel
+@{
+    ViewData["Title"] = "Gợi ý AI - MoneyTracker";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/aisuggestions.css" asp-append-version="true" />
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="fas fa-robot me-2 text-primary"></i>Gợi ý AI
+                    </h1>
+                    <p class="text-muted mb-0">Nhận gợi ý thông minh để quản lý tài chính tốt hơn</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="refreshSuggestions()">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                    <button class="btn btn-primary" onclick="generateNewSuggestion()">
+                        <i class="fas fa-magic"></i> Tạo gợi ý mới
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- AI Suggestions List -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Gợi ý của AI
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="suggestionsList">
+                        <div class="text-center py-5">
+                            <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+                            <p class="text-muted">Đang tải gợi ý...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Analysis -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Phân tích tài chính
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="financialAnalysis">
+                        <div class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin text-primary mb-3"></i>
+                            <p class="text-muted">Đang phân tích...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Features & Tips -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>Thống kê nhanh
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-primary" id="totalSuggestions">0</h4>
+                            <small class="text-muted">Tổng gợi ý</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success" id="thisMonthSuggestions">0</h4>
+                            <small class="text-muted">Tháng này</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-warning" id="savingsRate">0%</h4>
+                            <small class="text-muted">Tỷ lệ tiết kiệm</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-info" id="expenseRatio">0%</h4>
+                            <small class="text-muted">Tỷ lệ chi tiêu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Tips -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tips me-2"></i>Mẹo từ AI
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <h6 class="text-primary"><i class="fas fa-piggy-bank me-2"></i>Tiết kiệm thông minh</h6>
+                        <small>Hãy cố gắng tiết kiệm ít nhất 20% thu nhập mỗi tháng để có tương lai tài chính ổn
+                            định.</small>
+                    </div>
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <h6 class="text-success"><i class="fas fa-chart-line me-2"></i>Theo dõi xu hướng</h6>
+                        <small>Xem xét chi tiêu hàng tháng để phát hiện các khoản chi không cần thiết.</small>
+                    </div>
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <h6 class="text-warning"><i class="fas fa-balance-scale me-2"></i>Cân bằng thu chi</h6>
+                        <small>Đảm bảo chi tiêu không vượt quá 80% thu nhập để tránh rủi ro tài chính.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Features -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cogs me-2"></i>Tính năng AI
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" onclick="analyzeSpendingPattern()">
+                            <i class="fas fa-search me-2"></i>Phân tích chi tiêu
+                        </button>
+                        <button class="btn btn-outline-success" onclick="suggestBudget()">
+                            <i class="fas fa-calculator me-2"></i>Gợi ý ngân sách
+                        </button>
+                        <button class="btn btn-outline-warning" onclick="predictTrends()">
+                            <i class="fas fa-crystal-ball me-2"></i>Dự đoán xu hướng
+                        </button>
+                        <button class="btn btn-outline-info" onclick="optimizeSavings()">
+                            <i class="fas fa-optimize me-2"></i>Tối ưu tiết kiệm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Suggestion Detail Modal -->
+<div class="modal fade" id="suggestionDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết gợi ý</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="suggestionDetailContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="applySuggestion()">Áp dụng gợi ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let suggestions = [];
+        let currentSuggestion = null;
+
+        $(document).ready(function () {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/Login';
+                return;
+            }
+
+            loadSuggestions();
+            loadFinancialAnalysis();
+        });
+
+        async function loadSuggestions() {
+            try {
+                const response = await fetch('/api/dashboard', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    suggestions = data.aiSuggestions || [];
+                    displaySuggestions();
+                    updateStats(data);
+                } else if (response.status === 401) {
+                    window.location.href = '/Login';
+                } else {
+                    showError('Có lỗi xảy ra khi tải gợi ý');
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+                showError('Có lỗi xảy ra khi tải gợi ý');
+            }
+        }
+
+        function displaySuggestions() {
+            const container = document.getElementById('suggestionsList');
+            container.innerHTML = '';
+
+            if (suggestions.length === 0) {
+                container.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-robot fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có gợi ý nào</h5>
+                            <p class="text-muted">Nhấn "Tạo gợi ý mới" để AI phân tích tình hình tài chính của bạn</p>
+                            <button class="btn btn-primary" onclick="generateNewSuggestion()">
+                                <i class="fas fa-magic me-2"></i>Tạo gợi ý đầu tiên
+                            </button>
+                        </div>
+                    `;
+                return;
+            }
+
+            suggestions.forEach((suggestion, index) => {
+                const suggestionCard = document.createElement('div');
+                suggestionCard.className = 'card mb-3 suggestion-card';
+                suggestionCard.innerHTML = `
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-lightbulb text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Gợi ý #${suggestions.length - index}</h6>
+                                            <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
+                                        </div>
+                                    </div>
+                                    <p class="mb-3">${suggestion.suggestion}</p>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="viewSuggestionDetail(${suggestion.id})">Xem chi tiết</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="shareSuggestion(${suggestion.id})">Chia sẻ</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteSuggestion(${suggestion.id})">Xóa</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-primary">AI Generated</span>
+                                    <span class="badge bg-success">Tài chính</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewSuggestionDetail(${suggestion.id})">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                container.appendChild(suggestionCard);
+            });
+        }
+
+        async function loadFinancialAnalysis() {
+            try {
+                const response = await fetch('/api/dashboard/budget-analysis', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    const analysis = await response.json();
+                    displayFinancialAnalysis(analysis);
+                }
+            } catch (error) {
+                console.error('Error loading financial analysis:', error);
+            }
+        }
+
+        function displayFinancialAnalysis(analysis) {
+            const container = document.getElementById('financialAnalysis');
+
+            const statusColor = {
+                'Good': 'success',
+                'Caution': 'warning',
+                'Warning': 'warning',
+                'Critical': 'danger'
+            }[analysis.budgetStatus] || 'secondary';
+
+            container.innerHTML = `
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-chart-pie text-primary me-2"></i>
+                                <strong>Tỷ lệ chi tiêu:</strong>
+                            </div>
+                            <h4 class="text-${statusColor}">${analysis.expenseRatio}%</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-piggy-bank text-success me-2"></i>
+                                <strong>Tỷ lệ tiết kiệm:</strong>
+                            </div>
+                            <h4 class="text-success">${analysis.savingsRate}%</h4>
+                        </div>
+                    </div>
+                
+                    <div class="alert alert-${statusColor} mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Tình trạng ngân sách: ${getBudgetStatusText(analysis.budgetStatus)}</strong>
+                        </div>
+                    </div>
+
+                    <div class="recommendations">
+                        <h6><i class="fas fa-recommendations me-2"></i>Khuyến nghị:</h6>
+                        <ul class="list-unstyled">
+                            ${analysis.recommendations.map(rec => `
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    ${rec}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+        }
+
+        function updateStats(data) {
+            document.getElementById('totalSuggestions').textContent = suggestions.length;
+
+            // Count this month's suggestions
+            const thisMonth = new Date().getMonth();
+            const thisYear = new Date().getFullYear();
+            const thisMonthCount = suggestions.filter(s => {
+                const date = new Date(s.createdAt);
+                return date.getMonth() === thisMonth && date.getFullYear() === thisYear;
+            }).length;
+
+            document.getElementById('thisMonthSuggestions').textContent = thisMonthCount;
+
+            // Calculate rates
+            const savingsRate = data.monthlyIncome > 0
+                ? (((data.monthlyIncome - data.monthlyExpenses) / data.monthlyIncome) * 100).toFixed(1)
+                : 0;
+            const expenseRatio = data.monthlyIncome > 0
+                ? ((data.monthlyExpenses / data.monthlyIncome) * 100).toFixed(1)
+                : 0;
+
+            document.getElementById('savingsRate').textContent = savingsRate + '%';
+            document.getElementById('expenseRatio').textContent = expenseRatio + '%';
+        }
+
+        async function generateNewSuggestion() {
+            try {
+                showLoading('Đang tạo gợi ý mới...');
+
+                const response = await fetch('/api/dashboard/generate-ai-suggestion', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                });
+
+                if (response.ok) {
+                    await loadSuggestions();
+                    showSuccess('Đã tạo gợi ý mới thành công!');
+                } else {
+                    showError('Có lỗi xảy ra khi tạo gợi ý');
+                }
+            } catch (error) {
+                console.error('Error generating suggestion:', error);
+                showError('Có lỗi xảy ra khi tạo gợi ý');
+            }
+        }
+
+        function viewSuggestionDetail(suggestionId) {
+            const suggestion = suggestions.find(s => s.id === suggestionId);
+            if (!suggestion) return;
+
+            currentSuggestion = suggestion;
+
+            const content = document.getElementById('suggestionDetailContent');
+            content.innerHTML = `
+                    <div class="mb-3">
+                        <h6>Thời gian tạo:</h6>
+                        <p>${formatDateTime(suggestion.createdAt)}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Nội dung gợi ý:</h6>
+                        <p>${suggestion.suggestion}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Phân loại:</h6>
+                        <span class="badge bg-primary">AI Generated</span>
+                        <span class="badge bg-success">Tài chính cá nhân</span>
+                    </div>
+                `;
+
+            const modal = new bootstrap.Modal(document.getElementById('suggestionDetailModal'));
+            modal.show();
+        }
+
+        function applySuggestion() {
+            if (!currentSuggestion) return;
+
+            // TODO: Implement suggestion application logic
+            alert('Tính năng áp dụng gợi ý sẽ được cập nhật trong phiên bản tiếp theo');
+        }
+
+        function analyzeSpendingPattern() {
+            alert('Tính năng phân tích chi tiêu sẽ được cập nhật');
+        }
+
+        function suggestBudget() {
+            alert('Tính năng gợi ý ngân sách sẽ được cập nhật');
+        }
+
+        function predictTrends() {
+            alert('Tính năng dự đoán xu hướng sẽ được cập nhật');
+        }
+
+        function optimizeSavings() {
+            alert('Tính năng tối ưu tiết kiệm sẽ được cập nhật');
+        }
+
+        function refreshSuggestions() {
+            loadSuggestions();
+            loadFinancialAnalysis();
+        }
+
+        function getBudgetStatusText(status) {
+            const statusMap = {
+                'Good': 'Tốt',
+                'Caution': 'Cần chú ý',
+                'Warning': 'Cảnh báo',
+                'Critical': 'Nguy hiểm'
+            };
+            return statusMap[status] || status;
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('vi-VN');
+        }
+
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString('vi-VN');
+        }
+
+        function showLoading(message) {
+            // TODO: Implement loading UI
+            console.log('Loading:', message);
+        }
+
+        function showSuccess(message) {
+            // TODO: Implement success notification
+            console.log('Success:', message);
+        }
+
+        function showError(message) {
+            // TODO: Implement error notification
+            console.error('Error:', message);
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken') || '';
+        }
+    </script>
+}

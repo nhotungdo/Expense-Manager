@@ -1,0 +1,46 @@
+2025-10-02 23:06:28.916 +07:00 [INF] User profile is available. Using 'C:\Users\MY PC\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-10-02 23:06:30.581 +07:00 [INF] Executed DbCommand (16ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-10-02 23:06:30.603 +07:00 [INF] Executed DbCommand (11ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-10-02 23:06:30.691 +07:00 [INF] Now listening on: http://localhost:5000
+2025-10-02 23:06:30.694 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-02 23:06:30.696 +07:00 [INF] Hosting environment: Development
+2025-10-02 23:06:30.696 +07:00 [INF] Content root path: F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
+2025-10-02 23:18:45.827 +07:00 [INF] User profile is available. Using 'C:\Users\MY PC\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-10-02 23:18:46.924 +07:00 [INF] Executed DbCommand (13ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-10-02 23:18:46.979 +07:00 [INF] Executed DbCommand (44ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-10-02 23:18:47.046 +07:00 [INF] Now listening on: http://localhost:5000
+2025-10-02 23:18:47.049 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-02 23:18:47.049 +07:00 [INF] Hosting environment: Development
+2025-10-02 23:18:47.050 +07:00 [INF] Content root path: F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker

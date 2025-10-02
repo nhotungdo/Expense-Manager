@@ -5,32 +5,7 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .table-hover tbody tr:hover {
-            background-color: #f1f1f1;
-        }
-        .btn-group .btn {
-            margin-right: 5px;
-        }
-        .modal-header {
-            background-color: #007bff;
-            color: white;
-        }
-        .modal-footer .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
 }
 
 <div class="container-fluid">
@@ -368,6 +343,20 @@
         let systemActivityChart = null;
 
         $(document).ready(function () {
+            // Check authentication and admin role
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/Login';
+                return;
+            }
+
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.role !== 'ADMIN') {
+                alert('Bạn không có quyền truy cập trang này');
+                window.location.href = '/Dashboard';
+                return;
+            }
+
             loadAdminDashboardData();
         });
 
@@ -414,7 +403,7 @@
             if (userRegistrationChart) {
                 userRegistrationChart.destroy();
             }
-            
+
             const registrationData = adminDashboardData.userRegistrationData || [];
             userRegistrationChart = new Chart(registrationCtx, {
                 type: 'line',
@@ -444,7 +433,7 @@
             if (systemActivityChart) {
                 systemActivityChart.destroy();
             }
-            
+
             const activityData = adminDashboardData.systemActivityData || [];
             systemActivityChart = new Chart(activityCtx, {
                 type: 'bar',
@@ -499,39 +488,39 @@
             users.forEach(user => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>
-                        <img src="${user.pictureUrl || '/images/default-avatar.png'}" 
-                             alt="Avatar" class="rounded-circle" width="32" height="32">
-                    </td>
-                    <td>
-                        <div>
-                            <strong>${user.fullName || user.username}</strong><br>
-                            <small class="text-muted">@@${user.username}</small>
-                        </div>
-                    </td>
-                    <td>${user.email}</td>
-                    <td>
-                        <span class="badge bg-${user.role === 'ADMIN' ? 'danger' : 'primary'}">
-                            ${user.role}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="badge bg-${user.enabled ? 'success' : 'secondary'}">
-                            ${user.enabled ? 'Hoạt động' : 'Vô hiệu hóa'}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(${user.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-${user.enabled ? 'warning' : 'success'}" 
-                                    onclick="toggleUserStatus(${user.id}, ${user.enabled})">
-                                <i class="fas fa-${user.enabled ? 'ban' : 'check'}"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
+                                <td>
+                                    <img src="${user.pictureUrl || '/images/default-avatar.png'}" 
+                                         alt="Avatar" class="rounded-circle" width="32" height="32">
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>${user.fullName || user.username}</strong><br>
+                                        <small class="text-muted">@@${user.username}</small>
+                                    </div>
+                                </td>
+                                <td>${user.email}</td>
+                                <td>
+                                    <span class="badge bg-${user.role === 'ADMIN' ? 'danger' : 'primary'}">
+                                        ${user.role}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-${user.enabled ? 'success' : 'secondary'}">
+                                        ${user.enabled ? 'Hoạt động' : 'Vô hiệu hóa'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editUser(${user.id})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-${user.enabled ? 'warning' : 'success'}" 
+                                                onclick="toggleUserStatus(${user.id}, ${user.enabled})">
+                                            <i class="fas fa-${user.enabled ? 'ban' : 'check'}"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            `;
                 tbody.appendChild(row);
             });
         }
@@ -566,14 +555,14 @@
                 const suggestionDiv = document.createElement('div');
                 suggestionDiv.className = 'alert alert-info mb-2';
                 suggestionDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <i class="fas fa-lightbulb me-2"></i>
-                            ${suggestion.suggestion}
-                        </div>
-                        <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
-                    </div>
-                `;
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <i class="fas fa-lightbulb me-2"></i>
+                                        ${suggestion.suggestion}
+                                    </div>
+                                    <small class="text-muted">${formatDate(suggestion.createdAt)}</small>
+                                </div>
+                            `;
                 container.appendChild(suggestionDiv);
             });
         }
@@ -607,24 +596,24 @@
             categories.forEach(category => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${category.name}</td>
-                    <td>
-                        <span class="badge bg-${category.type === 'Income' ? 'success' : category.type === 'Expense' ? 'danger' : 'info'}">
-                            ${category.type}
-                        </span>
-                    </td>
-                    <td>${category.description || '-'}</td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${category.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
+                                <td>${category.name}</td>
+                                <td>
+                                    <span class="badge bg-${category.type === 'Income' ? 'success' : category.type === 'Expense' ? 'danger' : 'info'}">
+                                        ${category.type}
+                                    </span>
+                                </td>
+                                <td>${category.description || '-'}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${category.id})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            `;
                 tbody.appendChild(row);
             });
         }
@@ -658,14 +647,14 @@
             logs.forEach(log => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${formatDateTime(log.timestamp)}</td>
-                    <td>
-                        <span class="badge bg-${getLogTypeColor(log.type)}">
-                            ${log.type}
-                        </span>
-                    </td>
-                    <td>${log.description}</td>
-                `;
+                                <td>${formatDateTime(log.timestamp)}</td>
+                                <td>
+                                    <span class="badge bg-${getLogTypeColor(log.type)}">
+                                        ${log.type}
+                                    </span>
+                                </td>
+                                <td>${log.description}</td>
+                            `;
                 tbody.appendChild(row);
             });
         }

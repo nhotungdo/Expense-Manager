@@ -14,100 +14,508 @@
     <title>@ViewData["Title"] - MoneyTracker</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
     <style>
+        /* Login Page Styles - Modern Design */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --card-shadow-hover: 0 25px 50px rgba(0, 0, 0, 0.15);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated Background Elements */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @@keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .particle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .particle:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 70%;
+            left: 80%;
+            animation-delay: 2s;
+        }
+
+        .particle:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            top: 40%;
+            left: 10%;
+            animation-delay: 4s;
+        }
+
+        @@keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced Login Card */
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Login Header */
+        .login-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 100px;
+            height: 100px;
+            background: var(--glass-bg);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .login-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 80px;
+            height: 80px;
+            background: var(--glass-bg);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite reverse;
+        }
+
+        @@keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @@keyframes logoGlow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        .welcome-text {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Enhanced Login Body */
+        .login-body {
+            padding: 3rem 2rem;
+            background: white;
+        }
+
+        .welcome-back {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-back h4 {
+            color: #1f2937;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-back p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        /* Enhanced Google Sign-In Button */
+        .google-signin-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .google-signin-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            border-radius: 12px;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .google-signin-container:hover::before {
+            opacity: 0.1;
+        }
+
+        .g_id_signin {
+            display: flex !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+
+        .g_id_signin>div {
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        /* Terms and Privacy */
+        .terms-privacy {
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .terms-privacy a {
+            color: #4285f4;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .terms-privacy a:hover {
+            color: #3367d6;
+            text-decoration: underline;
+        }
+
+        /* Enhanced Error/Success Messages */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fef2f2 0%, #fce7e7 100%);
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #16a34a;
+            border-left: 4px solid #16a34a;
+        }
+
+        /* Footer */
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+
+        /* Loading State */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: inherit;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .login-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            max-width: 400px;
-            width: 100%;
+        .loading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+            z-index: 10;
         }
 
-        .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            text-align: center;
+        @@keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
         }
 
-        .login-body {
-            padding: 2rem;
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .login-card {
+                max-width: 100%;
+                margin: 0 1rem;
+            }
+
+            .login-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .login-body {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .welcome-text {
+                font-size: 1.1rem;
+            }
+
+            .particle {
+                display: none;
+            }
         }
 
-        .btn-google {
-            background: #db4437;
-            border: none;
-            color: white;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+        @@media (max-width: 576px) {
+            .login-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .login-body {
+                padding: 1.5rem 1rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .welcome-text {
+                font-size: 1rem;
+            }
         }
 
-        .btn-google:hover {
-            background: #c23321;
-            color: white;
-            transform: translateY(-2px);
+        /* Accessibility */
+        @@media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
-        .logo {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
+        /* Dark mode support */
+        @@media (prefers-color-scheme: dark) {
+            .login-card {
+                background: rgba(31, 41, 55, 0.95);
+                color: #f9fafb;
+            }
 
-        .welcome-text {
-            font-size: 1.1rem;
-            opacity: 0.9;
+            .login-body {
+                background: #1f2937;
+            }
+
+            .welcome-back h4 {
+                color: #f9fafb;
+            }
+
+            .welcome-back p {
+                color: #9ca3af;
+            }
+
+            .terms-privacy {
+                color: #9ca3af;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Floating Particles -->
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-8 col-lg-6 col-xl-5">
                 <div class="login-card">
                     <div class="login-header">
                         <div class="logo">
                             <i class="fas fa-wallet"></i>
                         </div>
-                        <h2 class="mb-0">MoneyTracker</h2>
+                        <h2 class="mb-2 fw-bold">MoneyTracker</h2>
                         <p class="welcome-text mb-0">Quản lý tài chính cá nhân thông minh</p>
                     </div>
                     <div class="login-body">
-                        <div class="text-center mb-4">
+                        <div class="welcome-back">
                             <h4>Chào mừng trở lại!</h4>
-                            <p class="text-muted">Đăng nhập để tiếp tục quản lý tài chính</p>
+                            <p>Đăng nhập để tiếp tục hành trình quản lý tài chính của bạn</p>
                         </div>
 
                         <div id="g_id_onload" data-client_id="@Model.GoogleClientId"
                             data-callback="handleCredentialResponse" data-auto_prompt="false">
                         </div>
 
-                        <div class="d-flex justify-content-center mb-3">
+                        <div class="google-signin-container">
                             <div class="g_id_signin" data-type="standard" data-shape="rectangular"
                                 data-theme="filled_blue" data-text="signin_with" data-size="large"
-                                data-logo_alignment="left">
+                                data-logo_alignment="left" data-width="100%">
                             </div>
                         </div>
 
-                        <div class="text-center">
-                            <small class="text-muted">
-                                Bằng cách đăng nhập, bạn đồng ý với
-                                <a href="#" class="text-primary">Điều khoản sử dụng</a>
-                                và
-                                <a href="#" class="text-primary">Chính sách bảo mật</a>
-                            </small>
+                        <!-- Alternative Custom Button (if needed) -->
+                        <!--
+                        <button class="custom-google-btn" onclick="handleGoogleSignIn()">
+                            <div class="google-icon"></div>
+                            <span>Đăng nhập với Google</span>
+                        </button>
+                        -->
+
+                        <div class="terms-privacy">
+                            Bằng cách đăng nhập, bạn đồng ý với
+                            <a href="#" onclick="showTerms()">Điều khoản sử dụng</a>
+                            và
+                            <a href="#" onclick="showPrivacy()">Chính sách bảo mật</a>
                         </div>
 
                         <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;">
@@ -116,8 +524,8 @@
                     </div>
                 </div>
 
-                <div class="text-center mt-4">
-                    <small class="text-white">
+                <div class="login-footer">
+                    <small>
                         © 2025 MoneyTracker. Tất cả quyền được bảo lưu.
                     </small>
                 </div>
@@ -149,10 +557,25 @@
                     localStorage.setItem('authToken', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
 
-                    showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
-                    setTimeout(() => {
-                        window.location.href = '/Dashboard';
-                    }, 1000);
+                    if (data.isNewUser) {
+                        showSuccess('Chào mừng bạn đến với MoneyTracker! Đang thiết lập tài khoản...');
+                        setTimeout(() => {
+                            window.location.href = '/Onboarding';
+                        }, 1500);
+                    } else {
+                        // Check user role for redirection
+                        if (data.user.role === 'ADMIN') {
+                            showSuccess('Đăng nhập thành công! Đang chuyển đến Admin Dashboard...');
+                            setTimeout(() => {
+                                window.location.href = '/Admin/Dashboard';
+                            }, 1000);
+                        } else {
+                            showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
+                            setTimeout(() => {
+                                window.location.href = '/HomePage';
+                            }, 1000);
+                        }
+                    }
                 } else {
                     const errorData = await result.text();
                     showError('Đăng nhập thất bại: ' + errorData);
@@ -184,7 +607,7 @@
                 })
                     .then(response => {
                         if (response.ok) {
-                            window.location.href = '/Dashboard';
+                            window.location.href = '/HomePage';
                         } else {
                             localStorage.removeItem('authToken');
                             localStorage.removeItem('user');
@@ -211,7 +634,44 @@
             errorDiv.className = 'alert alert-success mt-3';
         }
 
-        // No explicit loading UI required because GIS button handles states
+        function showTerms() {
+            // Show terms modal or redirect to terms page
+            alert('Điều khoản sử dụng sẽ được hiển thị ở đây');
+        }
+
+        function showPrivacy() {
+            // Show privacy modal or redirect to privacy page
+            alert('Chính sách bảo mật sẽ được hiển thị ở đây');
+        }
+
+        function addLoadingState() {
+            document.querySelector('.login-card').classList.add('loading');
+        }
+
+        function removeLoadingState() {
+            document.querySelector('.login-card').classList.remove('loading');
+        }
+
+        // Enhanced error handling with better UX
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>' + message;
+            errorDiv.style.display = 'block';
+            errorDiv.className = 'alert alert-danger mt-3';
+
+            // Auto-hide error after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Enhanced success message with better UX
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + message;
+            errorDiv.style.display = 'block';
+            errorDiv.className = 'alert alert-success mt-3';
+        }
     </script>
 </body>
 

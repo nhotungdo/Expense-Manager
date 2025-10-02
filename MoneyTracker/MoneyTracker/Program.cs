@@ -65,7 +65,11 @@ builder.Services.AddCors(options =>
 // Add Services
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IDefaultCategoryService, DefaultCategoryService>();
 builder.Services.AddHttpContextAccessor();
+
+
+
 
 // Google Auth configuration is handled in JWT configuration above
 
@@ -90,11 +94,10 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 
-// Default route to HomePage
+// Default route to Landing for non-authenticated users
 app.MapGet("/", () => Results.Redirect("/HomePage"));
 
-// Redirect Dashboard to HomePage
-app.MapGet("/Dashboard", () => Results.Redirect("/HomePage"));
+// Dashboard route - will be handled by Razor Pages
 
 // Ensure database is created
 using (var scope = app.Services.CreateScope())

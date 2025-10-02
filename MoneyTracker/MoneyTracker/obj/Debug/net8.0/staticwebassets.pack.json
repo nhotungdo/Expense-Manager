@@ -5,18 +5,6 @@
       "PackagePath": "staticwebassets\\MoneyTracker.bundle.scp.css"
     },
     {
-      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\home.css",
-      "PackagePath": "staticwebassets\\css\\home.css"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\index.css",
-      "PackagePath": "staticwebassets\\css\\index.css"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\landing.css",
-      "PackagePath": "staticwebassets\\css\\landing.css"
-    },
-    {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

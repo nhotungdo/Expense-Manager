@@ -1,0 +1,323 @@
+@page
+@model MoneyTracker.Pages.OnboardingModel
+@{
+    ViewData["Title"] = "Thiết lập tài khoản";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MoneyTracker</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/onboarding.css" asp-append-version="true" />
+
+</head>
+
+<body>
+    <div class="onboarding-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="onboarding-card welcome-animation">
+                        <div class="onboarding-header">
+                            <div class="mb-3">
+                                <i class="fas fa-wallet fa-3x"></i>
+                            </div>
+                            <h1 class="mb-3">Chào mừng đến với MoneyTracker!</h1>
+                            <p class="mb-0 fs-5">Hãy cùng thiết lập tài khoản để bắt đầu quản lý tài chính thông minh
+                            </p>
+                        </div>
+
+                        <div class="onboarding-body">
+                            <!-- Step Indicator -->
+                            <div class="step-indicator" id="stepIndicator">
+                                <div class="step active" id="step1">1</div>
+                                <div class="step" id="step2">2</div>
+                                <div class="step" id="step3">3</div>
+                            </div>
+
+                            <!-- Step 1: Welcome & Profile -->
+                            <div class="step-content active" id="content1">
+                                <div class="welcome-animation">
+                                    <div class="text-center mb-4">
+                                        <h3>Xin chào, <span id="userName"></span>!</h3>
+                                        <p class="text-muted">Chúng tôi đã tải thông tin cơ bản từ Google của bạn</p>
+                                    </div>
+
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-8">
+                                            <div class="user-info">
+                                                <img id="userAvatar" src="" alt="Avatar" class="user-avatar"
+                                                    style="display: none;">
+                                                <div id="userAvatarPlaceholder"
+                                                    class="user-avatar bg-primary text-white d-flex align-items-center justify-content-center mx-auto"
+                                                    style="font-size: 2rem; font-weight: bold;">
+                                                    U
+                                                </div>
+                                                <h4 id="userFullName" class="mb-2"></h4>
+                                                <p class="text-muted mb-3" id="userEmail"></p>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-shield-alt me-1"></i>
+                                                    Thông tin được bảo mật và an toàn
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mt-4">
+                                        <h5 class="mb-3">Sẵn sàng bắt đầu hành trình quản lý tài chính?</h5>
+                                        <div class="d-flex justify-content-center gap-3">
+                                            <button class="btn btn-primary btn-lg" onclick="nextStep()">
+                                                <i class="fas fa-rocket me-2"></i>Tiếp tục
+                                            </button>
+                                            <button class="btn btn-outline-primary" onclick="skipToEnd()">
+                                                <i class="fas fa-forward me-2"></i>Bỏ qua
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Default Categories Setup -->
+                            <div class="step-content" id="content2">
+                                <div class="text-center mb-4">
+                                    <h3>Thiết lập danh mục mặc định</h3>
+                                    <p class="text-muted">Chúng tôi sẽ tạo sẵn các danh mục phổ biến để bạn dễ dàng quản
+                                        lý thu chi</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="text-success mb-3">
+                                            <i class="fas fa-arrow-up me-2"></i>Danh mục Thu nhập
+                                        </h5>
+                                        <div id="incomeCategories" class="mb-4">
+                                            <!-- Income categories will be loaded here -->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="text-danger mb-3">
+                                            <i class="fas fa-arrow-down me-2"></i>Danh mục Chi tiêu
+                                        </h5>
+                                        <div id="expenseCategories">
+                                            <!-- Expense categories will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button class="btn btn-outline-primary me-3" onclick="prevStep()">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                    </button>
+                                    <button class="btn btn-primary" onclick="setupCategories()">
+                                        Thiết lập danh mục <i class="fas fa-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Complete -->
+                            <div class="step-content" id="content3">
+                                <div class="text-center">
+                                    <div class="mb-4">
+                                        <i class="fas fa-check-circle fa-5x text-success"></i>
+                                    </div>
+                                    <h3>Hoàn tất thiết lập!</h3>
+                                    <p class="text-muted mb-4">Tài khoản của bạn đã được thiết lập thành công. Bạn có
+                                        thể bắt đầu sử dụng MoneyTracker ngay bây giờ.</p>
+
+                                    <div class="row justify-content-center mb-4">
+                                        <div class="col-md-8">
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-lightbulb me-2"></i>Gợi ý cho bước tiếp theo:</h6>
+                                                <ul class="mb-0 text-start">
+                                                    <li>Thêm giao dịch đầu tiên của bạn</li>
+                                                    <li>Xem tổng quan tài chính trên Dashboard</li>
+                                                    <li>Tùy chỉnh danh mục theo nhu cầu</li>
+                                                    <li>Khám phá tính năng AI Suggestions</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-primary btn-lg" onclick="goToDashboard()">
+                                        Bắt đầu sử dụng <i class="fas fa-rocket ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let currentStep = 1;
+        let defaultCategories = {};
+
+        $(document).ready(function () {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/Login';
+                return;
+            }
+
+            // Load user info
+            loadUserInfo();
+            loadDefaultCategories();
+        });
+
+        function loadUserInfo() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+            $('#userName').text(user.fullName || user.username || 'Bạn');
+            $('#userFullName').text(user.fullName || user.username);
+            $('#userEmail').text(user.email);
+
+            if (user.pictureUrl) {
+                $('#userAvatar').attr('src', user.pictureUrl).show();
+                $('#userAvatarPlaceholder').hide();
+            } else {
+                const initial = (user.fullName || user.username || 'U').charAt(0).toUpperCase();
+                $('#userAvatarPlaceholder').text(initial).show();
+                $('#userAvatar').hide();
+            }
+        }
+
+        async function loadDefaultCategories() {
+            try {
+                const response = await fetch('/api/onboarding/default-categories', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    }
+                });
+
+                if (response.ok) {
+                    defaultCategories = await response.json();
+                    displayCategories();
+                }
+            } catch (error) {
+                console.error('Error loading default categories:', error);
+            }
+        }
+
+        function displayCategories() {
+            // Display income categories
+            const incomeContainer = $('#incomeCategories');
+            incomeContainer.empty();
+
+            defaultCategories.incomeCategories.forEach(category => {
+                incomeContainer.append(`
+                    <div class="d-flex align-items-center mb-2 p-2 border rounded">
+                        <i class="fas fa-plus-circle text-success me-2"></i>
+                        <div>
+                            <strong>${category.name}</strong>
+                            <small class="d-block text-muted">${category.description}</small>
+                        </div>
+                    </div>
+                `);
+            });
+
+            // Display expense categories
+            const expenseContainer = $('#expenseCategories');
+            expenseContainer.empty();
+
+            defaultCategories.expenseCategories.forEach(category => {
+                expenseContainer.append(`
+                    <div class="d-flex align-items-center mb-2 p-2 border rounded">
+                        <i class="fas fa-minus-circle text-danger me-2"></i>
+                        <div>
+                            <strong>${category.name}</strong>
+                            <small class="d-block text-muted">${category.description}</small>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < 3) {
+                // Hide current step
+                $(`#content${currentStep}`).removeClass('active');
+                $(`#step${currentStep}`).removeClass('active').addClass('completed');
+
+                // Show next step
+                currentStep++;
+                $(`#content${currentStep}`).addClass('active');
+                $(`#step${currentStep}`).addClass('active');
+
+                // Update progress indicator
+                updateProgressIndicator();
+            }
+        }
+
+        function skipToEnd() {
+            // Mark all steps as completed and go to final step
+            for (let i = 1; i <= 2; i++) {
+                $(`#step${i}`).removeClass('active').addClass('completed');
+                $(`#content${i}`).removeClass('active');
+            }
+
+            currentStep = 3;
+            $('#content3').addClass('active');
+            $('#step3').addClass('active');
+            updateProgressIndicator();
+        }
+
+        function updateProgressIndicator() {
+            const indicator = $('#stepIndicator');
+            indicator.removeClass('progress-1 progress-2 progress-3');
+            if (currentStep > 1) {
+                indicator.addClass('progress-' + (currentStep - 1));
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                // Hide current step
+                $(`#content${currentStep}`).removeClass('active');
+                $(`#step${currentStep}`).removeClass('active');
+
+                // Show previous step
+                currentStep--;
+                $(`#content${currentStep}`).addClass('active');
+                $(`#step${currentStep}`).removeClass('completed').addClass('active');
+            }
+        }
+
+        async function setupCategories() {
+            try {
+                const response = await fetch('/api/onboarding/setup-default-categories', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    }
+                });
+
+                if (response.ok) {
+                    nextStep();
+                } else {
+                    alert('Có lỗi xảy ra khi thiết lập danh mục. Vui lòng thử lại.');
+                }
+            } catch (error) {
+                console.error('Error setting up categories:', error);
+                alert('Có lỗi xảy ra khi thiết lập danh mục. Vui lòng thử lại.');
+            }
+        }
+
+        function goToDashboard() {
+            window.location.href = '/HomePage';
+        }
+    </script>
+</body>
+
+</html>

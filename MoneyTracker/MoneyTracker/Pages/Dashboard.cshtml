@@ -5,60 +5,7 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
-        body {
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-        .dashboard-card {
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        .financial-overview-card {
-            color: white;
-        }
-        .balance-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .income-card {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-        }
-        .expense-card {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-        .ratio-card {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-        }
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-        .transaction-type-badge {
-            font-size: 0.9rem;
-            padding: 0.4em 0.75em;
-        }
-        .transaction-amount {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        .ai-suggestion {
-            background: #fff3cd;
-            border-left: 4px solid #ffeeba;
-            padding: 1rem;
-            border-radius: 8px;
-        }
-        .quick-action-btn {
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-        .quick-action-btn:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 }
 
 <div class="container-fluid px-4">
@@ -66,11 +13,22 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-1 text-gradient">
-                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                    </h1>
-                    <p class="text-muted mb-0">Tổng quan tài chính cá nhân của bạn</p>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <img id="userAvatar" src="" alt="Avatar" class="rounded-circle" width="50" height="50"
+                            style="display: none;">
+                        <div id="userAvatarPlaceholder"
+                            class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px; font-weight: bold;">
+                            U
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-1 text-gradient">
+                            <i class="fas fa-tachometer-alt me-2"></i>Chào <span id="userGreeting">bạn</span>!
+                        </h1>
+                        <p class="text-muted mb-0">Tổng quan tài chính cá nhân của bạn</p>
+                    </div>
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
@@ -179,7 +137,8 @@
                             <i class="fas fa-chart-pie me-2 text-primary"></i>Chi tiêu theo danh mục
                         </h5>
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu">
@@ -207,11 +166,13 @@
                             <i class="fas fa-chart-line me-2 text-success"></i>Xu hướng thu chi 6 tháng
                         </h5>
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="exportChart('line')">Xuất biểu đồ</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportChart('line')">Xuất biểu đồ</a>
+                                </li>
                                 <li><a class="dropdown-item" href="#" onclick="refreshChart('line')">Làm mới</a></li>
                             </ul>
                         </div>
@@ -237,7 +198,8 @@
                             <i class="fas fa-history me-2 text-info"></i>Giao dịch gần nhất
                         </h5>
                         <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="loadRecentTransactions()" title="Làm mới">
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadRecentTransactions()"
+                                title="Làm mới">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                             <a href="/Expenses" class="btn btn-sm btn-primary">
@@ -289,7 +251,8 @@
                         <h5 class="card-title mb-0 text-dark">
                             <i class="fas fa-robot me-2 text-warning"></i>Gợi ý AI
                         </h5>
-                        <button class="btn btn-sm btn-outline-primary" onclick="generateAISuggestion()" title="Tạo gợi ý mới">
+                        <button class="btn btn-sm btn-outline-primary" onclick="generateAISuggestion()"
+                            title="Tạo gợi ý mới">
                             <i class="fas fa-magic"></i>
                         </button>
                     </div>
@@ -317,7 +280,8 @@
                 <div class="card-body p-4">
                     <div class="row g-3">
                         <div class="col-lg-3 col-md-6">
-                            <button class="btn quick-action-btn w-100 h-100 border-danger text-danger" onclick="showAddExpenseModal()">
+                            <button class="btn quick-action-btn w-100 h-100 border-danger text-danger"
+                                onclick="showAddExpenseModal()">
                                 <div class="d-flex flex-column align-items-center justify-content-center h-100">
                                     <i class="fas fa-minus-circle fa-3x mb-3"></i>
                                     <h6 class="mb-2 fw-bold">Thêm chi tiêu</h6>
@@ -326,7 +290,8 @@
                             </button>
                         </div>
                         <div class="col-lg-3 col-md-6">
-                            <button class="btn quick-action-btn w-100 h-100 border-success text-success" onclick="showAddIncomeModal()">
+                            <button class="btn quick-action-btn w-100 h-100 border-success text-success"
+                                onclick="showAddIncomeModal()">
                                 <div class="d-flex flex-column align-items-center justify-content-center h-100">
                                     <i class="fas fa-plus-circle fa-3x mb-3"></i>
                                     <h6 class="mb-2 fw-bold">Thêm thu nhập</h6>
@@ -335,7 +300,9 @@
                             </button>
                         </div>
                         <div class="col-lg-3 col-md-6">
-                            <a href="/Categories" class="btn quick-action-btn w-100 h-100 border-primary text-primary text-decoration-none" onclick="return true;">
+                            <a href="/Categories"
+                                class="btn quick-action-btn w-100 h-100 border-primary text-primary text-decoration-none"
+                                onclick="return true;">
                                 <div class="d-flex flex-column align-items-center justify-content-center h-100">
                                     <i class="fas fa-tags fa-3x mb-3"></i>
                                     <h6 class="mb-2 fw-bold">Quản lý danh mục</h6>
@@ -344,7 +311,9 @@
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-6">
-                            <a href="/Profile" class="btn quick-action-btn w-100 h-100 border-secondary text-secondary text-decoration-none" onclick="return true;">
+                            <a href="/Profile"
+                                class="btn quick-action-btn w-100 h-100 border-secondary text-secondary text-decoration-none"
+                                onclick="return true;">
                                 <div class="d-flex flex-column align-items-center justify-content-center h-100">
                                     <i class="fas fa-user-cog fa-3x mb-3"></i>
                                     <h6 class="mb-2 fw-bold">Cài đặt tài khoản</h6>
@@ -370,12 +339,14 @@
             <div class="modal-body">
                 <ul class="nav nav-tabs" id="transactionTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="expense-tab" data-bs-toggle="tab" data-bs-target="#expense" type="button" role="tab">
+                        <button class="nav-link active" id="expense-tab" data-bs-toggle="tab" data-bs-target="#expense"
+                            type="button" role="tab">
                             <i class="fas fa-minus-circle text-danger me-2"></i>Chi tiêu
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="income-tab" data-bs-toggle="tab" data-bs-target="#income" type="button" role="tab">
+                        <button class="nav-link" id="income-tab" data-bs-toggle="tab" data-bs-target="#income"
+                            type="button" role="tab">
                             <i class="fas fa-plus-circle text-success me-2"></i>Thu nhập
                         </button>
                     </li>
@@ -473,8 +444,8 @@
             document.getElementById('currentBalance').textContent = formatCurrency(dashboardData.netWorth || 0);
             document.getElementById('monthlyIncome').textContent = formatCurrency(dashboardData.monthlyIncome || 0);
             document.getElementById('monthlyExpenses').textContent = formatCurrency(dashboardData.monthlyExpenses || 0);
-            
-            const expenseRatio = dashboardData.monthlyIncome > 0 
+
+            const expenseRatio = dashboardData.monthlyIncome > 0
                 ? ((dashboardData.monthlyExpenses / dashboardData.monthlyIncome) * 100).toFixed(1)
                 : 0;
             document.getElementById('expenseRatio').textContent = expenseRatio + '%';
@@ -486,7 +457,7 @@
             if (expensesPieChart) {
                 expensesPieChart.destroy();
             }
-            
+
             const expensesData = dashboardData.expensesByCategory || [];
             expensesPieChart = new Chart(expensesCtx, {
                 type: 'pie',
@@ -495,7 +466,7 @@
                     datasets: [{
                         data: expensesData.map(item => item.amount),
                         backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
                             '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
                         ]
                     }]
@@ -516,7 +487,7 @@
             if (monthlyTrendsChart) {
                 monthlyTrendsChart.destroy();
             }
-            
+
             const trendsData = dashboardData.monthlyTrends || [];
             monthlyTrendsChart = new Chart(trendsCtx, {
                 type: 'line',
@@ -555,14 +526,14 @@
 
             if (transactions.length === 0) {
                 tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="fas fa-inbox fa-2x mb-3 d-block"></i>
-                            <div>Chưa có giao dịch nào</div>
-                            <small>Hãy thêm giao dịch đầu tiên của bạn</small>
-                        </td>
-                    </tr>
-                `;
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-3 d-block"></i>
+                                    <div>Chưa có giao dịch nào</div>
+                                    <small>Hãy thêm giao dịch đầu tiên của bạn</small>
+                                </td>
+                            </tr>
+                        `;
                 return;
             }
 
@@ -570,31 +541,31 @@
                 const row = document.createElement('tr');
                 row.className = 'transaction-row';
                 row.innerHTML = `
-                    <td class="py-3 px-4">
-                        <span class="badge transaction-type-badge bg-${transaction.type === 'Income' ? 'success' : 'danger'}">
-                            <i class="fas fa-${transaction.type === 'Income' ? 'arrow-up' : 'arrow-down'} me-1"></i>
-                            ${transaction.type === 'Income' ? 'Thu nhập' : 'Chi tiêu'}
-                        </span>
-                    </td>
-                    <td class="py-3 px-4">
-                        <span class="transaction-amount ${transaction.type === 'Income' ? 'text-success' : 'text-danger'}">
-                            ${transaction.type === 'Income' ? '+' : '-'}${formatCurrency(transaction.amount)}
-                        </span>
-                    </td>
-                    <td class="py-3 px-4">
-                        <span class="badge bg-light text-dark">
-                            <i class="fas fa-folder me-1"></i>${transaction.category}
-                        </span>
-                    </td>
-                    <td class="py-3 px-4">
-                        <small class="text-muted">${formatDate(transaction.date)}</small>
-                    </td>
-                    <td class="py-3 px-4">
-                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="${transaction.note || ''}">
-                            ${transaction.note || '-'}
-                        </span>
-                    </td>
-                `;
+                            <td class="py-3 px-4">
+                                <span class="badge transaction-type-badge bg-${transaction.type === 'Income' ? 'success' : 'danger'}">
+                                    <i class="fas fa-${transaction.type === 'Income' ? 'arrow-up' : 'arrow-down'} me-1"></i>
+                                    ${transaction.type === 'Income' ? 'Thu nhập' : 'Chi tiêu'}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="transaction-amount ${transaction.type === 'Income' ? 'text-success' : 'text-danger'}">
+                                    ${transaction.type === 'Income' ? '+' : '-'}${formatCurrency(transaction.amount)}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-folder me-1"></i>${transaction.category}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <small class="text-muted">${formatDate(transaction.date)}</small>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-truncate d-inline-block" style="max-width: 150px;" title="${transaction.note || ''}">
+                                    ${transaction.note || '-'}
+                                </span>
+                            </td>
+                        `;
                 tbody.appendChild(row);
             });
         }
@@ -606,12 +577,12 @@
 
             if (suggestions.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-4 text-muted">
-                        <i class="fas fa-robot fa-3x mb-3 text-warning"></i>
-                        <div class="mb-2">Chưa có gợi ý nào</div>
-                        <small>Nhấn nút <i class="fas fa-magic"></i> để tạo gợi ý mới</small>
-                    </div>
-                `;
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-robot fa-3x mb-3 text-warning"></i>
+                                <div class="mb-2">Chưa có gợi ý nào</div>
+                                <small>Nhấn nút <i class="fas fa-magic"></i> để tạo gợi ý mới</small>
+                            </div>
+                        `;
                 return;
             }
 
@@ -619,20 +590,20 @@
                 const suggestionDiv = document.createElement('div');
                 suggestionDiv.className = 'ai-suggestion mb-3';
                 suggestionDiv.innerHTML = `
-                    <div class="d-flex align-items-start">
-                        <div class="flex-shrink-0 me-3">
-                            <div class="bg-warning bg-opacity-20 rounded-circle p-2">
-                                <i class="fas fa-lightbulb text-warning"></i>
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="bg-warning bg-opacity-20 rounded-circle p-2">
+                                        <i class="fas fa-lightbulb text-warning"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-2 small">${suggestion.suggestion}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>${formatDate(suggestion.createdAt)}
+                                    </small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <p class="mb-2 small">${suggestion.suggestion}</p>
-                            <small class="text-muted">
-                                <i class="fas fa-clock me-1"></i>${formatDate(suggestion.createdAt)}
-                            </small>
-                        </div>
-                    </div>
-                `;
+                        `;
                 container.appendChild(suggestionDiv);
             });
         }
@@ -649,10 +620,10 @@
                     const categories = await response.json();
                     const expenseSelect = document.getElementById('expenseCategory');
                     const incomeSelect = document.getElementById('incomeCategory');
-                    
+
                     expenseSelect.innerHTML = '<option value="">Chọn danh mục</option>';
                     incomeSelect.innerHTML = '<option value="">Chọn danh mục</option>';
-                    
+
                     categories.forEach(category => {
                         const option1 = new Option(category.name, category.id);
                         const option2 = new Option(category.name, category.id);
@@ -689,7 +660,7 @@
         async function saveTransaction() {
             const activeTab = document.querySelector('#transactionTabs .nav-link.active');
             const isExpense = activeTab.id === 'expense-tab';
-            
+
             const form = isExpense ? document.getElementById('addExpenseForm') : document.getElementById('addIncomeForm');
             if (!form.checkValidity()) {
                 form.reportValidity();
@@ -797,13 +768,13 @@
             const element = document.getElementById(elementId);
             if (element) {
                 element.innerHTML = `
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Đang tải...</span>
-                        </div>
-                        <div class="mt-2 text-muted">Đang tải dữ liệu...</div>
-                    </div>
-                `;
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                                <div class="mt-2 text-muted">Đang tải dữ liệu...</div>
+                            </div>
+                        `;
             }
         }
 
@@ -823,11 +794,38 @@
 
         // Initialize dashboard with animation
         $(document).ready(function () {
+            // Check authentication first
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/Login';
+                return;
+            }
+
+            // Load user info
+            loadUserInfo();
+
             loadDashboardData().then(() => {
                 animateCards();
             });
             loadCategories();
             setDefaultDates();
         });
+
+        function loadUserInfo() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+            // Update greeting
+            const firstName = user.fullName ? user.fullName.split(' ')[0] : (user.username || 'bạn');
+            $('#userGreeting').text(firstName);
+
+            // Update avatar
+            if (user.pictureUrl) {
+                $('#userAvatar').attr('src', user.pictureUrl).show();
+                $('#userAvatarPlaceholder').hide();
+            } else {
+                const initial = firstName.charAt(0).toUpperCase();
+                $('#userAvatarPlaceholder').text(initial);
+            }
+        }
     </script>
 }

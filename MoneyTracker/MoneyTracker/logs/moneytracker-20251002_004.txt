@@ -1,0 +1,334 @@
+2025-10-02 22:47:53.531 +07:00 [INF] User profile is available. Using 'C:\Users\MY PC\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-10-02 22:47:54.541 +07:00 [INF] Executed DbCommand (15ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-10-02 22:47:54.593 +07:00 [INF] Executed DbCommand (39ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-10-02 22:47:54.826 +07:00 [INF] Now listening on: https://localhost:7249
+2025-10-02 22:47:54.828 +07:00 [INF] Now listening on: http://localhost:5001
+2025-10-02 22:47:54.919 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-02 22:47:54.921 +07:00 [INF] Hosting environment: Development
+2025-10-02 22:47:54.923 +07:00 [INF] Content root path: F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
+2025-10-02 22:47:55.649 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/ - null null
+2025-10-02 22:47:55.884 +07:00 [INF] Executing endpoint 'HTTP: GET /'
+2025-10-02 22:47:55.893 +07:00 [INF] Executing RedirectResult, redirecting to /Landing.
+2025-10-02 22:47:55.895 +07:00 [INF] Executed endpoint 'HTTP: GET /'
+2025-10-02 22:47:55.900 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/ - 302 0 null 264.6484ms
+2025-10-02 22:47:55.908 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Landing - null null
+2025-10-02 22:47:55.916 +07:00 [INF] Executing endpoint '/Landing'
+2025-10-02 22:47:55.943 +07:00 [INF] Route matched with {page = "/Landing", action = "", controller = ""}. Executing page /Landing
+2025-10-02 22:47:55.953 +07:00 [INF] Executing handler method MoneyTracker.Pages.LandingModel.OnGet - ModelState is "Valid"
+2025-10-02 22:47:55.955 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:47:55.958 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:47:55.958 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:47:56.009 +07:00 [INF] Executed page /Landing in 60.0468ms
+2025-10-02 22:47:56.011 +07:00 [INF] Executed endpoint '/Landing'
+2025-10-02 22:47:56.014 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Landing - 200 null text/html; charset=utf-8 106.3158ms
+2025-10-02 22:47:56.019 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:47:56.025 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:47:56.025 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:47:56.030 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 11.8363ms
+2025-10-02 22:47:56.043 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 18.1695ms
+2025-10-02 22:47:56.054 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:47:56.095 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 69.8104ms
+2025-10-02 22:48:07.003 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Login - null null
+2025-10-02 22:48:07.009 +07:00 [INF] Executing endpoint '/Login'
+2025-10-02 22:48:07.014 +07:00 [INF] Route matched with {page = "/Login", action = "", controller = ""}. Executing page /Login
+2025-10-02 22:48:07.016 +07:00 [INF] Executing handler method MoneyTracker.Pages.LoginModel.OnGet - ModelState is "Valid"
+2025-10-02 22:48:07.017 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:48:07.019 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:48:07.020 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:48:07.031 +07:00 [INF] Executed page /Login in 15.1769ms
+2025-10-02 22:48:07.032 +07:00 [INF] Executed endpoint '/Login'
+2025-10-02 22:48:07.033 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Login - 200 null text/html; charset=utf-8 30.7007ms
+2025-10-02 22:48:07.054 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:48:07.057 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 3.1903ms
+2025-10-02 22:48:07.059 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:48:07.059 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:48:07.060 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:48:07.063 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 4.976ms
+2025-10-02 22:48:07.089 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 30.0357ms
+2025-10-02 22:48:07.107 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/api/auth/me - null null
+2025-10-02 22:48:07.191 +07:00 [INF] Executing endpoint 'MoneyTracker.Controllers.AuthController.GetCurrentUser (MoneyTracker)'
+2025-10-02 22:48:07.212 +07:00 [INF] Route matched with {action = "GetCurrentUser", controller = "Auth", page = ""}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetCurrentUser() on controller MoneyTracker.Controllers.AuthController (MoneyTracker).
+2025-10-02 22:48:07.636 +07:00 [INF] Executed DbCommand (40ms) [Parameters=[@__p_0='?' (DbType = Int64)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[id], [u].[address], [u].[created_at], [u].[date_of_birth], [u].[default_currency], [u].[email], [u].[email_notifications], [u].[enabled], [u].[full_name], [u].[gender], [u].[google_id], [u].[language], [u].[last_login], [u].[password], [u].[phone_number], [u].[picture_url], [u].[push_notifications], [u].[role], [u].[theme], [u].[timezone], [u].[updated_at], [u].[username]
+FROM [users] AS [u]
+WHERE [u].[id] = @__p_0
+2025-10-02 22:48:07.731 +07:00 [INF] Executing OkObjectResult, writing value of type 'MoneyTracker.Models.DTOs.UserDto'.
+2025-10-02 22:48:07.745 +07:00 [INF] Executed action MoneyTracker.Controllers.AuthController.GetCurrentUser (MoneyTracker) in 530.488ms
+2025-10-02 22:48:07.748 +07:00 [INF] Executed endpoint 'MoneyTracker.Controllers.AuthController.GetCurrentUser (MoneyTracker)'
+2025-10-02 22:48:07.752 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/api/auth/me - 200 null application/json; charset=utf-8 645.93ms
+2025-10-02 22:48:07.754 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/HomePage - null null
+2025-10-02 22:48:07.760 +07:00 [INF] Executing endpoint '/HomePage'
+2025-10-02 22:48:07.763 +07:00 [INF] Route matched with {page = "/HomePage", action = "", controller = ""}. Executing page /HomePage
+2025-10-02 22:48:07.765 +07:00 [INF] Executing handler method MoneyTracker.Pages.HomePageModel.OnGet - ModelState is "Valid"
+2025-10-02 22:48:07.766 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:48:07.767 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:48:07.768 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:48:07.791 +07:00 [INF] Executed page /HomePage in 26.773ms
+2025-10-02 22:48:07.794 +07:00 [INF] Executed endpoint '/HomePage'
+2025-10-02 22:48:07.795 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/HomePage - 200 null text/html; charset=utf-8 41.9152ms
+2025-10-02 22:48:07.809 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:48:07.813 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 3.9402ms
+2025-10-02 22:48:07.816 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:48:07.817 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/css/site.css - null null
+2025-10-02 22:48:07.818 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/css/homepage.css - null null
+2025-10-02 22:48:07.818 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/MoneyTracker.styles.css - null null
+2025-10-02 22:48:07.819 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/js/site.js - null null
+2025-10-02 22:48:07.824 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:48:07.818 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/css/dashboard.css - null null
+2025-10-02 22:48:07.819 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:48:07.874 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 55.0256ms
+2025-10-02 22:48:07.890 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 66.2772ms
+2025-10-02 22:48:07.892 +07:00 [INF] Sending file. Request path: '/MoneyTracker.styles.css'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\scopedcss\bundle\MoneyTracker.styles.css'
+2025-10-02 22:48:07.892 +07:00 [INF] Sending file. Request path: '/css/dashboard.css'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\wwwroot\css\dashboard.css'
+2025-10-02 22:48:07.892 +07:00 [INF] Sending file. Request path: '/js/site.js'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\wwwroot\js\site.js'
+2025-10-02 22:48:07.892 +07:00 [INF] Sending file. Request path: '/css/site.css'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\wwwroot\css\site.css'
+2025-10-02 22:48:07.892 +07:00 [INF] Sending file. Request path: '/css/homepage.css'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\wwwroot\css\homepage.css'
+2025-10-02 22:48:07.895 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/MoneyTracker.styles.css - 200 1130 text/css 76.8557ms
+2025-10-02 22:48:07.896 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/css/dashboard.css - 200 9854 text/css 78.0083ms
+2025-10-02 22:48:07.897 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/js/site.js - 200 231 text/javascript 78.5222ms
+2025-10-02 22:48:07.898 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/css/site.css - 200 362 text/css 81.7475ms
+2025-10-02 22:48:07.900 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/css/homepage.css - 200 4635 text/css 81.9777ms
+2025-10-02 22:48:13.530 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/HomePage - null null
+2025-10-02 22:48:13.536 +07:00 [INF] Executing endpoint '/HomePage'
+2025-10-02 22:48:13.538 +07:00 [INF] Route matched with {page = "/HomePage", action = "", controller = ""}. Executing page /HomePage
+2025-10-02 22:48:13.539 +07:00 [INF] Executing handler method MoneyTracker.Pages.HomePageModel.OnGet - ModelState is "Valid"
+2025-10-02 22:48:13.541 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:48:13.542 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:48:13.543 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:48:13.550 +07:00 [INF] Executed page /HomePage in 10.9374ms
+2025-10-02 22:48:13.552 +07:00 [INF] Executed endpoint '/HomePage'
+2025-10-02 22:48:13.553 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/HomePage - 200 null text/html; charset=utf-8 23.6642ms
+2025-10-02 22:48:13.569 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:48:13.571 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 3.1371ms
+2025-10-02 22:48:13.574 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:48:13.575 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:48:13.577 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:48:13.580 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 5.0296ms
+2025-10-02 22:48:13.599 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 22.6857ms
+2025-10-02 22:48:15.058 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Dashboard - null null
+2025-10-02 22:48:15.065 +07:00 [INF] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+2025-10-02 22:48:15.070 +07:00 [INF] AuthenticationScheme: Bearer was challenged.
+2025-10-02 22:48:15.071 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Dashboard - 401 0 null 13.1579ms
+2025-10-02 22:48:16.316 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:48:16.321 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 5.4061ms
+2025-10-02 22:48:17.567 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Expenses - null null
+2025-10-02 22:48:17.571 +07:00 [INF] Executing endpoint '/Expenses'
+2025-10-02 22:48:17.576 +07:00 [INF] Route matched with {page = "/Expenses", action = "", controller = ""}. Executing page /Expenses
+2025-10-02 22:48:17.578 +07:00 [INF] Executing handler method MoneyTracker.Pages.ExpensesModel.OnGet - ModelState is "Valid"
+2025-10-02 22:48:17.579 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:48:17.580 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:48:17.581 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:48:17.587 +07:00 [INF] Executed page /Expenses in 9.6722ms
+2025-10-02 22:48:17.588 +07:00 [INF] Executed endpoint '/Expenses'
+2025-10-02 22:48:17.592 +07:00 [WRN] Unable to configure Browser Link script injection on the response. 
+2025-10-02 22:48:17.594 +07:00 [WRN] Unable to configure browser refresh script injection on the response. Consider manually adding '<script src="/_framework/aspnetcore-browser-refresh.js"></script>' to the body of the page.
+2025-10-02 22:48:17.594 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Expenses - 200 null text/html; charset=utf-8 28.0953ms
+2025-10-02 22:48:18.958 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:48:18.962 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 5.394ms
+2025-10-02 22:48:19.795 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Categories - null null
+2025-10-02 22:48:19.800 +07:00 [INF] Executing endpoint '/Categories'
+2025-10-02 22:48:19.803 +07:00 [INF] Route matched with {page = "/Categories", action = "", controller = ""}. Executing page /Categories
+2025-10-02 22:48:19.805 +07:00 [INF] Executing handler method MoneyTracker.Pages.CategoriesModel.OnGet - ModelState is "Valid"
+2025-10-02 22:48:19.806 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:48:19.808 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:48:19.808 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:48:19.814 +07:00 [INF] Executed page /Categories in 9.5623ms
+2025-10-02 22:48:19.815 +07:00 [INF] Executed endpoint '/Categories'
+2025-10-02 22:48:19.816 +07:00 [WRN] Unable to configure Browser Link script injection on the response. 
+2025-10-02 22:48:19.816 +07:00 [WRN] Unable to configure browser refresh script injection on the response. Consider manually adding '<script src="/_framework/aspnetcore-browser-refresh.js"></script>' to the body of the page.
+2025-10-02 22:48:19.818 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Categories - 200 null text/html; charset=utf-8 22.5867ms
+2025-10-02 22:48:20.931 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:48:20.935 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 5.1969ms
+2025-10-02 22:59:11.718 +07:00 [INF] User profile is available. Using 'C:\Users\MY PC\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-10-02 22:59:12.345 +07:00 [INF] Executed DbCommand (10ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-10-02 22:59:12.375 +07:00 [INF] Executed DbCommand (23ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-10-02 22:59:12.419 +07:00 [INF] Now listening on: http://localhost:5183
+2025-10-02 22:59:12.420 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-02 22:59:12.421 +07:00 [INF] Hosting environment: Development
+2025-10-02 22:59:12.421 +07:00 [INF] Content root path: F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
+2025-10-02 22:59:39.438 +07:00 [INF] User profile is available. Using 'C:\Users\MY PC\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-10-02 22:59:40.386 +07:00 [INF] Executed DbCommand (14ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-10-02 22:59:40.408 +07:00 [INF] Executed DbCommand (9ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-10-02 22:59:40.655 +07:00 [INF] Now listening on: https://localhost:7249
+2025-10-02 22:59:40.656 +07:00 [INF] Now listening on: http://localhost:5001
+2025-10-02 22:59:40.728 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-02 22:59:40.730 +07:00 [INF] Hosting environment: Development
+2025-10-02 22:59:40.731 +07:00 [INF] Content root path: F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
+2025-10-02 22:59:41.138 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/ - null null
+2025-10-02 22:59:42.453 +07:00 [INF] Executing endpoint 'HTTP: GET /'
+2025-10-02 22:59:42.468 +07:00 [INF] Executing RedirectResult, redirecting to /Landing.
+2025-10-02 22:59:42.471 +07:00 [INF] Executed endpoint 'HTTP: GET /'
+2025-10-02 22:59:42.478 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/ - 302 0 null 1352.8415ms
+2025-10-02 22:59:42.485 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Landing - null null
+2025-10-02 22:59:42.497 +07:00 [INF] Executing endpoint '/Landing'
+2025-10-02 22:59:42.534 +07:00 [INF] Route matched with {page = "/Landing", action = "", controller = ""}. Executing page /Landing
+2025-10-02 22:59:42.545 +07:00 [INF] Executing handler method MoneyTracker.Pages.LandingModel.OnGet - ModelState is "Valid"
+2025-10-02 22:59:42.547 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:59:42.550 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:59:42.550 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:59:42.608 +07:00 [INF] Executed page /Landing in 69.0386ms
+2025-10-02 22:59:42.610 +07:00 [INF] Executed endpoint '/Landing'
+2025-10-02 22:59:42.614 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Landing - 200 null text/html; charset=utf-8 129.2338ms
+2025-10-02 22:59:42.620 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:59:42.629 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:59:42.629 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/css/landing.css - null null
+2025-10-02 22:59:42.631 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:59:42.633 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 12.5888ms
+2025-10-02 22:59:42.654 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 25.5628ms
+2025-10-02 22:59:42.662 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:59:42.672 +07:00 [INF] Sending file. Request path: '/css/landing.css'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\wwwroot\css\landing.css'
+2025-10-02 22:59:42.691 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/css/landing.css - 200 2159 text/css 62.5656ms
+2025-10-02 22:59:42.727 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 95.6597ms
+2025-10-02 22:59:47.817 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Login - null null
+2025-10-02 22:59:47.824 +07:00 [INF] Executing endpoint '/Login'
+2025-10-02 22:59:47.831 +07:00 [INF] Route matched with {page = "/Login", action = "", controller = ""}. Executing page /Login
+2025-10-02 22:59:47.832 +07:00 [INF] Executing handler method MoneyTracker.Pages.LoginModel.OnGet - ModelState is "Valid"
+2025-10-02 22:59:47.834 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:59:47.835 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:59:47.836 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:59:47.848 +07:00 [INF] Executed page /Login in 16.0749ms
+2025-10-02 22:59:47.850 +07:00 [INF] Executed endpoint '/Login'
+2025-10-02 22:59:47.851 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Login - 200 null text/html; charset=utf-8 34.2923ms
+2025-10-02 22:59:47.871 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:59:47.875 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 4.1989ms
+2025-10-02 22:59:47.875 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/css/login.css - null null
+2025-10-02 22:59:47.875 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:59:47.878 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:59:47.886 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 11.2263ms
+2025-10-02 22:59:47.880 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:59:47.896 +07:00 [INF] Sending file. Request path: '/css/login.css'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\wwwroot\css\login.css'
+2025-10-02 22:59:47.901 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/css/login.css - 200 1503 text/css 26.1448ms
+2025-10-02 22:59:47.913 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 35.0314ms
+2025-10-02 22:59:47.937 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/api/auth/me - null null
+2025-10-02 22:59:48.034 +07:00 [INF] Executing endpoint 'MoneyTracker.Controllers.AuthController.GetCurrentUser (MoneyTracker)'
+2025-10-02 22:59:48.048 +07:00 [INF] Route matched with {action = "GetCurrentUser", controller = "Auth", page = ""}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetCurrentUser() on controller MoneyTracker.Controllers.AuthController (MoneyTracker).
+2025-10-02 22:59:48.556 +07:00 [INF] Executed DbCommand (83ms) [Parameters=[@__p_0='?' (DbType = Int64)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[id], [u].[address], [u].[created_at], [u].[date_of_birth], [u].[default_currency], [u].[email], [u].[email_notifications], [u].[enabled], [u].[full_name], [u].[gender], [u].[google_id], [u].[language], [u].[last_login], [u].[password], [u].[phone_number], [u].[picture_url], [u].[push_notifications], [u].[role], [u].[theme], [u].[timezone], [u].[updated_at], [u].[username]
+FROM [users] AS [u]
+WHERE [u].[id] = @__p_0
+2025-10-02 22:59:48.696 +07:00 [INF] Executing OkObjectResult, writing value of type 'MoneyTracker.Models.DTOs.UserDto'.
+2025-10-02 22:59:48.717 +07:00 [INF] Executed action MoneyTracker.Controllers.AuthController.GetCurrentUser (MoneyTracker) in 665.4506ms
+2025-10-02 22:59:48.719 +07:00 [INF] Executed endpoint 'MoneyTracker.Controllers.AuthController.GetCurrentUser (MoneyTracker)'
+2025-10-02 22:59:48.723 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/api/auth/me - 200 null application/json; charset=utf-8 787.2531ms
+2025-10-02 22:59:48.726 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/HomePage - null null
+2025-10-02 22:59:48.731 +07:00 [INF] Executing endpoint '/HomePage'
+2025-10-02 22:59:48.734 +07:00 [INF] Route matched with {page = "/HomePage", action = "", controller = ""}. Executing page /HomePage
+2025-10-02 22:59:48.736 +07:00 [INF] Executing handler method MoneyTracker.Pages.HomePageModel.OnGet - ModelState is "Valid"
+2025-10-02 22:59:48.737 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:59:48.738 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:59:48.739 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:59:48.766 +07:00 [INF] Executed page /HomePage in 29.7789ms
+2025-10-02 22:59:48.767 +07:00 [INF] Executed endpoint '/HomePage'
+2025-10-02 22:59:48.769 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/HomePage - 200 null text/html; charset=utf-8 43.6158ms
+2025-10-02 22:59:48.787 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:59:48.789 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 3.5479ms
+2025-10-02 22:59:48.793 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:59:48.797 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/css/homepage.css - null null
+2025-10-02 22:59:48.797 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:59:48.797 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/MoneyTracker.styles.css - null null
+2025-10-02 22:59:48.801 +07:00 [INF] The file /css/homepage.css was not modified
+2025-10-02 22:59:48.804 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 7.6324ms
+2025-10-02 22:59:48.798 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:59:48.808 +07:00 [INF] Sending file. Request path: '/MoneyTracker.styles.css'. Physical path: 'F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\scopedcss\bundle\MoneyTracker.styles.css'
+2025-10-02 22:59:48.808 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/css/homepage.css - 304 null text/css 12.0543ms
+2025-10-02 22:59:48.818 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/MoneyTracker.styles.css - 200 1130 text/css 20.3984ms
+2025-10-02 22:59:48.830 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 31.8979ms
+2025-10-02 22:59:54.207 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/Reports - null null
+2025-10-02 22:59:54.214 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/Reports - 404 0 null 6.8551ms
+2025-10-02 22:59:54.218 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/Reports, Response status code: 404
+2025-10-02 22:59:55.798 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:59:55.803 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 5.4071ms
+2025-10-02 22:59:57.520 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/HomePage - null null
+2025-10-02 22:59:57.526 +07:00 [INF] Executing endpoint '/HomePage'
+2025-10-02 22:59:57.527 +07:00 [INF] Route matched with {page = "/HomePage", action = "", controller = ""}. Executing page /HomePage
+2025-10-02 22:59:57.529 +07:00 [INF] Executing handler method MoneyTracker.Pages.HomePageModel.OnGet - ModelState is "Valid"
+2025-10-02 22:59:57.530 +07:00 [INF] Executed handler method OnGet, returned result .
+2025-10-02 22:59:57.531 +07:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-10-02 22:59:57.533 +07:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-10-02 22:59:57.540 +07:00 [INF] Executed page /HomePage in 11.0099ms
+2025-10-02 22:59:57.541 +07:00 [INF] Executed endpoint '/HomePage'
+2025-10-02 22:59:57.542 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/HomePage - 200 null text/html; charset=utf-8 22.4872ms
+2025-10-02 22:59:57.560 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-10-02 22:59:57.563 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css - 404 0 null 3.3641ms
+2025-10-02 22:59:57.568 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/MoneyTracker.styles.css - null null
+2025-10-02 22:59:57.568 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7249/lib/bootstrap/dist/css/bootstrap.min.css, Response status code: 404
+2025-10-02 22:59:57.568 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:59:57.570 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_vs/browserLink - null null
+2025-10-02 22:59:57.571 +07:00 [INF] The file /MoneyTracker.styles.css was not modified
+2025-10-02 22:59:57.578 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 10.3084ms
+2025-10-02 22:59:57.582 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/MoneyTracker.styles.css - 304 null text/css 14.469ms
+2025-10-02 22:59:57.592 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_vs/browserLink - 200 null text/javascript; charset=UTF-8 22.0539ms
+2025-10-02 22:59:58.655 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - null null
+2025-10-02 22:59:58.659 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7249/_framework/aspnetcore-browser-refresh.js - 200 13760 application/javascript; charset=utf-8 3.7401ms
+2025-10-02 23:06:27.895 +07:00 [INF] User profile is available. Using 'C:\Users\MY PC\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-10-02 23:06:29.837 +07:00 [INF] Executed DbCommand (31ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-10-02 23:06:29.932 +07:00 [INF] Executed DbCommand (81ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-10-02 23:06:30.115 +07:00 [INF] Now listening on: http://localhost:5183
+2025-10-02 23:06:30.119 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-02 23:06:30.120 +07:00 [INF] Hosting environment: Development
+2025-10-02 23:06:30.121 +07:00 [INF] Content root path: F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
