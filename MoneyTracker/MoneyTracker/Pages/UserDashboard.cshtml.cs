@@ -1,23 +1,20 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 
-namespace MoneyTracker.Pages.Admin
+namespace MoneyTracker.Pages
 {
-    // Temporarily remove [Authorize] to allow access for testing
-    public class DashboardModel : PageModel
+    public class UserDashboardModel : PageModel
     {
-        private readonly ILogger<DashboardModel> _logger;
+        private readonly ILogger<UserDashboardModel> _logger;
 
-        public DashboardModel(ILogger<DashboardModel> logger)
+        public UserDashboardModel(ILogger<UserDashboardModel> logger)
         {
             _logger = logger;
         }
 
         public void OnGet()
         {
-            // Admin Dashboard page initialization
+            // User Dashboard page initialization
         }
 
         public string GetCurrentUserId()
@@ -35,9 +32,9 @@ namespace MoneyTracker.Pages.Admin
             return User.FindFirst(ClaimTypes.Name)?.Value ?? "";
         }
 
-        public bool IsAdmin()
+        public bool IsUser()
         {
-            return User.IsInRole("ADMIN");
+            return User.IsInRole("USER") || !User.IsInRole("ADMIN");
         }
     }
 }

@@ -5,12 +5,40 @@
       "PackagePath": "staticwebassets\\MoneyTracker.bundle.scp.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\admin-dashboard.css",
+      "PackagePath": "staticwebassets\\css\\admin-dashboard.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\flopay-dashboard.css",
+      "PackagePath": "staticwebassets\\css\\flopay-dashboard.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\flopay-homepage.css",
+      "PackagePath": "staticwebassets\\css\\flopay-homepage.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\flopay-onboarding.css",
+      "PackagePath": "staticwebassets\\css\\flopay-onboarding.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\homepage.css",
+      "PackagePath": "staticwebassets\\css\\homepage.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\user-dashboard.css",
+      "PackagePath": "staticwebassets\\css\\user-dashboard.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\flopay-onboarding.js",
+      "PackagePath": "staticwebassets\\js\\flopay-onboarding.js"
     },
     {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\site.js",
