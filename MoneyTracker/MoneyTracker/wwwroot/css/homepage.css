@@ -1,0 +1,197 @@
+﻿/* ==== GLOBAL ==== */
+body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    color: #fff;
+    line-height: 1.6;
+}
+
+.text-gradient {
+    background: linear-gradient(90deg, #f9d423, #ff4e50);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+/* ==== PARTICLES ==== */
+.welcome-header {
+    position: relative;
+    overflow: hidden;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    margin-bottom: 2.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.3);
+}
+
+.particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: float 6s infinite ease-in-out;
+}
+
+    .particle:nth-child(1) {
+        top: 10%;
+        left: 20%;
+        animation-delay: 0s;
+    }
+
+    .particle:nth-child(2) {
+        top: 40%;
+        left: 80%;
+        animation-delay: 2s;
+    }
+
+    .particle:nth-child(3) {
+        top: 70%;
+        left: 50%;
+        animation-delay: 4s;
+    }
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: translateY(-20px);
+        opacity: 0.4;
+    }
+}
+
+/* ==== STATS CARDS ==== */
+.stats-card {
+    padding: 1.8rem;
+    border-radius: 1.5rem;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    color: #fff;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    transition: transform .3s, box-shadow .3s;
+    position: relative;
+    overflow: hidden;
+}
+
+    .stats-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+    }
+
+.stats-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.stats-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.stats-change {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+    .stats-change.positive {
+        color: #4ade80;
+    }
+
+    .stats-change.negative {
+        color: #f87171;
+    }
+
+/* ==== QUICK ACTIONS ==== */
+.quick-actions {
+    padding: 2rem;
+    border-radius: 1.5rem;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    margin-bottom: 2.5rem;
+}
+
+.action-btn {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-radius: 1.2rem;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    transition: transform .25s, background .25s;
+}
+
+    .action-btn:hover {
+        transform: translateY(-4px);
+        background: rgba(255,255,255,0.15);
+    }
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #fff;
+}
+
+/* Gradient sets */
+.expense-icon {
+    background: linear-gradient(135deg,#ff416c,#ff4b2b);
+}
+
+.income-icon {
+    background: linear-gradient(135deg,#11998e,#38ef7d);
+}
+
+.balance-icon {
+    background: linear-gradient(135deg,#4776e6,#8e54e9);
+}
+
+.savings-icon {
+    background: linear-gradient(135deg,#f7971e,#ffd200);
+}
+
+/* ==== RECENT TRANSACTIONS ==== */
+.recent-transactions {
+    padding: 2rem;
+    border-radius: 1.5rem;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    height: 100%;
+}
+
+/* ==== NOTIFICATIONS ==== */
+.notifications-list .notification-item {
+    transition: transform .2s;
+}
+
+    .notifications-list .notification-item:hover {
+        transform: scale(1.02);
+    }
+
+/* ==== SMALL UTILITIES ==== */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.shadow-sm {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25) !important;
+}
