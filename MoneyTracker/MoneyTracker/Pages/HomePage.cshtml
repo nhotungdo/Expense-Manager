@@ -10,112 +10,752 @@
 }
 
 <div class="money-tracking-homepage">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">Chào mừng đến với Money Tracking</h1>
-            <p class="hero-subtitle">Giải pháp quản lý tài chính cá nhân toàn diện và thông minh</p>
-            <div class="hero-actions">
-                <a href="/Dashboard" class="btn btn-primary btn-lg">
-                    <i class="fas fa-tachometer-alt me-2"></i>
-                    Truy cập Dashboard
-                </a>
-                <a href="/Onboarding" class="btn btn-outline-primary btn-lg">
-                    <i class="fas fa-rocket me-2"></i>
-                    Bắt đầu ngay
-                </a>
+    <!-- ========================================
+         NAVIGATION BAR
+         ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <!-- Brand Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="/HomePage">
+                <i class="fas fa-wallet me-2"></i>
+                <span class="fw-bold">MoneyTracker</span>
+            </a>
+
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Menu -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <!-- Features Link -->
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="#features">
+                            <i class="fas fa-star me-1"></i>
+                            Tính năng
+                        </a>
+                    </li>
+
+                    <!-- About Link -->
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="#about">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Giới thiệu
+                        </a>
+                    </li>
+
+                    <!-- Contact Link -->
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="#contact">
+                            <i class="fas fa-envelope me-1"></i>
+                            Liên hệ
+                        </a>
+                    </li>
+
+                    <!-- Notifications with Badge -->
+                    <li class="nav-item">
+                        <a class="nav-link px-3 position-relative" href="#notifications">
+                            <i class="fas fa-bell me-1"></i>
+                            <span class="d-none d-lg-inline">Thông báo</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                                  style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                                3
+                                <span class="visually-hidden">thông báo chưa đọc</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <!-- Divider for Desktop -->
+                    <li class="nav-item d-none d-lg-block">
+                        <span class="nav-link px-2 text-muted">|</span>
+                    </li>
+
+                    <!-- Login Button -->
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-light px-4 mx-1 my-2 my-lg-0" href="/Login">
+                            <i class="fas fa-sign-in-alt me-1"></i>
+                            Đăng nhập
+                        </a>
+                    </li>
+
+                    <!-- Register Button -->
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary px-4 mx-1 my-2 my-lg-0" href="/Register">
+                            <i class="fas fa-user-plus me-1"></i>
+                            Đăng ký
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
-        <div class="hero-image">
-            <div class="floating-card">
-                <div class="card-header">
-                    <h3>Số dư của bạn</h3>
-                    <div class="balance">14.231.000 ₫</div>
+    </nav>
+
+    <!-- ========================================
+         HERO SECTION
+         ======================================== -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-100">
+                <!-- Hero Content -->
+                <div class="col-lg-6">
+        <div class="hero-content">
+                        <!-- Hero Badge -->
+                        <div class="hero-badge mb-4">
+                            <span class="badge bg-primary-gradient">
+                                <i class="fas fa-star me-2"></i>
+                                #1 Ứng dụng quản lý tài chính
+                            </span>
+                        </div>
+
+                        <!-- Hero Title -->
+                        <h1 class="hero-title">
+                            <span class="text-gradient">Chào mừng đến với</span><br>
+                            <span class="text-primary">Money Tracking</span>
+                        </h1>
+
+                        <!-- Hero Subtitle -->
+                        <p class="hero-subtitle">
+                            Giải pháp quản lý tài chính cá nhân toàn diện và thông minh. 
+                            Kiểm soát chi tiêu, tiết kiệm tiền và đạt được mục tiêu tài chính của bạn.
+                        </p>
+
+                        <!-- Hero Stats -->
+                        <div class="hero-stats mb-4">
+                            <div class="stat-item">
+                                <div class="stat-number">50K+</div>
+                                <div class="stat-label">Người dùng</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">$2M+</div>
+                                <div class="stat-label">Tiết kiệm</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">4.9★</div>
+                                <div class="stat-label">Đánh giá</div>
+                            </div>
+                        </div>
+
+                        <!-- Hero Actions -->
+            <div class="hero-actions">
+                            <a href="/Onboarding" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-rocket me-2"></i>
+                                Bắt đầu miễn phí
+                            </a>
+                            <a href="#demo" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-play me-2"></i>
+                                Xem demo
+                            </a>
+                        </div>
+
+                        <!-- Hero Trust -->
+                        <div class="hero-trust mt-4">
+                            <p class="text-muted small mb-2">Được tin tưởng bởi</p>
+                            <div class="trust-logos">
+                                <div class="trust-logo">🏦</div>
+                                <div class="trust-logo">💳</div>
+                                <div class="trust-logo">📱</div>
+                                <div class="trust-logo">🔒</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <div class="summary-item">
-                        <span class="label">Nhà ở</span>
-                        <span class="value">3.021.000 ₫</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">Điện nước</span>
-                        <span class="value">2.100.000 ₫</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">Làm vườn</span>
-                        <span class="value">3.320.000 ₫</span>
+
+                <!-- Hero Visual -->
+                <div class="col-lg-6">
+                    <div class="hero-visual">
+                        <div class="floating-cards">
+                            <!-- Card 1: Total Assets -->
+                            <div class="card card-1">
+                                <div class="card-header">
+                                    <i class="fas fa-wallet"></i>
+                                    <span>Tổng tài sản</span>
+                                </div>
+                                <div class="card-amount">$12,450</div>
+                                <div class="card-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    +12.5%
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Monthly Expenses -->
+                            <div class="card card-2">
+                                <div class="card-header">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Chi tiêu tháng</span>
+                                </div>
+                                <div class="card-amount">$3,200</div>
+                                <div class="card-progress">
+                                    <div class="progress-bar" style="width: 65%"></div>
+            </div>
+        </div>
+       
+                            <!-- Card 3: Savings -->
+                            <div class="card card-3">
+                                <div class="card-header">
+                                    <i class="fas fa-piggy-bank"></i>
+                                    <span>Tiết kiệm</span>
+                                </div>
+                                <div class="card-amount">$2,100</div>
+                                <div class="card-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    +8.2%
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Features Section -->
-    <div class="features-section">
+    <!-- ========================================
+         FEATURES SECTION
+         ======================================== -->
+    <div class="features-section" id="features">
         <div class="container">
+            <!-- Section Header -->
+            <div class="text-center mb-5">
+                <span class="badge bg-primary-gradient mb-3">
+                    <i class="fas fa-star me-2"></i>
+                    Tính năng nổi bật
+                </span>
             <h2 class="section-title">Tại sao chọn Money Tracking?</h2>
+                <p class="section-subtitle">Khám phá những tính năng mạnh mẽ giúp bạn quản lý tài chính hiệu quả</p>
+            </div>
+
+            <!-- Features Grid -->
             <div class="features-grid">
-                <div class="feature-card">
+                <!-- Feature 1: Smart Wallet -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
                     <div class="feature-icon">
                         <i class="fas fa-wallet"></i>
                     </div>
                     <h3>Ví thông minh</h3>
-                    <p>Quản lý tất cả tài khoản tài chính của bạn ở một nơi với phân loại thông minh và thông tin chi
-                        tiết.</p>
+                    <p>Quản lý tất cả tài khoản tài chính của bạn ở một nơi với phân loại thông minh và thông tin chi tiết.</p>
+                    <div class="feature-link">
+                        <a href="#" class="btn btn-link">
+                            Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="feature-card">
+
+                <!-- Feature 2: Analytics & Reports -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
                     <div class="feature-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <h3>Phân tích & Báo cáo</h3>
-                    <p>Nhận thông tin chi tiết về mô hình chi tiêu và tình hình tài chính với các biểu đồ trực quan đẹp
-                        mắt.</p>
+                    <p>Nhận thông tin chi tiết về mô hình chi tiêu và tình hình tài chính với các biểu đồ trực quan đẹp mắt.</p>
+                    <div class="feature-link">
+                        <a href="#" class="btn btn-link">
+                            Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="feature-card">
+
+                <!-- Feature 3: AI Suggestions -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
                     <div class="feature-icon">
                         <i class="fas fa-robot"></i>
                     </div>
                     <h3>Gợi ý AI</h3>
-                    <p>Nhận các khuyến nghị cá nhân hóa để tối ưu hóa quyết định tài chính và tiết kiệm nhiều tiền hơn.
-                    </p>
+                    <p>Nhận các khuyến nghị cá nhân hóa để tối ưu hóa quyết định tài chính và tiết kiệm nhiều tiền hơn.</p>
+                    <div class="feature-link">
+                        <a href="#" class="btn btn-link">
+                            Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="feature-card">
+
+                <!-- Feature 4: Security & Privacy -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
                     <div class="feature-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <h3>Bảo mật & Riêng tư</h3>
-                    <p>Dữ liệu tài chính của bạn được mã hóa và bảo mật. Chúng tôi không bao giờ chia sẻ thông tin cá
-                        nhân của bạn.</p>
+                    <p>Dữ liệu tài chính của bạn được mã hóa và bảo mật. Chúng tôi không bao giờ chia sẻ thông tin cá nhân của bạn.</p>
+                    <div class="feature-link">
+                        <a href="#" class="btn btn-link">
+                            Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Feature 5: Mobile App -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Ứng dụng di động</h3>
+                    <p>Truy cập và quản lý tài chính mọi lúc mọi nơi với ứng dụng di động tiện lợi và dễ sử dụng.</p>
+                    <div class="feature-link">
+                        <a href="#" class="btn btn-link">
+                            Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Feature 6: Real-time Sync -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Đồng bộ thời gian thực</h3>
+                    <p>Dữ liệu được đồng bộ tự động trên tất cả thiết bị, đảm bảo bạn luôn có thông tin mới nhất.</p>
+                    <div class="feature-link">
+                        <a href="#" class="btn btn-link">
+                            Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- CTA Section -->
-    <div class="cta-section">
+    <!-- ========================================
+         STATS SECTION
+         ======================================== -->
+    <div class="stats-section">
         <div class="container">
-            <div class="cta-content">
-                <h2>Sẵn sàng kiểm soát tài chính của bạn?</h2>
-                <p>Tham gia cùng hàng nghìn người dùng tin tưởng Money Tracking cho nhu cầu quản lý tài chính của họ.
-                </p>
-                <a href="/Dashboard" class="btn btn-primary btn-lg">
-                    <i class="fas fa-rocket me-2"></i>
-                    Bắt đầu ngay
-                </a>
+            <div class="row text-center">
+                <!-- Stat 1: Users -->
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-box">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Người dùng</div>
+                    </div>
+                </div>
+
+                <!-- Stat 2: Savings -->
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-box">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-number">$2M+</div>
+                        <div class="stat-label">Tiết kiệm</div>
+                    </div>
+                </div>
+
+                <!-- Stat 3: Rating -->
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-box">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-number">4.9</div>
+                        <div class="stat-label">Đánh giá</div>
+                    </div>
+                </div>
+
+                <!-- Stat 4: Countries -->
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-box">
+                        <div class="stat-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="stat-number">25+</div>
+                        <div class="stat-label">Quốc gia</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- ========================================
+         TESTIMONIALS SECTION
+         ======================================== -->
+    <div class="testimonials-section">
+        <div class="container">
+            <!-- Section Header -->
+            <div class="text-center mb-5">
+                <span class="badge bg-primary-gradient mb-3">
+                    <i class="fas fa-quote-left me-2"></i>
+                    Phản hồi khách hàng
+                </span>
+                <h2 class="section-title">Người dùng nói gì về chúng tôi</h2>
+            </div>
+
+            <!-- Testimonials Grid -->
+            <div class="testimonials-grid">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"Money Tracking đã giúp tôi tiết kiệm được 30% chi phí mỗi tháng. Giao diện đẹp và dễ sử dụng!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://via.placeholder.com/50" alt="Nguyễn Văn A">
+                        </div>
+                        <div class="author-info">
+                            <h5>Nguyễn Văn A</h5>
+                            <span>Doanh nhân</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"Tính năng AI gợi ý rất hữu ích. Tôi đã học được cách quản lý tài chính tốt hơn nhờ ứng dụng này."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://via.placeholder.com/50" alt="Trần Thị B">
+                        </div>
+                        <div class="author-info">
+                            <h5>Trần Thị B</h5>
+                            <span>Nhân viên văn phòng</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"Bảo mật tuyệt vời và đồng bộ mượt mà trên mọi thiết bị. Tôi rất yên tâm khi sử dụng."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://via.placeholder.com/50" alt="Lê Văn C">
+                        </div>
+                        <div class="author-info">
+                            <h5>Lê Văn C</h5>
+                            <span>Freelancer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         CTA SECTION
+         ======================================== -->
+    <div class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <div class="row align-items-center">
+                    <!-- CTA Content -->
+                    <div class="col-lg-8">
+                <h2>Sẵn sàng kiểm soát tài chính của bạn?</h2>
+                        <p>Tham gia cùng hàng nghìn người dùng tin tưởng Money Tracking cho nhu cầu quản lý tài chính của họ. Bắt đầu miễn phí ngay hôm nay!</p>
+                        
+                        <!-- CTA Features -->
+                        <div class="cta-features">
+                            <div class="cta-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Miễn phí 30 ngày đầu</span>
+                            </div>
+                            <div class="cta-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Không cần thẻ tín dụng</span>
+                            </div>
+                            <div class="cta-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Hỗ trợ 24/7</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="col-lg-4 text-center">
+                        <div class="cta-buttons">
+                            <a href="/Onboarding" class="btn btn-primary btn-lg mb-3">
+                    <i class="fas fa-rocket me-2"></i>
+                                Bắt đầu miễn phí
+                </a>
+                            <p class="small text-muted">Đã có tài khoản? <a href="/Login" class="text-primary">Đăng nhập</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         FOOTER
+         ======================================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <!-- Brand Section -->
+                <div class="col-lg-4 mb-4">
+                    <div class="footer-brand">
+                        <div class="brand-logo">
+                            <i class="fas fa-wallet"></i>
+                            <span>MoneyTracker</span>
+                        </div>
+                        <p>Giải pháp quản lý tài chính cá nhân toàn diện và thông minh nhất.</p>
+                        <div class="social-links">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Links -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Sản phẩm</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Tính năng</a></li>
+                        <li><a href="#">Bảng giá</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">Tích hợp</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support Links -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Hỗ trợ</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                        <li><a href="#">Tài liệu</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                        <li><a href="#">Trạng thái</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company Links -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Công ty</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Về chúng tôi</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Tuyển dụng</a></li>
+                        <li><a href="#">Báo chí</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal Links -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Pháp lý</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Điều khoản</a></li>
+                        <li><a href="#">Bảo mật</a></li>
+                        <li><a href="#">Cookie</a></li>
+                        <li><a href="#">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer Divider -->
+            <hr class="footer-divider">
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0">&copy; 2025 MoneyTracker. Tất cả quyền được bảo lưu.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0">Được phát triển với <i class="fas fa-heart text-danger"></i> tại Việt Nam</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // For testing, allow access to both pages
-            // const token = localStorage.getItem('authToken');
-            // if (token) {
-            //     // Redirect to dashboard if already logged in
-            //     window.location.href = '/Dashboard';
-            // }
+            // ========================================
+            // NAVBAR FUNCTIONALITY
+            // ========================================
+            
+            // Navbar scroll effect
+            $(window).scroll(function() {
+                if ($(window).scrollTop() > 50) {
+                    $('.navbar').addClass('scrolled');
+                } else {
+                    $('.navbar').removeClass('scrolled');
+                }
+            });
+
+            // Mobile menu close on link click
+            $('.navbar-nav .nav-link').on('click', function() {
+                if ($(window).width() < 992) {
+                    $('.navbar-collapse').collapse('hide');
+                }
+            });
+
+            // ========================================
+            // SMOOTH SCROLLING
+            // ========================================
+            
+            // Smooth scrolling for anchor links
+            $('a[href^="#"]').on('click', function(event) {
+                var target = $(this.getAttribute('href'));
+                if (target.length) {
+                    event.preventDefault();
+                    $('html, body').stop().animate({
+                        scrollTop: target.offset().top - 80
+                    }, 1000);
+                }
+            });
+
+            // ========================================
+            // ANIMATIONS
+            // ========================================
+            
+            // Animate numbers on scroll
+            function animateNumbers() {
+                $('.stat-number').each(function() {
+                    var $this = $(this);
+                    var countTo = $this.attr('data-count');
+                    
+                    if (countTo) {
+                        $({ countNum: $this.text() }).animate({
+                            countNum: countTo
+                        }, {
+                            duration: 2000,
+                            easing: 'swing',
+                            step: function() {
+                                $this.text(Math.floor(this.countNum));
+                            },
+                            complete: function() {
+                                $this.text(this.countNum);
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Intersection Observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                        
+                        // Animate numbers when stats section comes into view
+                        if (entry.target.classList.contains('stats-section')) {
+                            animateNumbers();
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements for animation
+            document.querySelectorAll('.feature-card, .testimonial-card, .stat-box').forEach(el => {
+                observer.observe(el);
+            });
+
+            // ========================================
+            // INTERACTIVE ELEMENTS
+            // ========================================
+            
+            // Add loading animation to buttons
+            $('.btn').on('click', function() {
+                var $btn = $(this);
+                var originalText = $btn.html();
+                
+                if (!$btn.hasClass('no-loading')) {
+                    $btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang tải...');
+                    $btn.prop('disabled', true);
+                    
+                    // Re-enable after 2 seconds
+                    setTimeout(function() {
+                        $btn.html(originalText);
+                        $btn.prop('disabled', false);
+                    }, 2000);
+                }
+            });
+
+            // Parallax effect for hero section
+            $(window).scroll(function() {
+                var scrolled = $(window).scrollTop();
+                var parallax = $('.hero-section');
+                var speed = scrolled * 0.5;
+                parallax.css('transform', 'translateY(' + speed + 'px)');
+            });
+
+            // Add hover effects to floating cards
+            $('.card').hover(
+                function() {
+                    $(this).css('transform', 'translateY(-10px) scale(1.02)');
+                },
+                function() {
+                    $(this).css('transform', 'translateY(0) scale(1)');
+                }
+            );
+
+            // ========================================
+            // USER AUTHENTICATION
+            // ========================================
+            
+            // Check if user is already logged in
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // Update navbar for logged in users
+                updateNavbarForLoggedInUser();
+            }
         });
+
+        // ========================================
+        // USER MENU FUNCTIONS
+        // ========================================
+        
+        function updateNavbarForLoggedInUser() {
+            // Hide login/register buttons and show user menu
+            $('.navbar-nav .nav-link[href="/Login"]').parent().hide();
+            $('.navbar-nav .nav-link[href="/Register"]').parent().hide();
+            
+            // Add user menu
+            var userMenu = `
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>
+                        Tài khoản
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/Profile"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="/Dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </li>
+            `;
+            $('.navbar-nav').append(userMenu);
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/HomePage';
+        }
     </script>
 }

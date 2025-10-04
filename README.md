@@ -181,7 +181,7 @@ cd Expense-Manager/MoneyTracker/MoneyTracker
 3. **Cấu hình Google OAuth**
 - Tạo Google OAuth credentials tại [Google Cloud Console](https://console.cloud.google.com/)
 - Cập nhật `ClientId` và `ClientSecret` trong `appsettings.json`
-- Authorized redirect URI: `https://localhost:5001/signin-google` và `http://localhost:5000/signin-google`
+- Authorized redirect URI: `https://localhost:7249/signin-google`
 
 4. **Cấu hình Email (Optional)**
 - Cập nhật email settings trong `appsettings.json`
@@ -194,7 +194,7 @@ dotnet restore
 dotnet run
 ```
 
-Ứng dụng chạy tại: `https://localhost:5001`
+Ứng dụng chạy tại: `https://localhost:7249`
 
 ## 🔧 Cấu hình
 

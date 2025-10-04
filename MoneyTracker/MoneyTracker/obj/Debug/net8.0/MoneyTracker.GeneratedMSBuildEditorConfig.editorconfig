@@ -17,71 +17,71 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = MoneyTracker
 build_property.RootNamespace = MoneyTracker
-build_property.ProjectDir = f:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\
+build_property.ProjectDir = F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = f:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
+build_property.MSBuildProjectDirectory = F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
 build_property._RazorSourceGeneratorDebug = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Admin/Dashboard.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Admin/Users.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Admin/Users.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cVXNlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/AiSuggestions.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/AiSuggestions.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWlTdWdnZXN0aW9ucy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Categories.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Categories.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Dashboard.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Expenses.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Expenses.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXhwZW5zZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/HomePage.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/HomePage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZVBhZ2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Incomes.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Incomes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5jb21lcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Landing.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Landing.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGFuZGluZy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Login.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Onboarding.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Onboarding.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT25ib2FyZGluZy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Profile.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Shared/_ValidationScriptsPartial.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/UserDashboard.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/UserDashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckRhc2hib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Shared/_Layout.cshtml]
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-994o21g4ka

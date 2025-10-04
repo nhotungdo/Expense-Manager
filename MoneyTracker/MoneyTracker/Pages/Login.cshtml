@@ -572,7 +572,7 @@
                         } else {
                             showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
                             setTimeout(() => {
-                                window.location.href = '/HomePage';
+                                window.location.href = '/Onboarding';
                             }, 1000);
                         }
                     }
@@ -607,7 +607,7 @@
                 })
                     .then(response => {
                         if (response.ok) {
-                            window.location.href = '/HomePage';
+                            window.location.href = '/Onboarding';
                         } else {
                             localStorage.removeItem('authToken');
                             localStorage.removeItem('user');

@@ -21,10 +21,6 @@
       "PackagePath": "staticwebassets\\css\\flopay-onboarding.css"
     },
     {
-      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\homepage.css",
-      "PackagePath": "staticwebassets\\css\\homepage.css"
-    },
-    {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
