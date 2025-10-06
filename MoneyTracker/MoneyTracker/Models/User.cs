@@ -51,11 +51,17 @@ public partial class User
 
     public virtual ICollection<AiSuggestion> AiSuggestions { get; set; } = new List<AiSuggestion>();
 
+    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+
+    public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
+
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
 
     public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
 
     public virtual ICollection<Income> Incomes { get; set; } = new List<Income>();
+
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Email> Emails { get; set; } = new List<Email>();
 }

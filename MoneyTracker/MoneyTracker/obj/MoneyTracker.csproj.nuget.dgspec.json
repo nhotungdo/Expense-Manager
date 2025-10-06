@@ -54,6 +54,14 @@
               "target": "Package",
               "version": "[12.0.1, )"
             },
+            "ClosedXML": {
+              "target": "Package",
+              "version": "[0.102.2, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
             "Google.Apis.Auth": {
               "target": "Package",
               "version": "[1.68.0, )"
@@ -103,6 +111,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[7.0.3, )"
+            },
+            "iTextSharp": {
+              "target": "Package",
+              "version": "[5.5.13.3, )"
             }
           },
           "imports": [

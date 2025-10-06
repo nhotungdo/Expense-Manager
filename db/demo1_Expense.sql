@@ -149,6 +149,67 @@ CREATE TABLE emails (
 PRINT 'Created emails table';
 
 -- ========================================
+-- Bảng audit_logs (ghi log hoạt động hệ thống)
+-- ========================================
+CREATE TABLE audit_logs (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT NULL,                           -- NULL = system event
+    action NVARCHAR(100) NOT NULL,                 -- hành động: LOGIN, CREATE_EXPENSE, etc.
+    details NVARCHAR(MAX),                         -- chi tiết hành động
+    entity_type VARCHAR(50),                       -- loại entity: EXPENSE, INCOME, CATEGORY
+    entity_id BIGINT,                              -- ID của entity bị tác động
+    ip_address VARCHAR(45),                        -- IP address của user
+    user_agent NVARCHAR(500),                      -- User agent string
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+PRINT 'Created audit_logs table';
+
+-- ========================================
+-- Bảng budgets (ngân sách theo danh mục)
+-- ========================================
+CREATE TABLE budgets (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    category_id BIGINT NULL,                       -- NULL = tổng ngân sách
+    budget_amount DECIMAL(15,2) NOT NULL,
+    spent_amount DECIMAL(15,2) DEFAULT 0,
+    currency VARCHAR(10) DEFAULT 'VND',
+    period_type VARCHAR(20) NOT NULL DEFAULT 'MONTHLY' 
+        CHECK (period_type IN ('DAILY','WEEKLY','MONTHLY','YEARLY')),
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    is_active BIT DEFAULT 1,
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE NO ACTION
+);
+
+PRINT 'Created budgets table';
+
+-- ========================================
+-- Bảng notifications (thông báo cho user)
+-- ========================================
+CREATE TABLE notifications (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    title NVARCHAR(255) NOT NULL,
+    message NVARCHAR(MAX) NOT NULL,
+    type VARCHAR(50) NOT NULL DEFAULT 'INFO' 
+        CHECK (type IN ('INFO','WARNING','ERROR','SUCCESS','BUDGET_ALERT','AI_SUGGESTION')),
+    is_read BIT DEFAULT 0,
+    is_important BIT DEFAULT 0,
+    action_url VARCHAR(500),                       -- URL để user có thể thực hiện hành động
+    expires_at DATETIME,                           -- thời gian hết hạn thông báo
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+PRINT 'Created notifications table';
+
+-- ========================================
 -- Tạo indexes để tối ưu hiệu suất
 -- ========================================
 CREATE INDEX IX_users_google_id ON users(google_id);
@@ -164,6 +225,16 @@ CREATE INDEX IX_categories_type ON categories(type);
 CREATE INDEX IX_ai_suggestions_user_id ON ai_suggestions(user_id);
 CREATE INDEX IX_emails_user_id ON emails(user_id);
 CREATE INDEX IX_emails_status ON emails(status);
+CREATE INDEX IX_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IX_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX IX_audit_logs_action ON audit_logs(action);
+CREATE INDEX IX_budgets_user_id ON budgets(user_id);
+CREATE INDEX IX_budgets_category_id ON budgets(category_id);
+CREATE INDEX IX_budgets_period ON budgets(start_date, end_date);
+CREATE INDEX IX_notifications_user_id ON notifications(user_id);
+CREATE INDEX IX_notifications_is_read ON notifications(is_read);
+CREATE INDEX IX_notifications_type ON notifications(type);
+CREATE INDEX IX_notifications_created_at ON notifications(created_at);
 
 PRINT 'Created performance indexes';
 
@@ -243,6 +314,48 @@ INSERT INTO ai_suggestions (user_id, suggestion, created_at) VALUES
 (3, 'Thu nhập từ đầu tư của bạn rất ấn tượng! Với 8 triệu lợi nhuận, bạn có thể cân nhắc đa dạng hóa danh mục đầu tư.', CAST(DATEADD(hour, -4, GETDATE()) AS DATETIME));
 
 PRINT 'Inserted 5 smart AI suggestions';
+
+-- Thêm budgets mẫu
+INSERT INTO budgets (user_id, category_id, budget_amount, spent_amount, currency, period_type, start_date, end_date, is_active) VALUES
+-- User 2 (Nguyễn Văn A) - Ngân sách tháng hiện tại
+(2, 1, 2000000, 85000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Ăn uống: 2M, đã chi 85K
+(2, 2, 500000, 150000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Giao thông: 500K, đã chi 150K
+(2, 3, 3000000, 1200000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Mua sắm: 3M, đã chi 1.2M
+(2, 4, 1000000, 350000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Giải trí: 1M, đã chi 350K
+(2, 6, 1000000, 800000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Hóa đơn: 1M, đã chi 800K
+(2, NULL, 15000000, 2805000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Tổng ngân sách: 15M, đã chi 2.8M
+-- User 3 (Trần Thị B) - Ngân sách tháng hiện tại
+(3, 1, 1500000, 120000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Ăn uống: 1.5M, đã chi 120K
+(3, 3, 5000000, 2500000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Mua sắm: 5M, đã chi 2.5M
+(3, 7, 5000000, 3000000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Giáo dục: 5M, đã chi 3M
+(3, 8, 1000000, 500000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1), -- Nhà cửa: 1M, đã chi 500K
+(3, NULL, 20000000, 6120000, 'VND', 'MONTHLY', CAST(GETDATE() AS DATE), EOMONTH(GETDATE()), 1); -- Tổng ngân sách: 20M, đã chi 6.1M
+
+PRINT 'Inserted 11 sample budgets';
+
+-- Thêm notifications mẫu
+INSERT INTO notifications (user_id, title, message, type, is_read, is_important, action_url, expires_at) VALUES
+(2, 'Chào mừng đến với MoneyTracker!', 'Cảm ơn bạn đã đăng ký. Hãy bắt đầu quản lý tài chính thông minh!', 'SUCCESS', 1, 0, '/dashboard', DATEADD(day, 7, GETDATE())),
+(2, 'Cảnh báo ngân sách', 'Bạn đã chi tiêu 40% ngân sách mua sắm tháng này. Hãy cân nhắc điều chỉnh!', 'BUDGET_ALERT', 0, 1, '/budgets', DATEADD(day, 3, GETDATE())),
+(2, 'Gợi ý AI', 'Dựa trên lịch sử chi tiêu, bạn nên tăng ngân sách ăn uống lên 2.5 triệu VND.', 'AI_SUGGESTION', 0, 0, '/ai-suggestions', DATEADD(day, 5, GETDATE())),
+(3, 'Chào mừng đến với MoneyTracker!', 'Chúc mừng! Bạn đã sẵn sàng quản lý tài chính hiệu quả.', 'SUCCESS', 1, 0, '/dashboard', DATEADD(day, 7, GETDATE())),
+(3, 'Cảnh báo ngân sách nghiêm trọng', 'Bạn đã chi tiêu 50% ngân sách mua sắm và 60% ngân sách giáo dục. Cần điều chỉnh ngay!', 'BUDGET_ALERT', 0, 1, '/budgets', DATEADD(day, 1, GETDATE())),
+(3, 'Gợi ý AI', 'Thu nhập từ đầu tư của bạn rất tốt. Hãy cân nhắc tăng tỷ lệ đầu tư!', 'AI_SUGGESTION', 0, 0, '/ai-suggestions', DATEADD(day, 3, GETDATE()));
+
+PRINT 'Inserted 6 sample notifications';
+
+-- Thêm audit logs mẫu
+INSERT INTO audit_logs (user_id, action, details, entity_type, entity_id, ip_address, user_agent, created_at) VALUES
+(2, 'LOGIN', 'User logged in via Google OAuth', 'USER', 2, '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', CAST(DATEADD(hour, -2, GETDATE()) AS DATETIME)),
+(2, 'CREATE_EXPENSE', 'Created new expense: Ăn trưa tại quán cơm gần văn phòng', 'EXPENSE', 1, '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', CAST(DATEADD(hour, -1, GETDATE()) AS DATETIME)),
+(2, 'CREATE_INCOME', 'Created new income: Lương tháng hiện tại - Developer', 'INCOME', 1, '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', CAST(DATEADD(day, -25, GETDATE()) AS DATETIME)),
+(3, 'LOGIN', 'User logged in via Google OAuth', 'USER', 3, '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', CAST(DATEADD(hour, -3, GETDATE()) AS DATETIME)),
+(3, 'CREATE_EXPENSE', 'Created new expense: Mua túi xách Louis Vuitton', 'EXPENSE', 6, '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', CAST(DATEADD(day, -1, GETDATE()) AS DATETIME)),
+(3, 'CREATE_INCOME', 'Created new income: Lợi nhuận đầu tư chứng khoán', 'INCOME', 4, '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', CAST(DATEADD(day, -15, GETDATE()) AS DATETIME)),
+(NULL, 'SYSTEM_START', 'MoneyTracker application started successfully', 'SYSTEM', NULL, '127.0.0.1', 'MoneyTracker/1.0', CAST(DATEADD(hour, -4, GETDATE()) AS DATETIME)),
+(NULL, 'DATABASE_BACKUP', 'Daily database backup completed successfully', 'SYSTEM', NULL, '127.0.0.1', 'MoneyTracker/1.0', CAST(DATEADD(day, -1, GETDATE()) AS DATETIME));
+
+PRINT 'Inserted 8 sample audit logs';
 
 -- Thêm emails mẫu
 INSERT INTO emails (user_id, subject, body, status, sent_at, created_at) VALUES

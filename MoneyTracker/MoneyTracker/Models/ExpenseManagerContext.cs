@@ -17,11 +17,17 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<AiSuggestion> AiSuggestions { get; set; }
 
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+
+    public virtual DbSet<Budget> Budgets { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Expense> Expenses { get; set; }
 
     public virtual DbSet<Income> Incomes { get; set; }
+
+    public virtual DbSet<Notification> Notifications { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -278,6 +284,135 @@ public partial class ExpenseManagerContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__emails__user_id");
+        });
+
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__audit_lo__3213E83F");
+
+            entity.ToTable("audit_logs");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Action)
+                .HasMaxLength(100)
+                .HasColumnName("action");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Details)
+                .HasMaxLength(4000)
+                .HasColumnName("details");
+            entity.Property(e => e.EntityId).HasColumnName("entity_id");
+            entity.Property(e => e.EntityType)
+                .HasMaxLength(50)
+                .HasColumnName("entity_type");
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(45)
+                .HasColumnName("ip_address");
+            entity.Property(e => e.UserAgent)
+                .HasMaxLength(500)
+                .HasColumnName("user_agent");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK__audit_logs__user_id");
+        });
+
+        modelBuilder.Entity<Budget>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__budgets__3213E83F");
+
+            entity.ToTable("budgets");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BudgetAmount)
+                .HasColumnType("decimal(15, 2)")
+                .HasColumnName("budget_amount");
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Currency)
+                .HasMaxLength(10)
+                .HasDefaultValueSql("('VND')")
+                .HasColumnName("currency");
+            entity.Property(e => e.EndDate)
+                .HasColumnType("date")
+                .HasColumnName("end_date");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValueSql("((1))")
+                .HasColumnName("is_active");
+            entity.Property(e => e.PeriodType)
+                .HasMaxLength(20)
+                .HasDefaultValueSql("('MONTHLY')")
+                .HasColumnName("period_type");
+            entity.Property(e => e.SpentAmount)
+                .HasDefaultValueSql("((0))")
+                .HasColumnType("decimal(15, 2)")
+                .HasColumnName("spent_amount");
+            entity.Property(e => e.StartDate)
+                .HasColumnType("date")
+                .HasColumnName("start_date");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.Budgets)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK__budgets__categor__6E01572D");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Budgets)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__budgets__user_id");
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__notifica__3213E83F");
+
+            entity.ToTable("notifications");
+
+            entity.Property(e => e.ActionUrl)
+                .HasMaxLength(500)
+                .HasColumnName("action_url");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.ExpiresAt)
+                .HasColumnType("datetime")
+                .HasColumnName("expires_at");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IsImportant)
+                .HasDefaultValueSql("((0))")
+                .HasColumnName("is_important");
+            entity.Property(e => e.IsRead)
+                .HasDefaultValueSql("((0))")
+                .HasColumnName("is_read");
+            entity.Property(e => e.Message)
+                .HasMaxLength(4000)
+                .HasColumnName("message");
+            entity.Property(e => e.Title)
+                .HasMaxLength(255)
+                .HasColumnName("title");
+            entity.Property(e => e.Type)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('INFO')")
+                .HasColumnName("type");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Notifications)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__notifications__user_id");
         });
 
         OnModelCreatingPartial(modelBuilder);

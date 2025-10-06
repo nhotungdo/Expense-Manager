@@ -1,0 +1,581 @@
+@* Mobile-optimized components *@
+
+<!-- Mobile Sidebar -->
+<div class="sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+        <h5 class="sidebar-title">
+            <i class="fas fa-wallet me-2"></i>
+            MoneyTracker
+        </h5>
+        <button type="button" class="btn-close" onclick="mobileUtils.closeSidebar()"></button>
+    </div>
+    <div class="sidebar-body">
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/HomePage">
+                <i class="fas fa-home me-2"></i>
+                Trang chủ
+            </a>
+            <a class="nav-link" href="/Dashboard">
+                <i class="fas fa-chart-pie me-2"></i>
+                Bảng điều khiển
+            </a>
+            <a class="nav-link" href="/Expenses">
+                <i class="fas fa-credit-card me-2"></i>
+                Chi tiêu
+            </a>
+            <a class="nav-link" href="/Incomes">
+                <i class="fas fa-money-bill-wave me-2"></i>
+                Thu nhập
+            </a>
+            <a class="nav-link" href="/Categories">
+                <i class="fas fa-tags me-2"></i>
+                Danh mục
+            </a>
+            <a class="nav-link" href="/Reports">
+                <i class="fas fa-chart-bar me-2"></i>
+                Báo cáo
+            </a>
+            <a class="nav-link" href="/Profile">
+                <i class="fas fa-user me-2"></i>
+                Hồ sơ
+            </a>
+        </nav>
+    </div>
+</div>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Floating Action Button -->
+<button class="fab" id="fabButton" title="Thêm giao dịch">
+    <i class="fas fa-plus"></i>
+</button>
+
+<!-- Mobile Transaction Card Template -->
+<template id="mobileTransactionCard">
+    <div class="mobile-transaction-card swipeable" data-id="">
+        <div class="transaction-content">
+            <div class="transaction-header">
+                <div class="transaction-type">
+                    <i class="fas fa-credit-card"></i>
+                    <span class="type-label">Chi tiêu</span>
+                </div>
+                <div class="transaction-amount mobile-amount">0 VND</div>
+            </div>
+            <div class="transaction-body">
+                <div class="transaction-category">
+                    <span class="mobile-category-chip">Danh mục</span>
+                </div>
+                <div class="transaction-note mobile-note">Ghi chú</div>
+                <div class="transaction-date mobile-date">Ngày</div>
+            </div>
+        </div>
+        <div class="swipe-actions">
+            <button class="btn" onclick="editTransaction(this)" title="Sửa">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn" onclick="deleteTransaction(this)" title="Xóa">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Mobile Quick Add Form -->
+<div class="mobile-quick-add" id="mobileQuickAdd">
+    <div class="quick-add-header">
+        <h6>Thêm nhanh</h6>
+        <button type="button" class="btn-close" onclick="closeQuickAdd()"></button>
+    </div>
+    <div class="quick-add-body">
+        <form id="quickAddForm">
+            <div class="form-group">
+                <label class="form-label">Loại</label>
+                <select class="form-control" name="type" required>
+                    <option value="expense">Chi tiêu</option>
+                    <option value="income">Thu nhập</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Số tiền</label>
+                <input type="number" class="form-control" name="amount" placeholder="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Danh mục</label>
+                <select class="form-control" name="categoryId" required>
+                    <option value="">Chọn danh mục</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ghi chú</label>
+                <input type="text" class="form-control" name="note" placeholder="Ghi chú (tùy chọn)">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary w-100">Thêm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Mobile Search Overlay -->
+<div class="mobile-search-overlay" id="mobileSearchOverlay">
+    <div class="search-header">
+        <div class="search-input-group">
+            <input type="text" class="form-control" id="mobileSearchInput" placeholder="Tìm kiếm giao dịch...">
+            <button type="button" class="btn" onclick="performMobileSearch()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <button type="button" class="btn-close" onclick="closeMobileSearch()"></button>
+    </div>
+    <div class="search-results" id="mobileSearchResults">
+        <!-- Search results will be populated here -->
+    </div>
+</div>
+
+<!-- Mobile Filter Panel -->
+<div class="mobile-filter-panel" id="mobileFilterPanel">
+    <div class="filter-header">
+        <h6>Bộ lọc</h6>
+        <button type="button" class="btn-close" onclick="closeMobileFilter()"></button>
+    </div>
+    <div class="filter-body">
+        <form id="mobileFilterForm">
+            <div class="form-group">
+                <label class="form-label">Từ ngày</label>
+                <input type="date" class="form-control" name="startDate">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Đến ngày</label>
+                <input type="date" class="form-control" name="endDate">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Loại</label>
+                <select class="form-control" name="type">
+                    <option value="">Tất cả</option>
+                    <option value="expense">Chi tiêu</option>
+                    <option value="income">Thu nhập</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Danh mục</label>
+                <select class="form-control" name="categoryId">
+                    <option value="">Tất cả</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Số tiền từ</label>
+                <input type="number" class="form-control" name="minAmount" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Số tiền đến</label>
+                <input type="number" class="form-control" name="maxAmount" placeholder="0">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary w-100">Áp dụng</button>
+                <button type="button" class="btn btn-outline-secondary w-100 mt-2" onclick="clearMobileFilter()">Xóa bộ lọc</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-bottom-nav">
+    <a href="/HomePage" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Trang chủ</span>
+    </a>
+    <a href="/Dashboard" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Dashboard</span>
+    </a>
+    <a href="/Expenses" class="nav-item">
+        <i class="fas fa-credit-card"></i>
+        <span>Chi tiêu</span>
+    </a>
+    <a href="/Incomes" class="nav-item">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>Thu nhập</span>
+    </a>
+    <a href="/Profile" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>Hồ sơ</span>
+    </a>
+</nav>
+
+<!-- Mobile Loading Spinner -->
+<div class="mobile-loading" id="mobileLoading">
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="loading-text">Đang tải...</div>
+    </div>
+</div>
+
+<!-- Mobile Toast Container -->
+<div class="mobile-toast-container" id="mobileToastContainer"></div>
+
+<style>
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    z-index: 1000;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+}
+
+.mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #6c757d;
+    font-size: 0.75rem;
+    padding: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+.mobile-bottom-nav .nav-item.active,
+.mobile-bottom-nav .nav-item:hover {
+    color: #007bff;
+}
+
+.mobile-bottom-nav .nav-item i {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Mobile Loading */
+.mobile-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.mobile-loading.show {
+    display: flex;
+}
+
+.loading-spinner {
+    text-align: center;
+}
+
+.loading-text {
+    margin-top: 1rem;
+    color: #6c757d;
+}
+
+/* Mobile Toast */
+.mobile-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.mobile-toast {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    animation: slideInRight 0.3s ease-out;
+}
+
+/* Mobile Quick Add */
+.mobile-quick-add {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #dee2e6;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.mobile-quick-add.show {
+    transform: translateY(0);
+}
+
+.quick-add-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.quick-add-body {
+    padding: 1rem;
+}
+
+/* Mobile Search Overlay */
+.mobile-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    z-index: 1000;
+    display: none;
+}
+
+.mobile-search-overlay.show {
+    display: block;
+}
+
+.search-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.search-input-group {
+    display: flex;
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.search-input-group input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.search-input-group button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.search-results {
+    padding: 1rem;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+/* Mobile Filter Panel */
+.mobile-filter-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #dee2e6;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.mobile-filter-panel.show {
+    transform: translateY(0);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.filter-body {
+    padding: 1rem;
+}
+
+/* Mobile Transaction Card */
+.mobile-transaction-card {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #28a745;
+    overflow: hidden;
+}
+
+.mobile-transaction-card.income {
+    border-left-color: #007bff;
+}
+
+.transaction-content {
+    position: relative;
+    z-index: 1;
+}
+
+.transaction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.transaction-type {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.transaction-type i {
+    margin-right: 0.25rem;
+}
+
+.transaction-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* Responsive adjustments */
+@@media (min-width: 769px) {
+    .mobile-bottom-nav,
+    .mobile-quick-add,
+    .mobile-search-overlay,
+    .mobile-filter-panel {
+        display: none !important;
+    }
+}
+</style>
+
+<script>
+// Mobile utility functions
+window.mobileUtils = {
+    closeSidebar: () => {
+        document.getElementById('mobileSidebar').classList.remove('show');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+        document.body.classList.remove('sidebar-open');
+    },
+    
+    showQuickAdd: () => {
+        document.getElementById('mobileQuickAdd').classList.add('show');
+    },
+    
+    closeQuickAdd: () => {
+        document.getElementById('mobileQuickAdd').classList.remove('show');
+    },
+    
+    showMobileSearch: () => {
+        document.getElementById('mobileSearchOverlay').classList.add('show');
+        document.getElementById('mobileSearchInput').focus();
+    },
+    
+    closeMobileSearch: () => {
+        document.getElementById('mobileSearchOverlay').classList.remove('show');
+    },
+    
+    showMobileFilter: () => {
+        document.getElementById('mobileFilterPanel').classList.add('show');
+    },
+    
+    closeMobileFilter: () => {
+        document.getElementById('mobileFilterPanel').classList.remove('show');
+    },
+    
+    showLoading: () => {
+        document.getElementById('mobileLoading').classList.add('show');
+    },
+    
+    hideLoading: () => {
+        document.getElementById('mobileLoading').classList.remove('show');
+    },
+    
+    showToast: (message, type = 'info') => {
+        const container = document.getElementById('mobileToastContainer');
+        const toast = document.createElement('div');
+        toast.className = `mobile-toast toast-${type}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+};
+
+// Mobile event handlers
+function performMobileSearch() {
+    const query = document.getElementById('mobileSearchInput').value;
+    if (query.trim()) {
+        // Implement search functionality
+        console.log('Searching for:', query);
+    }
+}
+
+function clearMobileFilter() {
+    document.getElementById('mobileFilterForm').reset();
+}
+
+function editTransaction(button) {
+    const card = button.closest('.mobile-transaction-card');
+    const id = card.dataset.id;
+    // Navigate to edit page
+    window.location.href = `/Expenses/Edit/${id}`;
+}
+
+function deleteTransaction(button) {
+    const card = button.closest('.mobile-transaction-card');
+    const id = card.dataset.id;
+    
+    if (confirm('Bạn có chắc chắn muốn xóa giao dịch này?')) {
+        // Implement delete functionality
+        console.log('Deleting transaction:', id);
+    }
+}
+
+// Initialize mobile components
+document.addEventListener('DOMContentLoaded', () => {
+    // Setup FAB click handler
+    const fab = document.getElementById('fabButton');
+    if (fab) {
+        fab.addEventListener('click', () => {
+            mobileUtils.showQuickAdd();
+        });
+    }
+    
+    // Setup quick add form
+    const quickAddForm = document.getElementById('quickAddForm');
+    if (quickAddForm) {
+        quickAddForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Implement form submission
+            console.log('Quick add form submitted');
+            mobileUtils.closeQuickAdd();
+        });
+    }
+    
+    // Setup mobile filter form
+    const filterForm = document.getElementById('mobileFilterForm');
+    if (filterForm) {
+        filterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Implement filter application
+            console.log('Filter applied');
+            mobileUtils.closeMobileFilter();
+        });
+    }
+});
+</script>

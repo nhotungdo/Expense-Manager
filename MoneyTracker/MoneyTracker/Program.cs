@@ -66,6 +66,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IDefaultCategoryService, DefaultCategoryService>();
+builder.Services.AddScoped<IReportExportService, ReportExportService>();
+builder.Services.AddScoped<IAdvancedSearchService, AdvancedSearchService>();
+builder.Services.AddScoped<ILocalizationService, LocalizationService>();
+builder.Services.AddScoped<IAdvancedAnalyticsService, AdvancedAnalyticsService>();
 builder.Services.AddHttpContextAccessor();
 
 

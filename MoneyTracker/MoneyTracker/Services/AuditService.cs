@@ -37,12 +37,12 @@ namespace MoneyTracker.Services
                     CreatedAt = DateTime.UtcNow
                 };
 
-                // For now, we'll log to Serilog since we don't have audit_logs table yet
+                // Log to Serilog for immediate visibility
                 _logger.LogInformation("User Action: {@AuditLog}", auditLog);
 
-                // TODO: Save to database when audit_logs table is created
-                // _context.AuditLogs.Add(auditLog);
-                // await _context.SaveChangesAsync();
+                // Save to database
+                _context.AuditLogs.Add(auditLog);
+                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -70,8 +70,9 @@ namespace MoneyTracker.Services
 
                 _logger.LogInformation("System Event: {@AuditLog}", auditLog);
 
-                // TODO: Save to database when audit_logs table is created
-                await Task.CompletedTask;
+                // Save to database
+                _context.AuditLogs.Add(auditLog);
+                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -81,18 +82,38 @@ namespace MoneyTracker.Services
 
         public async Task<List<AuditLog>> GetUserAuditLogsAsync(long userId, int skip = 0, int take = 50)
         {
-            // TODO: Implement when audit_logs table is created
-            // For now, return empty list
-            await Task.CompletedTask;
-            return new List<AuditLog>();
+            try
+            {
+                return await _context.AuditLogs
+                    .Where(a => a.UserId == userId)
+                    .OrderByDescending(a => a.CreatedAt)
+                    .Skip(skip)
+                    .Take(take)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get user audit logs for user {UserId}", userId);
+                return new List<AuditLog>();
+            }
         }
 
         public async Task<List<AuditLog>> GetSystemAuditLogsAsync(int skip = 0, int take = 50)
         {
-            // TODO: Implement when audit_logs table is created
-            // For now, return empty list
-            await Task.CompletedTask;
-            return new List<AuditLog>();
+            try
+            {
+                return await _context.AuditLogs
+                    .Where(a => a.UserId == null)
+                    .OrderByDescending(a => a.CreatedAt)
+                    .Skip(skip)
+                    .Take(take)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get system audit logs");
+                return new List<AuditLog>();
+            }
         }
     }
 }
