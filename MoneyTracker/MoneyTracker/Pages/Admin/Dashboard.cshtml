@@ -332,35 +332,18 @@
         let systemActivityChart = null;
 
         $(document).ready(function () {
-            // For testing, load admin dashboard data directly
             loadAdminDashboardData();
         });
 
         async function loadAdminDashboardData() {
             try {
-                // For testing, use mock data instead of API call
-                const mockData = {
-                    totalUsers: 1250,
-                    activeUsers: 980,
-                    newUsers: 45,
-                    totalAISuggestions: 320,
-                    userRegistrationData: [
-                        { month: 'Tháng 1', count: 120 },
-                        { month: 'Tháng 2', count: 150 },
-                        { month: 'Tháng 3', count: 180 },
-                        { month: 'Tháng 4', count: 200 },
-                        { month: 'Tháng 5', count: 220 },
-                        { month: 'Tháng 6', count: 250 }
-                    ],
-                    systemActivityData: [
-                        { type: 'Đăng nhập', count: 1250 },
-                        { type: 'Giao dịch', count: 3200 },
-                        { type: 'Gợi ý AI', count: 320 },
-                        { type: 'Báo cáo', count: 150 }
-                    ]
-                };
+                const response = await fetch('/api/admin/dashboard');
+                if (response.ok) {
+                    adminDashboardData = await response.json();
+                } else {
+                    throw new Error('Failed to load admin dashboard data');
+                }
 
-                adminDashboardData = mockData;
                 updateAdminDashboardUI();
                 createAdminCharts();
                 loadUsers();
@@ -369,6 +352,7 @@
                 loadSystemLogs();
             } catch (error) {
                 console.error('Error loading admin dashboard data:', error);
+                showError('Không thể tải dữ liệu dashboard');
             }
         }
 
@@ -443,37 +427,13 @@
 
         async function loadUsers() {
             try {
-                // Mock data for testing
-                const mockUsers = [
-                    {
-                        id: 1,
-                        fullName: 'Nguyễn Văn A',
-                        username: 'nguyenvana',
-                        email: 'nguyenvana@example.com',
-                        role: 'USER',
-                        enabled: true,
-                        pictureUrl: null
-                    },
-                    {
-                        id: 2,
-                        fullName: 'Trần Thị B',
-                        username: 'tranthib',
-                        email: 'tranthib@example.com',
-                        role: 'ADMIN',
-                        enabled: true,
-                        pictureUrl: null
-                    },
-                    {
-                        id: 3,
-                        fullName: 'Lê Văn C',
-                        username: 'levanc',
-                        email: 'levanc@example.com',
-                        role: 'USER',
-                        enabled: false,
-                        pictureUrl: null
-                    }
-                ];
-                displayUsers(mockUsers);
+                const response = await fetch('/api/admin/users');
+                if (response.ok) {
+                    const users = await response.json();
+                    displayUsers(users);
+                } else {
+                    throw new Error('Failed to load users');
+                }
             } catch (error) {
                 console.error('Error loading users:', error);
             }
@@ -529,22 +489,13 @@
 
         async function loadAISuggestions() {
             try {
-                // Mock data for testing
-                const mockSuggestions = [
-                    {
-                        suggestion: 'Người dùng có thể tiết kiệm 15% chi phí ăn uống bằng cách nấu ăn tại nhà',
-                        createdAt: '2024-01-15T10:30:00Z'
-                    },
-                    {
-                        suggestion: 'Gợi ý đầu tư vào quỹ ETF với lãi suất 8% mỗi năm',
-                        createdAt: '2024-01-14T15:45:00Z'
-                    },
-                    {
-                        suggestion: 'Tạo ngân sách hàng tháng để kiểm soát chi tiêu tốt hơn',
-                        createdAt: '2024-01-13T09:20:00Z'
-                    }
-                ];
-                displayAISuggestions(mockSuggestions);
+                const response = await fetch('/api/admin/ai-suggestions');
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    displayAISuggestions(suggestions);
+                } else {
+                    throw new Error('Failed to load AI suggestions');
+                }
             } catch (error) {
                 console.error('Error loading AI suggestions:', error);
             }
@@ -577,14 +528,13 @@
 
         async function loadGlobalCategories() {
             try {
-                // Mock data for testing
-                const mockCategories = [
-                    { id: 1, name: 'Ăn uống', type: 'Expense', description: 'Chi phí ăn uống hàng ngày' },
-                    { id: 2, name: 'Lương', type: 'Income', description: 'Thu nhập từ lương' },
-                    { id: 3, name: 'Xăng xe', type: 'Expense', description: 'Chi phí nhiên liệu' },
-                    { id: 4, name: 'Đầu tư', type: 'Both', description: 'Cả thu nhập và chi tiêu đầu tư' }
-                ];
-                displayGlobalCategories(mockCategories);
+                const response = await fetch('/api/admin/categories');
+                if (response.ok) {
+                    const categories = await response.json();
+                    displayGlobalCategories(categories);
+                } else {
+                    throw new Error('Failed to load categories');
+                }
             } catch (error) {
                 console.error('Error loading global categories:', error);
             }
@@ -626,15 +576,13 @@
 
         async function loadSystemLogs() {
             try {
-                // Mock data for testing
-                const mockLogs = [
-                    { timestamp: '2024-01-15T10:30:00Z', type: 'INFO', description: 'User đăng nhập thành công' },
-                    { timestamp: '2024-01-15T10:25:00Z', type: 'WARNING', description: 'Tốc độ phản hồi API chậm' },
-                    { timestamp: '2024-01-15T10:20:00Z', type: 'SUCCESS', description: 'Backup dữ liệu hoàn tất' },
-                    { timestamp: '2024-01-15T10:15:00Z', type: 'ERROR', description: 'Lỗi kết nối database' },
-                    { timestamp: '2024-01-15T10:10:00Z', type: 'INFO', description: 'Hệ thống khởi động' }
-                ];
-                displaySystemLogs(mockLogs);
+                const response = await fetch('/api/admin/system-logs');
+                if (response.ok) {
+                    const logs = await response.json();
+                    displaySystemLogs(logs);
+                } else {
+                    throw new Error('Failed to load system logs');
+                }
             } catch (error) {
                 console.error('Error loading system logs:', error);
             }

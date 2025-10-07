@@ -25,6 +25,10 @@
       "PackagePath": "staticwebassets\\css\\mobile-optimization.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\modern-dashboard.css",
+      "PackagePath": "staticwebassets\\css\\modern-dashboard.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
@@ -41,8 +45,16 @@
       "PackagePath": "staticwebassets\\js\\flopay-onboarding.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\logout.js",
+      "PackagePath": "staticwebassets\\js\\logout.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\mobile-optimization.js",
       "PackagePath": "staticwebassets\\js\\mobile-optimization.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\modern-dashboard.js",
+      "PackagePath": "staticwebassets\\js\\modern-dashboard.js"
     },
     {
       "Id": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\site.js",

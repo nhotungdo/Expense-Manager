@@ -1,0 +1,583 @@
+@page
+@model MoneyTracker.Pages.ReportsModel
+@{
+    ViewData["Title"] = "Báo Cáo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Báo Cáo Tài Chính</h2>
+                <p class="text-gray-600 dark:text-gray-300">Phân tích chi tiết thu chi và xuất báo cáo</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="exportReport('pdf')" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    Xuất PDF
+                </button>
+                <button onclick="exportReport('excel')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                    <i class="fas fa-file-excel mr-2"></i>
+                    Xuất Excel
+                </button>
+                <button onclick="sendEmailReport()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-envelope mr-2"></i>
+                    Gửi Email
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Filters -->
+    <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Bộ Lọc Báo Cáo</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Loại báo cáo</label>
+                <select id="report-type" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                    <option value="monthly">Báo cáo tháng</option>
+                    <option value="yearly">Báo cáo năm</option>
+                    <option value="custom">Tùy chỉnh</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Từ ngày</label>
+                <input type="date" id="start-date" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Đến ngày</label>
+                <input type="date" id="end-date" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+            </div>
+            <div class="flex items-end">
+                <button onclick="generateReport()" class="w-full bg-blue-500 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    Tạo Báo Cáo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-medium">Tổng Thu Nhập</p>
+                    <p class="text-3xl font-bold" id="total-income">0 VND</p>
+                </div>
+                <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-coins text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-red-400 to-pink-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up" style="animation-delay: 0.1s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-red-100 text-sm font-medium">Tổng Chi Tiêu</p>
+                    <p class="text-3xl font-bold" id="total-expense">0 VND</p>
+                </div>
+                <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-credit-card text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium">Số Dư</p>
+                    <p class="text-3xl font-bold" id="net-balance">0 VND</p>
+                </div>
+                <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-wallet text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-yellow-100 text-sm font-medium">Tỷ Lệ Tiết Kiệm</p>
+                    <p class="text-3xl font-bold" id="savings-rate">0%</p>
+                </div>
+                <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-percentage text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Income vs Expense Chart -->
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Thu Nhập vs Chi Tiêu</h3>
+            <div class="h-80">
+                <canvas id="incomeExpenseChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Category Breakdown Chart -->
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Phân Bổ Theo Danh Mục</h3>
+            <div class="h-80">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Trends Chart -->
+    <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Xu Hướng Theo Tháng</h3>
+        <div class="h-96">
+            <canvas id="monthlyTrendsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Detailed Tables -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Top Expenses -->
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 animate-fade-in">
+            <div class="p-6 border-b border-white/20">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Chi Tiêu Lớn Nhất</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4" id="top-expenses">
+                    <!-- Top expenses will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Income -->
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 animate-fade-in">
+            <div class="p-6 border-b border-white/20">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Thu Nhập Lớn Nhất</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4" id="top-income">
+                    <!-- Top income will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Analysis -->
+    <div class="bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 animate-fade-in">
+        <div class="p-6 border-b border-white/20">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Phân Tích Theo Danh Mục</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-white/10">
+                    <tr>
+                        <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Danh mục</th>
+                        <th class="text-right py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Chi tiêu</th>
+                        <th class="text-right py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Thu nhập</th>
+                        <th class="text-right py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Số dư</th>
+                        <th class="text-right py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Tỷ lệ</th>
+                    </tr>
+                </thead>
+                <tbody id="category-analysis">
+                    <!-- Category analysis will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Email Report Modal -->
+<div id="email-report-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-800">Gửi Báo Cáo Qua Email</h3>
+                <button onclick="closeModal('email-report-modal')" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-times text-gray-500"></i>
+                </button>
+            </div>
+            <form id="email-report-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email nhận báo cáo</label>
+                        <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nhập email">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Loại báo cáo</label>
+                        <select name="reportType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="pdf">PDF</option>
+                            <option value="excel">Excel</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+                        <textarea name="note" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nhập ghi chú (tùy chọn)"></textarea>
+                    </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="button" onclick="closeModal('email-report-modal')" class="flex-1 px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                        Hủy
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Gửi Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let incomeExpenseChart, categoryChart, monthlyTrendsChart;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date range (current month)
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            document.getElementById('start-date').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('end-date').value = lastDay.toISOString().split('T')[0];
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Generate initial report
+            generateReport();
+            
+            // Setup form handlers
+            setupFormHandlers();
+        });
+        
+        function initializeCharts() {
+            // Income vs Expense Chart
+            const incomeExpenseCtx = document.getElementById('incomeExpenseChart');
+            if (incomeExpenseCtx) {
+                incomeExpenseChart = createChart('incomeExpenseChart', {
+                    type: 'bar',
+                    data: {
+                        labels: ['Thu nhập', 'Chi tiêu'],
+                        datasets: [{
+                            data: [0, 0],
+                            backgroundColor: ['rgb(34, 197, 94)', 'rgb(239, 68, 68)'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart');
+            if (categoryCtx) {
+                categoryChart = createChart('categoryChart', {
+                    type: 'doughnut',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            data: [],
+                            backgroundColor: []
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Monthly Trends Chart
+            const monthlyTrendsCtx = document.getElementById('monthlyTrendsChart');
+            if (monthlyTrendsCtx) {
+                monthlyTrendsChart = createChart('monthlyTrendsChart', {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Thu nhập',
+                            data: [],
+                            borderColor: 'rgb(34, 197, 94)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Chi tiêu',
+                            data: [],
+                            borderColor: 'rgb(239, 68, 68)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        async function generateReport() {
+            try {
+                showLoading();
+                
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                const reportType = document.getElementById('report-type').value;
+                
+                const params = new URLSearchParams({
+                    startDate,
+                    endDate,
+                    reportType
+                });
+                
+                const data = await apiCall(`/api/reports/generate?${params}`);
+                
+                // Update summary
+                document.getElementById('total-income').textContent = formatCurrency(data.totalIncome || 0);
+                document.getElementById('total-expense').textContent = formatCurrency(data.totalExpense || 0);
+                document.getElementById('net-balance').textContent = formatCurrency((data.totalIncome || 0) - (data.totalExpense || 0));
+                
+                const savingsRate = data.totalIncome > 0 ? ((data.totalIncome - data.totalExpense) / data.totalIncome * 100).toFixed(1) : 0;
+                document.getElementById('savings-rate').textContent = savingsRate + '%';
+                
+                // Update charts
+                updateCharts(data);
+                
+                // Update detailed data
+                updateDetailedData(data);
+                
+            } catch (error) {
+                console.error('Error generating report:', error);
+                showToast('Có lỗi xảy ra khi tạo báo cáo', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function updateCharts(data) {
+            // Update Income vs Expense Chart
+            if (incomeExpenseChart) {
+                incomeExpenseChart.data.datasets[0].data = [data.totalIncome || 0, data.totalExpense || 0];
+                incomeExpenseChart.update();
+            }
+            
+            // Update Category Chart
+            if (categoryChart && data.categoryBreakdown) {
+                const categories = Object.keys(data.categoryBreakdown);
+                const amounts = Object.values(data.categoryBreakdown);
+                const colors = generateColors(categories.length);
+                
+                categoryChart.data.labels = categories;
+                categoryChart.data.datasets[0].data = amounts;
+                categoryChart.data.datasets[0].backgroundColor = colors;
+                categoryChart.update();
+            }
+            
+            // Update Monthly Trends Chart
+            if (monthlyTrendsChart && data.monthlyTrends) {
+                const months = data.monthlyTrends.map(t => t.month);
+                const income = data.monthlyTrends.map(t => t.income);
+                const expenses = data.monthlyTrends.map(t => t.expenses);
+                
+                monthlyTrendsChart.data.labels = months;
+                monthlyTrendsChart.data.datasets[0].data = income;
+                monthlyTrendsChart.data.datasets[1].data = expenses;
+                monthlyTrendsChart.update();
+            }
+        }
+        
+        function updateDetailedData(data) {
+            // Update top expenses
+            const topExpensesContainer = document.getElementById('top-expenses');
+            if (data.topExpenses && data.topExpenses.length > 0) {
+                topExpensesContainer.innerHTML = data.topExpenses.map(expense => `
+                    <div class="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-tag text-red-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800 dark:text-white">${expense.categoryName}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">${expense.note || 'Không có ghi chú'}</p>
+                            </div>
+                        </div>
+                        <span class="font-semibold text-red-600">${formatCurrency(expense.amount)}</span>
+                    </div>
+                `).join('');
+            } else {
+                topExpensesContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Không có dữ liệu</p>';
+            }
+            
+            // Update top income
+            const topIncomeContainer = document.getElementById('top-income');
+            if (data.topIncome && data.topIncome.length > 0) {
+                topIncomeContainer.innerHTML = data.topIncome.map(income => `
+                    <div class="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-tag text-green-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800 dark:text-white">${income.categoryName}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">${income.note || 'Không có ghi chú'}</p>
+                            </div>
+                        </div>
+                        <span class="font-semibold text-green-600">${formatCurrency(income.amount)}</span>
+                    </div>
+                `).join('');
+            } else {
+                topIncomeContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Không có dữ liệu</p>';
+            }
+            
+            // Update category analysis
+            const categoryAnalysisContainer = document.getElementById('category-analysis');
+            if (data.categoryAnalysis && data.categoryAnalysis.length > 0) {
+                categoryAnalysisContainer.innerHTML = data.categoryAnalysis.map(category => `
+                    <tr class="border-b border-gray-100 dark:border-gray-700">
+                        <td class="py-3 px-6 text-sm text-gray-600 dark:text-gray-300">${category.name}</td>
+                        <td class="py-3 px-6 text-sm font-medium text-right text-red-600">${formatCurrency(category.expense || 0)}</td>
+                        <td class="py-3 px-6 text-sm font-medium text-right text-green-600">${formatCurrency(category.income || 0)}</td>
+                        <td class="py-3 px-6 text-sm font-medium text-right ${(category.income || 0) - (category.expense || 0) >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${formatCurrency((category.income || 0) - (category.expense || 0))}
+                        </td>
+                        <td class="py-3 px-6 text-sm font-medium text-right text-gray-600 dark:text-gray-300">${category.percentage || 0}%</td>
+                    </tr>
+                `).join('');
+            } else {
+                categoryAnalysisContainer.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-gray-500">Không có dữ liệu</td></tr>';
+            }
+        }
+        
+        function generateColors(count) {
+            const colors = [
+                '#EF4444', '#F97316', '#F59E0B', '#EAB308',
+                '#84CC16', '#22C55E', '#10B981', '#14B8A6',
+                '#06B6D4', '#0EA5E9', '#3B82F6', '#6366F1',
+                '#8B5CF6', '#A855F7', '#D946EF', '#EC4899'
+            ];
+            return colors.slice(0, count);
+        }
+        
+        async function exportReport(format) {
+            try {
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                const reportType = document.getElementById('report-type').value;
+                
+                const params = new URLSearchParams({
+                    startDate,
+                    endDate,
+                    reportType,
+                    format
+                });
+                
+                showLoading();
+                
+                const response = await fetch(`/api/reports/export?${params}`);
+                if (!response.ok) throw new Error('Export failed');
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bao-cao-${format}-${new Date().toISOString().split('T')[0]}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showToast(`Xuất báo cáo ${format.toUpperCase()} thành công!`, 'success');
+                
+            } catch (error) {
+                console.error('Error exporting report:', error);
+                showToast('Có lỗi xảy ra khi xuất báo cáo', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function sendEmailReport() {
+            openModal('email-report-modal');
+        }
+        
+        function setupFormHandlers() {
+            // Email report form
+            document.getElementById('email-report-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
+                
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                const reportType = document.getElementById('report-type').value;
+                
+                try {
+                    await apiCall('/api/reports/send-email', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            ...data,
+                            startDate,
+                            endDate,
+                            reportType
+                        })
+                    });
+                    
+                    showToast('Gửi email báo cáo thành công!', 'success');
+                    closeModal('email-report-modal');
+                    this.reset();
+                } catch (error) {
+                    console.error('Error sending email report:', error);
+                    showToast('Có lỗi xảy ra khi gửi email', 'error');
+                }
+            });
+            
+            // Report type change handler
+            document.getElementById('report-type').addEventListener('change', function() {
+                const reportType = this.value;
+                const startDateInput = document.getElementById('start-date');
+                const endDateInput = document.getElementById('end-date');
+                const today = new Date();
+                
+                if (reportType === 'monthly') {
+                    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    startDateInput.value = firstDay.toISOString().split('T')[0];
+                    endDateInput.value = lastDay.toISOString().split('T')[0];
+                } else if (reportType === 'yearly') {
+                    const firstDay = new Date(today.getFullYear(), 0, 1);
+                    const lastDay = new Date(today.getFullYear(), 11, 31);
+                    startDateInput.value = firstDay.toISOString().split('T')[0];
+                    endDateInput.value = lastDay.toISOString().split('T')[0];
+                }
+            });
+        }
+    </script>
+}

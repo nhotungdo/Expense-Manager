@@ -21,10 +21,6 @@ namespace MoneyTracker.Services
         {
             try
             {
-                var httpContext = _httpContextAccessor.HttpContext;
-                var ipAddress = httpContext?.Connection?.RemoteIpAddress?.ToString();
-                var userAgent = httpContext?.Request?.Headers["User-Agent"].ToString();
-
                 var auditLog = new AuditLog
                 {
                     UserId = userId,
@@ -32,21 +28,20 @@ namespace MoneyTracker.Services
                     Details = details,
                     EntityType = entityType,
                     EntityId = entityId,
-                    IpAddress = ipAddress,
-                    UserAgent = userAgent,
+                    IpAddress = GetClientIpAddress(),
+                    UserAgent = GetUserAgent(),
                     CreatedAt = DateTime.UtcNow
                 };
 
-                // Log to Serilog for immediate visibility
-                _logger.LogInformation("User Action: {@AuditLog}", auditLog);
-
-                // Save to database
                 _context.AuditLogs.Add(auditLog);
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Audit log created: User {UserId} performed {Action} on {EntityType} {EntityId}",
+                    userId, action, entityType, entityId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to log user action");
+                _logger.LogError(ex, "Failed to create audit log for user {UserId}, action {Action}", userId, action);
             }
         }
 
@@ -56,63 +51,92 @@ namespace MoneyTracker.Services
             {
                 var auditLog = new AuditLog
                 {
-                    UserId = null,
+                    UserId = null, // System event
                     Action = eventType,
                     Details = description,
-                    EntityType = "System",
+                    EntityType = "SYSTEM",
+                    EntityId = null,
+                    IpAddress = GetClientIpAddress(),
+                    UserAgent = GetUserAgent(),
                     CreatedAt = DateTime.UtcNow
                 };
 
                 if (data != null)
                 {
-                    auditLog.Details += $" Data: {JsonSerializer.Serialize(data)}";
+                    auditLog.Details += $" | Data: {JsonSerializer.Serialize(data)}";
                 }
 
-                _logger.LogInformation("System Event: {@AuditLog}", auditLog);
-
-                // Save to database
                 _context.AuditLogs.Add(auditLog);
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("System audit log created: {EventType} - {Description}", eventType, description);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to log system event");
+                _logger.LogError(ex, "Failed to create system audit log for event {EventType}", eventType);
             }
         }
 
         public async Task<List<AuditLog>> GetUserAuditLogsAsync(long userId, int skip = 0, int take = 50)
         {
-            try
-            {
-                return await _context.AuditLogs
-                    .Where(a => a.UserId == userId)
-                    .OrderByDescending(a => a.CreatedAt)
-                    .Skip(skip)
-                    .Take(take)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to get user audit logs for user {UserId}", userId);
-                return new List<AuditLog>();
-            }
+            return await _context.AuditLogs
+                .Where(a => a.UserId == userId)
+                .OrderByDescending(a => a.CreatedAt)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
         }
 
         public async Task<List<AuditLog>> GetSystemAuditLogsAsync(int skip = 0, int take = 50)
         {
+            return await _context.AuditLogs
+                .Where(a => a.UserId == null)
+                .OrderByDescending(a => a.CreatedAt)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        private string? GetClientIpAddress()
+        {
             try
             {
-                return await _context.AuditLogs
-                    .Where(a => a.UserId == null)
-                    .OrderByDescending(a => a.CreatedAt)
-                    .Skip(skip)
-                    .Take(take)
-                    .ToListAsync();
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null) return null;
+
+                // Check for forwarded IP first (for load balancers/proxies)
+                var forwardedFor = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(forwardedFor))
+                {
+                    return forwardedFor.Split(',')[0].Trim();
+                }
+
+                // Check for real IP
+                var realIp = httpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(realIp))
+                {
+                    return realIp;
+                }
+
+                // Fallback to connection remote IP
+                return httpContext.Connection.RemoteIpAddress?.ToString();
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Failed to get system audit logs");
-                return new List<AuditLog>();
+                return null;
+            }
+        }
+
+        private string? GetUserAgent()
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                return httpContext?.Request.Headers["User-Agent"].FirstOrDefault();
+            }
+            catch
+            {
+                return null;
             }
         }
     }

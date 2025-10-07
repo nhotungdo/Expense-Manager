@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "0xopt4hUK7z0uEweQ+RxD/St8yTp6JPJtYP4R0v906E=",
+  "Hash": "uwdK6b47EDFrsKg4O1wJwso0i7DxRHQnMKrMFcPB5D8=",
   "Source": "MoneyTracker",
   "BasePath": "_content/MoneyTracker",
   "Mode": "Default",
@@ -150,6 +150,25 @@
       "OriginalItemSpec": "wwwroot\\css\\mobile-optimization.css"
     },
     {
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\modern-dashboard.css",
+      "SourceId": "MoneyTracker",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\",
+      "BasePath": "_content/MoneyTracker",
+      "RelativePath": "css/modern-dashboard.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\modern-dashboard.css"
+    },
+    {
       "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\site.css",
       "SourceId": "MoneyTracker",
       "SourceType": "Discovered",
@@ -226,6 +245,25 @@
       "OriginalItemSpec": "wwwroot\\js\\flopay-onboarding.js"
     },
     {
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\logout.js",
+      "SourceId": "MoneyTracker",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\",
+      "BasePath": "_content/MoneyTracker",
+      "RelativePath": "js/logout.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\logout.js"
+    },
+    {
       "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\mobile-optimization.js",
       "SourceId": "MoneyTracker",
       "SourceType": "Discovered",
@@ -243,6 +281,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\mobile-optimization.js"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\modern-dashboard.js",
+      "SourceId": "MoneyTracker",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\",
+      "BasePath": "_content/MoneyTracker",
+      "RelativePath": "js/modern-dashboard.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\modern-dashboard.js"
     },
     {
       "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\site.js",

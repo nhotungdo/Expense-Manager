@@ -1,13 +1,14 @@
 @page
 @model MoneyTracker.Pages.HomePageModel
 @{
-    ViewData["Title"] = "Money Tracking - Quản lý tài chính thông minh";
+    ViewData["Title"] = "MoneyTracker - Quản lý tài chính thông minh";
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/flopay-homepage.css" asp-append-version="true" />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
 }
 
 <div class="money-tracking-homepage">
@@ -15,7 +16,7 @@
          NAVIGATION BAR
          ======================================== -->
     <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
+        <div class="container-fluid">
             <!-- Brand Logo -->
             <a class="navbar-brand d-flex align-items-center" href="/HomePage">
                 <i class="fas fa-wallet me-2"></i>
@@ -31,62 +32,39 @@
             <!-- Navigation Menu -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <!-- Features Link -->
+                    <!-- Main Navigation Links -->
                     <li class="nav-item">
                         <a class="nav-link px-3" href="#features">
                             <i class="fas fa-star me-1"></i>
-                            Tính năng
+                            <span class="d-none d-lg-inline">Tính năng</span>
                         </a>
                     </li>
-
-                    <!-- About Link -->
                     <li class="nav-item">
                         <a class="nav-link px-3" href="#about">
                             <i class="fas fa-info-circle me-1"></i>
-                            Giới thiệu
+                            <span class="d-none d-lg-inline">Giới thiệu</span>
                         </a>
                     </li>
-
-                    <!-- Contact Link -->
                     <li class="nav-item">
                         <a class="nav-link px-3" href="#contact">
                             <i class="fas fa-envelope me-1"></i>
-                            Liên hệ
+                            <span class="d-none d-lg-inline">Liên hệ</span>
                         </a>
                     </li>
 
-                    <!-- Notifications with Badge -->
-                    <li class="nav-item">
-                        <a class="nav-link px-3 position-relative" href="#notifications">
-                            <i class="fas fa-bell me-1"></i>
-                            <span class="d-none d-lg-inline">Thông báo</span>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 0.65rem; padding: 0.25em 0.5em;">
-                                3
-                                <span class="visually-hidden">thông báo chưa đọc</span>
-                            </span>
-                        </a>
-                    </li>
+                  
 
-                    <!-- Divider for Desktop -->
-                    <li class="nav-item d-none d-lg-block">
-                        <span class="nav-link px-2 text-muted">|</span>
-                    </li>
-
-                    <!-- Login Button -->
+                    <!-- Auth Buttons -->
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-light px-4 mx-1 my-2 my-lg-0" href="/Login">
+                        <a class="nav-link btn btn-outline-light px-3 mx-1 my-2 my-lg-0" href="/Login">
                             <i class="fas fa-sign-in-alt me-1"></i>
-                            Đăng nhập
+                            <span class="d-none d-lg-inline">Đăng nhập</span>
                         </a>
                     </li>
-
-                    <!-- Register Button -->
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary px-4 mx-1 my-2 my-lg-0" href="/Register">
+                        <a class="nav-link btn btn-primary px-3 mx-1 my-2 my-lg-0" href="/Register">
                             <i class="fas fa-user-plus me-1"></i>
-                            Đăng ký
+                            <span class="d-none d-lg-inline">Đăng ký</span>
                         </a>
                     </li>
                 </ul>
@@ -97,11 +75,11 @@
     <!-- ========================================
          HERO SECTION
          ======================================== -->
-    <div class="hero-section">
-        <div class="container">
+    <div class="hero-section content-wrapper">
+        <div class="container-fluid">
             <div class="row align-items-center min-vh-100">
                 <!-- Hero Content -->
-                <div class="col-lg-6">
+                <div class="col-lg-6 col-md-12">
                     <div class="hero-content">
                         <!-- Hero Badge -->
                         <div class="hero-badge mb-4" data-aos="fade-up" data-aos-delay="100">
@@ -114,7 +92,7 @@
                         <!-- Hero Title -->
                         <h1 class="hero-title" data-aos="fade-up" data-aos-delay="200">
                             <span class="text-gradient">Chào mừng đến với</span><br>
-                            <span class="text-primary">Money Tracking</span>
+                            <span class="text-primary">MoneyTracker</span>
                         </h1>
 
                         <!-- Hero Subtitle -->
@@ -141,14 +119,26 @@
 
                         <!-- Hero Actions -->
                         <div class="hero-actions" data-aos="fade-up" data-aos-delay="500">
-                            <a href="/Onboarding" class="btn btn-primary btn-lg me-3">
-                                <i class="fas fa-rocket me-2"></i>
-                                Bắt đầu miễn phí
-                            </a>
-                            <a href="#demo" class="btn btn-outline-light btn-lg">
-                                <i class="fas fa-play me-2"></i>
-                                Xem demo
-                            </a>
+                            <div id="guestActions">
+                                <a href="/Onboarding" class="btn btn-primary btn-lg me-3 mb-2">
+                                    <i class="fas fa-rocket me-2"></i>
+                                    Bắt đầu miễn phí
+                                </a>
+                            </div>
+                            <div id="userActions" style="display: none;">
+                                <a href="/Dashboard" class="btn btn-primary btn-lg me-3 mb-2">
+                                    <i class="fas fa-tachometer-alt me-2"></i>
+                                    Vào Dashboard
+                                </a>
+                                <a href="/Profile" class="btn btn-outline-light btn-lg me-3 mb-2">
+                                    <i class="fas fa-user me-2"></i>
+                                    Hồ sơ cá nhân
+                                </a>
+                                <button onclick="logout()" class="btn btn-outline-danger btn-lg mb-2">
+                                    <i class="fas fa-sign-out-alt me-2"></i>
+                                    Đăng xuất
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Hero Trust -->
@@ -165,7 +155,7 @@
                 </div>
 
                 <!-- Hero Visual -->
-                <div class="col-lg-6">
+                <div class="col-lg-6 col-md-12">
                     <div class="hero-visual" data-aos="fade-left" data-aos-delay="400">
                         <div class="floating-cards">
                             <!-- Card 1: Total Assets -->
@@ -215,15 +205,15 @@
     <!-- ========================================
          FEATURES SECTION
          ======================================== -->
-    <div class="features-section" id="features">
-        <div class="container">
+    <div class="features-section section-spacing" id="features">
+        <div class="container-fluid">
             <!-- Section Header -->
             <div class="text-center mb-5">
                 <span class="badge bg-primary-gradient mb-3">
                     <i class="fas fa-star me-2"></i>
                     Tính năng nổi bật
                 </span>
-                <h2 class="section-title">Tại sao chọn Money Tracking?</h2>
+                <h2 class="section-title">Tại sao chọn MoneyTracker?</h2>
                 <p class="section-subtitle">Khám phá những tính năng mạnh mẽ giúp bạn quản lý tài chính hiệu quả</p>
             </div>
 
@@ -235,10 +225,9 @@
                         <i class="fas fa-wallet"></i>
                     </div>
                     <h3>Ví thông minh</h3>
-                    <p>Quản lý tất cả tài khoản tài chính của bạn ở một nơi với phân loại thông minh và thông tin chi
-                        tiết.</p>
+                    <p>Quản lý tất cả tài khoản tài chính của bạn ở một nơi với phân loại thông minh và thông tin chi tiết.</p>
                     <div class="feature-link">
-                        <a href="#" class="btn btn-link">
+                        <a href="/Dashboard" class="btn btn-link">
                             Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -250,10 +239,9 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <h3>Phân tích & Báo cáo</h3>
-                    <p>Nhận thông tin chi tiết về mô hình chi tiêu và tình hình tài chính với các biểu đồ trực quan đẹp
-                        mắt.</p>
+                    <p>Nhận thông tin chi tiết về mô hình chi tiêu và tình hình tài chính với các biểu đồ trực quan đẹp mắt.</p>
                     <div class="feature-link">
-                        <a href="#" class="btn btn-link">
+                        <a href="/Reports" class="btn btn-link">
                             Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -265,10 +253,9 @@
                         <i class="fas fa-robot"></i>
                     </div>
                     <h3>Gợi ý AI</h3>
-                    <p>Nhận các khuyến nghị cá nhân hóa để tối ưu hóa quyết định tài chính và tiết kiệm nhiều tiền hơn.
-                    </p>
+                    <p>Nhận các khuyến nghị cá nhân hóa để tối ưu hóa quyết định tài chính và tiết kiệm nhiều tiền hơn.</p>
                     <div class="feature-link">
-                        <a href="#" class="btn btn-link">
+                        <a href="/AI" class="btn btn-link">
                             Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -280,10 +267,9 @@
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <h3>Bảo mật & Riêng tư</h3>
-                    <p>Dữ liệu tài chính của bạn được mã hóa và bảo mật. Chúng tôi không bao giờ chia sẻ thông tin cá
-                        nhân của bạn.</p>
+                    <p>Dữ liệu tài chính của bạn được mã hóa và bảo mật. Chúng tôi không bao giờ chia sẻ thông tin cá nhân của bạn.</p>
                     <div class="feature-link">
-                        <a href="#" class="btn btn-link">
+                        <a href="/Profile" class="btn btn-link">
                             Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -297,7 +283,7 @@
                     <h3>Ứng dụng di động</h3>
                     <p>Truy cập và quản lý tài chính mọi lúc mọi nơi với ứng dụng di động tiện lợi và dễ sử dụng.</p>
                     <div class="feature-link">
-                        <a href="#" class="btn btn-link">
+                        <a href="#contact" class="btn btn-link">
                             Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -311,7 +297,7 @@
                     <h3>Đồng bộ thời gian thực</h3>
                     <p>Dữ liệu được đồng bộ tự động trên tất cả thiết bị, đảm bảo bạn luôn có thông tin mới nhất.</p>
                     <div class="feature-link">
-                        <a href="#" class="btn btn-link">
+                        <a href="/Dashboard" class="btn btn-link">
                             Tìm hiểu thêm <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -323,11 +309,11 @@
     <!-- ========================================
          STATS SECTION
          ======================================== -->
-    <div class="stats-section">
-        <div class="container">
+    <div class="stats-section section-spacing">
+        <div class="container-fluid">
             <div class="row text-center">
                 <!-- Stat 1: Users -->
-                <div class="col-md-3 col-6 mb-4">
+                <div class="col-lg-3 col-md-6 col-6 mb-4">
                     <div class="stat-box">
                         <div class="stat-icon">
                             <i class="fas fa-users"></i>
@@ -338,7 +324,7 @@
                 </div>
 
                 <!-- Stat 2: Savings -->
-                <div class="col-md-3 col-6 mb-4">
+                <div class="col-lg-3 col-md-6 col-6 mb-4">
                     <div class="stat-box">
                         <div class="stat-icon">
                             <i class="fas fa-dollar-sign"></i>
@@ -349,7 +335,7 @@
                 </div>
 
                 <!-- Stat 3: Rating -->
-                <div class="col-md-3 col-6 mb-4">
+                <div class="col-lg-3 col-md-6 col-6 mb-4">
                     <div class="stat-box">
                         <div class="stat-icon">
                             <i class="fas fa-star"></i>
@@ -360,7 +346,7 @@
                 </div>
 
                 <!-- Stat 4: Countries -->
-                <div class="col-md-3 col-6 mb-4">
+                <div class="col-lg-3 col-md-6 col-6 mb-4">
                     <div class="stat-box">
                         <div class="stat-icon">
                             <i class="fas fa-globe"></i>
@@ -376,8 +362,8 @@
     <!-- ========================================
          TESTIMONIALS SECTION
          ======================================== -->
-    <div class="testimonials-section">
-        <div class="container">
+    <div class="testimonials-section section-spacing" id="about">
+        <div class="container-fluid">
             <!-- Section Header -->
             <div class="text-center mb-5">
                 <span class="badge bg-primary-gradient mb-3">
@@ -387,78 +373,9 @@
                 <h2 class="section-title">Người dùng nói gì về chúng tôi</h2>
             </div>
 
-            <!-- Testimonials Grid -->
-            <div class="testimonials-grid">
-                <!-- Testimonial 1 -->
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p>"Money Tracking đã giúp tôi tiết kiệm được 30% chi phí mỗi tháng. Giao diện đẹp và dễ sử
-                            dụng!"</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="https://via.placeholder.com/50" alt="Nguyễn Văn A">
-                        </div>
-                        <div class="author-info">
-                            <h5>Nguyễn Văn A</h5>
-                            <span>Doanh nhân</span>
-                        </div>
-                    </div>
-                </div>
+          
 
-                <!-- Testimonial 2 -->
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p>"Tính năng AI gợi ý rất hữu ích. Tôi đã học được cách quản lý tài chính tốt hơn nhờ ứng dụng
-                            này."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="https://via.placeholder.com/50" alt="Trần Thị B">
-                        </div>
-                        <div class="author-info">
-                            <h5>Trần Thị B</h5>
-                            <span>Nhân viên văn phòng</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testimonial 3 -->
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p>"Bảo mật tuyệt vời và đồng bộ mượt mà trên mọi thiết bị. Tôi rất yên tâm khi sử dụng."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="https://via.placeholder.com/50" alt="Lê Văn C">
-                        </div>
-                        <div class="author-info">
-                            <h5>Lê Văn C</h5>
-                            <span>Freelancer</span>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -466,18 +383,17 @@
     <!-- ========================================
          CTA SECTION
          ======================================== -->
-    <div class="cta-section">
-        <div class="container">
+    <div class="cta-section section-spacing" id="contact">
+        <div class="container-fluid">
             <div class="cta-content">
                 <div class="row align-items-center">
                     <!-- CTA Content -->
-                    <div class="col-lg-8">
-                        <h2>Sẵn sàng kiểm soát tài chính của bạn?</h2>
-                        <p>Tham gia cùng hàng nghìn người dùng tin tưởng Money Tracking cho nhu cầu quản lý tài chính
-                            của họ. Bắt đầu miễn phí ngay hôm nay!</p>
+                    <div class="col-lg-8 col-md-12">
+                        <h2 data-aos="fade-up">Sẵn sàng kiểm soát tài chính của bạn?</h2>
+                        <p data-aos="fade-up" data-aos-delay="100">Tham gia cùng hàng nghìn người dùng tin tưởng MoneyTracker cho nhu cầu quản lý tài chính của họ. Bắt đầu miễn phí ngay hôm nay!</p>
 
                         <!-- CTA Features -->
-                        <div class="cta-features">
+                        <div class="cta-features" data-aos="fade-up" data-aos-delay="200">
                             <div class="cta-feature">
                                 <i class="fas fa-check-circle"></i>
                                 <span>Miễn phí 30 ngày đầu</span>
@@ -494,14 +410,24 @@
                     </div>
 
                     <!-- CTA Buttons -->
-                    <div class="col-lg-4 text-center">
-                        <div class="cta-buttons">
+                    <div class="col-lg-4 col-md-12 text-center">
+                        <div class="cta-buttons" id="guestCTA" data-aos="fade-up" data-aos-delay="300">
                             <a href="/Onboarding" class="btn btn-primary btn-lg mb-3">
                                 <i class="fas fa-rocket me-2"></i>
                                 Bắt đầu miễn phí
                             </a>
-                            <p class="small text-muted">Đã có tài khoản? <a href="/Login" class="text-primary">Đăng
-                                    nhập</a></p>
+                            <p class="small text-muted">Đã có tài khoản? <a href="/Login" class="text-primary">Đăng nhập</a></p>
+                        </div>
+                        <div class="cta-buttons" id="userCTA" style="display: none;" data-aos="fade-up" data-aos-delay="300">
+                            <a href="/Dashboard" class="btn btn-primary btn-lg mb-3">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Vào Dashboard
+                            </a>
+                            <button onclick="logout()" class="btn btn-outline-light btn-lg mb-3">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Đăng xuất
+                            </button>
+                            <p class="small text-muted">Quản lý tài chính thông minh</p>
                         </div>
                     </div>
                 </div>
@@ -513,10 +439,10 @@
          FOOTER
          ======================================== -->
     <footer class="footer">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <!-- Brand Section -->
-                <div class="col-lg-4 mb-4">
+                <div class="col-lg-4 col-md-6 mb-4">
                     <div class="footer-brand">
                         <div class="brand-logo">
                             <i class="fas fa-wallet"></i>
@@ -533,40 +459,40 @@
                 </div>
 
                 <!-- Products Links -->
-                <div class="col-lg-2 col-md-6 mb-4">
+                <div class="col-lg-2 col-md-6 col-6 mb-4">
                     <h5>Sản phẩm</h5>
                     <ul class="footer-links">
-                        <li><a href="#">Tính năng</a></li>
-                        <li><a href="#">Bảng giá</a></li>
-                        <li><a href="#">API</a></li>
-                        <li><a href="#">Tích hợp</a></li>
+                        <li><a href="#features">Tính năng</a></li>
+                        <li><a href="/Dashboard">Dashboard</a></li>
+                        <li><a href="/Reports">Báo cáo</a></li>
+                        <li><a href="/AI">AI Gợi ý</a></li>
                     </ul>
                 </div>
 
                 <!-- Support Links -->
-                <div class="col-lg-2 col-md-6 mb-4">
+                <div class="col-lg-2 col-md-6 col-6 mb-4">
                     <h5>Hỗ trợ</h5>
                     <ul class="footer-links">
-                        <li><a href="#">Trung tâm trợ giúp</a></li>
-                        <li><a href="#">Tài liệu</a></li>
-                        <li><a href="#">Liên hệ</a></li>
-                        <li><a href="#">Trạng thái</a></li>
+                        <li><a href="#contact">Liên hệ</a></li>
+                        <li><a href="/Profile">Hồ sơ</a></li>
+                        <li><a href="/Login">Đăng nhập</a></li>
+                        <li><a href="/Register">Đăng ký</a></li>
                     </ul>
                 </div>
 
                 <!-- Company Links -->
-                <div class="col-lg-2 col-md-6 mb-4">
+                <div class="col-lg-2 col-md-6 col-6 mb-4">
                     <h5>Công ty</h5>
                     <ul class="footer-links">
-                        <li><a href="#">Về chúng tôi</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Tuyển dụng</a></li>
-                        <li><a href="#">Báo chí</a></li>
+                        <li><a href="#about">Về chúng tôi</a></li>
+                        <li><a href="#features">Tính năng</a></li>
+                        <li><a href="#contact">Liên hệ</a></li>
+                        <li><a href="/HomePage">Trang chủ</a></li>
                     </ul>
                 </div>
 
                 <!-- Legal Links -->
-                <div class="col-lg-2 col-md-6 mb-4">
+                <div class="col-lg-2 col-md-6 col-6 mb-4">
                     <h5>Pháp lý</h5>
                     <ul class="footer-links">
                         <li><a href="#">Điều khoản</a></li>
@@ -598,65 +524,79 @@
 @section Scripts {
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize AOS
+        // Initialize AOS with optimized settings
         AOS.init({
-            duration: 1000,
-            easing: 'ease-in-out',
+            duration: 800,
+            easing: 'ease-out-cubic',
             once: true,
-            offset: 100
+            offset: 50,
+            delay: 0,
+            disable: 'mobile' // Disable on mobile for better performance
         });
 
         $(document).ready(function () {
             // ========================================
-            // NAVBAR FUNCTIONALITY
+            // NAVBAR FUNCTIONALITY (Optimized)
             // ========================================
 
-            // Navbar scroll effect
-            $(window).scroll(function () {
-                if ($(window).scrollTop() > 50) {
-                    $('.navbar').addClass('scrolled');
-                } else {
-                    $('.navbar').removeClass('scrolled');
+            // Throttled navbar scroll effect for better performance
+            let scrollTimeout;
+            $(window).on('scroll', function() {
+                if (scrollTimeout) {
+                    clearTimeout(scrollTimeout);
                 }
+                scrollTimeout = setTimeout(function() {
+                    if ($(window).scrollTop() > 50) {
+                        $('.navbar').addClass('scrolled');
+                    } else {
+                        $('.navbar').removeClass('scrolled');
+                    }
+                }, 10);
             });
 
-            // Mobile menu close on link click
-            $('.navbar-nav .nav-link').on('click', function () {
+            // Mobile menu close on link click (delegated event)
+            $(document).on('click', '.navbar-nav .nav-link', function () {
                 if ($(window).width() < 992) {
                     $('.navbar-collapse').collapse('hide');
                 }
             });
 
             // ========================================
-            // SMOOTH SCROLLING
+            // SMOOTH SCROLLING (Optimized)
             // ========================================
 
-            // Smooth scrolling for anchor links
-            $('a[href^="#"]').on('click', function (event) {
-                var target = $(this.getAttribute('href'));
+            // Smooth scrolling for anchor links with performance optimization
+            $(document).on('click', 'a[href^="#"]', function (event) {
+                const target = $(this.getAttribute('href'));
                 if (target.length) {
                     event.preventDefault();
+                    const targetOffset = target.offset().top - 80;
+                    
                     $('html, body').stop().animate({
-                        scrollTop: target.offset().top - 80
-                    }, 1000);
+                        scrollTop: targetOffset
+                    }, 800, 'easeOutCubic');
                 }
             });
 
             // ========================================
-            // ANIMATIONS
+            // ANIMATIONS (Optimized)
             // ========================================
 
-            // Animate numbers on scroll
+            // Optimized number animation with throttling
+            let numbersAnimated = false;
             function animateNumbers() {
+                if (numbersAnimated) return;
+                numbersAnimated = true;
+                
                 $('.stat-number').each(function () {
-                    var $this = $(this);
-                    var countTo = $this.attr('data-count');
+                    const $this = $(this);
+                    const countTo = $this.attr('data-count');
 
                     if (countTo) {
                         $({ countNum: 0 }).animate({
                             countNum: countTo
                         }, {
-                            duration: 2000,
+                            duration: 1500,
                             easing: 'easeOutQuart',
                             step: function () {
                                 $this.text(Math.floor(this.countNum));
@@ -699,48 +639,47 @@
             });
 
             // ========================================
-            // INTERACTIVE ELEMENTS
+            // INTERACTIVE ELEMENTS (Optimized)
             // ========================================
 
-            // Add loading animation to buttons
-            $('.btn').on('click', function () {
-                var $btn = $(this);
-                var originalText = $btn.html();
+            // Optimized button loading animation with delegated events
+            $(document).on('click', '.btn:not(.no-loading)', function () {
+                const $btn = $(this);
+                const originalText = $btn.html();
 
-                if (!$btn.hasClass('no-loading')) {
-                    $btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang tải...');
-                    $btn.prop('disabled', true);
+                $btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang tải...');
+                $btn.prop('disabled', true);
 
-                    // Re-enable after 2 seconds
-                    setTimeout(function () {
-                        $btn.html(originalText);
-                        $btn.prop('disabled', false);
-                    }, 2000);
-                }
+                // Re-enable after 1.5 seconds (reduced from 2s)
+                setTimeout(function () {
+                    $btn.html(originalText);
+                    $btn.prop('disabled', false);
+                }, 1500);
             });
 
-            // Parallax effect for hero section
-            $(window).scroll(function () {
-                var scrolled = $(window).scrollTop();
-                var parallax = $('.hero-section');
-                var speed = scrolled * 0.5;
-                parallax.css('transform', 'translateY(' + speed + 'px)');
+            // Optimized parallax effect with throttling
+            let parallaxTimeout;
+            $(window).on('scroll', function() {
+                if (parallaxTimeout) {
+                    clearTimeout(parallaxTimeout);
+                }
+                parallaxTimeout = setTimeout(function() {
+                    const scrolled = $(window).scrollTop();
+                    const parallax = $('.hero-section');
+                    const speed = scrolled * 0.3; // Reduced for better performance
+                    parallax.css('transform', 'translateY(' + speed + 'px)');
+                }, 16); // ~60fps
             });
 
-            // Add hover effects to floating cards
-            $('.card').hover(
-                function () {
-                    $(this).css('transform', 'translateY(-15px) scale(1.05)');
-                    $(this).css('animation-play-state', 'paused');
-                },
-                function () {
-                    $(this).css('transform', 'translateY(0) scale(1)');
-                    $(this).css('animation-play-state', 'running');
-                }
-            );
+            // Optimized card hover effects with CSS classes
+            $(document).on('mouseenter', '.card', function () {
+                $(this).addClass('card-hover');
+            }).on('mouseleave', '.card', function () {
+                $(this).removeClass('card-hover');
+            });
 
-            // Add click effect to cards
-            $('.card').on('click', function () {
+            // Optimized card click effect
+            $(document).on('click', '.card', function () {
                 $(this).addClass('card-clicked');
                 setTimeout(() => {
                     $(this).removeClass('card-clicked');
@@ -756,6 +695,9 @@
             if (token) {
                 // Update navbar for logged in users
                 updateNavbarForLoggedInUser();
+                
+                // Update hero actions for logged in users
+                updateHeroActionsForLoggedInUser();
             }
         });
 
@@ -763,23 +705,88 @@
         // USER MENU FUNCTIONS
         // ========================================
 
+        function updateHeroActionsForLoggedInUser() {
+            // Hide guest actions and show user actions
+            $('#guestActions').hide();
+            $('#userActions').show();
+            
+            // Update CTA section
+            $('#guestCTA').hide();
+            $('#userCTA').show();
+            
+            // Get user info for personalized greeting
+            const userData = JSON.parse(localStorage.getItem('user') || '{}');
+            const userName = userData.fullName || userData.username || 'Người dùng';
+            
+            // Update hero title for logged in user
+            $('.hero-title').html(`
+                <span class="text-gradient">Chào mừng trở lại,</span><br>
+                <span class="text-primary">${userName}!</span>
+            `);
+            
+            // Update hero subtitle
+            $('.hero-subtitle').text('Tiếp tục quản lý tài chính của bạn một cách thông minh và hiệu quả.');
+            
+            // Update CTA section content
+            $('.cta-section h2').text('Tiếp tục hành trình tài chính của bạn!');
+            $('.cta-section p').text('Quản lý chi tiêu, theo dõi thu nhập và đạt được mục tiêu tài chính với MoneyTracker.');
+        }
+
         function updateNavbarForLoggedInUser() {
             // Hide login/register buttons and show user menu
             $('.navbar-nav .nav-link[href="/Login"]').parent().hide();
             $('.navbar-nav .nav-link[href="/Register"]').parent().hide();
 
-            // Add user menu
+            // Get user info from localStorage
+            const userData = JSON.parse(localStorage.getItem('user') || '{}');
+            const userName = userData.fullName || userData.username || 'Người dùng';
+            const userEmail = userData.email || '';
+            const userRole = userData.role || 'USER';
+
+            // Add user menu with enhanced UI
             var userMenu = `
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i>
-                                Tài khoản
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar me-2">
+                                    ${userData.pictureUrl ? 
+                                        `<img src="${userData.pictureUrl}" alt="${userName}" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">` :
+                                        `<div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 14px;">
+                                            <i class="fas fa-user"></i>
+                                        </div>`
+                                    }
+                                </div>
+                                <div class="user-info d-none d-lg-block">
+                                    <div class="user-name">${userName}</div>
+                                    <div class="user-role text-muted small">${userRole === 'ADMIN' ? 'Quản trị viên' : 'Người dùng'}</div>
+                                </div>
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/Profile"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                                <li><a class="dropdown-item" href="/Dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 280px;">
+                                <li class="dropdown-header">
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-3">
+                                            ${userData.pictureUrl ? 
+                                                `<img src="${userData.pictureUrl}" alt="${userName}" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">` :
+                                                `<div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 20px;">
+                                                    <i class="fas fa-user"></i>
+                                                </div>`
+                                            }
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">${userName}</div>
+                                            <div class="text-muted small">${userEmail}</div>
+                                            <span class="badge bg-${userRole === 'ADMIN' ? 'danger' : 'primary'} small">${userRole === 'ADMIN' ? 'Quản trị viên' : 'Người dùng'}</span>
+                                        </div>
+                                    </div>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                                <li><a class="dropdown-item" href="/Dashboard"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="/Profile"><i class="fas fa-user me-2 text-info"></i>Hồ sơ cá nhân</a></li>
+                                <li><a class="dropdown-item" href="/Expenses"><i class="fas fa-receipt me-2 text-warning"></i>Chi tiêu</a></li>
+                                <li><a class="dropdown-item" href="/Incomes"><i class="fas fa-money-bill-wave me-2 text-success"></i>Thu nhập</a></li>
+                                <li><a class="dropdown-item" href="/Reports"><i class="fas fa-chart-bar me-2 text-secondary"></i>Báo cáo</a></li>
+                                ${userRole === 'ADMIN' ? '<li><a class="dropdown-item" href="/Admin"><i class="fas fa-cog me-2 text-danger"></i>Quản trị</a></li>' : ''}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                             </ul>
                         </li>
                     `;
@@ -787,9 +794,58 @@
         }
 
         function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = '/HomePage';
+            if (window.logoutManager) {
+                window.logoutManager.logout();
+            } else {
+                // Fallback for backward compatibility
+                showLogoutConfirmation();
+            }
+        }
+
+        function showLogoutConfirmation() {
+            // Create a simple confirmation dialog
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                // Clear user data
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                localStorage.removeItem('userPreferences');
+                localStorage.removeItem('dashboardData');
+                sessionStorage.clear();
+                
+                // Show success message
+                showLogoutSuccess();
+                
+                // Redirect after delay
+                setTimeout(() => {
+                    window.location.href = '/HomePage';
+                }, 1500);
+            }
+        }
+
+        function showLogoutSuccess() {
+            // Create success toast
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center text-white bg-success border-0';
+            toast.style.position = 'fixed';
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>Đăng xuất thành công!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 3000);
         }
     </script>
 }

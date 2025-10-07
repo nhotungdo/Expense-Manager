@@ -1,238 +1,267 @@
 @page
 @model MoneyTracker.Pages.ProfileModel
 @{
-    ViewData["Title"] = "Hồ sơ cá nhân - MoneyTracker";
+    ViewData["Title"] = "Hồ Sơ Cá Nhân";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-1">Hồ sơ cá nhân</h1>
-                    <p class="text-muted mb-0">Quản lý thông tin và cài đặt tài khoản của bạn</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary" onclick="refreshProfile()">
-                        <i class="fas fa-sync-alt"></i> Làm mới
-                    </button>
-                    <button class="btn btn-primary" onclick="saveProfile()">
-                        <i class="fas fa-save"></i> Lưu thay đổi
-                    </button>
-                </div>
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hồ Sơ Cá Nhân</h2>
+                <p class="text-gray-600 dark:text-gray-300">Quản lý thông tin và cài đặt tài khoản</p>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Profile Information -->
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-user me-2"></i>Thông tin cá nhân
-                    </h5>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Profile Info -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Basic Information -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Thông Tin Cơ Bản</h3>
+                    <button onclick="editProfile()"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-edit mr-2"></i>
+                        Chỉnh Sửa
+                    </button>
                 </div>
-                <div class="card-body">
-                    <!-- Google Account Info -->
-                    <div class="alert alert-info mb-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fab fa-google fa-2x me-3 text-primary"></i>
-                            <div>
-                                <h6 class="mb-1">Tài khoản Google</h6>
-                                <small>Thông tin cơ bản được đồng bộ từ tài khoản Google của bạn</small>
-                            </div>
+                <form id="profile-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Họ và
+                                tên</label>
+                            <input type="text" name="fullName" id="full-name"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50"
+                                placeholder="Nhập họ và tên">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                            <input type="email" name="email" id="email" readonly
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Số điện
+                                thoại</label>
+                            <input type="tel" name="phoneNumber" id="phone-number"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50"
+                                placeholder="Nhập số điện thoại">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ngày
+                                sinh</label>
+                            <input type="date" name="dateOfBirth" id="date-of-birth"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Giới
+                                tính</label>
+                            <select name="gender" id="gender"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                                <option value="">Chọn giới tính</option>
+                                <option value="Male">Nam</option>
+                                <option value="Female">Nữ</option>
+                                <option value="Other">Khác</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Địa
+                                chỉ</label>
+                            <input type="text" name="address" id="address"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50"
+                                placeholder="Nhập địa chỉ">
                         </div>
                     </div>
-
-                    <form id="profileForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Tên đăng nhập</label>
-                                <input type="text" class="form-control" id="username" readonly>
-                                <small class="text-muted">Từ Google Account</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" readonly>
-                                <small class="text-muted">Từ Google Account</small>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Họ và tên</label>
-                                <input type="text" class="form-control" id="fullName">
-                                <small class="text-muted">Có thể chỉnh sửa từ Google Account</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Số điện thoại</label>
-                                <input type="tel" class="form-control" id="phoneNumber">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Ngày sinh</label>
-                                <input type="date" class="form-control" id="dateOfBirth">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Giới tính</label>
-                                <select class="form-control" id="gender">
-                                    <option value="">Chọn giới tính</option>
-                                    <option value="Male">Nam</option>
-                                    <option value="Female">Nữ</option>
-                                    <option value="Other">Khác</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Địa chỉ</label>
-                            <textarea class="form-control" id="address" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
+                    <div class="mt-6 flex space-x-3">
+                        <button type="submit"
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            Lưu Thay Đổi
+                        </button>
+                        <button type="button" onclick="cancelEdit()"
+                            class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                            Hủy
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <!-- Account Settings -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-cog me-2"></i>Cài đặt tài khoản
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form id="settingsForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Ngôn ngữ</label>
-                                <select class="form-control" id="language">
-                                    <option value="vi">Tiếng Việt</option>
-                                    <option value="en">English</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Tiền tệ mặc định</label>
-                                <select class="form-control" id="defaultCurrency">
-                                    <option value="VND">VND - Đồng Việt Nam</option>
-                                    <option value="USD">USD - Đô la Mỹ</option>
-                                    <option value="EUR">EUR - Euro</option>
-                                </select>
-                            </div>
+            <!-- Preferences -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Tùy Chỉnh</h3>
+                <form id="preferences-form">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ngôn
+                                ngữ</label>
+                            <select name="language" id="language"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                                <option value="vi">Tiếng Việt</option>
+                                <option value="en">English</option>
+                            </select>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Múi giờ</label>
-                                <select class="form-control" id="timezone">
-                                    <option value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh (GMT+7)</option>
-                                    <option value="UTC">UTC (GMT+0)</option>
-                                    <option value="America/New_York">America/New_York (GMT-5)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Chế độ hiển thị</label>
-                                <select class="form-control" id="theme">
-                                    <option value="light">Sáng</option>
-                                    <option value="dark">Tối</option>
-                                    <option value="auto">Tự động</option>
-                                </select>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Đơn vị tiền
+                                tệ</label>
+                            <select name="defaultCurrency" id="default-currency"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                                <option value="VND">VND (Việt Nam Đồng)</option>
+                                <option value="USD">USD (US Dollar)</option>
+                                <option value="EUR">EUR (Euro)</option>
+                            </select>
                         </div>
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="emailNotifications">
-                                <label class="form-check-label" for="emailNotifications">
-                                    Nhận thông báo qua email
-                                </label>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Múi
+                                giờ</label>
+                            <select name="timezone" id="timezone"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                                <option value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh (GMT+7)</option>
+                                <option value="UTC">UTC (GMT+0)</option>
+                                <option value="America/New_York">America/New_York (GMT-5)</option>
+                            </select>
                         </div>
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="pushNotifications">
-                                <label class="form-check-label" for="pushNotifications">
-                                    Nhận thông báo đẩy
-                                </label>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Giao
+                                diện</label>
+                            <select name="theme" id="theme"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                                <option value="light">Sáng</option>
+                                <option value="dark">Tối</option>
+                                <option value="auto">Tự động</option>
+                            </select>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit"
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            Lưu Tùy Chỉnh
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Notifications -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Thông Báo</h3>
+                <form id="notifications-form">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-800 dark:text-white">Email thông báo</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Nhận thông báo qua email</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="emailNotifications" id="email-notifications"
+                                    class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                                </div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-800 dark:text-white">Thông báo đẩy</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Nhận thông báo trên trình duyệt</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="pushNotifications" id="push-notifications"
+                                    class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit"
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            Lưu Cài Đặt
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <!-- Profile Picture and Stats -->
-        <div class="col-md-4">
-            <!-- Profile Picture -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-image me-2"></i>Ảnh đại diện
-                    </h5>
-                </div>
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <img id="profilePicture" src="/images/default-avatar.png" alt="Profile Picture"
-                            class="rounded-circle" width="120" height="120">
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Avatar Section -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <div class="text-center">
+                    <div class="relative inline-block">
+                        <div
+                            class="w-32 h-32 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-white text-4xl" id="avatar-icon"></i>
+                        </div>
+                        <button onclick="changeAvatar()"
+                            class="absolute bottom-0 right-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-camera text-sm"></i>
+                        </button>
                     </div>
-                    <button class="btn btn-outline-primary btn-sm" onclick="changeProfilePicture()">
-                        <i class="fas fa-camera me-2"></i>Thay đổi ảnh
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white" id="user-name">Tên người dùng</h3>
+                    <p class="text-gray-600 dark:text-gray-300" id="user-role">Người dùng</p>
+                </div>
+            </div>
+
+            <!-- Account Stats -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Thống Kê Tài Khoản</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600 dark:text-gray-300">Ngày tham gia</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-white" id="join-date">-</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600 dark:text-gray-300">Lần đăng nhập cuối</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-white" id="last-login">-</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600 dark:text-gray-300">Tổng giao dịch</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-white" id="total-transactions">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Bảo Mật</h3>
+                <div class="space-y-3">
+                    <button onclick="changePassword()"
+                        class="w-full flex items-center space-x-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors">
+                        <div
+                            class="w-10 h-10 bg-yellow-100 dark:bg-yellow-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-key text-yellow-600 dark:text-yellow-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-800 dark:text-white">Đổi mật khẩu</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Cập nhật mật khẩu mới</p>
+                        </div>
                     </button>
-                </div>
-            </div>
-
-            <!-- Account Statistics -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-chart-bar me-2"></i>Thống kê tài khoản
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6 mb-3">
-                            <h4 class="text-primary" id="totalTransactions">0</h4>
-                            <small class="text-muted">Giao dịch</small>
+                    <button onclick="exportData()"
+                        class="w-full flex items-center space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
+                        <div
+                            class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-download text-green-600 dark:text-green-400"></i>
                         </div>
-                        <div class="col-6 mb-3">
-                            <h4 class="text-success" id="accountAge">0</h4>
-                            <small class="text-muted">Ngày tham gia</small>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-800 dark:text-white">Xuất dữ liệu</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Tải xuống dữ liệu cá nhân</p>
                         </div>
-                    </div>
-                    <hr>
-                    <div class="row text-center">
-                        <div class="col-6 mb-3">
-                            <h4 class="text-info" id="totalCategories">0</h4>
-                            <small class="text-muted">Danh mục</small>
+                    </button>
+                    <button onclick="deleteAccount()"
+                        class="w-full flex items-center space-x-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                        <div class="w-10 h-10 bg-red-100 dark:bg-red-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-trash text-red-600 dark:text-red-400"></i>
                         </div>
-                        <div class="col-6 mb-3">
-                            <h4 class="text-warning" id="aiSuggestions">0</h4>
-                            <small class="text-muted">Gợi ý AI</small>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-800 dark:text-white">Xóa tài khoản</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Xóa vĩnh viễn tài khoản</p>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Security Settings -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-shield-alt me-2"></i>Bảo mật
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning mb-3">
-                        <small><i class="fas fa-info-circle me-2"></i>Bạn đang sử dụng đăng nhập Google. Một số tính
-                            năng bảo mật được quản lý bởi Google.</small>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-info" onclick="viewLoginHistory()">
-                            <i class="fas fa-history me-2"></i>Lịch sử đăng nhập
-                        </button>
-                        <button class="btn btn-outline-primary" onclick="manageGoogleAccount()">
-                            <i class="fab fa-google me-2"></i>Quản lý tài khoản Google
-                        </button>
-                        <button class="btn btn-outline-danger" onclick="deleteAccount()">
-                            <i class="fas fa-trash me-2"></i>Xóa tài khoản
-                        </button>
-                    </div>
+                    </button>
                 </div>
             </div>
         </div>
@@ -240,214 +269,252 @@
 </div>
 
 <!-- Change Password Modal -->
-<div class="modal fade" id="changePasswordModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Đổi mật khẩu</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div id="change-password-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-800">Đổi Mật Khẩu</h3>
+                <button onclick="closeModal('change-password-modal')"
+                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-times text-gray-500"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <form id="changePasswordForm">
-                    <div class="mb-3">
-                        <label class="form-label">Mật khẩu hiện tại</label>
-                        <input type="password" class="form-control" id="currentPassword" required>
+            <form id="change-password-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu hiện tại</label>
+                        <input type="password" name="currentPassword" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Nhập mật khẩu hiện tại">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mật khẩu mới</label>
-                        <input type="password" class="form-control" id="newPassword" required>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu mới</label>
+                        <input type="password" name="newPassword" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Nhập mật khẩu mới">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Xác nhận mật khẩu mới</label>
-                        <input type="password" class="form-control" id="confirmPassword" required>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu</label>
+                        <input type="password" name="confirmPassword" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Nhập lại mật khẩu mới">
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" onclick="savePassword()">Đổi mật khẩu</button>
-            </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="button" onclick="closeModal('change-password-modal')"
+                        class="flex-1 px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                        Hủy
+                    </button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        Đổi Mật Khẩu
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        let profileData = {};
+        let isEditing = false;
+        let originalData = {};
 
-        $(document).ready(function () {
-            loadProfileData();
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUserProfile();
+            setupFormHandlers();
         });
 
-        async function loadProfileData() {
+        async function loadUserProfile() {
             try {
-                const response = await fetch('/api/profile', {
-                    headers: {
-                        'Authorization': 'Bearer ' + getToken()
-                    }
-                });
+                const data = await apiCall('/api/user/profile');
 
-                if (response.ok) {
-                    profileData = await response.json();
-                    updateProfileUI();
-                } else if (response.status === 401) {
-                    window.location.href = '/Login';
-                } else {
-                    alert('Có lỗi xảy ra khi tải thông tin hồ sơ');
-                }
+                // Update basic info
+                document.getElementById('full-name').value = data.fullName || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('phone-number').value = data.phoneNumber || '';
+                document.getElementById('date-of-birth').value = data.dateOfBirth || '';
+                document.getElementById('gender').value = data.gender || '';
+                document.getElementById('address').value = data.address || '';
+
+                // Update preferences
+                document.getElementById('language').value = data.language || 'vi';
+                document.getElementById('default-currency').value = data.defaultCurrency || 'VND';
+                document.getElementById('timezone').value = data.timezone || 'Asia/Ho_Chi_Minh';
+                document.getElementById('theme').value = data.theme || 'light';
+
+                // Update notifications
+                document.getElementById('email-notifications').checked = data.emailNotifications || false;
+                document.getElementById('push-notifications').checked = data.pushNotifications || false;
+
+                // Update sidebar info
+                document.getElementById('user-name').textContent = data.fullName || data.email || 'Người dùng';
+                document.getElementById('user-role').textContent = data.role || 'Người dùng';
+                document.getElementById('join-date').textContent = data.createdAt ? formatDate(data.createdAt) : '-';
+                document.getElementById('last-login').textContent = data.lastLogin ? formatDate(data.lastLogin) : '-';
+                document.getElementById('total-transactions').textContent = data.totalTransactions || '0';
+
+                // Store original data
+                originalData = { ...data };
+
             } catch (error) {
-                console.error('Error loading profile data:', error);
-                alert('Có lỗi xảy ra khi tải thông tin hồ sơ');
+                console.error('Error loading user profile:', error);
+                showToast('Có lỗi xảy ra khi tải thông tin', 'error');
             }
         }
 
-        function updateProfileUI() {
-            // Update profile form
-            document.getElementById('username').value = profileData.username || '';
-            document.getElementById('email').value = profileData.email || '';
-            document.getElementById('fullName').value = profileData.fullName || '';
-            document.getElementById('phoneNumber').value = profileData.phoneNumber || '';
-            document.getElementById('dateOfBirth').value = profileData.dateOfBirth || '';
-            document.getElementById('gender').value = profileData.gender || '';
-            document.getElementById('address').value = profileData.address || '';
+        function setupFormHandlers() {
+            // Profile form
+            document.getElementById('profile-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-            // Update settings form
-            document.getElementById('language').value = profileData.language || 'vi';
-            document.getElementById('defaultCurrency').value = profileData.defaultCurrency || 'VND';
-            document.getElementById('timezone').value = profileData.timezone || 'Asia/Ho_Chi_Minh';
-            document.getElementById('theme').value = profileData.theme || 'light';
-            document.getElementById('emailNotifications').checked = profileData.emailNotifications || false;
-            document.getElementById('pushNotifications').checked = profileData.pushNotifications || false;
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
 
-            // Update profile picture
-            if (profileData.pictureUrl) {
-                document.getElementById('profilePicture').src = profileData.pictureUrl;
-            }
+                try {
+                    await apiCall('/api/user/profile', {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
 
-            // Update statistics
-            document.getElementById('totalTransactions').textContent = profileData.totalTransactions || 0;
-            document.getElementById('accountAge').textContent = profileData.accountAge || 0;
-            document.getElementById('totalCategories').textContent = profileData.totalCategories || 0;
-            document.getElementById('aiSuggestions').textContent = profileData.aiSuggestions || 0;
-        }
-
-        async function saveProfile() {
-            const profileForm = document.getElementById('profileForm');
-            const settingsForm = document.getElementById('settingsForm');
-
-            if (!profileForm.checkValidity() || !settingsForm.checkValidity()) {
-                profileForm.reportValidity();
-                settingsForm.reportValidity();
-                return;
-            }
-
-            const profileData = {
-                fullName: document.getElementById('fullName').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                dateOfBirth: document.getElementById('dateOfBirth').value,
-                gender: document.getElementById('gender').value,
-                address: document.getElementById('address').value,
-                language: document.getElementById('language').value,
-                defaultCurrency: document.getElementById('defaultCurrency').value,
-                timezone: document.getElementById('timezone').value,
-                theme: document.getElementById('theme').value,
-                emailNotifications: document.getElementById('emailNotifications').checked,
-                pushNotifications: document.getElementById('pushNotifications').checked
-            };
-
-            try {
-                const response = await fetch('/api/profile', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + getToken()
-                    },
-                    body: JSON.stringify(profileData)
-                });
-
-                if (response.ok) {
-                    alert('Cập nhật hồ sơ thành công');
-                    loadProfileData();
-                } else {
-                    alert('Có lỗi xảy ra khi cập nhật hồ sơ');
+                    showToast('Cập nhật thông tin thành công!', 'success');
+                    loadUserProfile();
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    showToast('Có lỗi xảy ra khi cập nhật thông tin', 'error');
                 }
-            } catch (error) {
-                console.error('Error saving profile:', error);
-                alert('Có lỗi xảy ra khi cập nhật hồ sơ');
-            }
-        }
+            });
 
-        function changeProfilePicture() {
-            // TODO: Implement profile picture upload
-            alert('Chức năng thay đổi ảnh đại diện sẽ được cập nhật');
-        }
+            // Preferences form
+            document.getElementById('preferences-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-        function manageGoogleAccount() {
-            window.open('https://myaccount.google.com/', '_blank');
-        }
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
 
-        async function savePassword() {
-            const form = document.getElementById('changePasswordForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+                try {
+                    await apiCall('/api/user/preferences', {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
 
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (newPassword !== confirmPassword) {
-                alert('Mật khẩu xác nhận không khớp');
-                return;
-            }
-
-            const passwordData = {
-                currentPassword: document.getElementById('currentPassword').value,
-                newPassword: newPassword
-            };
-
-            try {
-                const response = await fetch('/api/profile/change-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + getToken()
-                    },
-                    body: JSON.stringify(passwordData)
-                });
-
-                if (response.ok) {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
-                    modal.hide();
-                    form.reset();
-                    alert('Đổi mật khẩu thành công');
-                } else {
-                    alert('Có lỗi xảy ra khi đổi mật khẩu');
+                    showToast('Cập nhật tùy chỉnh thành công!', 'success');
+                } catch (error) {
+                    console.error('Error updating preferences:', error);
+                    showToast('Có lỗi xảy ra khi cập nhật tùy chỉnh', 'error');
                 }
-            } catch (error) {
-                console.error('Error changing password:', error);
-                alert('Có lỗi xảy ra khi đổi mật khẩu');
-            }
+            });
+
+            // Notifications form
+            document.getElementById('notifications-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
+
+                try {
+                    await apiCall('/api/user/notifications', {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+
+                    showToast('Cập nhật cài đặt thông báo thành công!', 'success');
+                } catch (error) {
+                    console.error('Error updating notifications:', error);
+                    showToast('Có lỗi xảy ra khi cập nhật cài đặt thông báo', 'error');
+                }
+            });
+
+            // Change password form
+            document.getElementById('change-password-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
+
+                if (data.newPassword !== data.confirmPassword) {
+                    showToast('Mật khẩu xác nhận không khớp', 'error');
+                    return;
+                }
+
+                try {
+                    await apiCall('/api/user/change-password', {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+
+                    showToast('Đổi mật khẩu thành công!', 'success');
+                    closeModal('change-password-modal');
+                    this.reset();
+                } catch (error) {
+                    console.error('Error changing password:', error);
+                    showToast('Có lỗi xảy ra khi đổi mật khẩu', 'error');
+                }
+            });
         }
 
-        function viewLoginHistory() {
-            // TODO: Implement login history view
-            alert('Chức năng xem lịch sử đăng nhập sẽ được cập nhật');
+        function editProfile() {
+            isEditing = true;
+            const inputs = document.querySelectorAll('#profile-form input, #profile-form select');
+            inputs.forEach(input => {
+                if (input.name !== 'email') {
+                    input.disabled = false;
+                    input.classList.remove('bg-gray-100', 'dark:bg-gray-700');
+                    input.classList.add('bg-white/50', 'dark:bg-gray-800/50');
+                }
+            });
+        }
+
+        function cancelEdit() {
+            isEditing = false;
+            const inputs = document.querySelectorAll('#profile-form input, #profile-form select');
+            inputs.forEach(input => {
+                if (input.name !== 'email') {
+                    input.disabled = true;
+                    input.classList.add('bg-gray-100', 'dark:bg-gray-700');
+                    input.classList.remove('bg-white/50', 'dark:bg-gray-800/50');
+                }
+            });
+
+            // Restore original values
+            Object.keys(originalData).forEach(key => {
+                const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
+                if (element) {
+                    element.value = originalData[key] || '';
+                }
+            });
+        }
+
+        function changeAvatar() {
+            showToast('Tính năng thay đổi avatar đang được phát triển', 'info');
+        }
+
+        function changePassword() {
+            openModal('change-password-modal');
+        }
+
+        function exportData() {
+            showToast('Tính năng xuất dữ liệu đang được phát triển', 'info');
         }
 
         function deleteAccount() {
-            if (confirm('Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác.')) {
-                // TODO: Implement account deletion
-                alert('Chức năng xóa tài khoản sẽ được cập nhật');
-            }
-        }
+            showConfirm('Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác!', async (confirmed) => {
+                if (confirmed) {
+                    try {
+                        await apiCall('/api/user/delete-account', {
+                            method: 'DELETE'
+                        });
 
-        function refreshProfile() {
-            loadProfileData();
-        }
-
-        function getToken() {
-            return localStorage.getItem('authToken') || '';
+                        showToast('Tài khoản đã được xóa thành công', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/Account/Login';
+                        }, 2000);
+                    } catch (error) {
+                        console.error('Error deleting account:', error);
+                        showToast('Có lỗi xảy ra khi xóa tài khoản', 'error');
+                    }
+                }
+            });
         }
     </script>
 }

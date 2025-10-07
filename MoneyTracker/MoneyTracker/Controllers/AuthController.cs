@@ -55,6 +55,9 @@ namespace MoneyTracker.Controllers
 
                 if (user == null)
                 {
+                    // Check if this is the default admin email
+                    var isDefaultAdmin = payload.Email == "nhotungdo89@gmail.com";
+
                     user = new User
                     {
                         GoogleId = payload.Subject,
@@ -62,7 +65,7 @@ namespace MoneyTracker.Controllers
                         Username = payload.Email.Split('@')[0],
                         FullName = payload.Name,
                         PictureUrl = payload.Picture,
-                        Role = "USER",
+                        Role = isDefaultAdmin ? "ADMIN" : "USER",
                         Enabled = true,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
@@ -75,6 +78,12 @@ namespace MoneyTracker.Controllers
                     if (!user.Enabled)
                     {
                         return BadRequest("Tài khoản đã bị vô hiệu hóa");
+                    }
+
+                    // Check if this is the default admin email and update role if needed
+                    if (user.Email == "nhotungdo89@gmail.com" && user.Role != "ADMIN")
+                    {
+                        user.Role = "ADMIN";
                     }
 
                     // Update last login and user info
@@ -120,14 +129,38 @@ namespace MoneyTracker.Controllers
             }
         }
 
-        [HttpPost("logout")]
-        public IActionResult Logout()
+        [HttpGet("logout")]
+        public IActionResult LogoutGet()
         {
-            // In JWT, logout is handled client-side by removing the token
-            // Here we can log the logout event
-            _logger.LogInformation("User logged out");
-            return Ok(new { message = "Logged out successfully" });
+            // Redirect to logout page for GET requests
+            return Redirect("/Account/Logout");
         }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId.HasValue)
+                {
+                    _logger.LogInformation("User {UserId} logged out", userId.Value);
+                }
+                else
+                {
+                    _logger.LogInformation("Anonymous user logged out");
+                }
+
+                return Ok(new { message = "Logged out successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during logout");
+                return Ok(new { message = "Logged out successfully" }); // Still return success for client-side cleanup
+            }
+        }
+
 
         [HttpGet("me")]
         [Authorize]

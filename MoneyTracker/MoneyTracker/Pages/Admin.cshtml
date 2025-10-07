@@ -1,0 +1,653 @@
+@page
+@model MoneyTracker.Pages.AdminModel
+@{
+    ViewData["Title"] = "Quản Trị Hệ Thống";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Quản Trị Hệ Thống</h2>
+                <p class="text-gray-600 dark:text-gray-300">Quản lý người dùng, hệ thống và báo cáo tổng quan</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                    <i class="fas fa-crown mr-1"></i>
+                    Admin
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Navigation Tabs -->
+    <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+        <div class="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <button onclick="switchTab('dashboard')" id="dashboard-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors bg-blue-500 text-white">
+                <i class="fas fa-chart-pie mr-2"></i>
+                Tổng Quan
+            </button>
+            <button onclick="switchTab('users')" id="users-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i class="fas fa-users mr-2"></i>
+                Người Dùng
+            </button>
+            <button onclick="switchTab('categories')" id="categories-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i class="fas fa-tags mr-2"></i>
+                Danh Mục
+            </button>
+            <button onclick="switchTab('logs')" id="logs-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i class="fas fa-list-alt mr-2"></i>
+                Nhật Ký
+            </button>
+            <button onclick="switchTab('system')" id="system-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i class="fas fa-cog mr-2"></i>
+                Hệ Thống
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div id="dashboard-content" class="tab-content">
+        <!-- System Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Tổng Người Dùng</p>
+                        <p class="text-3xl font-bold" id="total-users">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Giao Dịch Hôm Nay</p>
+                        <p class="text-3xl font-bold" id="today-transactions">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-exchange-alt text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Tổng Giao Dịch</p>
+                        <p class="text-3xl font-bold" id="total-transactions">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-xl animate-slide-in-up" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-yellow-100 text-sm font-medium">AI Gợi Ý</p>
+                        <p class="text-3xl font-bold" id="total-suggestions">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-robot text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Overview Chart -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Hoạt Động Người Dùng</h3>
+                <div class="h-80">
+                    <canvas id="userActivityChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Giao Dịch Theo Tháng</h3>
+                <div class="h-80">
+                    <canvas id="transactionTrendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="users-content" class="tab-content hidden">
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 animate-fade-in">
+            <div class="p-6 border-b border-white/20">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Quản Lý Người Dùng</h3>
+                    <div class="flex items-center space-x-3">
+                        <input type="text" id="user-search" placeholder="Tìm kiếm người dùng..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                        <button onclick="refreshUsers()" class="p-2 bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-white/30 transition-colors">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-white/10">
+                        <tr>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Người dùng</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Email</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Vai trò</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Trạng thái</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Ngày tạo</th>
+                            <th class="text-center py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table">
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Tab -->
+    <div id="categories-content" class="tab-content hidden">
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 animate-fade-in">
+            <div class="p-6 border-b border-white/20">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Quản Lý Danh Mục Toàn Cục</h3>
+                    <button onclick="createGlobalCategory()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Tạo Danh Mục
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="global-categories">
+                    <!-- Global categories will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs Tab -->
+    <div id="logs-content" class="tab-content hidden">
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 animate-fade-in">
+            <div class="p-6 border-b border-white/20">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Nhật Ký Hệ Thống</h3>
+                    <div class="flex items-center space-x-3">
+                        <select id="log-type-filter" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-800/50">
+                            <option value="">Tất cả loại</option>
+                            <option value="CREATE">Tạo mới</option>
+                            <option value="UPDATE">Cập nhật</option>
+                            <option value="DELETE">Xóa</option>
+                            <option value="LOGIN">Đăng nhập</option>
+                            <option value="LOGOUT">Đăng xuất</option>
+                        </select>
+                        <button onclick="refreshLogs()" class="p-2 bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-white/30 transition-colors">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-white/10">
+                        <tr>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Thời gian</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Người dùng</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Hành động</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Thực thể</th>
+                            <th class="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Mô tả</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-table">
+                        <!-- Logs will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Tab -->
+    <div id="system-content" class="tab-content hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- System Performance -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Hiệu Suất Hệ Thống</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 dark:text-gray-300">CPU Usage</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-white" id="cpu-usage">-</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 dark:text-gray-300">Memory Usage</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-white" id="memory-usage">-</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 dark:text-gray-300">Database Connections</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-white" id="db-connections">-</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 dark:text-gray-300">Active Users</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-white" id="active-users">-</span>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button onclick="refreshSystemStats()" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Làm Mới
+                    </button>
+                </div>
+            </div>
+
+            <!-- System Actions -->
+            <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 animate-fade-in">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Thao Tác Hệ Thống</h3>
+                <div class="space-y-3">
+                    <button onclick="clearCache()" class="w-full flex items-center space-x-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors">
+                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-broom text-yellow-600 dark:text-yellow-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-800 dark:text-white">Xóa Cache</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Làm sạch bộ nhớ đệm</p>
+                        </div>
+                    </button>
+                    <button onclick="optimizeDatabase()" class="w-full flex items-center space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
+                        <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-database text-green-600 dark:text-green-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-800 dark:text-white">Tối Ưu Database</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Tối ưu hóa cơ sở dữ liệu</p>
+                        </div>
+                    </button>
+                    <button onclick="generateSystemReport()" class="w-full flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-alt text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-800 dark:text-white">Báo Cáo Hệ Thống</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Tạo báo cáo tổng quan</p>
+                        </div>
+                    </button>
+                    <button onclick="backupDatabase()" class="w-full flex items-center space-x-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-save text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-800 dark:text-white">Sao Lưu Database</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Tạo bản sao lưu</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentTab = 'dashboard';
+        let userActivityChart, transactionTrendsChart;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            initializeCharts();
+        });
+        
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('[id$="-tab"]').forEach(tab => {
+                tab.className = 'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700';
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+            
+            // Add active class to selected tab
+            document.getElementById(tabName + '-tab').className = 'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors bg-blue-500 text-white';
+            
+            currentTab = tabName;
+            
+            // Load data for the selected tab
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'categories':
+                    loadGlobalCategories();
+                    break;
+                case 'logs':
+                    loadLogs();
+                    break;
+                case 'system':
+                    loadSystemStats();
+                    break;
+            }
+        }
+        
+        function initializeCharts() {
+            // User Activity Chart
+            const userActivityCtx = document.getElementById('userActivityChart');
+            if (userActivityCtx) {
+                userActivityChart = createChart('userActivityChart', {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Active Users', 'Inactive Users'],
+                        datasets: [{
+                            data: [0, 0],
+                            backgroundColor: ['rgb(34, 197, 94)', 'rgb(156, 163, 175)']
+                        }]
+                    }
+                });
+            }
+            
+            // Transaction Trends Chart
+            const transactionTrendsCtx = document.getElementById('transactionTrendsChart');
+            if (transactionTrendsCtx) {
+                transactionTrendsChart = createChart('transactionTrendsChart', {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Transactions',
+                            data: [],
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4
+                        }]
+                    }
+                });
+            }
+        }
+        
+        async function loadDashboardData() {
+            try {
+                const data = await apiCall('/api/admin/dashboard');
+                
+                // Update stats
+                document.getElementById('total-users').textContent = data.totalUsers || 0;
+                document.getElementById('today-transactions').textContent = data.todayTransactions || 0;
+                document.getElementById('total-transactions').textContent = data.totalTransactions || 0;
+                document.getElementById('total-suggestions').textContent = data.totalSuggestions || 0;
+                
+                // Update charts
+                if (userActivityChart) {
+                    userActivityChart.data.datasets[0].data = [data.activeUsers || 0, (data.totalUsers || 0) - (data.activeUsers || 0)];
+                    userActivityChart.update();
+                }
+                
+                if (transactionTrendsChart && data.transactionTrends) {
+                    const months = data.transactionTrends.map(t => t.month);
+                    const counts = data.transactionTrends.map(t => t.count);
+                    
+                    transactionTrendsChart.data.labels = months;
+                    transactionTrendsChart.data.datasets[0].data = counts;
+                    transactionTrendsChart.update();
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showToast('Có lỗi xảy ra khi tải dữ liệu', 'error');
+            }
+        }
+        
+        async function loadUsers() {
+            try {
+                const data = await apiCall('/api/admin/users');
+                const tbody = document.getElementById('users-table');
+                
+                if (data && data.length > 0) {
+                    tbody.innerHTML = data.map(user => `
+                        <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800 dark:text-white">${user.fullName || user.username}</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">${user.username}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-sm text-gray-600 dark:text-gray-300">${user.email}</td>
+                            <td class="py-4 px-6">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${user.role === 'Admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}">
+                                    ${user.role}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${user.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                    ${user.enabled ? 'Hoạt động' : 'Tạm khóa'}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-sm text-gray-600 dark:text-gray-300">${formatDate(user.createdAt)}</td>
+                            <td class="py-4 px-6 text-center">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <button onclick="toggleUserStatus(${user.id}, ${user.enabled})" class="p-2 ${user.enabled ? 'text-red-600 hover:bg-red-100' : 'text-green-600 hover:bg-green-100'} rounded-lg transition-colors" title="${user.enabled ? 'Khóa' : 'Mở khóa'}">
+                                        <i class="fas ${user.enabled ? 'fa-lock' : 'fa-unlock'}"></i>
+                                    </button>
+                                    <button onclick="deleteUser(${user.id})" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-gray-500">Không có dữ liệu</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showToast('Có lỗi xảy ra khi tải danh sách người dùng', 'error');
+            }
+        }
+        
+        async function loadGlobalCategories() {
+            try {
+                const data = await apiCall('/api/admin/categories');
+                const container = document.getElementById('global-categories');
+                
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(category => `
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: ${category.color || '#3B82F6'}20">
+                                        <i class="${category.icon || 'fas fa-tag'} text-sm" style="color: ${category.color || '#3B82F6'}"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-800 dark:text-white">${category.name}</span>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${category.type === 'EXPENSE' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                                    ${category.type === 'EXPENSE' ? 'Chi tiêu' : 'Thu nhập'}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">${category.description || 'Không có mô tả'}</p>
+                            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span>Người dùng: ${category.userCount || 0}</span>
+                                <span>Giao dịch: ${category.transactionCount || 0}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">Không có danh mục toàn cục</p>';
+                }
+            } catch (error) {
+                console.error('Error loading global categories:', error);
+                showToast('Có lỗi xảy ra khi tải danh mục', 'error');
+            }
+        }
+        
+        async function loadLogs() {
+            try {
+                const logType = document.getElementById('log-type-filter').value;
+                const params = logType ? `?type=${logType}` : '';
+                const data = await apiCall(`/api/admin/logs${params}`);
+                const tbody = document.getElementById('logs-table');
+                
+                if (data && data.length > 0) {
+                    tbody.innerHTML = data.map(log => `
+                        <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                            <td class="py-4 px-6 text-sm text-gray-600 dark:text-gray-300">${formatDate(log.timestamp)}</td>
+                            <td class="py-4 px-6 text-sm text-gray-600 dark:text-gray-300">${log.userName || 'System'}</td>
+                            <td class="py-4 px-6">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${getLogTypeClass(log.actionType)}">
+                                    ${getLogTypeText(log.actionType)}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-sm text-gray-600 dark:text-gray-300">${log.entityName || '-'}</td>
+                            <td class="py-4 px-6 text-sm text-gray-600 dark:text-gray-300">${log.description || '-'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-gray-500">Không có dữ liệu</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                showToast('Có lỗi xảy ra khi tải nhật ký', 'error');
+            }
+        }
+        
+        async function loadSystemStats() {
+            try {
+                const data = await apiCall('/api/admin/system-stats');
+                
+                document.getElementById('cpu-usage').textContent = data.cpuUsage || 'N/A';
+                document.getElementById('memory-usage').textContent = data.memoryUsage || 'N/A';
+                document.getElementById('db-connections').textContent = data.dbConnections || 'N/A';
+                document.getElementById('active-users').textContent = data.activeUsers || 'N/A';
+            } catch (error) {
+                console.error('Error loading system stats:', error);
+                showToast('Có lỗi xảy ra khi tải thống kê hệ thống', 'error');
+            }
+        }
+        
+        function getLogTypeClass(type) {
+            switch(type) {
+                case 'CREATE': return 'bg-green-100 text-green-800';
+                case 'UPDATE': return 'bg-blue-100 text-blue-800';
+                case 'DELETE': return 'bg-red-100 text-red-800';
+                case 'LOGIN': return 'bg-purple-100 text-purple-800';
+                case 'LOGOUT': return 'bg-gray-100 text-gray-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+        
+        function getLogTypeText(type) {
+            switch(type) {
+                case 'CREATE': return 'Tạo mới';
+                case 'UPDATE': return 'Cập nhật';
+                case 'DELETE': return 'Xóa';
+                case 'LOGIN': return 'Đăng nhập';
+                case 'LOGOUT': return 'Đăng xuất';
+                default: return type;
+            }
+        }
+        
+        async function toggleUserStatus(userId, currentStatus) {
+            try {
+                await apiCall(`/api/admin/users/${userId}/toggle-status`, {
+                    method: 'POST',
+                    body: JSON.stringify({ enabled: !currentStatus })
+                });
+                
+                showToast(`${currentStatus ? 'Khóa' : 'Mở khóa'} người dùng thành công!`, 'success');
+                loadUsers();
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                showToast('Có lỗi xảy ra khi thay đổi trạng thái người dùng', 'error');
+            }
+        }
+        
+        async function deleteUser(userId) {
+            showConfirm('Bạn có chắc chắn muốn xóa người dùng này?', async (confirmed) => {
+                if (confirmed) {
+                    try {
+                        await apiCall(`/api/admin/users/${userId}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        showToast('Xóa người dùng thành công!', 'success');
+                        loadUsers();
+                    } catch (error) {
+                        console.error('Error deleting user:', error);
+                        showToast('Có lỗi xảy ra khi xóa người dùng', 'error');
+                    }
+                }
+            });
+        }
+        
+        function refreshUsers() {
+            loadUsers();
+        }
+        
+        function refreshLogs() {
+            loadLogs();
+        }
+        
+        function refreshSystemStats() {
+            loadSystemStats();
+        }
+        
+        function createGlobalCategory() {
+            showToast('Tính năng tạo danh mục toàn cục đang được phát triển', 'info');
+        }
+        
+        function clearCache() {
+            showConfirm('Bạn có chắc chắn muốn xóa cache?', async (confirmed) => {
+                if (confirmed) {
+                    try {
+                        await apiCall('/api/admin/clear-cache', { method: 'POST' });
+                        showToast('Xóa cache thành công!', 'success');
+                    } catch (error) {
+                        console.error('Error clearing cache:', error);
+                        showToast('Có lỗi xảy ra khi xóa cache', 'error');
+                    }
+                }
+            });
+        }
+        
+        function optimizeDatabase() {
+            showConfirm('Bạn có chắc chắn muốn tối ưu database?', async (confirmed) => {
+                if (confirmed) {
+                    try {
+                        await apiCall('/api/admin/optimize-database', { method: 'POST' });
+                        showToast('Tối ưu database thành công!', 'success');
+                    } catch (error) {
+                        console.error('Error optimizing database:', error);
+                        showToast('Có lỗi xảy ra khi tối ưu database', 'error');
+                    }
+                }
+            });
+        }
+        
+        function generateSystemReport() {
+            showToast('Tính năng tạo báo cáo hệ thống đang được phát triển', 'info');
+        }
+        
+        function backupDatabase() {
+            showConfirm('Bạn có chắc chắn muốn tạo bản sao lưu database?', async (confirmed) => {
+                if (confirmed) {
+                    try {
+                        await apiCall('/api/admin/backup-database', { method: 'POST' });
+                        showToast('Tạo bản sao lưu thành công!', 'success');
+                    } catch (error) {
+                        console.error('Error backing up database:', error);
+                        showToast('Có lỗi xảy ra khi tạo bản sao lưu', 'error');
+                    }
+                }
+            });
+        }
+    </script>
+}

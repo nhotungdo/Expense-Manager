@@ -154,9 +154,8 @@ namespace MoneyTracker.Controllers
                     return BadRequest("New password is required");
                 }
 
-                // For demo purposes, we'll store the password as plain text
-                // In production, use proper password hashing like BCrypt
-                user.Password = passwordDto.NewPassword; // This should be hashed!
+                // Hash the password before storing (using built-in .NET hashing)
+                user.Password = Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(passwordDto.NewPassword)));
 
                 await _context.SaveChangesAsync();
 

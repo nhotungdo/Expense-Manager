@@ -4,7 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MoneyTracker.Models;
 using MoneyTracker.Services;
+using MoneyTracker.Middleware;
 using Serilog;
+using MoneyTracker.Migrations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +72,26 @@ builder.Services.AddScoped<IReportExportService, ReportExportService>();
 builder.Services.AddScoped<IAdvancedSearchService, AdvancedSearchService>();
 builder.Services.AddScoped<ILocalizationService, LocalizationService>();
 builder.Services.AddScoped<IAdvancedAnalyticsService, AdvancedAnalyticsService>();
+builder.Services.AddScoped<DefaultAdminService>();
+
+// Add new services
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IIncomeService, IncomeService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAISuggestionService, AISuggestionService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IScheduledEmailService, ScheduledEmailService>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
+builder.Services.AddScoped<IPerformanceService, PerformanceService>();
+
+// Add background services
+builder.Services.AddHostedService<EmailBackgroundService>();
+
+// Add caching
+builder.Services.AddMemoryCache();
+
+// Add HTTP context accessor
 builder.Services.AddHttpContextAccessor();
 
 
@@ -92,22 +114,59 @@ app.UseStaticFiles();
 app.UseCors("AllowAll");
 app.UseRouting();
 
+// Add middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<AuditMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
 
-// Default route to Landing for non-authenticated users
+// Add custom routes
+app.MapGet("/Account/Logout", () => Results.Redirect("/Account/Logout"));
+
+// Default route to HomePage
 app.MapGet("/", () => Results.Redirect("/HomePage"));
 
-// Dashboard route - will be handled by Razor Pages
+// Main application routes
+app.MapGet("/AI", () => Results.Redirect("/AI"));
+app.MapGet("/Reports", () => Results.Redirect("/Reports"));
+app.MapGet("/Profile", () => Results.Redirect("/Profile"));
+app.MapGet("/Expenses", () => Results.Redirect("/Expenses"));
+app.MapGet("/Incomes", () => Results.Redirect("/Incomes"));
+app.MapGet("/Dashboard", () => Results.Redirect("/Dashboard"));
+app.MapGet("/Categories", () => Results.Redirect("/Categories"));
+app.MapGet("/Admin", () => Results.Redirect("/Admin"));
 
-// Ensure database is created
+// Ensure database is created and run migrations
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ExpenseManagerContext>();
     context.Database.EnsureCreated();
+
+    // Apply migrations to ensure default admin user is created
+    try
+    {
+        context.Database.Migrate();
+        Log.Information("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Error applying database migrations");
+    }
+
+    // Ensure default admin user exists
+    try
+    {
+        var defaultAdminService = scope.ServiceProvider.GetRequiredService<DefaultAdminService>();
+        await defaultAdminService.EnsureDefaultAdminExistsAsync();
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Error ensuring default admin user exists");
+    }
 }
 
 app.Run();

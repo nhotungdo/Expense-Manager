@@ -2,10 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace MoneyTracker.Pages
 {
-    // Temporarily remove [Authorize] to allow access for testing
+    [Authorize]
     public class DashboardModel : PageModel
     {
         private readonly ILogger<DashboardModel> _logger;
@@ -17,7 +18,13 @@ namespace MoneyTracker.Pages
 
         public void OnGet()
         {
-            // Dashboard page initialization
+            _logger.LogInformation("Dashboard accessed by user {UserId} at {Time}",
+                GetCurrentUserId(), DateTime.UtcNow);
+
+            // Set page metadata
+            ViewData["Title"] = "Dashboard - MoneyTracker";
+            ViewData["Description"] = "Tổng quan tài chính cá nhân với thống kê chi tiết và biểu đồ trực quan";
+            ViewData["Keywords"] = "dashboard, tài chính, thống kê, biểu đồ, thu chi";
         }
 
         public string GetCurrentUserId()
@@ -33,6 +40,16 @@ namespace MoneyTracker.Pages
         public string GetCurrentUserName()
         {
             return User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+        }
+
+        public string GetCurrentUserRole()
+        {
+            return User.FindFirst(ClaimTypes.Role)?.Value ?? "USER";
+        }
+
+        public bool IsAdmin()
+        {
+            return User.IsInRole("ADMIN");
         }
     }
 }

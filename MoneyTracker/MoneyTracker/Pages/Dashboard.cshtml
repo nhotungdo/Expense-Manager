@@ -1,293 +1,351 @@
 @page
 @model MoneyTracker.Pages.DashboardModel
 @{
-    ViewData["Title"] = "Dashboard - Money Tracking";
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<script>
-    // Redirect to appropriate dashboard based on user role
-    window.location.href = '/UserDashboard';
-</script>
+@section Styles {
+    <style>
+        .dashboard-container {
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+        }
 
-<div class="flopay-container">
-    <!-- Left Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="logo">Money Tracking</h2>
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .chart-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .recent-transaction {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .recent-transaction:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .income-border {
+            border-left-color: #10b981;
+        }
+
+        .expense-border {
+            border-left-color: #ef4444;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes
+        pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @@keyframes
+        loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+    </style>
+}
+
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1 text-white">Dashboard</h1>
+            <p class="text-white-50 mb-0">Tổng quan tài chính của bạn</p>
         </div>
-        <nav class="sidebar-nav">
-            <ul class="nav-list">
-                <li class="nav-item active">
-                    <a href="/Dashboard" class="nav-link">
-                        <i class="fas fa-th-large"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/Expenses" class="nav-link">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Your shop</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-building"></i>
-                        <span>Pay Merchant</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>Orders</span>
-                    </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reports</span>
-                        <i class="fas fa-chevron-down dropdown-arrow"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-folder"></i>
-                        <span>Collections</span>
-                    </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Repayments</span>
-                        <i class="fas fa-chevron-down dropdown-arrow"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-wallet"></i>
-                        <span>Wallet</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/Profile" class="nav-link">
-                        <i class="fas fa-cog"></i>
-                        <span>Manage</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <div class="d-flex gap-3">
+            <button class="quick-action-btn" onclick="refreshDashboard()">
+                <i class="fas fa-sync-alt"></i>
+                Làm mới
+            </button>
+            <a href="/Expenses" class="quick-action-btn">
+                <i class="fas fa-plus"></i>
+                Thêm giao dịch
+            </a>
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Top Navigation Bar -->
-        <div class="top-nav">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Search for merchants or item." class="search-input">
-            </div>
-            <div class="top-nav-actions">
-                <button class="nav-action-btn">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <button class="nav-action-btn">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <div class="user-profile">
-                    <div class="user-avatar">AT</div>
-                    <i class="fas fa-chevron-down"></i>
+    <!-- Stats Cards Row -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50 mb-2">Tổng Thu Nhập</h6>
+                        <h3 class="text-white mb-1" id="total-income">0 VND</h3>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            <span id="income-change">+12%</span> tháng này
+                        </small>
+                    </div>
+                    <div class="bg-success bg-opacity-20 p-3 rounded-circle">
+                        <i class="fas fa-coins text-success fs-4"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Content -->
-        <div class="dashboard-content">
-            <!-- Balance Card -->
-            <div class="balance-card">
-                <div class="balance-content">
-                    <div class="balance-info">
-                        <h3 class="balance-title">Your Balance</h3>
-                        <div class="balance-amount" id="currentBalance">$14,231.00</div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50 mb-2">Tổng Chi Tiêu</h6>
+                        <h3 class="text-white mb-1" id="total-expense">0 VND</h3>
+                        <small class="text-danger">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            <span id="expense-change">+8%</span> tháng này
+                        </small>
                     </div>
-                    <div class="balance-actions">
-                        <button class="balance-btn">
-                            <i class="fas fa-wallet"></i>
-                            Wallet
-                        </button>
-                        <button class="balance-btn">
-                            <i class="fas fa-download"></i>
-                            Deposit
-                        </button>
+                    <div class="bg-danger bg-opacity-20 p-3 rounded-circle">
+                        <i class="fas fa-credit-card text-danger fs-4"></i>
                     </div>
-                </div>
-                <div class="balance-waves">
-                    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-                        <path
-                            d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"
-                            opacity=".25" fill="currentColor"></path>
-                        <path
-                            d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z"
-                            opacity=".5" fill="currentColor"></path>
-                        <path
-                            d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"
-                            fill="currentColor"></path>
-                    </svg>
                 </div>
             </div>
+        </div>
 
-            <!-- Summary Cards -->
-            <div class="summary-cards">
-                <div class="summary-card home-card">
-                    <div class="card-icon home-icon">
-                        <i class="fas fa-home"></i>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50 mb-2">Số Dư Hiện Tại</h6>
+                        <h3 class="text-white mb-1" id="current-balance">0 VND</h3>
+                        <small class="text-info">
+                            <i class="fas fa-wallet me-1"></i>
+                            Tài khoản chính
+                        </small>
                     </div>
-                    <div class="card-amount">$3,021.00</div>
-                    <div class="card-label">Home</div>
-                </div>
-                <div class="summary-card electricity-card">
-                    <div class="card-icon electricity-icon">
-                        <i class="fas fa-bolt"></i>
+                    <div class="bg-info bg-opacity-20 p-3 rounded-circle">
+                        <i class="fas fa-wallet text-info fs-4"></i>
                     </div>
-                    <div class="card-amount">$2,100.00</div>
-                    <div class="card-label">Electricity</div>
-                </div>
-                <div class="summary-card gardening-card">
-                    <div class="card-icon gardening-icon">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <div class="card-amount">$3,320.00</div>
-                    <div class="card-label">Gardening</div>
                 </div>
             </div>
+        </div>
 
-            <!-- Bottom Section -->
-            <div class="bottom-section">
-                <!-- Pending Payments -->
-                <div class="pending-payments">
-                    <div class="section-header">
-                        <div class="section-title">
-                            <h3>Need a payment</h3>
-                            <span class="pending-count">12 pending actions</span>
-                        </div>
-                        <button class="view-all-btn">
-                            View All
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50 mb-2">Giao Dịch Tháng</h6>
+                        <h3 class="text-white mb-1" id="monthly-transactions">0</h3>
+                        <small class="text-warning">
+                            <i class="fas fa-chart-line me-1"></i>
+                            <span id="transaction-change">+15%</span> so với tháng trước
+                        </small>
                     </div>
-                    <div class="pending-list">
-                        <div class="pending-item">
-                            <div class="pending-icon">
-                                <i class="fas fa-file-invoice"></i>
-                            </div>
-                            <div class="pending-info">
-                                <div class="merchant-name">Best Buy</div>
-                                <div class="pending-issue">Missing bill.</div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
+                    <div class="bg-warning bg-opacity-20 p-3 rounded-circle">
+                        <i class="fas fa-chart-line text-warning fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="chart-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="text-white mb-0">Xu Hướng Thu Chi</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-light btn-sm active"
+                            onclick="changeChartPeriod('week')">Tuần</button>
+                        <button type="button" class="btn btn-outline-light btn-sm"
+                            onclick="changeChartPeriod('month')">Tháng</button>
+                        <button type="button" class="btn btn-outline-light btn-sm"
+                            onclick="changeChartPeriod('year')">Năm</button>
+                    </div>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="trendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="chart-container">
+                <h5 class="text-white mb-4">Chi Tiêu Theo Danh Mục</h5>
+                <div style="height: 300px;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions and Quick Actions -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="chart-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="text-white mb-0">Giao Dịch Gần Đây</h5>
+                    <a href="/Expenses" class="btn btn-outline-light btn-sm">Xem tất cả</a>
+                </div>
+                <div id="recent-transactions">
+                    <!-- Loading skeleton -->
+                    <div class="recent-transaction loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="recent-transaction loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="recent-transaction loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="chart-container">
+                <h5 class="text-white mb-4">Thao Tác Nhanh</h5>
+                <div class="d-grid gap-3">
+                    <a href="/Expenses" class="quick-action-btn text-center">
+                        <i class="fas fa-plus-circle"></i>
+                        Thêm Chi Tiêu
+                    </a>
+                    <a href="/Incomes" class="quick-action-btn text-center">
+                        <i class="fas fa-coins"></i>
+                        Thêm Thu Nhập
+                    </a>
+                    <a href="/Reports" class="quick-action-btn text-center">
+                        <i class="fas fa-chart-bar"></i>
+                        Xem Báo Cáo
+                    </a>
+                    <a href="/AI" class="quick-action-btn text-center">
+                        <i class="fas fa-robot"></i>
+                        AI Gợi Ý
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Goals and Insights -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="chart-container">
+                <h5 class="text-white mb-4">Mục Tiêu Tài Chính</h5>
+                <div id="financial-goals">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-white">Tiết kiệm khẩn cấp</span>
+                            <span class="text-white-50">2,500,000 / 5,000,000 VND</span>
                         </div>
-                        <div class="pending-item">
-                            <div class="pending-icon">
-                                <i class="fas fa-credit-card"></i>
-                            </div>
-                            <div class="pending-info">
-                                <div class="merchant-name">Target</div>
-                                <div class="pending-issue">Incorrect payment details.</div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 50%"></div>
                         </div>
-                        <div class="pending-item">
-                            <div class="pending-icon">
-                                <i class="fas fa-ban"></i>
-                            </div>
-                            <div class="pending-info">
-                                <div class="merchant-name">Walmart</div>
-                                <div class="pending-issue">Not enough balance.</div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-white">Mua xe mới</span>
+                            <span class="text-white-50">15,000,000 / 50,000,000 VND</span>
                         </div>
-                        <div class="pending-item">
-                            <div class="pending-icon">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <div class="pending-info">
-                                <div class="merchant-name">Amazon</div>
-                                <div class="pending-issue">Out of stock.</div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" style="width: 30%"></div>
                         </div>
-                        <div class="pending-item">
-                            <div class="pending-icon">
-                                <i class="fas fa-file-invoice"></i>
-                            </div>
-                            <div class="pending-info">
-                                <div class="merchant-name">Costco</div>
-                                <div class="pending-issue">Payment overdue</div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-white">Du lịch</span>
+                            <span class="text-white-50">3,000,000 / 10,000,000 VND</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: 30%"></div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Transaction History -->
-                <div class="transaction-history">
-                    <div class="section-header">
-                        <div class="section-title">
-                            <h3>Transaction history</h3>
-                            <span class="account-info">Linked Account ***3400</span>
-                        </div>
-                        <button class="add-new-btn">
-                            <i class="fas fa-plus"></i>
-                            Add New
-                        </button>
+        <div class="col-lg-6 mb-4">
+            <div class="chart-container">
+                <h5 class="text-white mb-4">Thông Tin Thông Minh</h5>
+                <div id="ai-insights">
+                    <div class="alert alert-info bg-info bg-opacity-20 border-info text-white">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Gợi ý:</strong> Bạn đã chi tiêu nhiều hơn 20% so với tháng trước. Hãy xem xét cắt giảm
+                        chi phí không cần thiết.
                     </div>
-                    <div class="transaction-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Merchant Name</th>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionTableBody">
-                                <tr>
-                                    <td>Amazon</td>
-                                    <td>$1,249.99</td>
-                                    <td>April 10, 2025</td>
-                                    <td><span class="status-badge pending">Pending</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Walmart</td>
-                                    <td>$1,732.50</td>
-                                    <td>April 2, 2025</td>
-                                    <td><span class="status-badge completed">Completed</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Target</td>
-                                    <td>$2,089.00</td>
-                                    <td>March 21, 2025</td>
-                                    <td><span class="status-badge completed">Completed</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Best Buy</td>
-                                    <td>$3,199.75</td>
-                                    <td>March 3, 2025</td>
-                                    <td><span class="status-badge failed">Failed</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Costco</td>
-                                    <td>$4,580.20</td>
-                                    <td>February 14, 2025</td>
-                                    <td><span class="status-badge completed">Completed</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Home Depot</td>
-                                    <td>$5,345.95</td>
-                                    <td>January 8, 2025</td>
-                                    <td><span class="status-badge failed">Failed</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="alert alert-success bg-success bg-opacity-20 border-success text-white">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <strong>Tin tốt:</strong> Thu nhập của bạn đã tăng 15% so với tháng trước!
+                    </div>
+                    <div class="alert alert-warning bg-warning bg-opacity-20 border-warning text-white">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Lưu ý:</strong> Bạn sắp đạt giới hạn chi tiêu cho danh mục "Ăn uống" trong tháng này.
                     </div>
                 </div>
             </div>
@@ -296,72 +354,352 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Global variables
+        let trendsChart, categoryChart;
+        let currentPeriod = 'week';
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeDashboard();
+            loadDashboardData();
+            setupCharts();
+        });
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            // Set current date
+            const now = new Date();
+            const dateOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('vi-VN', dateOptions);
+        }
+
         // Load dashboard data
         async function loadDashboardData() {
             try {
-                // For testing, use mock data instead of API call
-                const mockData = {
-                    netWorth: 14231.00,
-                    monthlyIncome: 8500.00,
-                    monthlyExpenses: 6200.00
-                };
-                updateDashboardUI(mockData);
+                // Show loading state
+                showLoadingState();
 
-                // Uncomment below for real API integration
-                /*
-                const response = await fetch('/api/dashboard', {
-                    headers: {
-                        'Authorization': 'Bearer ' + getToken()
-                    }
-                });
+                // Load stats
+                await loadStats();
 
-                if (response.ok) {
-                    const data = await response.json();
-                    updateDashboardUI(data);
-                } else if (response.status === 401) {
-                    window.location.href = '/Login';
-                }
-                */
+                // Load recent transactions
+                await loadRecentTransactions();
+
+                // Load charts data
+                await loadChartsData();
+
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
-                // Use mock data as fallback
-                const mockData = {
-                    netWorth: 14231.00,
-                    monthlyIncome: 8500.00,
-                    monthlyExpenses: 6200.00
-                };
-                updateDashboardUI(mockData);
+                showErrorState();
             }
         }
 
-        function updateDashboardUI(data) {
-            // Update balance
-            if (data.netWorth !== undefined) {
-                document.getElementById('currentBalance').textContent = formatCurrency(data.netWorth);
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStats(data);
+                } else {
+                    // Use mock data if API fails
+                    updateStats({
+                        totalIncome: 15000000,
+                        totalExpense: 12000000,
+                        currentBalance: 3000000,
+                        monthlyTransactions: 45,
+                        incomeChange: 12,
+                        expenseChange: 8,
+                        transactionChange: 15
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                // Use mock data
+                updateStats({
+                    totalIncome: 15000000,
+                    totalExpense: 12000000,
+                    currentBalance: 3000000,
+                    monthlyTransactions: 45,
+                    incomeChange: 12,
+                    expenseChange: 8,
+                    transactionChange: 15
+                });
             }
         }
 
+        // Update statistics display
+        function updateStats(data) {
+            document.getElementById('total-income').textContent = formatCurrency(data.totalIncome);
+            document.getElementById('total-expense').textContent = formatCurrency(data.totalExpense);
+            document.getElementById('current-balance').textContent = formatCurrency(data.currentBalance);
+            document.getElementById('monthly-transactions').textContent = data.monthlyTransactions;
+            document.getElementById('income-change').textContent = `+${data.incomeChange}%`;
+            document.getElementById('expense-change').textContent = `+${data.expenseChange}%`;
+            document.getElementById('transaction-change').textContent = `+${data.transactionChange}%`;
+        }
+
+        // Load recent transactions
+        async function loadRecentTransactions() {
+            try {
+                const response = await fetch('/api/dashboard/recent-transactions');
+                if (response.ok) {
+                    const transactions = await response.json();
+                    displayRecentTransactions(transactions);
+                } else {
+                    // Use mock data
+                    displayRecentTransactions([
+                        { id: 1, type: 'expense', amount: 500000, description: 'Ăn trưa', category: 'Ăn uống', date: '2024-01-15' },
+                        { id: 2, type: 'income', amount: 15000000, description: 'Lương tháng 1', category: 'Lương', date: '2024-01-14' },
+                        { id: 3, type: 'expense', amount: 2000000, description: 'Mua sắm', category: 'Mua sắm', date: '2024-01-13' },
+                        { id: 4, type: 'expense', amount: 300000, description: 'Xăng xe', category: 'Giao thông', date: '2024-01-12' },
+                        { id: 5, type: 'expense', amount: 1500000, description: 'Tiền nhà', category: 'Nhà ở', date: '2024-01-11' }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Error loading recent transactions:', error);
+                // Use mock data
+                displayRecentTransactions([
+                    { id: 1, type: 'expense', amount: 500000, description: 'Ăn trưa', category: 'Ăn uống', date: '2024-01-15' },
+                    { id: 2, type: 'income', amount: 15000000, description: 'Lương tháng 1', category: 'Lương', date: '2024-01-14' },
+                    { id: 3, type: 'expense', amount: 2000000, description: 'Mua sắm', category: 'Mua sắm', date: '2024-01-13' }
+                ]);
+            }
+        }
+
+        // Display recent transactions
+        function displayRecentTransactions(transactions) {
+            const container = document.getElementById('recent-transactions');
+            container.innerHTML = '';
+
+            transactions.forEach(transaction => {
+                const transactionElement = document.createElement('div');
+                transactionElement.className = `recent-transaction ${transaction.type === 'income' ? 'income-border' : 'expense-border'}`;
+
+                const icon = transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down';
+                const color = transaction.type === 'income' ? 'text-success' : 'text-danger';
+
+                transactionElement.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas ${icon} ${color}"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-white mb-1">${transaction.description}</h6>
+                                        <small class="text-white-50">${transaction.category} • ${formatDate(transaction.date)}</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <h6 class="mb-0 ${color}">${transaction.type === 'income' ? '+' : '-'}${formatCurrency(transaction.amount)}</h6>
+                                </div>
+                            </div>
+                        `;
+
+                container.appendChild(transactionElement);
+            });
+        }
+
+        // Setup charts
+        function setupCharts() {
+            setupTrendsChart();
+            setupCategoryChart();
+        }
+
+        // Setup trends chart
+        function setupTrendsChart() {
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            trendsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                    datasets: [{
+                        label: 'Thu nhập',
+                        data: [1200000, 1900000, 3000000, 5000000, 2000000, 3000000, 4500000],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Chi tiêu',
+                        data: [800000, 1200000, 1500000, 2000000, 1800000, 2200000, 1900000],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'white',
+                                callback: function (value) {
+                                    return formatCurrency(value);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Setup category chart
+        function setupCategoryChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ăn uống', 'Mua sắm', 'Giao thông', 'Nhà ở', 'Giải trí', 'Khác'],
+                    datasets: [{
+                        data: [30, 25, 15, 20, 5, 5],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f97316',
+                            '#eab308',
+                            '#22c55e',
+                            '#3b82f6',
+                            '#8b5cf6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load charts data
+        async function loadChartsData() {
+            try {
+                const response = await fetch(`/api/dashboard/charts?period=${currentPeriod}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    updateCharts(data);
+                }
+            } catch (error) {
+                console.error('Error loading charts data:', error);
+            }
+        }
+
+        // Update charts
+        function updateCharts(data) {
+            if (trendsChart && data.trends) {
+                trendsChart.data.labels = data.trends.labels;
+                trendsChart.data.datasets[0].data = data.trends.income;
+                trendsChart.data.datasets[1].data = data.trends.expense;
+                trendsChart.update();
+            }
+
+            if (categoryChart && data.categories) {
+                categoryChart.data.labels = data.categories.labels;
+                categoryChart.data.datasets[0].data = data.categories.data;
+                categoryChart.update();
+            }
+        }
+
+        // Change chart period
+        function changeChartPeriod(period) {
+            currentPeriod = period;
+
+            // Update button states
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Reload charts data
+            loadChartsData();
+        }
+
+        // Refresh dashboard
+        function refreshDashboard() {
+            const refreshBtn = event.target;
+            const icon = refreshBtn.querySelector('i');
+
+            // Add loading animation
+            icon.classList.add('fa-spin');
+            refreshBtn.disabled = true;
+
+            // Reload data
+            loadDashboardData().finally(() => {
+                // Remove loading animation
+                icon.classList.remove('fa-spin');
+                refreshBtn.disabled = false;
+            });
+        }
+
+        // Show loading state
+        function showLoadingState() {
+            // Add pulse animation to stat cards
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.add('pulse-animation');
+            });
+        }
+
+        // Hide loading state
+        function hideLoadingState() {
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('pulse-animation');
+            });
+        }
+
+        // Show error state
+        function showErrorState() {
+            hideLoadingState();
+            // You can add error notification here
+            console.error('Failed to load dashboard data');
+        }
+
+        // Utility functions
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'VND'
             }).format(amount);
         }
 
-        function getToken() {
-            return localStorage.getItem('authToken') || '';
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
         }
-
-        // Initialize dashboard
-        $(document).ready(function () {
-            // For now, allow access without authentication for testing
-            // const token = localStorage.getItem('authToken');
-            // if (!token) {
-            //     window.location.href = '/Login';
-            //     return;
-            // }
-            loadDashboardData();
-        });
     </script>
 }
