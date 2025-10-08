@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -42,7 +44,7 @@ namespace MoneyTracker.Controllers
                 // Verify Google token
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings()
                 {
-                    Audience = new[] { _configuration["GoogleAuth:ClientId"] }
+                    Audience = new[] { _configuration["Authentication:Google:ClientId"] }
                 });
 
                 if (payload == null)
@@ -98,14 +100,31 @@ namespace MoneyTracker.Controllers
                 // Check if this is a new user (first login)
                 var isNewUser = user.LastLogin == null || user.CreatedAt?.Date == DateTime.UtcNow.Date;
 
-                // Generate JWT token
-                var token = GenerateJwtToken(user);
+                // Create claims for cookie authentication
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim("GoogleId", user.GoogleId)
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                // Sign in with cookie authentication
+                await HttpContext.SignInAsync(claimsPrincipal, new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTime.UtcNow.AddMinutes(60)
+                });
 
                 _logger.LogInformation("User {UserId} logged in successfully", user.Id);
 
                 return Ok(new AuthResponseDto
                 {
-                    Token = token,
+                    Token = "cookie-auth", // Placeholder for compatibility
                     IsNewUser = isNewUser,
                     User = new UserDto
                     {
@@ -137,7 +156,6 @@ namespace MoneyTracker.Controllers
         }
 
         [HttpPost("logout")]
-        [Authorize]
         public async Task<IActionResult> Logout()
         {
             try
@@ -152,6 +170,9 @@ namespace MoneyTracker.Controllers
                     _logger.LogInformation("Anonymous user logged out");
                 }
 
+                // Sign out from cookie authentication
+                await HttpContext.SignOutAsync();
+
                 return Ok(new { message = "Logged out successfully" });
             }
             catch (Exception ex)
@@ -163,7 +184,6 @@ namespace MoneyTracker.Controllers
 
 
         [HttpGet("me")]
-        [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
             try

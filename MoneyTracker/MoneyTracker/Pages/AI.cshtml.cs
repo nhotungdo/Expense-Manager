@@ -5,7 +5,6 @@ using System.Security.Claims;
 
 namespace MoneyTracker.Pages
 {
-    [Authorize]
     public class AIModel : PageModel
     {
         private readonly ILogger<AIModel> _logger;
@@ -15,9 +14,24 @@ namespace MoneyTracker.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            // AI page initialization
+            // Check if user is authenticated
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                _logger.LogInformation("Unauthenticated user tried to access AI, redirecting to Login");
+                return RedirectToPage("/Login");
+            }
+
+            _logger.LogInformation("AI page accessed by user {UserId} at {Time}",
+                GetCurrentUserId(), DateTime.UtcNow);
+
+            // Set page metadata
+            ViewData["Title"] = "AI Gợi Ý - MoneyTracker";
+            ViewData["Description"] = "Gợi ý thông minh từ AI";
+            ViewData["Keywords"] = "AI, gợi ý, thông minh, tài chính";
+
+            return Page();
         }
 
         public string GetCurrentUserId()
@@ -33,6 +47,16 @@ namespace MoneyTracker.Pages
         public string GetCurrentUserName()
         {
             return User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+        }
+
+        public string GetCurrentUserRole()
+        {
+            return User.FindFirst(ClaimTypes.Role)?.Value ?? "USER";
+        }
+
+        public bool IsAdmin()
+        {
+            return User.IsInRole("ADMIN");
         }
     }
 }

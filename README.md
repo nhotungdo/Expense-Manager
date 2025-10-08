@@ -1,357 +1,278 @@
-# 💰 MoneyTracker - Full-Stack Expense Management System
+# Money Tracker - Ứng Dụng Quản Lý Tài Chính Thông Minh
 
-A modern, comprehensive expense tracking application built with ASP.NET Core 8, featuring glassmorphism UI design, AI-powered insights, and advanced reporting capabilities.
+## 📋 Tổng Quan
 
-## 🚀 Features
+Money Tracker là một ứng dụng web quản lý tài chính cá nhân được xây dựng bằng ASP.NET Core 8.0, cung cấp các tính năng quản lý thu chi, ngân sách, báo cáo thống kê và gợi ý thông minh từ AI.
 
-### ✨ Core Functionality
-- **User Authentication**: Google OAuth2 integration with JWT tokens
-- **Expense Management**: Add, edit, delete, and categorize expenses
-- **Income Tracking**: Comprehensive income management with categories
-- **Dashboard**: Real-time financial overview with interactive charts
-- **Category Management**: Customizable expense and income categories
+## ✨ Tính Năng Chính
 
-### 🎨 Modern UI/UX
-- **Glassmorphism Design**: Beautiful, modern interface with glass-like effects
-- **Responsive Layout**: Optimized for desktop, tablet, and mobile devices
-- **Dark/Light Theme**: Automatic theme switching based on user preference
-- **Smooth Animations**: CSS animations and transitions for better UX
-- **Interactive Charts**: Chart.js integration for data visualization
+### 👤 Cho Người Dùng
+- **🔐 Xác thực & Tài khoản**
+  - Đăng nhập bằng Google OAuth2
+  - Quản lý hồ sơ cá nhân
+  - Onboarding cho người dùng mới
 
-### 🤖 AI-Powered Insights
-- **Smart Suggestions**: AI-generated financial recommendations
-- **Spending Analysis**: Automatic analysis of spending patterns
-- **Budget Recommendations**: Personalized budget advice based on spending habits
-- **Trend Analysis**: Historical data analysis for better financial planning
+- **💸 Quản lý Giao dịch**
+  - Thêm, sửa, xóa giao dịch thu/chi
+  - Tìm kiếm và lọc giao dịch
+  - Xem danh sách giao dịch theo thời gian
 
-### 📊 Advanced Reporting
-- **PDF Export**: Professional PDF reports with charts and summaries
-- **Excel Export**: Detailed Excel spreadsheets for further analysis
-- **CSV Export**: Raw data export for external tools
-- **Monthly Reports**: Automated monthly financial summaries
-- **Custom Date Ranges**: Flexible reporting periods
+- **🧾 Quản lý Danh mục**
+  - Tạo, sửa, xóa danh mục cá nhân
+  - Danh mục mặc định cho thu nhập và chi tiêu
+  - Hỗ trợ icon và màu sắc cho danh mục
 
-### 📧 Email Notifications
-- **Monthly Reports**: Automated monthly financial summaries via email
-- **Budget Alerts**: Email notifications when budget limits are exceeded
-- **Weekly Summaries**: Regular financial updates
-- **SMTP Integration**: Gmail SMTP support for reliable email delivery
+- **💰 Ngân sách cá nhân**
+  - Đặt ngân sách theo tháng/tuần/năm
+  - Theo dõi chi tiêu so với ngân sách
+  - Cảnh báo khi vượt hạn mức
 
-### 🔒 Security & Performance
-- **JWT Authentication**: Secure token-based authentication
-- **Role-Based Access**: Admin and user role management
-- **Input Validation**: Comprehensive server-side validation
-- **Audit Logging**: Complete audit trail of all user actions
-- **Performance Optimization**: Database optimization and caching
-- **Global Exception Handling**: Centralized error handling
+- **🤖 AI Gợi ý**
+  - Gợi ý chi tiêu thông minh
+  - Khuyến nghị ngân sách tự động
+  - Phân tích xu hướng chi tiêu
 
-## 🏗️ Architecture
+- **📊 Báo cáo & Thống kê**
+  - Báo cáo tháng/tuần/năm
+  - Biểu đồ thu/chi trực quan
+  - So sánh kỳ trước
+  - Xuất file Excel/PDF
 
-### Backend (ASP.NET Core 8)
-- **Clean Architecture**: Separation of concerns with Service Layer pattern
-- **Repository Pattern**: Data access abstraction
-- **Dependency Injection**: Built-in DI container
-- **Entity Framework Core**: ORM with SQL Server
-- **Serilog**: Structured logging with file and console outputs
-- **Background Services**: Automated email scheduling
+### 🧑‍💼 Cho Quản trị viên
+- **👥 Quản lý người dùng**
+  - Xem danh sách người dùng
+  - Phân quyền User/Admin
+  - Khóa/mở khóa tài khoản
 
-### Frontend (Razor Pages)
-- **Modern CSS**: Glassmorphism design with CSS Grid and Flexbox
-- **Chart.js**: Interactive data visualization
-- **Font Awesome**: Comprehensive icon library
-- **Responsive Design**: Mobile-first approach
-- **Progressive Enhancement**: Works without JavaScript
+- **🗂️ Quản lý danh mục hệ thống**
+  - Tạo danh mục mặc định
+  - Chỉnh sửa danh mục toàn cục
 
-### Database (SQL Server)
-- **Normalized Schema**: Optimized database design
-- **Indexes**: Performance-optimized queries
-- **Audit Trail**: Complete user action logging
-- **Data Integrity**: Foreign key constraints and validation
+- **📈 Giám sát hệ thống**
+  - Theo dõi hoạt động người dùng
+  - Thống kê tổng chi tiêu toàn hệ thống
+  - Kiểm tra gợi ý AI
 
-## 🛠️ Technology Stack
+## 🛠️ Công Nghệ Sử Dụng
 
 ### Backend
-- **.NET 8**: Latest .NET framework
-- **ASP.NET Core**: Web application framework
-- **Entity Framework Core**: Object-relational mapping
-- **SQL Server**: Relational database
-- **JWT Bearer**: Authentication tokens
-- **Serilog**: Structured logging
-- **MailKit**: Email functionality
-- **iTextSharp**: PDF generation
-- **ClosedXML**: Excel file generation
+- **ASP.NET Core 8.0** - Framework web
+- **Entity Framework Core** - ORM
+- **SQL Server** - Database
+- **JWT Authentication** - Xác thực
+- **Google OAuth2** - Đăng nhập Google
+- **Serilog** - Logging
+- **AutoMapper** - Object mapping
 
 ### Frontend
-- **Razor Pages**: Server-side rendering
-- **Bootstrap 5**: CSS framework
-- **Chart.js**: Data visualization
-- **Font Awesome**: Icons
-- **jQuery**: JavaScript library
-- **CSS Grid/Flexbox**: Modern layout
+- **Razor Pages** - Server-side rendering
+- **Bootstrap 5** - CSS Framework
+- **Chart.js** - Biểu đồ
+- **Font Awesome** - Icons
+- **JavaScript ES6+** - Client-side logic
 
-### DevOps & Tools
-- **Git**: Version control
-- **Visual Studio**: Development environment
-- **SQL Server Management Studio**: Database management
-- **Postman**: API testing
+### Services & Libraries
+- **MailKit** - Email service
+- **iTextSharp** - PDF generation
+- **ClosedXML** - Excel export
+- **EPPlus** - Excel processing
 
-## 📁 Project Structure
+## 🚀 Cài Đặt và Chạy
 
-```
-Expense-Manager/
-├── MoneyTracker/
-│   ├── Controllers/          # API Controllers
-│   ├── Services/            # Business Logic Services
-│   ├── Models/              # Data Models & DTOs
-│   ├── Pages/               # Razor Pages
-│   ├── Middleware/          # Custom Middleware
-│   ├── wwwroot/             # Static Files
-│   │   ├── css/            # Stylesheets
-│   │   ├── js/             # JavaScript
-│   │   └── lib/            # Third-party Libraries
-│   └── Program.cs           # Application Entry Point
-└── README.md               # Project Documentation
+### Yêu Cầu Hệ Thống
+- .NET 8.0 SDK
+- SQL Server 2019+
+- Visual Studio 2022 hoặc VS Code
+
+### Bước 1: Clone Repository
+```bash
+git clone <repository-url>
+cd Expense-Manager/MoneyTracker/MoneyTracker
 ```
 
-## 🚀 Getting Started
+### Bước 2: Cấu Hình Database
+1. Mở file `appsettings.json`
+2. Cập nhật connection string:
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=YOUR_SERVER;Initial Catalog=ExpenseManager;User ID=YOUR_USER;Password=YOUR_PASSWORD;Trusted_Connection=True;Trust Server Certificate=True"
+  }
+}
+```
 
-### Prerequisites
-- .NET 8 SDK
-- SQL Server (LocalDB or Full)
-- Visual Studio 2022 or VS Code
-- Git
+### Bước 3: Cấu Hình Google OAuth
+1. Tạo project trên [Google Cloud Console](https://console.cloud.google.com/)
+2. Bật Google+ API
+3. Tạo OAuth 2.0 credentials
+4. Cập nhật trong `appsettings.json`:
+```json
+{
+  "Authentication": {
+    "Google": {
+      "ClientId": "YOUR_CLIENT_ID",
+      "ClientSecret": "YOUR_CLIENT_SECRET"
+    }
+  }
+}
+```
 
-### Installation
+### Bước 4: Chạy Migration
+```bash
+dotnet ef database update
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd Expense-Manager/MoneyTracker
-   ```
+### Bước 5: Chạy Ứng Dụng
+```bash
+dotnet run
+```
 
-2. **Update connection string**
-   ```json
-   // appsettings.json
-   {
-     "ConnectionStrings": {
-       "DefaultConnection": "Your SQL Server connection string"
-     }
-   }
-   ```
+Truy cập: `https://localhost:5001`
 
-3. **Configure email settings**
-   ```json
-   // appsettings.json
-   {
-     "EmailSettings": {
-       "SmtpHost": "smtp.gmail.com",
-       "SmtpPort": 587,
-       "SmtpUsername": "your-email@gmail.com",
-       "SmtpPassword": "your-app-password"
-     }
-   }
-   ```
+## 📁 Cấu Trúc Dự Án
 
-4. **Run the application**
-   ```bash
-   dotnet run
-   ```
+```
+MoneyTracker/
+├── Controllers/          # API Controllers
+│   ├── AuthController.cs
+│   ├── DashboardController.cs
+│   ├── TransactionController.cs
+│   ├── BudgetController.cs
+│   ├── ReportController.cs
+│   └── AdminController.cs
+├── Models/              # Data Models
+│   ├── User.cs
+│   ├── Expense.cs
+│   ├── Income.cs
+│   ├── Budget.cs
+│   ├── Category.cs
+│   └── DTOs/           # Data Transfer Objects
+├── Services/            # Business Logic
+│   ├── ITransactionService.cs
+│   ├── TransactionService.cs
+│   ├── IBudgetService.cs
+│   ├── BudgetService.cs
+│   └── ...
+├── Pages/              # Razor Pages
+│   ├── Login.cshtml
+│   ├── Dashboard.cshtml
+│   ├── Transactions.cshtml
+│   ├── Budgets.cshtml
+│   ├── Reports.cshtml
+│   ├── AI.cshtml
+│   └── Admin.cshtml
+├── Migrations/         # Database Migrations
+├── wwwroot/           # Static Files
+│   ├── css/
+│   ├── js/
+│   └── lib/
+└── Program.cs         # Application Entry Point
+```
 
-5. **Access the application**
-   - Navigate to `https://localhost:7249`
-   - Register/Login with Google OAuth2
-   - Start managing your finances!
-
-## 🔧 Configuration
-
-### Database Setup
-The application will automatically create the database and tables on first run. Ensure your SQL Server instance is running and accessible.
-
-### Email Configuration
-Configure SMTP settings in `appsettings.json` for email functionality:
-- Gmail: Use App Passwords for authentication
-- Other providers: Update SMTP host and port accordingly
-
-### Google OAuth2 Setup
-1. Create a project in Google Cloud Console
-2. Enable Google+ API
-3. Create OAuth2 credentials
-4. Update `appsettings.json` with your credentials
-
-## 📊 API Endpoints
+## 🔧 API Endpoints
 
 ### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
-- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/login` - Đăng nhập
+- `POST /api/auth/google` - Đăng nhập Google
+- `POST /api/auth/logout` - Đăng xuất
 
-### Dashboard
-- `GET /api/dashboard` - Get dashboard data
-- `GET /api/dashboard/monthly-report` - Monthly report
-- `GET /api/dashboard/budget-analysis` - Budget analysis
-- `POST /api/dashboard/generate-ai-suggestion` - Generate AI insights
+### Transactions
+- `GET /api/transactions` - Lấy danh sách giao dịch
+- `POST /api/transactions` - Tạo giao dịch mới
+- `PUT /api/transactions/{id}` - Cập nhật giao dịch
+- `DELETE /api/transactions/{id}` - Xóa giao dịch
 
-### Expenses
-- `GET /api/expenses` - Get expenses
-- `POST /api/expenses` - Create expense
-- `PUT /api/expenses/{id}` - Update expense
-- `DELETE /api/expenses/{id}` - Delete expense
-
-### Incomes
-- `GET /api/incomes` - Get incomes
-- `POST /api/incomes` - Create income
-- `PUT /api/incomes/{id}` - Update income
-- `DELETE /api/incomes/{id}` - Delete income
+### Budgets
+- `GET /api/budgets` - Lấy danh sách ngân sách
+- `POST /api/budgets` - Tạo ngân sách mới
+- `PUT /api/budgets/{id}` - Cập nhật ngân sách
+- `DELETE /api/budgets/{id}` - Xóa ngân sách
 
 ### Reports
-- `GET /api/report/export/pdf` - Export PDF report
-- `GET /api/report/export/excel` - Export Excel report
-- `GET /api/report/export/csv` - Export CSV report
+- `GET /api/reports/monthly` - Báo cáo tháng
+- `GET /api/reports/yearly` - Báo cáo năm
+- `GET /api/reports/custom` - Báo cáo tùy chỉnh
+- `GET /api/reports/export/{format}` - Xuất báo cáo
 
-### Admin (Admin role required)
-- `GET /api/admin/database-stats` - Database statistics
-- `POST /api/admin/optimize-database` - Optimize database
-- `POST /api/admin/cleanup-data` - Clean up old data
-- `GET /api/admin/system-health` - System health check
+### Admin
+- `GET /api/admin/users` - Quản lý người dùng
+- `GET /api/admin/stats` - Thống kê hệ thống
+- `GET /api/admin/logs` - Nhật ký hoạt động
 
-## 🎨 UI Components
+## 🎨 Giao Diện
 
-### Dashboard
-- **Stats Cards**: Income, expenses, savings, and balance overview
-- **Interactive Charts**: Monthly trends and category breakdowns
-- **Recent Transactions**: Latest financial activities
-- **AI Insights**: Smart recommendations and alerts
+Ứng dụng sử dụng thiết kế hiện đại với:
+- **Glassmorphism** - Hiệu ứng kính mờ
+- **Gradient Backgrounds** - Nền gradient đẹp mắt
+- **Responsive Design** - Tương thích mọi thiết bị
+- **Dark Theme** - Giao diện tối hiện đại
+- **Smooth Animations** - Hiệu ứng mượt mà
 
-### Navigation
-- **Sidebar**: Collapsible navigation with icons
-- **Header**: Search, notifications, and user profile
-- **Breadcrumbs**: Clear navigation hierarchy
+## 🔒 Bảo Mật
 
-### Forms
-- **Expense/Income Forms**: Intuitive data entry
-- **Category Management**: Easy category creation and editing
-- **User Profile**: Comprehensive profile management
+- **JWT Authentication** - Xác thực token
+- **Google OAuth2** - Đăng nhập an toàn
+- **HTTPS** - Mã hóa dữ liệu
+- **Input Validation** - Kiểm tra đầu vào
+- **SQL Injection Protection** - Bảo vệ khỏi SQL injection
+- **CORS Configuration** - Cấu hình CORS
 
-## 🔒 Security Features
+## 📊 Database Schema
 
-### Authentication & Authorization
-- JWT token-based authentication
-- Role-based access control (Admin/User)
-- Google OAuth2 integration
-- Secure password handling
+### Bảng chính:
+- **Users** - Thông tin người dùng
+- **Expenses** - Giao dịch chi tiêu
+- **Incomes** - Giao dịch thu nhập
+- **Categories** - Danh mục
+- **Budgets** - Ngân sách
+- **Transactions** - Giao dịch tổng hợp
+- **Reports** - Báo cáo
+- **AuditLogs** - Nhật ký hoạt động
 
-### Data Protection
-- Input validation and sanitization
-- SQL injection prevention
-- XSS protection
-- CSRF protection
+## 🚀 Triển Khai
 
-### Audit & Logging
-- Complete audit trail
-- User action logging
-- System event logging
-- Error tracking and monitoring
-
-## 📈 Performance Optimizations
-
-### Database
-- Optimized queries with proper indexing
-- Connection pooling
-- Query result caching
-- Database maintenance automation
-
-### Application
-- Memory caching for frequently accessed data
-- Lazy loading for large datasets
-- Background services for heavy operations
-- Efficient data serialization
-
-### Frontend
-- Minified CSS and JavaScript
-- Image optimization
-- Lazy loading of components
-- Responsive image delivery
-
-## 🧪 Testing
-
-### Manual Testing
-- User registration and authentication
-- CRUD operations for expenses and incomes
-- Dashboard functionality
-- Report generation
-- Email notifications
-
-### API Testing
-Use Postman or similar tools to test API endpoints:
-- Import the API collection
-- Set up authentication headers
-- Test all CRUD operations
-- Verify response formats
-
-## 🚀 Deployment
-
-### Local Development
+### Docker
 ```bash
-dotnet run --environment Development
+docker build -t money-tracker .
+docker run -p 5000:80 money-tracker
 ```
 
-### Production Deployment
-1. **Build the application**
-   ```bash
-   dotnet publish -c Release -o ./publish
-   ```
+### Azure
+1. Tạo App Service trên Azure
+2. Cấu hình connection string
+3. Deploy từ GitHub Actions
 
-2. **Configure production settings**
-   - Update connection strings
-   - Configure email settings
-   - Set up SSL certificates
-   - Configure logging
+### IIS
+1. Publish ứng dụng
+2. Cấu hình IIS
+3. Thiết lập SSL certificate
 
-3. **Deploy to hosting provider**
-   - Azure App Service
-   - AWS Elastic Beanstalk
-   - DigitalOcean App Platform
-   - Self-hosted IIS
+## 🤝 Đóng Góp
 
-## 📝 Contributing
+1. Fork repository
+2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Mở Pull Request
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+## 📝 License
 
-## 📄 License
+Distributed under the MIT License. See `LICENSE` for more information.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 📞 Liên Hệ
 
-## 🤝 Support
+- **Email**: support@moneytracker.com
+- **Website**: https://moneytracker.com
+- **GitHub**: https://github.com/yourusername/money-tracker
 
-For support and questions:
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation
+## 🙏 Acknowledgments
 
-## 🎯 Future Enhancements
-
-### Planned Features
-- **Mobile App**: React Native or Flutter mobile application
-- **Advanced Analytics**: Machine learning for spending predictions
-- **Multi-Currency Support**: International currency handling
-- **Budget Planning**: Advanced budget creation and tracking
-- **Investment Tracking**: Portfolio management features
-- **Bill Reminders**: Automated bill payment reminders
-- **Receipt Scanning**: OCR for receipt processing
-- **Social Features**: Family/group expense sharing
-
-### Technical Improvements
-- **Microservices**: Break down into smaller services
-- **Docker**: Containerization for easier deployment
-- **CI/CD**: Automated testing and deployment
-- **Monitoring**: Application performance monitoring
-- **Caching**: Redis for distributed caching
-- **Message Queues**: Asynchronous processing
+- [ASP.NET Core](https://dotnet.microsoft.com/apps/aspnet) - Web framework
+- [Bootstrap](https://getbootstrap.com/) - CSS framework
+- [Chart.js](https://www.chartjs.org/) - Chart library
+- [Font Awesome](https://fontawesome.com/) - Icons
+- [Google OAuth](https://developers.google.com/identity) - Authentication
 
 ---
 
-**Built with ❤️ using ASP.NET Core 8 and modern web technologies**
+**Money Tracker** - Quản lý tài chính thông minh, đơn giản và hiệu quả! 💰✨

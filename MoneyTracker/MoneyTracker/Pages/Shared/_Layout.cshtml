@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" class="h-full">
 
 <head>
@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Money Tracker</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,147 +17,83 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="~/css/modern-dashboard.css">
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="~/css/design-system.css" asp-append-version="true">
 
     @await RenderSectionAsync("Styles", required: false)
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        },
-                        secondary: {
-                            50: '#faf5ff',
-                            100: '#f3e8ff',
-                            200: '#e9d5ff',
-                            300: '#d8b4fe',
-                            400: '#c084fc',
-                            500: '#a855f7',
-                            600: '#9333ea',
-                            700: '#7c3aed',
-                            800: '#6b21a8',
-                            900: '#581c87',
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-in': 'slideIn 0.3s ease-out',
-                        'bounce-gentle': 'bounceGentle 2s infinite',
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 
-<body
-    class="h-full bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-all duration-300">
+<body class="h-full" data-theme="light">
     <div class="min-h-full">
         <!-- Sidebar -->
-        <div id="sidebar"
-            class="fixed inset-y-0 left-0 z-50 w-64 bg-white/20 backdrop-blur-xl shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0">
-            <div class="flex flex-col h-full">
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-content">
                 <!-- Logo -->
-                <div class="flex items-center justify-center h-16 px-4 bg-white/10 backdrop-blur-sm">
-                    <div class="flex items-center space-x-3">
-                        <div
-                            class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-wallet text-white text-xl"></i>
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-wallet"></i>
                         </div>
-                        <span class="text-xl font-bold text-gray-800 dark:text-white">Money Tracker</span>
+                        <span class="logo-text">Money Tracker</span>
                     </div>
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 space-y-2">
-                    <a href="/Dashboard"
-                        class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                        <i
-                            class="fas fa-home w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-purple-600"></i>
-                        <span class="text-gray-700 dark:text-gray-200 group-hover:text-purple-600">Dashboard</span>
+                <nav class="sidebar-nav">
+                    <a href="/Dashboard" class="nav-link" data-page="dashboard">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
                     </a>
 
-                    <a href="/Expenses"
-                        class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                        <i
-                            class="fas fa-credit-card w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-red-500"></i>
-                        <span class="text-gray-700 dark:text-gray-200 group-hover:text-red-500">Chi tiêu</span>
+                    <a href="/Transactions" class="nav-link" data-page="transactions">
+                        <i class="fas fa-exchange-alt nav-icon"></i>
+                        <span class="nav-text">Giao dịch</span>
                     </a>
 
-                    <a href="/Incomes"
-                        class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                        <i
-                            class="fas fa-coins w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-green-500"></i>
-                        <span class="text-gray-700 dark:text-gray-200 group-hover:text-green-500">Thu nhập</span>
+                    <a href="/Budgets" class="nav-link" data-page="budgets">
+                        <i class="fas fa-chart-pie nav-icon"></i>
+                        <span class="nav-text">Ngân sách</span>
                     </a>
 
-                    <a href="/Categories"
-                        class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                        <i
-                            class="fas fa-tags w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-blue-500"></i>
-                        <span class="text-gray-700 dark:text-gray-200 group-hover:text-blue-500">Danh mục</span>
+                    <a href="/Categories" class="nav-link" data-page="categories">
+                        <i class="fas fa-tags nav-icon"></i>
+                        <span class="nav-text">Danh mục</span>
                     </a>
 
-                    <a href="/Reports"
-                        class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                        <i
-                            class="fas fa-chart-bar w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-indigo-500"></i>
-                        <span class="text-gray-700 dark:text-gray-200 group-hover:text-indigo-500">Báo cáo</span>
+                    <a href="/Reports" class="nav-link" data-page="reports">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Báo cáo</span>
                     </a>
 
-                    <a href="/AI"
-                        class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                        <i
-                            class="fas fa-robot w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-purple-500"></i>
-                        <span class="text-gray-700 dark:text-gray-200 group-hover:text-purple-500">AI Gợi ý</span>
+                    <a href="/AI" class="nav-link" data-page="ai">
+                        <i class="fas fa-robot nav-icon"></i>
+                        <span class="nav-text">AI Gợi ý</span>
                     </a>
 
-                    <a href="/Profile"
-                        class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                        <i
-                            class="fas fa-user w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-gray-600"></i>
-                        <span class="text-gray-700 dark:text-gray-200 group-hover:text-gray-600">Hồ sơ</span>
+                    <a href="/Profile" class="nav-link" data-page="profile">
+                        <i class="fas fa-user nav-icon"></i>
+                        <span class="nav-text">Hồ sơ</span>
                     </a>
 
                     @if (User.IsInRole("Admin"))
                     {
-                        <div class="border-t border-white/20 my-4"></div>
-                        <a href="/Admin"
-                            class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-white/20 hover:shadow-lg">
-                            <i
-                                class="fas fa-cog w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 group-hover:text-yellow-500"></i>
-                            <span class="text-gray-700 dark:text-gray-200 group-hover:text-yellow-500">Quản trị</span>
+                        <div class="nav-divider"></div>
+                        <a href="/Admin" class="nav-link" data-page="admin">
+                            <i class="fas fa-cog nav-icon"></i>
+                            <span class="nav-text">Quản trị</span>
                         </a>
                     }
                 </nav>
 
                 <!-- User Info -->
-                <div class="p-4 border-t border-white/20">
-                    <div class="flex items-center space-x-3">
-                        <div
-                            class="w-10 h-10 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user text-white"></i>
+                <div class="sidebar-footer">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-800 dark:text-white truncate">@User.Identity?.Name
-                            </p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">@User.FindFirst("Role")?.Value</p>
+                        <div class="user-details">
+                            <div class="user-name">@User.Identity?.Name</div>
+                            <div class="user-role">@User.FindFirst("Role")?.Value</div>
                         </div>
                     </div>
                 </div>
@@ -163,69 +101,56 @@
         </div>
 
         <!-- Main Content -->
-        <div class="lg:pl-64">
+        <div class="main-content">
             <!-- Top Bar -->
-            <div class="sticky top-0 z-40 bg-white/20 backdrop-blur-xl shadow-lg border-b border-white/20">
-                <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+            <div class="top-bar">
+                <div class="top-bar-content">
                     <!-- Mobile menu button -->
-                    <button id="sidebar-toggle"
-                        class="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-white/20 transition-colors">
-                        <i class="fas fa-bars text-xl"></i>
+                    <button id="sidebar-toggle" class="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
                     </button>
 
                     <!-- Page Title -->
-                    <div class="flex-1">
-                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">@ViewData["Title"]</h1>
+                    <div class="page-title">
+                        <h1 class="page-title-text">@ViewData["Title"]</h1>
                     </div>
 
                     <!-- Right side -->
-                    <div class="flex items-center space-x-4">
+                    <div class="top-bar-actions">
                         <!-- Theme Toggle -->
-                        <button id="theme-toggle"
-                            class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-white/20 transition-colors">
-                            <i class="fas fa-moon dark:hidden"></i>
-                            <i class="fas fa-sun hidden dark:block"></i>
+                        <button id="theme-toggle" class="action-btn" title="Chuyển đổi chế độ">
+                            <i class="fas fa-moon theme-icon"></i>
                         </button>
 
                         <!-- Notifications -->
-                        <div class="relative">
-                            <button id="notification-btn"
-                                class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-white/20 transition-colors relative">
-                                <i class="fas fa-bell text-xl"></i>
-                                <span id="notification-badge"
-                                    class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden">3</span>
+                        <div class="notification-container">
+                            <button id="notification-btn" class="action-btn notification-btn" title="Thông báo">
+                                <i class="fas fa-bell"></i>
+                                <span id="notification-badge" class="notification-badge">3</span>
                             </button>
 
                             <!-- Notification Dropdown -->
-                            <div id="notification-dropdown"
-                                class="absolute right-0 mt-2 w-80 bg-white/90 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 hidden z-50">
-                                <div class="p-4 border-b border-gray-200">
-                                    <h3 class="text-lg font-semibold text-gray-800">Thông báo</h3>
+                            <div id="notification-dropdown" class="notification-dropdown">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Thông báo</h3>
                                 </div>
-                                <div class="max-h-64 overflow-y-auto">
-                                    <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-                                        <div class="flex items-start space-x-3">
-                                            <div
-                                                class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                                                <i class="fas fa-exclamation-triangle text-yellow-600 text-sm"></i>
-                                            </div>
-                                            <div class="flex-1">
-                                                <p class="text-sm font-medium text-gray-800">Cảnh báo ngân sách</p>
-                                                <p class="text-xs text-gray-600">Chi tiêu ăn uống đã vượt 35% thu nhập
-                                                </p>
-                                            </div>
+                                <div class="notification-list">
+                                    <div class="notification-item">
+                                        <div class="notification-icon warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="notification-content">
+                                            <div class="notification-message">Cảnh báo ngân sách</div>
+                                            <div class="notification-detail">Chi tiêu ăn uống đã vượt 35% thu nhập</div>
                                         </div>
                                     </div>
-                                    <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-                                        <div class="flex items-start space-x-3">
-                                            <div
-                                                class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                <i class="fas fa-lightbulb text-blue-600 text-sm"></i>
-                                            </div>
-                                            <div class="flex-1">
-                                                <p class="text-sm font-medium text-gray-800">Gợi ý AI</p>
-                                                <p class="text-xs text-gray-600">Nên giảm chi tiêu giải trí 10%</p>
-                                            </div>
+                                    <div class="notification-item">
+                                        <div class="notification-icon info">
+                                            <i class="fas fa-lightbulb"></i>
+                                        </div>
+                                        <div class="notification-content">
+                                            <div class="notification-message">Gợi ý AI</div>
+                                            <div class="notification-detail">Nên giảm chi tiêu giải trí 10%</div>
                                         </div>
                                     </div>
                                 </div>
@@ -233,36 +158,30 @@
                         </div>
 
                         <!-- User Menu -->
-                        <div class="relative">
-                            <button id="user-menu-btn"
-                                class="flex items-center space-x-2 p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-white/20 transition-colors">
-                                <div
-                                    class="w-8 h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user text-white text-sm"></i>
+                        <div class="user-menu-container">
+                            <button id="user-menu-btn" class="user-menu-btn">
+                                <div class="user-avatar-small">
+                                    <i class="fas fa-user"></i>
                                 </div>
-                                <span class="hidden sm:block text-sm font-medium">@User.Identity?.Name</span>
-                                <i class="fas fa-chevron-down text-xs"></i>
+                                <span class="user-name-small">@User.Identity?.Name</span>
+                                <i class="fas fa-chevron-down"></i>
                             </button>
 
                             <!-- User Dropdown -->
-                            <div id="user-dropdown"
-                                class="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 hidden z-50">
-                                <div class="py-2">
-                                    <a href="/Profile"
-                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                        <i class="fas fa-user w-4 h-4 mr-3"></i>
-                                        Hồ sơ
+                            <div id="user-dropdown" class="user-dropdown">
+                                <div class="user-dropdown-content">
+                                    <a href="/Profile" class="dropdown-item">
+                                        <i class="fas fa-user"></i>
+                                        <span>Hồ sơ</span>
                                     </a>
-                                    <a href="/Settings"
-                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                        <i class="fas fa-cog w-4 h-4 mr-3"></i>
-                                        Cài đặt
+                                    <a href="/Settings" class="dropdown-item">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Cài đặt</span>
                                     </a>
-                                    <div class="border-t border-gray-200 my-1"></div>
-                                    <a href="#" onclick="window.logoutManager.logout(); return false;"
-                                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                        <i class="fas fa-sign-out-alt w-4 h-4 mr-3"></i>
-                                        Đăng xuất
+                                    <div class="dropdown-divider"></div>
+                                    <a href="#" onclick="window.logoutManager.logout(); return false;" class="dropdown-item logout">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Đăng xuất</span>
                                     </a>
                                 </div>
                             </div>
@@ -272,8 +191,8 @@
             </div>
 
             <!-- Page Content -->
-            <main class="p-6">
-                <div class="max-w-7xl mx-auto">
+            <main class="page-content">
+                <div class="content-container">
                     @RenderBody()
                 </div>
             </main>
@@ -281,23 +200,18 @@
     </div>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <div id="toast-container" class="toast-container"></div>
 
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
-        <div class="flex items-center justify-center h-full">
-            <div class="bg-white/90 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
-                <div class="flex items-center space-x-4">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                    <span class="text-lg font-medium text-gray-800">Đang tải...</span>
-                </div>
-            </div>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <span class="loading-text">Đang tải...</span>
         </div>
     </div>
 
     <!-- Scripts -->
-    <script src="~/js/modern-dashboard.js"></script>
-    <!-- Logout functionality -->
+    <script src="~/js/design-system.js"></script>
     <script src="~/js/logout.js"></script>
     
     @await RenderSectionAsync("Scripts", required: false)

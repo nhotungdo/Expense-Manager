@@ -5,7 +5,6 @@ using System.Security.Claims;
 
 namespace MoneyTracker.Pages
 {
-    [Authorize]
     public class ExpenseModel : PageModel
     {
         private readonly ILogger<ExpenseModel> _logger;
@@ -15,9 +14,17 @@ namespace MoneyTracker.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Check if user is authenticated
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                _logger.LogInformation("Unauthenticated user tried to access Expense, redirecting to Login");
+                return RedirectToPage("/Login");
+            }
+
             // Expense page initialization
+            return Page();
         }
 
         public string GetCurrentUserId()

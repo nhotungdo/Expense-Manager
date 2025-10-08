@@ -17,6 +17,15 @@ namespace MoneyTracker.Middleware
         {
             var startTime = DateTime.UtcNow;
 
+            // Skip audit for authentication-related paths to avoid redirect loops
+            var path = context.Request.Path.Value?.ToLower() ?? "";
+            if (path.Contains("/login") || path.Contains("/logout") || path.Contains("/account") ||
+                path.Contains("/api/auth") || path.Contains("/signin") || path.Contains("/signout"))
+            {
+                await _next(context);
+                return;
+            }
+
             // Log request
             await LogRequestAsync(context, auditService);
 

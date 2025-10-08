@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 
 namespace MoneyTracker.Pages
 {
@@ -12,31 +14,47 @@ namespace MoneyTracker.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            _logger.LogInformation("HomePage accessed at {Time}", DateTime.UtcNow);
+
+
+            
 
             // Set page metadata
-            ViewData["Title"] = "MoneyTracker - Quản lý tài chính thông minh";
-            ViewData["Description"] = "Giải pháp quản lý tài chính cá nhân toàn diện và thông minh. Kiểm soát chi tiêu, tiết kiệm tiền và đạt được mục tiêu tài chính của bạn.";
-            ViewData["Keywords"] = "quản lý tài chính, chi tiêu, tiết kiệm, budget, money tracker, tài chính cá nhân";
+            ViewData["Title"] = "Home - MoneyTracker";
+            ViewData["Description"] = "Dashboard tổng quan tài chính cá nhân";
+            ViewData["Keywords"] = "homepage, dashboard, tài chính, tổng quan";
+
+            // Set user data for the view
+            ViewData["UserName"] = GetCurrentUserName();
+            ViewData["UserEmail"] = GetCurrentUserEmail();
+
+            return Page();
         }
 
-        public IActionResult OnGetFeatures()
+        public string GetCurrentUserId()
         {
-            return RedirectToPage("/HomePage", null, "features");
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
         }
 
-        public IActionResult OnGetAbout()
+        public string GetCurrentUserEmail()
         {
-            return RedirectToPage("/HomePage", null, "about");
+            return User.FindFirst(ClaimTypes.Email)?.Value ?? "";
         }
 
-        public IActionResult OnGetContact()
+        public string GetCurrentUserName()
         {
-            return RedirectToPage("/HomePage", null, "contact");
+            return User.FindFirst(ClaimTypes.Name)?.Value ?? "User";
+        }
+
+        public string GetCurrentUserRole()
+        {
+            return User.FindFirst(ClaimTypes.Role)?.Value ?? "USER";
+        }
+
+        public bool IsAdmin()
+        {
+            return User.IsInRole("ADMIN");
         }
     }
 }
-
-

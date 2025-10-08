@@ -1,0 +1,569 @@
+@page
+@model MoneyTracker.Pages.BudgetsModel
+@{
+    ViewData["Title"] = "Ngân Sách";
+
+}
+
+@section Styles {
+    <style>
+        .budgets-container {
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+        }
+
+        .budget-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .budget-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .budget-card.over-budget {
+            border-left: 4px solid #ef4444;
+        }
+
+        .budget-card.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .budget-card.good {
+            border-left: 4px solid #10b981;
+        }
+
+        .progress-custom {
+            height: 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .progress-bar-custom {
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .add-budget-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-budget-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 20px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+        }
+
+        @@keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+}
+
+<div class="budgets-container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1 text-white">Ngân Sách</h1>
+            <p class="text-white-50 mb-0">Quản lý ngân sách và theo dõi chi tiêu</p>
+        </div>
+        <div class="d-flex gap-3">
+            <button class="add-budget-btn" data-bs-toggle="modal" data-bs-target="#addBudgetModal">
+                <i class="fas fa-plus me-2"></i>
+                Thêm Ngân Sách
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-card">
+        <h5 class="text-white mb-4">Tổng Quan Ngân Sách</h5>
+        <div class="row">
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalBudget">0 VND</div>
+                    <div class="stat-label">Tổng Ngân Sách</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalSpent">0 VND</div>
+                    <div class="stat-label">Đã Chi Tiêu</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalRemaining">0 VND</div>
+                    <div class="stat-label">Còn Lại</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-value" id="overBudgetCount">0</div>
+                    <div class="stat-label">Vượt Ngân Sách</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budgets List -->
+    <div id="budgetsList">
+        <!-- Loading skeleton -->
+        <div class="loading-skeleton"></div>
+        <div class="loading-skeleton"></div>
+        <div class="loading-skeleton"></div>
+    </div>
+</div>
+
+<!-- Add Budget Modal -->
+<div class="modal fade" id="addBudgetModal" tabindex="-1" aria-labelledby="addBudgetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-white" id="addBudgetModalLabel">Thêm Ngân Sách Mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addBudgetForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Danh mục</label>
+                            <select class="form-select bg-transparent text-white border-secondary" id="budgetCategory">
+                                <option value="">Tổng quát (tất cả danh mục)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Số tiền ngân sách</label>
+                            <input type="number" class="form-control bg-transparent text-white border-secondary" 
+                                   id="budgetAmount" placeholder="Nhập số tiền" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Loại kỳ hạn</label>
+                            <select class="form-select bg-transparent text-white border-secondary" id="budgetPeriodType" required>
+                                <option value="MONTHLY">Hàng tháng</option>
+                                <option value="WEEKLY">Hàng tuần</option>
+                                <option value="YEARLY">Hàng năm</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Tiền tệ</label>
+                            <select class="form-select bg-transparent text-white border-secondary" id="budgetCurrency">
+                                <option value="VND">VND</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Ngày bắt đầu</label>
+                            <input type="date" class="form-control bg-transparent text-white border-secondary" 
+                                   id="budgetStartDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Ngày kết thúc</label>
+                            <input type="date" class="form-control bg-transparent text-white border-secondary" 
+                                   id="budgetEndDate" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveBudget()">Lưu Ngân Sách</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Global variables
+        let categories = [];
+        let budgets = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            loadCategories();
+            loadBudgets();
+            setDefaultDates();
+        });
+
+        // Set default dates
+        function setDefaultDates() {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            document.getElementById('budgetStartDate').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('budgetEndDate').value = lastDay.toISOString().split('T')[0];
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                if (response.ok) {
+                    categories = await response.json();
+                    populateCategorySelect();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Populate category select
+        function populateCategorySelect() {
+            const select = document.getElementById('budgetCategory');
+            
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">Tổng quát (tất cả danh mục)</option>';
+            
+            categories.forEach(category => {
+                const option = new Option(category.name, category.id);
+                select.add(option);
+            });
+        }
+
+        // Load budgets
+        async function loadBudgets() {
+            try {
+                showLoadingState();
+                
+                const response = await fetch('/api/budgets');
+                if (response.ok) {
+                    budgets = await response.json();
+                    displayBudgets(budgets);
+                    loadBudgetSummary();
+                } else {
+                    // Use mock data
+                    displayMockBudgets();
+                }
+            } catch (error) {
+                console.error('Error loading budgets:', error);
+                displayMockBudgets();
+            }
+        }
+
+        // Load budget summary
+        async function loadBudgetSummary() {
+            try {
+                const response = await fetch('/api/budgets/summary');
+                if (response.ok) {
+                    const summary = await response.json();
+                    updateSummary(summary);
+                } else {
+                    // Use mock data
+                    updateSummary({
+                        totalBudget: 50000000,
+                        totalSpent: 35000000,
+                        totalRemaining: 15000000,
+                        percentageUsed: 70,
+                        activeBudgets: 5,
+                        overBudgetCategories: 1
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading budget summary:', error);
+            }
+        }
+
+        // Display budgets
+        function displayBudgets(budgets) {
+            const container = document.getElementById('budgetsList');
+            container.innerHTML = '';
+
+            if (budgets.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-white-50 py-5">
+                        <i class="fas fa-piggy-bank fa-3x mb-3"></i>
+                        <h5>Chưa có ngân sách nào</h5>
+                        <p>Hãy tạo ngân sách đầu tiên của bạn!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            budgets.forEach(budget => {
+                const budgetElement = document.createElement('div');
+                const percentage = budget.budgetAmount > 0 ? (budget.spentAmount / budget.budgetAmount) * 100 : 0;
+                
+                let cardClass = 'budget-card';
+                if (percentage > 100) {
+                    cardClass += ' over-budget';
+                } else if (percentage > 80) {
+                    cardClass += ' warning';
+                } else {
+                    cardClass += ' good';
+                }
+
+                budgetElement.className = cardClass;
+                
+                budgetElement.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="text-white mb-1">${budget.categoryName || 'Tổng quát'}</h5>
+                            <small class="text-white-50">${budget.periodType} • ${formatDate(budget.startDate)} - ${formatDate(budget.endDate)}</small>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="text-white mb-1">${formatCurrency(budget.spentAmount)} / ${formatCurrency(budget.budgetAmount)}</h6>
+                            <small class="text-white-50">${percentage.toFixed(1)}% đã sử dụng</small>
+                        </div>
+                    </div>
+                    <div class="progress-custom mb-3">
+                        <div class="progress-bar-custom ${getProgressBarClass(percentage)}" 
+                             style="width: ${Math.min(percentage, 100)}%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-white-50">Còn lại: </span>
+                            <span class="text-white fw-bold">${formatCurrency(budget.remainingAmount)}</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-light" onclick="editBudget(${budget.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteBudget(${budget.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(budgetElement);
+            });
+        }
+
+        // Display mock budgets
+        function displayMockBudgets() {
+            const mockBudgets = [
+                {
+                    id: 1,
+                    categoryName: 'Ăn uống',
+                    budgetAmount: 5000000,
+                    spentAmount: 4200000,
+                    remainingAmount: 800000,
+                    periodType: 'MONTHLY',
+                    startDate: '2024-01-01',
+                    endDate: '2024-01-31'
+                },
+                {
+                    id: 2,
+                    categoryName: 'Mua sắm',
+                    budgetAmount: 3000000,
+                    spentAmount: 3200000,
+                    remainingAmount: -200000,
+                    periodType: 'MONTHLY',
+                    startDate: '2024-01-01',
+                    endDate: '2024-01-31'
+                },
+                {
+                    id: 3,
+                    categoryName: 'Giao thông',
+                    budgetAmount: 2000000,
+                    spentAmount: 1500000,
+                    remainingAmount: 500000,
+                    periodType: 'MONTHLY',
+                    startDate: '2024-01-01',
+                    endDate: '2024-01-31'
+                },
+                {
+                    id: 4,
+                    categoryName: 'Nhà ở',
+                    budgetAmount: 10000000,
+                    spentAmount: 10000000,
+                    remainingAmount: 0,
+                    periodType: 'MONTHLY',
+                    startDate: '2024-01-01',
+                    endDate: '2024-01-31'
+                }
+            ];
+
+            displayBudgets(mockBudgets);
+            updateSummary({
+                totalBudget: 20000000,
+                totalSpent: 19900000,
+                totalRemaining: 100000,
+                percentageUsed: 99.5,
+                activeBudgets: 4,
+                overBudgetCategories: 1
+            });
+        }
+
+        // Update summary
+        function updateSummary(summary) {
+            document.getElementById('totalBudget').textContent = formatCurrency(summary.totalBudget);
+            document.getElementById('totalSpent').textContent = formatCurrency(summary.totalSpent);
+            document.getElementById('totalRemaining').textContent = formatCurrency(summary.totalRemaining);
+            document.getElementById('overBudgetCount').textContent = summary.overBudgetCategories;
+        }
+
+        // Get progress bar class
+        function getProgressBarClass(percentage) {
+            if (percentage > 100) {
+                return 'bg-danger';
+            } else if (percentage > 80) {
+                return 'bg-warning';
+            } else {
+                return 'bg-success';
+            }
+        }
+
+        // Save budget
+        async function saveBudget() {
+            const form = document.getElementById('addBudgetForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const budgetData = {
+                categoryId: document.getElementById('budgetCategory').value ? parseInt(document.getElementById('budgetCategory').value) : null,
+                budgetAmount: parseFloat(document.getElementById('budgetAmount').value),
+                currency: document.getElementById('budgetCurrency').value,
+                periodType: document.getElementById('budgetPeriodType').value,
+                startDate: document.getElementById('budgetStartDate').value,
+                endDate: document.getElementById('budgetEndDate').value
+            };
+
+            try {
+                const response = await fetch('/api/budgets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(budgetData)
+                });
+
+                if (response.ok) {
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addBudgetModal'));
+                    modal.hide();
+                    
+                    // Reset form
+                    form.reset();
+                    setDefaultDates();
+                    
+                    // Reload budgets
+                    loadBudgets();
+                    
+                    // Show success message
+                    showNotification('Ngân sách đã được thêm thành công!', 'success');
+                } else {
+                    showNotification('Có lỗi xảy ra khi thêm ngân sách!', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving budget:', error);
+                showNotification('Có lỗi xảy ra khi thêm ngân sách!', 'error');
+            }
+        }
+
+        // Edit budget
+        function editBudget(budgetId) {
+            // Implement edit functionality
+            showNotification('Chức năng chỉnh sửa sẽ được cập nhật!', 'info');
+        }
+
+        // Delete budget
+        async function deleteBudget(budgetId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa ngân sách này?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/budgets/${budgetId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadBudgets();
+                    showNotification('Ngân sách đã được xóa thành công!', 'success');
+                } else {
+                    showNotification('Có lỗi xảy ra khi xóa ngân sách!', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting budget:', error);
+                showNotification('Có lỗi xảy ra khi xóa ngân sách!', 'error');
+            }
+        }
+
+        // Show loading state
+        function showLoadingState() {
+            const container = document.getElementById('budgetsList');
+            container.innerHTML = `
+                <div class="loading-skeleton"></div>
+                <div class="loading-skeleton"></div>
+                <div class="loading-skeleton"></div>
+            `;
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // You can implement a toast notification here
+            alert(message);
+        }
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+    </script>
+}

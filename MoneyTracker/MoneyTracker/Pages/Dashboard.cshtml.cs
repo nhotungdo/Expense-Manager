@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 
 namespace MoneyTracker.Pages
 {
-    [Authorize]
     public class DashboardModel : PageModel
     {
         private readonly ILogger<DashboardModel> _logger;
@@ -16,8 +15,15 @@ namespace MoneyTracker.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Check if user is authenticated
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                _logger.LogInformation("Unauthenticated user tried to access Dashboard, redirecting to Login");
+                return RedirectToPage("/Login");
+            }
+
             _logger.LogInformation("Dashboard accessed by user {UserId} at {Time}",
                 GetCurrentUserId(), DateTime.UtcNow);
 
@@ -25,6 +31,8 @@ namespace MoneyTracker.Pages
             ViewData["Title"] = "Dashboard - MoneyTracker";
             ViewData["Description"] = "Tổng quan tài chính cá nhân với thống kê chi tiết và biểu đồ trực quan";
             ViewData["Keywords"] = "dashboard, tài chính, thống kê, biểu đồ, thu chi";
+
+            return Page();
         }
 
         public string GetCurrentUserId()

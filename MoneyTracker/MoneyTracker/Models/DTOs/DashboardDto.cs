@@ -8,20 +8,19 @@ namespace MoneyTracker.Models.DTOs
         public decimal MonthlyIncome { get; set; }
         public decimal MonthlyExpenses { get; set; }
         public decimal MonthlySavings { get; set; }
-        public Dictionary<string, decimal> ExpensesByCategory { get; set; } = new();
-        public Dictionary<string, decimal> IncomeByCategory { get; set; } = new();
-        public List<MonthlyTrend> MonthlyTrends { get; set; } = new();
+        public List<CategorySpendingDto> ExpensesByCategory { get; set; } = new();
+        public List<CategorySpendingDto> IncomeByCategory { get; set; } = new();
+        public List<MonthlyTrendDto> MonthlyTrends { get; set; } = new();
         public List<RecentTransaction> RecentTransactions { get; set; } = new();
         public List<AiSuggestion> AiSuggestions { get; set; } = new();
     }
 
-    public class MonthlyTrend
+    public class DashboardStatsDto
     {
-        public int Year { get; set; }
-        public int Month { get; set; }
-        public decimal Income { get; set; }
-        public decimal Expenses { get; set; }
-        public decimal Savings { get; set; }
+        public decimal TotalIncome { get; set; }
+        public decimal TotalExpense { get; set; }
+        public decimal NetIncome { get; set; }
+        public int TransactionCount { get; set; }
     }
 
     public class RecentTransaction

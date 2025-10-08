@@ -9,7 +9,6 @@ namespace MoneyTracker.Controllers
 {
     [ApiController]
     [Route("api/profile")]
-    [Authorize]
     public class ProfileController : ControllerBase
     {
         private readonly ExpenseManagerContext _context;

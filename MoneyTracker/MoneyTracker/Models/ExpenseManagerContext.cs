@@ -33,9 +33,20 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<Email> Emails { get; set; }
 
+    public virtual DbSet<Transaction> Transactions { get; set; }
+
+    public virtual DbSet<Report> Reports { get; set; }
+
+    public virtual DbSet<SystemSettings> SystemSettings { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            // This will be overridden by the configuration in Program.cs
+            optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,9 +80,19 @@ public partial class ExpenseManagerContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
             entity.Property(e => e.Description)
                 .HasMaxLength(500)
                 .HasColumnName("description");
+            entity.Property(e => e.Icon)
+                .HasMaxLength(100)
+                .HasColumnName("icon");
+            entity.Property(e => e.Color)
+                .HasMaxLength(20)
+                .HasColumnName("color");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -81,6 +102,12 @@ public partial class ExpenseManagerContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("type");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.IsDefault)
+                .HasDefaultValue(false)
+                .HasColumnName("is_default");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
 
             entity.HasOne(d => d.User).WithMany(p => p.Categories)
                 .HasForeignKey(d => d.UserId)
@@ -413,6 +440,123 @@ public partial class ExpenseManagerContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__notifications__user_id");
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__transactions__3213E83F");
+
+            entity.ToTable("transactions");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.Type)
+                .HasMaxLength(20)
+                .HasColumnName("type");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(15, 2)")
+                .HasColumnName("amount");
+            entity.Property(e => e.Currency)
+                .HasMaxLength(10)
+                .HasDefaultValue("VND")
+                .HasColumnName("currency");
+            entity.Property(e => e.Note)
+                .HasMaxLength(255)
+                .HasColumnName("note");
+            entity.Property(e => e.TransactionDate)
+                .HasColumnType("date")
+                .HasColumnName("transaction_date");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Category).WithMany()
+                .HasForeignKey(d => d.CategoryId)
+                .HasConstraintName("FK__transactions__category_id");
+
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__transactions__user_id");
+        });
+
+        modelBuilder.Entity<Report>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__reports__3213E83F");
+
+            entity.ToTable("reports");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ReportType)
+                .HasMaxLength(20)
+                .HasColumnName("report_type");
+            entity.Property(e => e.ReportName)
+                .HasMaxLength(255)
+                .HasColumnName("report_name");
+            entity.Property(e => e.StartDate)
+                .HasColumnType("date")
+                .HasColumnName("start_date");
+            entity.Property(e => e.EndDate)
+                .HasColumnType("date")
+                .HasColumnName("end_date");
+            entity.Property(e => e.Parameters)
+                .HasMaxLength(4000)
+                .HasColumnName("parameters");
+            entity.Property(e => e.FilePath)
+                .HasMaxLength(500)
+                .HasColumnName("file_path");
+            entity.Property(e => e.FileFormat)
+                .HasMaxLength(10)
+                .HasColumnName("file_format");
+            entity.Property(e => e.GeneratedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("generated_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__reports__user_id");
+        });
+
+        modelBuilder.Entity<SystemSettings>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__system_settings__3213E83F");
+
+            entity.ToTable("system_settings");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.SettingKey)
+                .HasMaxLength(100)
+                .HasColumnName("setting_key");
+            entity.Property(e => e.SettingValue)
+                .HasMaxLength(4000)
+                .HasColumnName("setting_value");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .HasColumnName("description");
+            entity.Property(e => e.SettingType)
+                .HasMaxLength(20)
+                .HasColumnName("setting_type");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
         });
 
         OnModelCreatingPartial(modelBuilder);

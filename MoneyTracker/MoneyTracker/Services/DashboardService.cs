@@ -60,7 +60,7 @@ namespace MoneyTracker.Services
             var incomeByCategory = await _incomeService.GetIncomeByCategorySummaryAsync(userId);
 
             // Get monthly trends (last 6 months)
-            var monthlyTrends = new List<MonthlyTrend>();
+            var monthlyTrends = new List<MonthlyTrendDto>();
             for (int i = 5; i >= 0; i--)
             {
                 var date = DateTime.UtcNow.AddMonths(-i);
@@ -70,13 +70,14 @@ namespace MoneyTracker.Services
                 var monthIncome = await _incomeService.GetTotalIncomeAsync(userId, trendStart, trendEnd);
                 var monthExpenses = await _expenseService.GetTotalExpensesAsync(userId, trendStart, trendEnd);
 
-                monthlyTrends.Add(new MonthlyTrend
+                monthlyTrends.Add(new MonthlyTrendDto
                 {
                     Year = date.Year,
                     Month = date.Month,
                     Income = monthIncome,
                     Expenses = monthExpenses,
-                    Savings = monthIncome - monthExpenses
+                    Savings = monthIncome - monthExpenses,
+                    NetWorth = monthIncome - monthExpenses
                 });
             }
 
@@ -118,8 +119,22 @@ namespace MoneyTracker.Services
                 MonthlyIncome = monthlyIncome,
                 MonthlyExpenses = monthlyExpenses,
                 MonthlySavings = monthlyIncome - monthlyExpenses,
-                ExpensesByCategory = expensesByCategory,
-                IncomeByCategory = incomeByCategory,
+                ExpensesByCategory = expensesByCategory.Select(kvp => new CategorySpendingDto
+                {
+                    CategoryName = kvp.Key,
+                    Amount = kvp.Value,
+                    Percentage = 0, // Will be calculated on client side
+                    TransactionCount = 0, // Will be calculated separately if needed
+                    AverageAmount = 0 // Will be calculated separately if needed
+                }).ToList(),
+                IncomeByCategory = incomeByCategory.Select(kvp => new CategorySpendingDto
+                {
+                    CategoryName = kvp.Key,
+                    Amount = kvp.Value,
+                    Percentage = 0, // Will be calculated on client side
+                    TransactionCount = 0, // Will be calculated separately if needed
+                    AverageAmount = 0 // Will be calculated separately if needed
+                }).ToList(),
                 MonthlyTrends = monthlyTrends,
                 RecentTransactions = recentTransactions,
                 AiSuggestions = aiSuggestions.ToList()

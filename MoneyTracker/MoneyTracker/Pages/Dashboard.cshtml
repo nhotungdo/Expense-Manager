@@ -2,289 +2,141 @@
 @model MoneyTracker.Pages.DashboardModel
 @{
     ViewData["Title"] = "Dashboard";
-    Layout = "~/Pages/Shared/_Layout.cshtml";
+
 }
 
-@section Styles {
-    <style>
-        .dashboard-container {
-            min-height: calc(100vh - 80px);
-            padding: 2rem;
-        }
 
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+<!-- Header Section -->
+<div class="d-flex justify-content-between align-items-center mb-6">
+    <div>
+        <h1 class="h1 mb-2">Dashboard</h1>
+        <p class="text-secondary mb-0">Tổng quan tài chính của bạn</p>
+    </div>
+    <div class="d-flex gap-3">
+        <button class="btn btn-outline" onclick="refreshDashboard()">
+            <i class="fas fa-sync-alt"></i>
+            Làm mới
+        </button>
+        <a href="/Expenses" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Thêm giao dịch
+        </a>
+    </div>
+</div>
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .chart-container {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .quick-action-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            padding: 1rem 1.5rem;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .quick-action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-            color: white;
-            text-decoration: none;
-        }
-
-        .recent-transaction {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-            border-left: 4px solid;
-            transition: all 0.3s ease;
-        }
-
-        .recent-transaction:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-
-        .income-border {
-            border-left-color: #10b981;
-        }
-
-        .expense-border {
-            border-left-color: #ef4444;
-        }
-
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-
-        @@keyframes
-        pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @@keyframes
-        loading {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-    </style>
-}
-
-<div class="dashboard-container">
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h2 mb-1 text-white">Dashboard</h1>
-            <p class="text-white-50 mb-0">Tổng quan tài chính của bạn</p>
-        </div>
-        <div class="d-flex gap-3">
-            <button class="quick-action-btn" onclick="refreshDashboard()">
-                <i class="fas fa-sync-alt"></i>
-                Làm mới
-            </button>
-            <a href="/Expenses" class="quick-action-btn">
-                <i class="fas fa-plus"></i>
-                Thêm giao dịch
-            </a>
+<!-- Stats Cards Row -->
+<div class="row mb-6">
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-value text-income" id="total-income">0 VND</div>
+            <div class="stat-label">Tổng Thu Nhập</div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span id="income-change">+12%</span>
+            </div>
         </div>
     </div>
-
-    <!-- Stats Cards Row -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card h-100">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white-50 mb-2">Tổng Thu Nhập</h6>
-                        <h3 class="text-white mb-1" id="total-income">0 VND</h3>
-                        <small class="text-success">
-                            <i class="fas fa-arrow-up me-1"></i>
-                            <span id="income-change">+12%</span> tháng này
-                        </small>
-                    </div>
-                    <div class="bg-success bg-opacity-20 p-3 rounded-circle">
-                        <i class="fas fa-coins text-success fs-4"></i>
-                    </div>
-                </div>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-value text-expense" id="total-expense">0 VND</div>
+            <div class="stat-label">Tổng Chi Tiêu</div>
+            <div class="stat-change negative">
+                <i class="fas fa-arrow-up"></i>
+                <span id="expense-change">+8%</span>
             </div>
         </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card h-100">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white-50 mb-2">Tổng Chi Tiêu</h6>
-                        <h3 class="text-white mb-1" id="total-expense">0 VND</h3>
-                        <small class="text-danger">
-                            <i class="fas fa-arrow-up me-1"></i>
-                            <span id="expense-change">+8%</span> tháng này
-                        </small>
-                    </div>
-                    <div class="bg-danger bg-opacity-20 p-3 rounded-circle">
-                        <i class="fas fa-credit-card text-danger fs-4"></i>
-                    </div>
-                </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-value text-primary" id="current-balance">0 VND</div>
+            <div class="stat-label">Số Dư Hiện Tại</div>
+            <div class="stat-change positive">
+                <i class="fas fa-wallet"></i>
+                <span>Tài khoản chính</span>
             </div>
         </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card h-100">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white-50 mb-2">Số Dư Hiện Tại</h6>
-                        <h3 class="text-white mb-1" id="current-balance">0 VND</h3>
-                        <small class="text-info">
-                            <i class="fas fa-wallet me-1"></i>
-                            Tài khoản chính
-                        </small>
-                    </div>
-                    <div class="bg-info bg-opacity-20 p-3 rounded-circle">
-                        <i class="fas fa-wallet text-info fs-4"></i>
-                    </div>
-                </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-value text-primary" id="monthly-transactions">0</div>
+            <div class="stat-label">Giao Dịch Tháng</div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span id="transaction-change">+15%</span>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card h-100">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white-50 mb-2">Giao Dịch Tháng</h6>
-                        <h3 class="text-white mb-1" id="monthly-transactions">0</h3>
-                        <small class="text-warning">
-                            <i class="fas fa-chart-line me-1"></i>
-                            <span id="transaction-change">+15%</span> so với tháng trước
-                        </small>
-                    </div>
-                    <div class="bg-warning bg-opacity-20 p-3 rounded-circle">
-                        <i class="fas fa-chart-line text-warning fs-4"></i>
-                    </div>
+<!-- Charts Row -->
+<div class="row mb-6">
+    <div class="col-lg-8 mb-4">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Xu Hướng Thu Chi</h5>
+                <div class="chart-actions">
+                    <button type="button" class="chart-btn active" onclick="changeChartPeriod('week')">Tuần</button>
+                    <button type="button" class="chart-btn" onclick="changeChartPeriod('month')">Tháng</button>
+                    <button type="button" class="chart-btn" onclick="changeChartPeriod('year')">Năm</button>
                 </div>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="trendsChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="row mb-4">
-        <div class="col-lg-8 mb-4">
-            <div class="chart-container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="text-white mb-0">Xu Hướng Thu Chi</h5>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-light btn-sm active"
-                            onclick="changeChartPeriod('week')">Tuần</button>
-                        <button type="button" class="btn btn-outline-light btn-sm"
-                            onclick="changeChartPeriod('month')">Tháng</button>
-                        <button type="button" class="btn btn-outline-light btn-sm"
-                            onclick="changeChartPeriod('year')">Năm</button>
-                    </div>
-                </div>
-                <div style="height: 300px;">
-                    <canvas id="trendsChart"></canvas>
-                </div>
+    <div class="col-lg-4 mb-4">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Chi Tiêu Theo Danh Mục</h5>
             </div>
-        </div>
-
-        <div class="col-lg-4 mb-4">
-            <div class="chart-container">
-                <h5 class="text-white mb-4">Chi Tiêu Theo Danh Mục</h5>
-                <div style="height: 300px;">
-                    <canvas id="categoryChart"></canvas>
-                </div>
+            <div style="height: 300px;">
+                <canvas id="categoryChart"></canvas>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Recent Transactions and Quick Actions -->
-    <div class="row">
-        <div class="col-lg-8 mb-4">
-            <div class="chart-container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="text-white mb-0">Giao Dịch Gần Đây</h5>
-                    <a href="/Expenses" class="btn btn-outline-light btn-sm">Xem tất cả</a>
-                </div>
+<!-- Recent Transactions and Quick Actions -->
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Giao Dịch Gần Đây</h5>
+                <a href="/Transactions" class="btn btn-outline btn-sm">Xem tất cả</a>
+            </div>
+            <div class="card-body">
                 <div id="recent-transactions">
                     <!-- Loading skeleton -->
-                    <div class="recent-transaction loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
-                    <div class="recent-transaction loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
-                    <div class="recent-transaction loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="loading-skeleton" style="height: 60px; margin-bottom: 10px;"></div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-lg-4 mb-4">
-            <div class="chart-container">
-                <h5 class="text-white mb-4">Thao Tác Nhanh</h5>
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Thao Tác Nhanh</h5>
+            </div>
+            <div class="card-body">
                 <div class="d-grid gap-3">
-                    <a href="/Expenses" class="quick-action-btn text-center">
-                        <i class="fas fa-plus-circle"></i>
-                        Thêm Chi Tiêu
+                    <a href="/Transactions" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i>
+                        Thêm Giao Dịch
                     </a>
-                    <a href="/Incomes" class="quick-action-btn text-center">
-                        <i class="fas fa-coins"></i>
-                        Thêm Thu Nhập
+                    <a href="/Budgets" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-chart-pie"></i>
+                        Quản Lý Ngân Sách
                     </a>
-                    <a href="/Reports" class="quick-action-btn text-center">
+                    <a href="/Reports" class="btn btn-outline btn-lg">
                         <i class="fas fa-chart-bar"></i>
                         Xem Báo Cáo
                     </a>
-                    <a href="/AI" class="quick-action-btn text-center">
+                    <a href="/AI" class="btn btn-outline btn-lg">
                         <i class="fas fa-robot"></i>
                         AI Gợi Ý
                     </a>
@@ -292,60 +144,96 @@
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Goals and Insights -->
-    <div class="row">
-        <div class="col-lg-6 mb-4">
-            <div class="chart-container">
-                <h5 class="text-white mb-4">Mục Tiêu Tài Chính</h5>
+<!-- Goals and Insights -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Mục Tiêu Tài Chính</h5>
+            </div>
+            <div class="card-body">
                 <div id="financial-goals">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-white">Tiết kiệm khẩn cấp</span>
-                            <span class="text-white-50">2,500,000 / 5,000,000 VND</span>
+                    <div class="budget-item">
+                        <div class="budget-header">
+                            <div class="budget-title">Tiết kiệm khẩn cấp</div>
+                            <div class="budget-amount">2,500,000 / 5,000,000 VND</div>
                         </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" style="width: 50%"></div>
+                        <div class="budget-progress">
+                            <div class="budget-progress-bar" style="width: 50%"></div>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-white">Mua xe mới</span>
-                            <span class="text-white-50">15,000,000 / 50,000,000 VND</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-info" style="width: 30%"></div>
+                        <div class="budget-footer">
+                            <div class="budget-remaining">Còn lại: 2,500,000 VND</div>
+                            <div class="budget-percentage">50%</div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-white">Du lịch</span>
-                            <span class="text-white-50">3,000,000 / 10,000,000 VND</span>
+                    <div class="budget-item">
+                        <div class="budget-header">
+                            <div class="budget-title">Mua xe mới</div>
+                            <div class="budget-amount">15,000,000 / 50,000,000 VND</div>
                         </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-warning" style="width: 30%"></div>
+                        <div class="budget-progress">
+                            <div class="budget-progress-bar" style="width: 30%"></div>
+                        </div>
+                        <div class="budget-footer">
+                            <div class="budget-remaining">Còn lại: 35,000,000 VND</div>
+                            <div class="budget-percentage">30%</div>
+                        </div>
+                    </div>
+                    <div class="budget-item">
+                        <div class="budget-header">
+                            <div class="budget-title">Du lịch</div>
+                            <div class="budget-amount">3,000,000 / 10,000,000 VND</div>
+                        </div>
+                        <div class="budget-progress">
+                            <div class="budget-progress-bar" style="width: 30%"></div>
+                        </div>
+                        <div class="budget-footer">
+                            <div class="budget-remaining">Còn lại: 7,000,000 VND</div>
+                            <div class="budget-percentage">30%</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-lg-6 mb-4">
-            <div class="chart-container">
-                <h5 class="text-white mb-4">Thông Tin Thông Minh</h5>
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Thông Tin Thông Minh</h5>
+            </div>
+            <div class="card-body">
                 <div id="ai-insights">
-                    <div class="alert alert-info bg-info bg-opacity-20 border-info text-white">
-                        <i class="fas fa-lightbulb me-2"></i>
-                        <strong>Gợi ý:</strong> Bạn đã chi tiêu nhiều hơn 20% so với tháng trước. Hãy xem xét cắt giảm
-                        chi phí không cần thiết.
+                    <div class="toast show">
+                        <div class="toast-icon info">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="toast-content">
+                            <div class="toast-title">Gợi ý</div>
+                            <div class="toast-message">Bạn đã chi tiêu nhiều hơn 20% so với tháng trước. Hãy xem xét cắt
+                                giảm chi phí không cần thiết.</div>
+                        </div>
                     </div>
-                    <div class="alert alert-success bg-success bg-opacity-20 border-success text-white">
-                        <i class="fas fa-chart-line me-2"></i>
-                        <strong>Tin tốt:</strong> Thu nhập của bạn đã tăng 15% so với tháng trước!
+                    <div class="toast show">
+                        <div class="toast-icon success">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="toast-content">
+                            <div class="toast-title">Tin tốt</div>
+                            <div class="toast-message">Thu nhập của bạn đã tăng 15% so với tháng trước!</div>
+                        </div>
                     </div>
-                    <div class="alert alert-warning bg-warning bg-opacity-20 border-warning text-white">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Lưu ý:</strong> Bạn sắp đạt giới hạn chi tiêu cho danh mục "Ăn uống" trong tháng này.
+                    <div class="toast show">
+                        <div class="toast-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="toast-content">
+                            <div class="toast-title">Lưu ý</div>
+                            <div class="toast-message">Bạn sắp đạt giới hạn chi tiêu cho danh mục "Ăn uống" trong tháng
+                                này.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -354,7 +242,6 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Global variables
         let trendsChart, categoryChart;
@@ -481,25 +368,22 @@
 
             transactions.forEach(transaction => {
                 const transactionElement = document.createElement('div');
-                transactionElement.className = `recent-transaction ${transaction.type === 'income' ? 'income-border' : 'expense-border'}`;
+                transactionElement.className = 'transaction-item';
 
+                const iconClass = transaction.type === 'income' ? 'income' : 'expense';
                 const icon = transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down';
-                const color = transaction.type === 'income' ? 'text-success' : 'text-danger';
+                const amountClass = transaction.type === 'income' ? 'income' : 'expense';
 
                 transactionElement.innerHTML = `
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="fas ${icon} ${color}"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="text-white mb-1">${transaction.description}</h6>
-                                        <small class="text-white-50">${transaction.category} • ${formatDate(transaction.date)}</small>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <h6 class="mb-0 ${color}">${transaction.type === 'income' ? '+' : '-'}${formatCurrency(transaction.amount)}</h6>
-                                </div>
+                            <div class="transaction-icon ${iconClass}">
+                                <i class="fas ${icon}"></i>
+                            </div>
+                            <div class="transaction-details">
+                                <div class="transaction-title">${transaction.description}</div>
+                                <div class="transaction-meta">${transaction.category} • ${formatDate(transaction.date)}</div>
+                            </div>
+                            <div class="transaction-amount ${amountClass}">
+                                ${transaction.type === 'income' ? '+' : '-'}${formatCurrency(transaction.amount)}
                             </div>
                         `;
 
@@ -516,95 +400,111 @@
         // Setup trends chart
         function setupTrendsChart() {
             const ctx = document.getElementById('trendsChart').getContext('2d');
-            trendsChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-                    datasets: [{
-                        label: 'Thu nhập',
-                        data: [1200000, 1900000, 3000000, 5000000, 2000000, 3000000, 4500000],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: 'Chi tiêu',
-                        data: [800000, 1200000, 1500000, 2000000, 1800000, 2200000, 1900000],
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
+            const data = {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                datasets: [{
+                    label: 'Thu nhập',
+                    data: [1200000, 1900000, 3000000, 5000000, 2000000, 3000000, 4500000],
+                    borderColor: '#2ECC71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Chi tiêu',
+                    data: [800000, 1200000, 1500000, 2000000, 1800000, 2200000, 1900000],
+                    borderColor: '#E74C3C',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            };
+
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 12
+                            }
+                        }
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: 'white'
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11
                             }
                         }
                     },
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: 'white'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
+                    y: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
-                        y: {
-                            ticks: {
-                                color: 'white',
-                                callback: function (value) {
-                                    return formatCurrency(value);
-                                }
+                        ticks: {
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11
                             },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                            callback: function (value) {
+                                return formatCurrency(value);
                             }
                         }
                     }
                 }
-            });
+            };
+
+            trendsChart = ChartUtils.createLineChart(ctx, data, options);
         }
 
         // Setup category chart
         function setupCategoryChart() {
             const ctx = document.getElementById('categoryChart').getContext('2d');
-            categoryChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Ăn uống', 'Mua sắm', 'Giao thông', 'Nhà ở', 'Giải trí', 'Khác'],
-                    datasets: [{
-                        data: [30, 25, 15, 20, 5, 5],
-                        backgroundColor: [
-                            '#ef4444',
-                            '#f97316',
-                            '#eab308',
-                            '#22c55e',
-                            '#3b82f6',
-                            '#8b5cf6'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: 'white',
-                                padding: 20
+            const data = {
+                labels: ['Ăn uống', 'Mua sắm', 'Giao thông', 'Nhà ở', 'Giải trí', 'Khác'],
+                datasets: [{
+                    data: [30, 25, 15, 20, 5, 5],
+                    backgroundColor: [
+                        '#E74C3C',
+                        '#F39C12',
+                        '#F1C40F',
+                        '#2ECC71',
+                        '#3498DB',
+                        '#9B59B6'
+                    ],
+                    borderWidth: 0
+                }]
+            };
+
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 12
                             }
                         }
                     }
                 }
-            });
+            };
+
+            categoryChart = ChartUtils.createDoughnutChart(ctx, data, options);
         }
 
         // Load charts data
@@ -691,15 +591,14 @@
 
         // Utility functions
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN', {
+            return window.designSystem ? window.designSystem.formatCurrency(amount) : new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
                 currency: 'VND'
             }).format(amount);
         }
 
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('vi-VN');
+            return window.designSystem ? window.designSystem.formatDate(dateString) : new Date(dateString).toLocaleDateString('vi-VN');
         }
     </script>
 }

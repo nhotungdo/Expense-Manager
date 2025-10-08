@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MoneyTracker.Models;
@@ -25,31 +26,19 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ExpenseManagerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+// Add Authentication - Minimal configuration
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidateAudience = true,
-        ValidAudience = jwtSettings["Audience"],
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
-});
+        options.LoginPath = "/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Login";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
+        options.Cookie.Name = "MoneyTrackerAuth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    });
 
 builder.Services.AddAuthorization();
 
@@ -84,6 +73,8 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScheduledEmailService, ScheduledEmailService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<IPerformanceService, PerformanceService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
 
 // Add background services
 builder.Services.AddHostedService<EmailBackgroundService>();
@@ -114,31 +105,19 @@ app.UseStaticFiles();
 app.UseCors("AllowAll");
 app.UseRouting();
 
-// Add middleware
-app.UseMiddleware<GlobalExceptionMiddleware>();
-app.UseMiddleware<AuditMiddleware>();
-
+// Add authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Temporarily disable custom middleware to isolate the issue
+// app.UseMiddleware<GlobalExceptionMiddleware>();
+// app.UseMiddleware<AuditMiddleware>();
 
 app.MapRazorPages();
 app.MapControllers();
 
-// Add custom routes
-app.MapGet("/Account/Logout", () => Results.Redirect("/Account/Logout"));
-
 // Default route to HomePage
 app.MapGet("/", () => Results.Redirect("/HomePage"));
-
-// Main application routes
-app.MapGet("/AI", () => Results.Redirect("/AI"));
-app.MapGet("/Reports", () => Results.Redirect("/Reports"));
-app.MapGet("/Profile", () => Results.Redirect("/Profile"));
-app.MapGet("/Expenses", () => Results.Redirect("/Expenses"));
-app.MapGet("/Incomes", () => Results.Redirect("/Incomes"));
-app.MapGet("/Dashboard", () => Results.Redirect("/Dashboard"));
-app.MapGet("/Categories", () => Results.Redirect("/Categories"));
-app.MapGet("/Admin", () => Results.Redirect("/Admin"));
 
 // Ensure database is created and run migrations
 using (var scope = app.Services.CreateScope())

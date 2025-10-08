@@ -1,0 +1,518 @@
+@page
+@model MoneyTracker.Pages.TransactionsModel
+@{
+    ViewData["Title"] = "Giao Dịch";
+
+}
+
+@section Styles {
+    <style>
+        .transactions-container {
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+        }
+    </style>
+}
+
+<div class="transactions-container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-6">
+        <div>
+            <h1 class="h1 mb-2">Giao Dịch</h1>
+            <p class="text-secondary mb-0">Quản lý thu chi của bạn</p>
+        </div>
+        <div class="d-flex gap-3">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                <i class="fas fa-plus me-2"></i>
+                Thêm Giao Dịch
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <h5 class="card-title">Bộ lọc</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Loại giao dịch</label>
+                    <select class="form-control form-select" id="typeFilter">
+                        <option value="">Tất cả</option>
+                        <option value="income">Thu nhập</option>
+                        <option value="expense">Chi tiêu</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Danh mục</label>
+                    <select class="form-control form-select" id="categoryFilter">
+                        <option value="">Tất cả danh mục</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" class="form-control" id="endDate">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Tìm kiếm</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo mô tả...">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Sắp xếp</label>
+                    <select class="form-control form-select" id="sortBy">
+                        <option value="date">Ngày</option>
+                        <option value="amount">Số tiền</option>
+                        <option value="category">Danh mục</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Thứ tự</label>
+                    <select class="form-control form-select" id="sortOrder">
+                        <option value="desc">Giảm dần</option>
+                        <option value="asc">Tăng dần</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex gap-2">
+                    <button class="filter-btn active" onclick="applyFilters()">
+                        <i class="fas fa-filter me-1"></i>
+                        Áp dụng bộ lọc
+                    </button>
+                    <button class="filter-btn" onclick="clearFilters()">
+                        <i class="fas fa-times me-1"></i>
+                        Xóa bộ lọc
+                    </button>
+                </div>
+                <div class="text-white-50">
+                    Tổng: <span id="totalTransactions">0</span> giao dịch
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions List -->
+        <div id="transactionsList">
+            <!-- Loading skeleton -->
+            <div class="loading-skeleton"></div>
+            <div class="loading-skeleton"></div>
+            <div class="loading-skeleton"></div>
+            <div class="loading-skeleton"></div>
+            <div class="loading-skeleton"></div>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Transaction pagination" class="mt-4">
+            <ul class="pagination pagination-custom justify-content-center" id="pagination">
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Add Transaction Modal -->
+    <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white" id="addTransactionModalLabel">Thêm Giao Dịch Mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTransactionForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white">Loại giao dịch</label>
+                                <select class="form-select bg-transparent text-white border-secondary"
+                                    id="transactionType" required>
+                                    <option value="">Chọn loại</option>
+                                    <option value="income">Thu nhập</option>
+                                    <option value="expense">Chi tiêu</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white">Danh mục</label>
+                                <select class="form-select bg-transparent text-white border-secondary"
+                                    id="transactionCategory" required>
+                                    <option value="">Chọn danh mục</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white">Số tiền</label>
+                                <input type="number" class="form-control bg-transparent text-white border-secondary"
+                                    id="transactionAmount" placeholder="Nhập số tiền" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white">Ngày giao dịch</label>
+                                <input type="date" class="form-control bg-transparent text-white border-secondary"
+                                    id="transactionDate" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white">Mô tả</label>
+                            <textarea class="form-control bg-transparent text-white border-secondary"
+                                id="transactionNote" rows="3" placeholder="Nhập mô tả giao dịch..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTransaction()">Lưu Giao Dịch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+        <script>
+            // Global variables
+            let currentPage = 1;
+            let pageSize = 10;
+            let totalPages = 1;
+            let categories = [];
+
+            // Initialize page
+            document.addEventListener('DOMContentLoaded', function () {
+                loadCategories();
+                loadTransactions();
+                setDefaultDates();
+            });
+
+            // Set default dates
+            function setDefaultDates() {
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+                document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+                document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
+            }
+
+            // Load categories
+            async function loadCategories() {
+                try {
+                    const response = await fetch('/api/categories');
+                    if (response.ok) {
+                        categories = await response.json();
+                        populateCategorySelects();
+                    }
+                } catch (error) {
+                    console.error('Error loading categories:', error);
+                }
+            }
+
+            // Populate category selects
+            function populateCategorySelects() {
+                const filterSelect = document.getElementById('categoryFilter');
+                const modalSelect = document.getElementById('transactionCategory');
+
+                // Clear existing options
+                filterSelect.innerHTML = '<option value="">Tất cả danh mục</option>';
+                modalSelect.innerHTML = '<option value="">Chọn danh mục</option>';
+
+                categories.forEach(category => {
+                    const option1 = new Option(category.name, category.id);
+                    const option2 = new Option(category.name, category.id);
+                    filterSelect.add(option1);
+                    modalSelect.add(option2);
+                });
+            }
+
+            // Load transactions
+            async function loadTransactions(page = 1) {
+                try {
+                    currentPage = page;
+                    showLoadingState();
+
+                    const filters = getFilters();
+                    const queryParams = new URLSearchParams({
+                        page: page,
+                        pageSize: pageSize,
+                        ...filters
+                    });
+
+                    const response = await fetch(`/api/transactions?${queryParams}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        displayTransactions(data.transactions);
+                        updatePagination(data.totalPages, data.totalCount);
+                    } else {
+                        // Use mock data
+                        displayMockTransactions();
+                    }
+                } catch (error) {
+                    console.error('Error loading transactions:', error);
+                    displayMockTransactions();
+                }
+            }
+
+            // Get current filters
+            function getFilters() {
+                const filters = {};
+
+                const type = document.getElementById('typeFilter').value;
+                if (type) filters.type = type;
+
+                const category = document.getElementById('categoryFilter').value;
+                if (category) filters.categoryId = category;
+
+                const startDate = document.getElementById('startDate').value;
+                if (startDate) filters.startDate = startDate;
+
+                const endDate = document.getElementById('endDate').value;
+                if (endDate) filters.endDate = endDate;
+
+                const search = document.getElementById('searchInput').value;
+                if (search) filters.searchTerm = search;
+
+                const sortBy = document.getElementById('sortBy').value;
+                if (sortBy) filters.sortBy = sortBy;
+
+                const sortOrder = document.getElementById('sortOrder').value;
+                if (sortOrder) filters.sortOrder = sortOrder;
+
+                return filters;
+            }
+
+            // Display transactions
+            function displayTransactions(transactions) {
+                const container = document.getElementById('transactionsList');
+                container.innerHTML = '';
+
+                if (transactions.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-white-50 py-5">
+                            <i class="fas fa-receipt fa-3x mb-3"></i>
+                            <h5>Không có giao dịch nào</h5>
+                            <p>Hãy thêm giao dịch đầu tiên của bạn!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                transactions.forEach(transaction => {
+                    const transactionElement = document.createElement('div');
+                    transactionElement.className = `transaction-card ${transaction.type === 'income' ? 'transaction-income' : 'transaction-expense'}`;
+
+                    const icon = transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down';
+                    const color = transaction.type === 'income' ? 'text-success' : 'text-danger';
+                    const amountPrefix = transaction.type === 'income' ? '+' : '-';
+
+                    transactionElement.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas ${icon} ${color} fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white mb-1">${transaction.note || 'Không có mô tả'}</h6>
+                                    <small class="text-white-50">${transaction.categoryName} • ${formatDate(transaction.transactionDate)}</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <h5 class="mb-0 ${color}">${amountPrefix}${formatCurrency(transaction.amount)}</h5>
+                                <small class="text-white-50">${transaction.currency || 'VND'}</small>
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(transactionElement);
+                });
+            }
+
+            // Display mock transactions
+            function displayMockTransactions() {
+                const mockTransactions = [
+                    {
+                        id: 1,
+                        type: 'expense',
+                        amount: 500000,
+                        note: 'Ăn trưa',
+                        categoryName: 'Ăn uống',
+                        transactionDate: '2024-01-15',
+                        currency: 'VND'
+                    },
+                    {
+                        id: 2,
+                        type: 'income',
+                        amount: 15000000,
+                        note: 'Lương tháng 1',
+                        categoryName: 'Lương',
+                        transactionDate: '2024-01-14',
+                        currency: 'VND'
+                    },
+                    {
+                        id: 3,
+                        type: 'expense',
+                        amount: 2000000,
+                        note: 'Mua sắm',
+                        categoryName: 'Mua sắm',
+                        transactionDate: '2024-01-13',
+                        currency: 'VND'
+                    },
+                    {
+                        id: 4,
+                        type: 'expense',
+                        amount: 300000,
+                        note: 'Xăng xe',
+                        categoryName: 'Giao thông',
+                        transactionDate: '2024-01-12',
+                        currency: 'VND'
+                    },
+                    {
+                        id: 5,
+                        type: 'expense',
+                        amount: 1500000,
+                        note: 'Tiền nhà',
+                        categoryName: 'Nhà ở',
+                        transactionDate: '2024-01-11',
+                        currency: 'VND'
+                    }
+                ];
+
+                displayTransactions(mockTransactions);
+                updatePagination(1, mockTransactions.length);
+            }
+
+            // Update pagination
+            function updatePagination(totalPages, totalCount) {
+                this.totalPages = totalPages;
+                document.getElementById('totalTransactions').textContent = totalCount;
+
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+
+                // Previous button
+                const prevItem = document.createElement('li');
+                prevItem.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+                prevItem.innerHTML = `<a class="page-link" href="#" onclick="loadTransactions(${currentPage - 1})">Trước</a>`;
+                pagination.appendChild(prevItem);
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                        const pageItem = document.createElement('li');
+                        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                        pageItem.innerHTML = `<a class="page-link" href="#" onclick="loadTransactions(${i})">${i}</a>`;
+                        pagination.appendChild(pageItem);
+                    } else if (i === currentPage - 3 || i === currentPage + 3) {
+                        const ellipsisItem = document.createElement('li');
+                        ellipsisItem.className = 'page-item disabled';
+                        ellipsisItem.innerHTML = '<span class="page-link">...</span>';
+                        pagination.appendChild(ellipsisItem);
+                    }
+                }
+
+                // Next button
+                const nextItem = document.createElement('li');
+                nextItem.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextItem.innerHTML = `<a class="page-link" href="#" onclick="loadTransactions(${currentPage + 1})">Sau</a>`;
+                pagination.appendChild(nextItem);
+            }
+
+            // Apply filters
+            function applyFilters() {
+                currentPage = 1;
+                loadTransactions();
+            }
+
+            // Clear filters
+            function clearFilters() {
+                document.getElementById('typeFilter').value = '';
+                document.getElementById('categoryFilter').value = '';
+                document.getElementById('searchInput').value = '';
+                document.getElementById('sortBy').value = 'date';
+                document.getElementById('sortOrder').value = 'desc';
+                setDefaultDates();
+                applyFilters();
+            }
+
+            // Save transaction
+            async function saveTransaction() {
+                const form = document.getElementById('addTransactionForm');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const transactionData = {
+                    type: document.getElementById('transactionType').value,
+                    categoryId: parseInt(document.getElementById('transactionCategory').value) || null,
+                    amount: parseFloat(document.getElementById('transactionAmount').value),
+                    currency: 'VND',
+                    note: document.getElementById('transactionNote').value,
+                    transactionDate: document.getElementById('transactionDate').value
+                };
+
+                try {
+                    const response = await fetch('/api/transactions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(transactionData)
+                    });
+
+                    if (response.ok) {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addTransactionModal'));
+                        modal.hide();
+
+                        // Reset form
+                        form.reset();
+                        setDefaultDates();
+
+                        // Reload transactions
+                        loadTransactions();
+
+                        // Show success message
+                        showNotification('Giao dịch đã được thêm thành công!', 'success');
+                    } else {
+                        showNotification('Có lỗi xảy ra khi thêm giao dịch!', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error saving transaction:', error);
+                    showNotification('Có lỗi xảy ra khi thêm giao dịch!', 'error');
+                }
+            }
+
+            // Show loading state
+            function showLoadingState() {
+                const container = document.getElementById('transactionsList');
+                container.innerHTML = `
+                    <div class="loading-skeleton"></div>
+                    <div class="loading-skeleton"></div>
+                    <div class="loading-skeleton"></div>
+                    <div class="loading-skeleton"></div>
+                    <div class="loading-skeleton"></div>
+                `;
+            }
+
+            // Show notification
+            function showNotification(message, type) {
+                // You can implement a toast notification here
+                alert(message);
+            }
+
+            // Utility functions
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(amount);
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('vi-VN');
+            }
+        </script>
+}

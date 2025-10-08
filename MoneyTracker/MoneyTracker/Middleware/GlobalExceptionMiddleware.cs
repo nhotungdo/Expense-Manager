@@ -23,6 +23,14 @@ namespace MoneyTracker.Middleware
             }
             catch (Exception ex)
             {
+                // Skip exception handling for authentication-related paths to avoid redirect loops
+                var path = context.Request.Path.Value?.ToLower() ?? "";
+                if (path.Contains("/login") || path.Contains("/logout") || path.Contains("/account") ||
+                    path.Contains("/api/auth") || path.Contains("/signin") || path.Contains("/signout"))
+                {
+                    throw; // Re-throw to let authentication middleware handle it
+                }
+
                 _logger.LogError(ex, "An unhandled exception occurred");
                 await HandleExceptionAsync(context, ex);
             }
