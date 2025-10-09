@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace MoneyTracker.Models;
 
-public partial class ExpenseManagerContext : DbContext
+public partial class ExpenseManagerContext : IdentityDbContext<User, IdentityRole<long>, long>
 {
     public ExpenseManagerContext()
     {
@@ -29,8 +31,6 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
-
     public virtual DbSet<Email> Emails { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
@@ -50,6 +50,56 @@ public partial class ExpenseManagerContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Configure Identity tables with long keys
+        base.OnModelCreating(modelBuilder);
+
+        // Configure Identity tables to use long keys
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("AspNetUsers");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<IdentityRole<long>>(entity =>
+        {
+            entity.ToTable("AspNetRoles");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<IdentityUserRole<long>>(entity =>
+        {
+            entity.ToTable("AspNetUserRoles");
+            entity.HasKey(e => new { e.UserId, e.RoleId });
+        });
+
+        modelBuilder.Entity<IdentityUserClaim<long>>(entity =>
+        {
+            entity.ToTable("AspNetUserClaims");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<IdentityUserLogin<long>>(entity =>
+        {
+            entity.ToTable("AspNetUserLogins");
+            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+        });
+
+        modelBuilder.Entity<IdentityRoleClaim<long>>(entity =>
+        {
+            entity.ToTable("AspNetRoleClaims");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<IdentityUserToken<long>>(entity =>
+        {
+            entity.ToTable("AspNetUserTokens");
+            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+        });
+
         modelBuilder.Entity<AiSuggestion>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__ai_sugge__3213E83FF23784DC");
@@ -187,100 +237,7 @@ public partial class ExpenseManagerContext : DbContext
                 .HasConstraintName("FK__incomes__user_id__4D94879B");
         });
 
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__users__3213E83F4728A3A4");
-
-            entity.ToTable("users");
-
-            entity.HasIndex(e => e.Email, "UQ__users__AB6E6164C09E4075").IsUnique();
-
-            entity.HasIndex(e => e.GoogleId, "UQ__users__CCBDE7DCBD977897").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Address)
-                .HasMaxLength(500)
-                .HasColumnName("address");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
-            entity.Property(e => e.DefaultCurrency)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .HasDefaultValue("VND")
-                .HasColumnName("default_currency");
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("email");
-            entity.Property(e => e.EmailNotifications)
-                .HasDefaultValue(true)
-                .HasColumnName("email_notifications");
-            entity.Property(e => e.Enabled)
-                .HasDefaultValue(true)
-                .HasColumnName("enabled");
-            entity.Property(e => e.FullName)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("full_name");
-            entity.Property(e => e.Gender)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .HasColumnName("gender");
-            entity.Property(e => e.GoogleId)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("google_id");
-            entity.Property(e => e.Language)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .HasDefaultValue("vi")
-                .HasColumnName("language");
-            entity.Property(e => e.LastLogin)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("last_login");
-            entity.Property(e => e.Password)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("password");
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("phone_number");
-            entity.Property(e => e.PictureUrl)
-                .HasMaxLength(500)
-                .IsUnicode(false)
-                .HasColumnName("picture_url");
-            entity.Property(e => e.PushNotifications)
-                .HasDefaultValue(true)
-                .HasColumnName("push_notifications");
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasDefaultValue("USER")
-                .HasColumnName("role");
-            entity.Property(e => e.Theme)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .HasDefaultValue("light")
-                .HasColumnName("theme");
-            entity.Property(e => e.Timezone)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasDefaultValue("Asia/Ho_Chi_Minh")
-                .HasColumnName("timezone");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("username");
-        });
+        // User entity configuration is handled by Identity above
 
         modelBuilder.Entity<Email>(entity =>
         {

@@ -1,101 +1,274 @@
 @page
 @model MoneyTracker.Pages.LoginModel
 @{
-    ViewData["Title"] = "Đăng Nhập";
-
+    ViewData["Title"] = "Đăng nhập - Money Tracker";
 }
 
 @section Styles {
     <style>
-        .login-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        .login-form {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            width: 100%;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .login-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
             overflow: hidden;
         }
 
-        .login-container::before {
+        .login-image::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.3;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.1)" points="0,1000 1000,0 1000,1000"/></svg>');
+            background-size: cover;
         }
 
-        .login-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 450px;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-        }
-
-        .login-logo {
+        .login-image-content {
             text-align: center;
+            color: white;
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+        }
+
+        .login-image-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .login-image-content p {
+            font-size: 1.2rem;
+            opacity: 0.9;
             margin-bottom: 2rem;
         }
 
-        .login-logo h1 {
-            color: white;
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
+        .feature-list {
+            list-style: none;
+            text-align: left;
         }
 
-        .login-logo p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
+        .feature-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feature-list li i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .text-danger {
+            color: #dc3545;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .google-login {
+            margin-top: 1rem;
         }
 
         .google-btn {
-            background: white;
-            border: none;
-            border-radius: 15px;
-            padding: 1rem 2rem;
             width: 100%;
+            background: #fff;
             color: #333;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
+            border: 2px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            gap: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .google-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            color: #333;
-        }
-
-        .google-btn:active {
-            transform: translateY(0);
+            background: #f8f9fa;
+            border-color: #4285f4;
+            color: #4285f4;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.15);
         }
 
         .google-icon {
-            width: 24px;
-            height: 24px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%234285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="%2334A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="%23FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="%23EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>') no-repeat center;
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%234285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="%2334a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="%23fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="%23ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>') no-repeat center;
             background-size: contain;
         }
 
         .divider {
             text-align: center;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
             position: relative;
         }
 
@@ -106,437 +279,122 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: rgba(255, 255, 255, 0.3);
+            background: #ddd;
         }
 
         .divider span {
-            background: rgba(255, 255, 255, 0.1);
+            background: white;
             padding: 0 1rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: #6c757d;
             font-size: 0.9rem;
         }
 
-        .features {
-            margin-top: 2rem;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .feature-item i {
-            margin-right: 1rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .loading-spinner {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #333;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @@keyframes spin {
-            0% {
-                transform: rotate(0deg);
+        @@media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                margin: 1rem;
+                max-width: none;
             }
 
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .floating-shapes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .shape {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .shape:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            top: 60%;
-            right: 10%;
-            animation-delay: 2s;
-        }
-
-        .shape:nth-child(3) {
-            width: 60px;
-            height: 60px;
-            bottom: 20%;
-            left: 20%;
-            animation-delay: 4s;
-        }
-
-        @@keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0px);
+            .login-image {
+                order: -1;
+                min-height: 300px;
             }
 
-            50% {
-                transform: translateY(-20px);
+            .login-form {
+                padding: 2rem;
             }
-        }
 
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            color: #fca5a5;
-            display: none;
-        }
-
-        .success-message {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            color: #6ee7b7;
-            display: none;
+            .login-header h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 }
 
 <div class="login-container">
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-
-    <div class="login-card">
-        <div class="login-logo">
-            <h1>
-                <i class="fas fa-wallet me-2"></i>
-                Money Tracker
-            </h1>
-            <p>Quản lý tài chính thông minh</p>
+    <div class="login-form">
+        <div class="login-header">
+            <h1>Đăng nhập</h1>
+            <p>Chào mừng bạn quay trở lại Money Tracker</p>
         </div>
 
-        <div class="error-message" id="errorMessage">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            <span id="errorText"></span>
-        </div>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-        <div class="success-message" id="successMessage">
-            <i class="fas fa-check-circle me-2"></i>
-            <span id="successText"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="Input.Email">Email</label>
+                <input asp-for="Input.Email" class="form-control" placeholder="Nhập địa chỉ email" />
+                <span asp-validation-for="Input.Email" class="invalid-feedback"></span>
+            </div>
 
-        <button class="google-btn" onclick="loginWithGoogle()" id="googleLoginBtn">
-            <div class="google-icon"></div>
-            <span>Đăng nhập với Google</span>
-            <div class="loading-spinner" id="loadingSpinner"></div>
-        </button>
+            <div class="form-group">
+                <label asp-for="Input.Password">Mật khẩu</label>
+                <input asp-for="Input.Password" class="form-control" placeholder="Nhập mật khẩu" />
+                <span asp-validation-for="Input.Password" class="invalid-feedback"></span>
+            </div>
+
+            <div class="remember-me">
+                <input asp-for="Input.RememberMe" type="checkbox" />
+                <label asp-for="Input.RememberMe">Ghi nhớ đăng nhập</label>
+            </div>
+
+            <div class="forgot-password">
+                <a asp-page="./ForgotPassword">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i>
+                Đăng nhập
+            </button>
+        </form>
 
         <div class="divider">
             <span>Hoặc</span>
         </div>
 
-        <form id="loginForm" style="display: none;">
-            <div class="mb-3">
-                <label class="form-label text-white">Email</label>
-                <input type="email" class="form-control bg-transparent text-white border-secondary" id="email"
-                    placeholder="Nhập email của bạn">
-            </div>
-            <div class="mb-3">
-                <label class="form-label text-white">Mật khẩu</label>
-                <input type="password" class="form-control bg-transparent text-white border-secondary" id="password"
-                    placeholder="Nhập mật khẩu">
-            </div>
-            <button type="submit" class="google-btn">
-                <i class="fas fa-sign-in-alt me-2"></i>
-                Đăng nhập
-            </button>
-        </form>
+        <div class="google-login">
+            <form asp-page="/Identity/Account/ExternalLogin" method="get">
+                <input type="hidden" name="provider" value="Google" />
+                <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+                <button type="submit" class="btn google-btn">
+                    <div class="google-icon"></div>
+                    Đăng nhập với Google
+                </button>
+            </form>
+        </div>
 
-        <div class="features">
-            <h6 class="text-white mb-3">Tính năng nổi bật:</h6>
-            <div class="feature-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Theo dõi thu chi trực quan</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-robot"></i>
-                <span>Gợi ý thông minh từ AI</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-shield-alt"></i>
-                <span>Bảo mật dữ liệu tuyệt đối</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-mobile-alt"></i>
-                <span>Tương thích mọi thiết bị</span>
-            </div>
+        <div class="register-link">
+            <p>Chưa có tài khoản? <a href="/Register">Đăng ký ngay</a></p>
+        </div>
+    </div>
+
+    <div class="login-image">
+        <div class="login-image-content">
+            <h2>Quản lý tài chính thông minh</h2>
+            <p>Trải nghiệm các tính năng mạnh mẽ của Money Tracker</p>
+            <ul class="feature-list">
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>Dashboard tổng quan tài chính</span>
+                </li>
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>Phân tích chi tiêu thông minh</span>
+                </li>
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>Gợi ý AI cá nhân hóa</span>
+                </li>
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>Báo cáo tài chính chi tiết</span>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script>
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function () {
-            // Check if user is already logged in
-            checkAuthStatus();
-
-            // Setup form submission
-            document.getElementById('loginForm').addEventListener('submit', handleFormLogin);
-        });
-
-        // Check authentication status
-        function checkAuthStatus() {
-            const token = localStorage.getItem('authToken');
-            if (token) {
-                // User is already logged in, redirect to dashboard
-                window.location.href = '/Dashboard';
-            }
-        }
-
-        // Login with Google
-        async function loginWithGoogle() {
-            const btn = document.getElementById('googleLoginBtn');
-            const spinner = document.getElementById('loadingSpinner');
-            const btnText = btn.querySelector('span');
-
-            // Show loading state
-            btn.disabled = true;
-            spinner.style.display = 'block';
-            btnText.textContent = 'Đang đăng nhập...';
-
-            try {
-                // Use Google Identity Services
-                if (typeof google !== 'undefined' && google.accounts) {
-                    await handleGoogleSignIn();
-                } else {
-                    // Fallback to server-side OAuth
-                    window.location.href = '/api/auth/google-login';
-                }
-
-            } catch (error) {
-                console.error('Login error:', error);
-                showError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
-            } finally {
-                // Reset button state
-                btn.disabled = false;
-                spinner.style.display = 'none';
-                btnText.textContent = 'Đăng nhập với Google';
-            }
-        }
-
-        // Handle Google Sign-In
-        async function handleGoogleSignIn() {
-            return new Promise((resolve, reject) => {
-                google.accounts.id.initialize({
-                    client_id: '294978301369-6b2q7e4pdo503srrn6vuvv7dppqntuuv.apps.googleusercontent.com',
-                    callback: async (response) => {
-                        try {
-                            const result = await fetch('/api/auth/google-login', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ idToken: response.credential })
-                            });
-
-                            if (result.ok) {
-                                const data = await result.json();
-
-                                // Store token in localStorage for API calls
-                                localStorage.setItem('authToken', data.token);
-                                localStorage.setItem('userInfo', JSON.stringify(data.user));
-
-                                showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
-
-                                // Redirect to HomePage after successful login
-                                setTimeout(() => {
-                                    window.location.href = '/HomePage';
-                                }, 1500);
-
-                                resolve();
-                            } else {
-                                const errorData = await result.json();
-                                throw new Error(errorData.message || 'Đăng nhập thất bại');
-                            }
-                        } catch (error) {
-                            reject(error);
-                        }
-                    }
-                });
-
-                google.accounts.id.prompt();
-            });
-        }
-
-        // Simulate Google login process
-        async function simulateGoogleLogin() {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    // Simulate successful login
-                    const mockToken = 'mock-jwt-token-' + Date.now();
-                    localStorage.setItem('authToken', mockToken);
-                    localStorage.setItem('userInfo', JSON.stringify({
-                        id: 1,
-                        name: 'Nguyễn Văn A',
-                        email: 'user@example.com',
-                        picture: 'https://via.placeholder.com/100'
-                    }));
-                    resolve();
-                }, 2000);
-            });
-        }
-
-        // Handle form login
-        async function handleFormLogin(event) {
-            event.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                showError('Vui lòng nhập đầy đủ thông tin.');
-                return;
-            }
-
-            try {
-                // Simulate API call
-                await simulateFormLogin(email, password);
-                showSuccess('Đăng nhập thành công!');
-                setTimeout(() => {
-                    window.location.href = '/Dashboard';
-                }, 1500);
-            } catch (error) {
-                showError('Email hoặc mật khẩu không đúng.');
-            }
-        }
-
-        // Simulate form login
-        async function simulateFormLogin(email, password) {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    // Simple validation for demo
-                    if (email === 'admin@moneytracker.com' && password === 'admin123') {
-                        const mockToken = 'mock-jwt-token-' + Date.now();
-                        localStorage.setItem('authToken', mockToken);
-                        localStorage.setItem('userInfo', JSON.stringify({
-                            id: 1,
-                            name: 'Administrator',
-                            email: email,
-                            role: 'ADMIN'
-                        }));
-                        resolve();
-                    } else {
-                        reject(new Error('Invalid credentials'));
-                    }
-                }, 1000);
-            });
-        }
-
-        // Show error message
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            const successDiv = document.getElementById('successMessage');
-
-            errorText.textContent = message;
-            errorDiv.style.display = 'block';
-            successDiv.style.display = 'none';
-
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
-        }
-
-        // Show success message
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            const successText = document.getElementById('successText');
-            const errorDiv = document.getElementById('errorMessage');
-
-            successText.textContent = message;
-            successDiv.style.display = 'block';
-            errorDiv.style.display = 'none';
-
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                successDiv.style.display = 'none';
-            }, 3000);
-        }
-
-        // Handle Google OAuth callback (if implemented)
-        function handleGoogleCallback() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const error = urlParams.get('error');
-
-            if (error) {
-                showError('Đăng nhập bị từ chối hoặc có lỗi xảy ra.');
-                return;
-            }
-
-            if (code) {
-                // Exchange code for token
-                exchangeCodeForToken(code);
-            }
-        }
-
-        // Exchange authorization code for access token
-        async function exchangeCodeForToken(code) {
-            try {
-                const response = await fetch('/api/auth/google/callback', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ code: code })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('userInfo', JSON.stringify(data.user));
-                    window.location.href = '/Dashboard';
-                } else {
-                    showError('Có lỗi xảy ra khi xác thực.');
-                }
-            } catch (error) {
-                console.error('Token exchange error:', error);
-                showError('Có lỗi xảy ra khi xác thực.');
-            }
-        }
-
-        // Check for OAuth callback on page load
-        if (window.location.search.includes('code=') || window.location.search.includes('error=')) {
-            handleGoogleCallback();
-        }
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 }

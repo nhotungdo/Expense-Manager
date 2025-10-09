@@ -64,7 +64,7 @@ namespace MoneyTracker.Controllers
                     {
                         GoogleId = payload.Subject,
                         Email = payload.Email,
-                        Username = payload.Email.Split('@')[0],
+                        UserName = payload.Email.Split('@')[0],
                         FullName = payload.Name,
                         PictureUrl = payload.Picture,
                         Role = isDefaultAdmin ? "ADMIN" : "USER",
@@ -104,7 +104,7 @@ namespace MoneyTracker.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.Role),
                     new Claim("GoogleId", user.GoogleId)
@@ -129,7 +129,7 @@ namespace MoneyTracker.Controllers
                     User = new UserDto
                     {
                         Id = user.Id,
-                        Username = user.Username,
+                        Username = user.UserName,
                         Email = user.Email,
                         FullName = user.FullName,
                         PictureUrl = user.PictureUrl,
@@ -203,7 +203,7 @@ namespace MoneyTracker.Controllers
                 return Ok(new UserDto
                 {
                     Id = user.Id,
-                    Username = user.Username,
+                    Username = user.UserName,
                     Email = user.Email,
                     FullName = user.FullName,
                     PictureUrl = user.PictureUrl,
@@ -228,7 +228,7 @@ namespace MoneyTracker.Controllers
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim("GoogleId", user.GoogleId)

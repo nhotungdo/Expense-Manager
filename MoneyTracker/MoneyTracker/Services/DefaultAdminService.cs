@@ -27,7 +27,7 @@ namespace MoneyTracker.Services
                     var adminUser = new User
                     {
                         GoogleId = "admin_default_google_id",
-                        Username = "nhotungdo89",
+                        UserName = "nhotungdo89",
                         Email = adminEmail,
                         FullName = "Admin User",
                         PictureUrl = "",

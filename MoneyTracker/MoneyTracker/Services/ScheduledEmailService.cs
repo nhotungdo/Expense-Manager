@@ -164,7 +164,7 @@ namespace MoneyTracker.Services
                         <body style='font-family: Arial, sans-serif; margin: 20px;'>
                             <div style='background-color: #f8f9fa; padding: 20px; border-radius: 10px;'>
                                 <h2 style='color: #007bff;'>📊 Tóm tắt tuần</h2>
-                                <p>Xin chào {user.FullName ?? user.Username},</p>
+                                <p>Xin chào {user.FullName ?? user.UserName},</p>
                                 
                                 <div style='background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0;'>
                                     <h3 style='color: #495057; margin-top: 0;'>Tóm tắt tuần qua</h3>

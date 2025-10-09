@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using MoneyTracker.Models;
 using MoneyTracker.Models.DTOs;
@@ -12,11 +13,13 @@ namespace MoneyTracker.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly ExpenseManagerContext _context;
+        private readonly UserManager<User> _userManager;
         private readonly ILogger<ProfileController> _logger;
 
-        public ProfileController(ExpenseManagerContext context, ILogger<ProfileController> logger)
+        public ProfileController(ExpenseManagerContext context, UserManager<User> userManager, ILogger<ProfileController> logger)
         {
             _context = context;
+            _userManager = userManager;
             _logger = logger;
         }
 
@@ -55,7 +58,7 @@ namespace MoneyTracker.Controllers
                 var profileData = new
                 {
                     id = user.Id,
-                    username = user.Username,
+                    username = user.UserName,
                     email = user.Email,
                     fullName = user.FullName,
                     phoneNumber = user.PhoneNumber,
@@ -153,10 +156,14 @@ namespace MoneyTracker.Controllers
                     return BadRequest("New password is required");
                 }
 
-                // Hash the password before storing (using built-in .NET hashing)
-                user.Password = Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(passwordDto.NewPassword)));
+                // Use UserManager to change password
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, passwordDto.NewPassword);
 
-                await _context.SaveChangesAsync();
+                if (!result.Succeeded)
+                {
+                    return BadRequest("Failed to change password");
+                }
 
                 _logger.LogInformation("Changed password for user {UserId}", userId);
 
@@ -268,10 +275,16 @@ namespace MoneyTracker.Controllers
                     return NotFound("User not found");
                 }
 
-                // Verify password (in a real application, you would verify the password)
+                // Verify password using UserManager
                 if (string.IsNullOrEmpty(deleteDto.Password))
                 {
                     return BadRequest("Password is required to delete account");
+                }
+
+                var passwordValid = await _userManager.CheckPasswordAsync(user, deleteDto.Password);
+                if (!passwordValid)
+                {
+                    return BadRequest("Invalid password");
                 }
 
                 // Check if user has transactions

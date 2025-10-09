@@ -16,18 +16,16 @@ namespace MoneyTracker.Pages
 
         public IActionResult OnGet()
         {
-
-
-            
+            // If user is authenticated, redirect to dashboard
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Dashboard");
+            }
 
             // Set page metadata
-            ViewData["Title"] = "Home - MoneyTracker";
-            ViewData["Description"] = "Dashboard tổng quan tài chính cá nhân";
-            ViewData["Keywords"] = "homepage, dashboard, tài chính, tổng quan";
-
-            // Set user data for the view
-            ViewData["UserName"] = GetCurrentUserName();
-            ViewData["UserEmail"] = GetCurrentUserEmail();
+            ViewData["Title"] = "Money Tracker - Quản lý tài chính thông minh";
+            ViewData["Description"] = "Ứng dụng quản lý tài chính cá nhân thông minh với AI";
+            ViewData["Keywords"] = "homepage, landing page, tài chính, quản lý tiền bạc, AI";
 
             return Page();
         }
@@ -44,7 +42,7 @@ namespace MoneyTracker.Pages
 
         public string GetCurrentUserName()
         {
-            return User.FindFirst(ClaimTypes.Name)?.Value ?? "User";
+            return User.FindFirst(ClaimTypes.Name)?.Value ?? User.FindFirst("UserName")?.Value ?? "User";
         }
 
         public string GetCurrentUserRole()

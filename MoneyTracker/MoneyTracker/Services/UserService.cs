@@ -39,7 +39,7 @@ namespace MoneyTracker.Services
         {
             var user = new User
             {
-                Username = userDto.Username,
+                UserName = userDto.Username,
                 Email = userDto.Email,
                 FullName = userDto.FullName,
                 GoogleId = userDto.GoogleId,
@@ -75,7 +75,7 @@ namespace MoneyTracker.Services
             var oldEmail = user.Email;
             var oldFullName = user.FullName;
 
-            user.Username = userDto.Username ?? user.Username;
+            user.UserName = userDto.Username ?? user.UserName;
             user.Email = userDto.Email ?? user.Email;
             user.FullName = userDto.FullName ?? user.FullName;
             user.PictureUrl = userDto.PictureUrl ?? user.PictureUrl;

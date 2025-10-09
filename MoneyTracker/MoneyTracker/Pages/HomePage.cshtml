@@ -1,763 +1,838 @@
 @page
 @model MoneyTracker.Pages.HomePageModel
 @{
-    ViewData["Title"] = "Home";
-
+    ViewData["Title"] = "Money Tracker - Quản lý tài chính thông minh";
 }
 
 @section Styles {
     <style>
-        /* Homepage specific styles */
-        .homepage-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
             left: 0;
-            height: 100vh;
-            width: 280px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            right: 0;
             z-index: 1000;
             transition: all 0.3s ease;
         }
 
-        .sidebar-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .sidebar-logo {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-decoration: none;
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
-        .sidebar-logo i {
+        .logo i {
+            color: #667eea;
             font-size: 2rem;
-            color: #ffd700;
         }
 
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-
-        .nav-item {
-            margin: 0.25rem 0;
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
         }
 
         .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.3s ease;
-            border-radius: 0 25px 25px 0;
-            margin-right: 1rem;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .nav-link i {
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            margin-left: 280px;
-            min-height: 100vh;
-            background: #f8f9fa;
-        }
-
-        .content-header {
-            background: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .welcome-section {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .welcome-text h1 {
             color: #2c3e50;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
         }
 
-        .welcome-text p {
-            color: #6c757d;
-            margin: 0.5rem 0 0 0;
+        .nav-link:hover {
+            color: #667eea;
         }
 
-        .quick-actions {
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
             display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
         }
 
-        .quick-action-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
+        .btn {
             padding: 0.75rem 1.5rem;
+            border: none;
             border-radius: 25px;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
-            display: flex;
+            cursor: pointer;
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .quick-action-btn:hover {
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
-        /* Dashboard Cards */
-        .dashboard-grid {
-            padding: 0 2rem 2rem 2rem;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .main-widget {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .widget-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .metric-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 1.5rem;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .metric-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .income {
-            color: #28a745;
-        }
-
-        .expense {
-            color: #dc3545;
-        }
-
-        .savings {
-            color: #17a2b8;
-        }
-
-        .chart-container {
-            height: 300px;
+        .user-menu {
             position: relative;
         }
 
-        /* Secondary Cards */
-        .secondary-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .secondary-card {
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
             background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
         }
 
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .user-menu:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
             color: #2c3e50;
-            margin-bottom: 1rem;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .account-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .account-item:last-child {
-            border-bottom: none;
-        }
-
-        .account-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .account-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .account-name {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        .account-balance {
-            font-weight: 600;
-            color: #28a745;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-
-        .transaction-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .transaction-category {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.8rem;
-        }
-
-        .transaction-details {
-            flex: 1;
-        }
-
-        .transaction-description {
-            font-weight: 500;
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-
-        .transaction-category-name {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-
-        .transaction-amount {
-            font-weight: 600;
-        }
-
-        .transaction-income {
-            color: #28a745;
-        }
-
-        .transaction-expense {
-            color: #dc3545;
-        }
-
-        .budget-item {
-            margin-bottom: 1rem;
-        }
-
-        .budget-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .budget-category {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        .budget-amount {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .progress {
-            height: 8px;
-            border-radius: 4px;
-            background: #e9ecef;
+            position: relative;
             overflow: hidden;
         }
 
-        .progress-bar {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.1)" points="0,1000 1000,0 1000,1000"/></svg>');
+            background-size: cover;
         }
 
-        .progress-success {
-            background: #28a745;
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
         }
 
-        .progress-warning {
-            background: #ffc107;
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
         }
 
-        .progress-danger {
-            background: #dc3545;
+        .hero-text p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .floating-card {
+            position: absolute;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .floating-card:nth-child(1) {
+            top: 10%;
+            right: -10%;
+            animation-delay: 0s;
+        }
+
+        .floating-card:nth-child(2) {
+            bottom: 20%;
+            left: -10%;
+            animation-delay: 1s;
+        }
+
+        @@keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            color: #6c757d;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Feature Link Styles */
+        .feature-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .feature-link:hover .feature-action {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .feature-action {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #667eea;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feature-action i {
+            font-size: 0.9rem;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 6rem 0;
+            text-align: center;
+            color: white;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #667eea;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         /* Responsive Design */
-        @@media (max-width: 1200px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         @@media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
+            .nav-menu {
+                display: none;
             }
 
-            .main-content {
-                margin-left: 0;
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
             }
 
-            .content-header {
-                padding: 1rem;
+            .hero-text h1 {
+                font-size: 2.5rem;
             }
 
-            .dashboard-grid {
-                padding: 0 1rem 1rem 1rem;
+            .hero-buttons {
+                justify-content: center;
             }
 
-            .metrics-grid {
+            .floating-card {
+                display: none;
+            }
+
+            .features-grid {
                 grid-template-columns: 1fr;
             }
 
-            .welcome-section {
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .cta h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .hero-buttons {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center;
             }
 
-            .quick-actions {
+            .btn {
                 width: 100%;
-                justify-content: flex-start;
-            }
-        }
-
-        /* Loading Animation */
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @@keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
+                max-width: 300px;
+                justify-content: center;
             }
         }
     </style>
 }
 
-<div class="homepage-container">
-    <!-- Left Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <a href="/HomePage" class="sidebar-logo">
-                <i class="fas fa-wallet"></i>
-                Money Tracker
+<!-- Navigation Bar -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">
+            <i class="fas fa-wallet"></i>
+            Money Tracker
+        </a>
+
+        <ul class="nav-menu">
+            <li><a href="#home" class="nav-link">Trang chủ</a></li>
+            <li><a href="#features" class="nav-link">Tính năng</a></li>
+            <li><a href="#about" class="nav-link">Giới thiệu</a></li>
+            <li><a href="#contact" class="nav-link">Liên hệ</a></li>
+        </ul>
+
+        <div class="nav-buttons">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <!-- User Menu Dropdown -->
+                <div class="user-menu">
+                    <a href="#" class="btn btn-outline dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i>
+                        @Model.GetCurrentUserName()
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" asp-page="/Dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-page="/Profile">
+                                <i class="fas fa-user-circle"></i>
+                                Hồ sơ
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-page="/Identity/Account/Logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <!-- Guest User Buttons -->
+                <a asp-page="/Identity/Account/Login" class="btn btn-outline">Đăng nhập</a>
+                <a asp-page="/Identity/Account/Register" class="btn btn-primary">Đăng ký</a>
+            }
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1>Quản lý tài chính cá nhân thông minh và dễ dàng</h1>
+            <p>Money Tracker giúp bạn theo dõi thu chi, lập ngân sách và đạt được mục tiêu tài chính một cách hiệu quả.
+                Trải nghiệm quản lý tiền bạc thông minh với AI.</p>
+            <div class="hero-buttons">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <!-- Authenticated User CTA -->
+                    <a asp-page="/Dashboard" class="btn btn-primary btn-lg">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Đi đến Dashboard
+                    </a>
+                    <a href="#features" class="btn btn-outline btn-lg">
+                        <i class="fas fa-play"></i>
+                        Khám phá tính năng
+                    </a>
+                }
+                else
+                {
+                    <!-- Guest User CTA -->
+                    <a asp-page="/Identity/Account/Register" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket"></i>
+                        Bắt đầu ngay
+                    </a>
+                    <a href="#features" class="btn btn-outline btn-lg">
+                        <i class="fas fa-play"></i>
+                        Tìm hiểu thêm
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="https://via.placeholder.com/600x400/667eea/ffffff?text=Money+Tracker+Dashboard"
+                alt="Money Tracker Dashboard">
+            <div class="floating-card">
+                <h4>Thu nhập tháng này</h4>
+                <p class="text-success">+15,000,000 VND</p>
+            </div>
+            <div class="floating-card">
+                <h4>Tiết kiệm</h4>
+                <p class="text-primary">3,200,000 VND</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features" id="features">
+    <div class="container">
+        <div class="section-title">
+            <h2>Tính năng nổi bật</h2>
+            <p>Khám phá những tính năng mạnh mẽ giúp bạn quản lý tài chính hiệu quả</p>
+        </div>
+
+        <div class="features-grid">
+            <!-- Quản lý Giao dịch -->
+            <a asp-page="/Transactions" class="feature-card feature-link">
+                <div class="feature-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3>Quản lý Giao dịch</h3>
+                <p>Ghi chép và phân tích thu nhập, chi tiêu một cách chi tiết với biểu đồ trực quan và báo cáo thông
+                    minh.</p>
+                <div class="feature-action">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Xem giao dịch</span>
+                </div>
+            </a>
+
+            <!-- Thiết lập Ngân sách -->
+            <a asp-page="/Budgets" class="feature-card feature-link">
+                <div class="feature-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <h3>Thiết lập Ngân sách</h3>
+                <p>Tạo và quản lý ngân sách theo danh mục, nhận cảnh báo khi vượt quá giới hạn chi tiêu.</p>
+                <div class="feature-action">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Tạo ngân sách</span>
+                </div>
+            </a>
+
+            <!-- Tạo Danh mục -->
+            <a asp-page="/Categories" class="feature-card feature-link">
+                <div class="feature-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h3>Tạo Danh mục</h3>
+                <p>Phân loại và tổ chức các khoản thu chi theo danh mục để dễ dàng theo dõi và quản lý.</p>
+                <div class="feature-action">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Quản lý danh mục</span>
+                </div>
+            </a>
+
+            <!-- Xem Báo cáo -->
+            <a asp-page="/Reports" class="feature-card feature-link">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>Xem Báo cáo</h3>
+                <p>Báo cáo tài chính chi tiết với biểu đồ trực quan, giúp bạn hiểu rõ tình hình tài chính.</p>
+                <div class="feature-action">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Xem báo cáo</span>
+                </div>
+            </a>
+
+            <!-- Gợi ý từ AI -->
+            <a asp-page="/Suggestions" class="feature-card feature-link">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Gợi ý từ AI</h3>
+                <p>Nhận lời khuyên tài chính cá nhân hóa từ AI, phân tích thói quen chi tiêu và đề xuất cải thiện.</p>
+                <div class="feature-action">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Xem gợi ý</span>
+                </div>
+            </a>
+
+            <!-- Hồ sơ người dùng -->
+            <a asp-page="/Profile" class="feature-card feature-link">
+                <div class="feature-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3>Hồ sơ người dùng</h3>
+                <p>Quản lý thông tin cá nhân, cài đặt tài khoản và tùy chỉnh trải nghiệm sử dụng.</p>
+                <div class="feature-action">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Cập nhật hồ sơ</span>
+                </div>
             </a>
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-item">
-                <a href="/HomePage" class="nav-link active">
-                    <i class="fas fa-home"></i>
-                    Dashboard
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Transactions" class="nav-link">
-                    <i class="fas fa-exchange-alt"></i>
-                    Transactions
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Reports" class="nav-link">
-                    <i class="fas fa-chart-bar"></i>
-                    Reports
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Budgets" class="nav-link">
-                    <i class="fas fa-piggy-bank"></i>
-                    Budgets
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Profile" class="nav-link">
-                    <i class="fas fa-user-circle"></i>
-                    Accounts
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/AI" class="nav-link">
-                    <i class="fas fa-robot"></i>
-                    AI
-                </a>
-            </div>
-        </nav>
     </div>
+</section>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header Section -->
-        <div class="content-header">
-            <div class="welcome-section">
-                <div class="welcome-text">
-                    <h1>Welcome back, @Model.GetCurrentUserName()!</h1>
-                    <p>Here's your financial overview for today</p>
-                </div>
-                <div class="quick-actions">
-                    <a href="/Incomes" class="quick-action-btn">
-                        <i class="fas fa-plus"></i>
-                        Add Income
-                    </a>
-                    <a href="/Expenses" class="quick-action-btn">
-                        <i class="fas fa-minus"></i>
-                        Add Expense
-                    </a>
-                    <a href="/Transactions" class="quick-action-btn">
-                        <i class="fas fa-exchange-alt"></i>
-                        Transfer Funds
-                    </a>
-                    <a href="/Reports" class="quick-action-btn">
-                        <i class="fas fa-chart-line"></i>
-                        View Reports
-                    </a>
-                </div>
+<!-- CTA Section -->
+<section class="cta" id="about">
+    <div class="container">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <h2>Khám phá thêm các tính năng mạnh mẽ!</h2>
+            <p>Bạn đã sẵn sàng để tận dụng tối đa các công cụ quản lý tài chính thông minh của Money Tracker</p>
+            <a asp-page="/Dashboard" class="btn btn-primary">
+                <i class="fas fa-tachometer-alt"></i>
+                Đi đến Dashboard
+            </a>
+        }
+        else
+        {
+            <h2>Sẵn sàng bắt đầu hành trình tài chính thông minh?</h2>
+            <p>Tham gia cùng hàng nghìn người dùng đã tin tưởng Money Tracker để quản lý tài chính cá nhân</p>
+            <a asp-page="/Identity/Account/Register" class="btn btn-primary">
+                <i class="fas fa-rocket"></i>
+                Đăng ký ngay hôm nay
+            </a>
+        }
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer" id="contact">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Money Tracker</h3>
+                <p>Ứng dụng quản lý tài chính cá nhân thông minh, giúp bạn kiểm soát chi tiêu và đạt được mục tiêu tài
+                    chính.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Tính năng</h3>
+                <ul>
+                    <li><a href="#">Theo dõi thu chi</a></li>
+                    <li><a href="#">Lập ngân sách</a></li>
+                    <li><a href="#">Báo cáo tài chính</a></li>
+                    <li><a href="#">Gợi ý AI</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Hỗ trợ</h3>
+                <ul>
+                    <li><a href="#">Trung tâm trợ giúp</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Liên hệ</h3>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> support@moneytracker.com</li>
+                    <li><i class="fas fa-phone"></i> +84 123 456 789</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Hà Nội, Việt Nam</li>
+                </ul>
             </div>
         </div>
 
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- Main Widget -->
-            <div class="main-widget">
-                <h2 class="widget-title">
-                    <i class="fas fa-chart-pie"></i>
-                    This Month's Overview
-                </h2>
-
-                <!-- Metrics -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value income" id="totalIncome">15,500,000</div>
-                        <div class="metric-label">Total Income</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value expense" id="totalExpense">12,300,000</div>
-                        <div class="metric-label">Total Expenses</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value savings" id="netSavings">3,200,000</div>
-                        <div class="metric-label">Net Savings</div>
-                    </div>
-                </div>
-
-                <!-- Chart -->
-                <div class="chart-container">
-                    <canvas id="cashFlowChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Secondary Cards -->
-            <div class="secondary-cards">
-                <!-- My Accounts Card -->
-                <div class="secondary-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-credit-card"></i>
-                        My Accounts
-                    </h3>
-                    <div class="account-item">
-                        <div class="account-info">
-                            <div class="account-icon" style="background: #28a745;">C</div>
-                            <div class="account-name">Cash</div>
-                        </div>
-                        <div class="account-balance">2,500,000 VND</div>
-                    </div>
-                    <div class="account-item">
-                        <div class="account-info">
-                            <div class="account-icon" style="background: #007bff;">B</div>
-                            <div class="account-name">Bank Account</div>
-                        </div>
-                        <div class="account-balance">8,750,000 VND</div>
-                    </div>
-                    <div class="account-item">
-                        <div class="account-info">
-                            <div class="account-icon" style="background: #dc3545;">CC</div>
-                            <div class="account-name">Credit Card</div>
-                        </div>
-                        <div class="account-balance">-1,200,000 VND</div>
-                    </div>
-                </div>
-
-                <!-- Recent Transactions Card -->
-                <div class="secondary-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-history"></i>
-                        Recent Transactions
-                    </h3>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #28a745;">F</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Salary</div>
-                                <div class="transaction-category-name">Income</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-income">+15,000,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #ffc107;">F</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Grocery Shopping</div>
-                                <div class="transaction-category-name">Food</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-450,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #17a2b8;">T</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Gas Station</div>
-                                <div class="transaction-category-name">Transport</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-200,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #6f42c1;">E</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Netflix Subscription</div>
-                                <div class="transaction-category-name">Entertainment</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-180,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #fd7e14;">U</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Electricity Bill</div>
-                                <div class="transaction-category-name">Utilities</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-350,000</div>
-                    </div>
-                </div>
-
-                <!-- Budget Status Card -->
-                <div class="secondary-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-line"></i>
-                        Budget Status
-                    </h3>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Food</span>
-                            <span class="budget-amount">450,000 / 600,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-warning" style="width: 75%"></div>
-                        </div>
-                    </div>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Transport</span>
-                            <span class="budget-amount">200,000 / 300,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-success" style="width: 67%"></div>
-                        </div>
-                    </div>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Entertainment</span>
-                            <span class="budget-amount">180,000 / 200,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-warning" style="width: 90%"></div>
-                        </div>
-                    </div>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Utilities</span>
-                            <span class="budget-amount">350,000 / 400,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-success" style="width: 88%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Money Tracker. Tất cả quyền được bảo lưu.</p>
         </div>
     </div>
-</div>
+</footer>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap JS for dropdown functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Cash Flow Chart
-        const ctx = document.getElementById('cashFlowChart').getContext('2d');
-        const cashFlowChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [{
-                    label: 'Income',
-                    data: [3.5, 4.2, 3.8, 4.0],
-                    borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }, {
-                    label: 'Expenses',
-                    data: [2.8, 3.1, 3.2, 3.2],
-                    borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Cash Flow Trend (Last 30 Days)'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function (value) {
-                                return value + 'M VND';
-                            }
-                        }
-                    }
-                }
+        // Navbar scroll effect
+        window.addEventListener('scroll', function () {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
             }
         });
 
-        // Format numbers with commas
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        // Update metrics with formatted numbers
-        document.getElementById('totalIncome').textContent = formatNumber(15500000) + ' VND';
-        document.getElementById('totalExpense').textContent = formatNumber(12300000) + ' VND';
-        document.getElementById('netSavings').textContent = formatNumber(3200000) + ' VND';
-
-        // Add loading animation to cards
-        document.addEventListener('DOMContentLoaded', function () {
-            const cards = document.querySelectorAll('.secondary-card, .main-widget');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             });
         });
 
-        // Mobile sidebar toggle (if needed)
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('show');
-        }
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe feature cards
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Initialize Bootstrap dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        });
     </script>
 }

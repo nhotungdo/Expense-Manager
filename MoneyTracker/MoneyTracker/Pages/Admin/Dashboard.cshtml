@@ -1,325 +1,566 @@
 @page
 @model MoneyTracker.Pages.Admin.DashboardModel
 @{
-    ViewData["Title"] = "Admin Dashboard - Money Tracking";
+    ViewData["Title"] = "Admin Dashboard - Money Tracker";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-logo i {
+            font-size: 2rem;
+            color: #e74c3c;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0 25px 25px 0;
+            margin-right: 1rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        .content-header {
+            background: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .welcome-text p {
+            color: #6c757d;
+            margin: 0.5rem 0 0 0;
+        }
+
+        /* Admin Stats Grid */
+        .admin-stats {
+            padding: 0 2rem 2rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .users-icon {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .revenue-icon {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .transactions-icon {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .growth-icon {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            padding: 0 2rem 2rem 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Users Table */
+        .users-table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin: 0 2rem 2rem 2rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 1200px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-header {
+                padding: 1rem;
+            }
+
+            .admin-stats {
+                padding: 0 1rem 1rem 1rem;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .charts-section {
+                padding: 0 1rem 1rem 1rem;
+            }
+
+            .users-table-card {
+                margin: 0 1rem 1rem 1rem;
+            }
+
+            .welcome-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 }
 
-<div class="admin-dashboard-container">
-    <!-- Header -->
-    <div class="admin-header">
-        <div>
-            <h1>Admin Dashboard</h1>
-            <p>Quản lý hệ thống và người dùng Money Tracking</p>
-        </div>
-        <div class="admin-actions">
-            <button class="admin-btn admin-btn-primary" onclick="refreshAdminDashboard()">
-                <i class="fas fa-sync-alt"></i> Làm mới
-            </button>
-            <button class="admin-btn admin-btn-success" onclick="exportSystemReport()">
-                <i class="fas fa-download"></i> Xuất báo cáo
-            </button>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card users">
-            <div class="stat-header">
-                <div class="stat-title">Tổng người dùng</div>
-                <div class="stat-icon users">
-                    <i class="fas fa-users"></i>
-                </div>
-            </div>
-            <div class="stat-value" id="totalUsers">0</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+12% so với tháng trước</span>
-            </div>
-        </div>
-        <div class="stat-card active">
-            <div class="stat-header">
-                <div class="stat-title">User hoạt động</div>
-                <div class="stat-icon active">
-                    <i class="fas fa-user-check"></i>
-                </div>
-            </div>
-            <div class="stat-value" id="activeUsers">0</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+8% so với tuần trước</span>
-            </div>
-        </div>
-        <div class="stat-card new">
-            <div class="stat-header">
-                <div class="stat-title">User mới (7 ngày)</div>
-                <div class="stat-icon new">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-            </div>
-            <div class="stat-value" id="newUsers">0</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+5 người mới</span>
-            </div>
-        </div>
-        <div class="stat-card ai">
-            <div class="stat-header">
-                <div class="stat-title">Gợi ý AI</div>
-                <div class="stat-icon ai">
-                    <i class="fas fa-robot"></i>
-                </div>
-            </div>
-            <div class="stat-value" id="totalAISuggestions">0</div>
-            <div class="stat-change neutral">
-                <i class="fas fa-minus"></i>
-                <span>Không thay đổi</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Section -->
-    <div class="charts-section">
-        <!-- User Registration Chart -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <div class="chart-title">
-                    <div class="chart-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    Đăng ký người dùng theo tháng
-                </div>
-                <div class="chart-actions">
-                    <button class="chart-btn">Xuất</button>
-                    <button class="chart-btn">Làm mới</button>
-                </div>
-            </div>
-            <canvas id="userRegistrationChart" height="300"></canvas>
-        </div>
-
-        <!-- System Activity Chart -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <div class="chart-title">
-                    <div class="chart-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    Hoạt động hệ thống
-                </div>
-                <div class="chart-actions">
-                    <button class="chart-btn">Xuất</button>
-                    <button class="chart-btn">Làm mới</button>
-                </div>
-            </div>
-            <canvas id="systemActivityChart" height="300"></canvas>
-        </div>
-    </div>
-
-    <!-- Management Section -->
-    <div class="management-section">
-        <!-- User Management -->
-        <div class="management-card">
-            <div class="management-header">
-                <div class="management-title">
-                    <i class="fas fa-users"></i>
-                    Quản lý người dùng
-                </div>
-                <div class="management-actions">
-                    <button class="management-btn" onclick="loadUsers()">
-                        <i class="fas fa-sync-alt"></i>
-                        Làm mới
-                    </button>
-                    <a href="/Admin/Users" class="management-btn management-btn primary">
-                        <i class="fas fa-eye"></i>
-                        Xem tất cả
-                    </a>
-                </div>
-            </div>
-            <div class="management-content">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Người dùng</th>
-                            <th>Email</th>
-                            <th>Vai trò</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                        <!-- Users will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- AI Suggestions Monitoring -->
-        <div class="management-card">
-            <div class="management-header">
-                <div class="management-title">
-                    <i class="fas fa-robot"></i>
-                    Gợi ý AI gần nhất
-                </div>
-                <div class="management-actions">
-                    <button class="management-btn" onclick="loadAISuggestions()">
-                        <i class="fas fa-sync-alt"></i>
-                        Làm mới
-                    </button>
-                </div>
-            </div>
-            <div class="management-content">
-                <div id="aiSuggestionsList">
-                    <!-- AI suggestions will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- System Management -->
-    <div class="row mb-4">
-        <!-- Global Categories Management -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-tags me-2"></i>Quản lý danh mục toàn cục
-                    </h5>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-sm btn-outline-primary" onclick="loadGlobalCategories()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="btn btn-sm btn-success" onclick="showAddCategoryModal()">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Tên danh mục</th>
-                                    <th>Loại</th>
-                                    <th>Mô tả</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="globalCategoriesTable">
-                                <!-- Global categories will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Logs -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-clipboard-list me-2"></i>Nhật ký hệ thống
-                    </h5>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-sm btn-outline-primary" onclick="loadSystemLogs()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="btn btn-sm btn-info" onclick="downloadLogs()">
-                            <i class="fas fa-download"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Thời gian</th>
-                                    <th>Loại</th>
-                                    <th>Mô tả</th>
-                                </tr>
-                            </thead>
-                            <tbody id="systemLogsTable">
-                                <!-- System logs will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="quick-actions-section">
-        <div class="quick-actions-grid">
-            <a href="/Admin/Users" class="quick-action-card">
-                <div class="quick-action-icon users">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="quick-action-title">Quản lý người dùng</div>
-                <div class="quick-action-desc">Xem và quản lý tất cả người dùng</div>
+<div class="admin-container">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="fas fa-shield-alt"></i>
+                Admin Panel
             </a>
-            <button class="quick-action-card" onclick="showAddCategoryModal()">
-                <div class="quick-action-icon categories">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <div class="quick-action-title">Thêm danh mục</div>
-                <div class="quick-action-desc">Tạo danh mục mới cho hệ thống</div>
-            </button>
-            <button class="quick-action-card" onclick="loadSystemLogs()">
-                <div class="quick-action-icon logs">
-                    <i class="fas fa-clipboard-list"></i>
-                </div>
-                <div class="quick-action-title">Xem nhật ký</div>
-                <div class="quick-action-desc">Theo dõi hoạt động hệ thống</div>
-            </button>
-            <button class="quick-action-card" onclick="exportSystemReport()">
-                <div class="quick-action-icon reports">
-                    <i class="fas fa-file-export"></i>
-                </div>
-                <div class="quick-action-title">Xuất báo cáo</div>
-                <div class="quick-action-desc">Tạo báo cáo tổng hợp</div>
-            </button>
         </div>
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="/Admin/Dashboard" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/Admin/Users" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    Users
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/Admin/Transactions" class="nav-link">
+                    <i class="fas fa-exchange-alt"></i>
+                    Transactions
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/Admin/Reports" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    Reports
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/Admin/Settings" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/Dashboard" class="nav-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to App
+                </a>
+            </div>
+        </nav>
     </div>
-</div>
 
-<!-- Add Category Modal -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Thêm danh mục toàn cục</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header Section -->
+        <div class="content-header">
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h1>Admin Dashboard</h1>
+                    <p>Quản lý hệ thống Money Tracker</p>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="addCategoryForm">
-                    <div class="mb-3">
-                        <label class="form-label">Tên danh mục</label>
-                        <input type="text" class="form-control" id="categoryName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Loại</label>
-                        <select class="form-control" id="categoryType" required>
-                            <option value="">Chọn loại</option>
-                            <option value="Expense">Chi tiêu</option>
-                            <option value="Income">Thu nhập</option>
-                            <option value="Both">Cả hai</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="categoryDescription" rows="3"></textarea>
-                    </div>
-                </form>
+        </div>
+
+        <!-- Admin Stats -->
+        <div class="admin-stats">
+            <div class="stat-card">
+                <div class="stat-icon users-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">1,234</div>
+                <div class="stat-label">Total Users</div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" onclick="saveCategory()">Lưu</button>
+
+            <div class="stat-card">
+                <div class="stat-icon revenue-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value">$45.6M</div>
+                <div class="stat-label">Total Revenue</div>
             </div>
+
+            <div class="stat-card">
+                <div class="stat-icon transactions-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="stat-value">12,456</div>
+                <div class="stat-label">Transactions</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon growth-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-value">+15.3%</div>
+                <div class="stat-label">Growth Rate</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-line"></i>
+                    User Growth Over Time
+                </h3>
+                <div class="chart-container">
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-pie"></i>
+                    User Distribution
+                </h3>
+                <div class="chart-container">
+                    <canvas id="userDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="users-table-card">
+            <h3 class="chart-title">
+                <i class="fas fa-users"></i>
+                Recent Users
+            </h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Join Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">JD</div>
+                                <div>
+                                    <div style="font-weight: 500;">John Doe</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d;">ID: 1001</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>john.doe@example.com</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                        <td>2024-01-15</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm">Suspend</button>
+                            <button class="btn btn-danger btn-sm">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #e74c3c; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">JS</div>
+                                <div>
+                                    <div style="font-weight: 500;">Jane Smith</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d;">ID: 1002</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>jane.smith@example.com</td>
+                        <td><span class="badge badge-warning">Pending</span></td>
+                        <td>2024-01-20</td>
+                        <td>
+                            <button class="btn btn-success btn-sm">Approve</button>
+                            <button class="btn btn-danger btn-sm">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #27ae60; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">MJ</div>
+                                <div>
+                                    <div style="font-weight: 500;">Mike Johnson</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d;">ID: 1003</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>mike.johnson@example.com</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                        <td>2024-01-25</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm">Suspend</button>
+                            <button class="btn btn-danger btn-sm">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #9b59b6; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">SB</div>
+                                <div>
+                                    <div style="font-weight: 500;">Sarah Brown</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d;">ID: 1004</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>sarah.brown@example.com</td>
+                        <td><span class="badge badge-danger">Suspended</span></td>
+                        <td>2024-01-30</td>
+                        <td>
+                            <button class="btn btn-success btn-sm">Activate</button>
+                            <button class="btn btn-danger btn-sm">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -327,367 +568,62 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let adminDashboardData = {};
-        let userRegistrationChart = null;
-        let systemActivityChart = null;
-
-        $(document).ready(function () {
-            loadAdminDashboardData();
+        // User Growth Chart
+        const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+        const userGrowthChart = new Chart(userGrowthCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'New Users',
+                    data: [120, 190, 300, 500, 200, 300],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
         });
 
-        async function loadAdminDashboardData() {
-            try {
-                const response = await fetch('/api/admin/dashboard');
-                if (response.ok) {
-                    adminDashboardData = await response.json();
-                } else {
-                    throw new Error('Failed to load admin dashboard data');
-                }
-
-                updateAdminDashboardUI();
-                createAdminCharts();
-                loadUsers();
-                loadAISuggestions();
-                loadGlobalCategories();
-                loadSystemLogs();
-            } catch (error) {
-                console.error('Error loading admin dashboard data:', error);
-                showError('Không thể tải dữ liệu dashboard');
-            }
-        }
-
-        function updateAdminDashboardUI() {
-            document.getElementById('totalUsers').textContent = adminDashboardData.totalUsers || 0;
-            document.getElementById('activeUsers').textContent = adminDashboardData.activeUsers || 0;
-            document.getElementById('newUsers').textContent = adminDashboardData.newUsers || 0;
-            document.getElementById('totalAISuggestions').textContent = adminDashboardData.totalAISuggestions || 0;
-        }
-
-        function createAdminCharts() {
-            // User Registration Chart
-            const registrationCtx = document.getElementById('userRegistrationChart').getContext('2d');
-            if (userRegistrationChart) {
-                userRegistrationChart.destroy();
-            }
-
-            const registrationData = adminDashboardData.userRegistrationData || [];
-            userRegistrationChart = new Chart(registrationCtx, {
-                type: 'line',
-                data: {
-                    labels: registrationData.map(item => item.month),
-                    datasets: [{
-                        label: 'Đăng ký mới',
-                        data: registrationData.map(item => item.count),
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+        // User Distribution Chart
+        const userDistributionCtx = document.getElementById('userDistributionChart').getContext('2d');
+        const userDistributionChart = new Chart(userDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active Users', 'Inactive Users', 'Pending Users'],
+                datasets: [{
+                    data: [65, 25, 10],
+                    backgroundColor: [
+                        '#27ae60',
+                        '#e74c3c',
+                        '#f39c12'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
                     }
                 }
-            });
-
-            // System Activity Chart
-            const activityCtx = document.getElementById('systemActivityChart').getContext('2d');
-            if (systemActivityChart) {
-                systemActivityChart.destroy();
             }
-
-            const activityData = adminDashboardData.systemActivityData || [];
-            systemActivityChart = new Chart(activityCtx, {
-                type: 'bar',
-                data: {
-                    labels: activityData.map(item => item.type),
-                    datasets: [{
-                        label: 'Số lượng',
-                        data: activityData.map(item => item.count),
-                        backgroundColor: [
-                            '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        async function loadUsers() {
-            try {
-                const response = await fetch('/api/admin/users');
-                if (response.ok) {
-                    const users = await response.json();
-                    displayUsers(users);
-                } else {
-                    throw new Error('Failed to load users');
-                }
-            } catch (error) {
-                console.error('Error loading users:', error);
-            }
-        }
-
-        function displayUsers(users) {
-            const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = '';
-
-            if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Chưa có người dùng nào</td></tr>';
-                return;
-            }
-
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <img src="${user.pictureUrl || '/images/default-avatar.png'}" 
-                                     alt="Avatar" class="user-avatar">
-                                <div class="user-info">
-                                    <div class="user-name">${user.fullName || user.username}</div>
-                                    <div class="user-username">@@${user.username}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>${user.email}</td>
-                        <td>
-                            <span class="badge ${user.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}">
-                                ${user.role}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge ${user.enabled ? 'badge-active' : 'badge-inactive'}">
-                                ${user.enabled ? 'Hoạt động' : 'Vô hiệu hóa'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn edit" onclick="editUser(${user.id})">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="action-btn toggle" onclick="toggleUserStatus(${user.id}, ${user.enabled})">
-                                    <i class="fas fa-${user.enabled ? 'ban' : 'check'}"></i>
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                tbody.appendChild(row);
-            });
-        }
-
-        async function loadAISuggestions() {
-            try {
-                const response = await fetch('/api/admin/ai-suggestions');
-                if (response.ok) {
-                    const suggestions = await response.json();
-                    displayAISuggestions(suggestions);
-                } else {
-                    throw new Error('Failed to load AI suggestions');
-                }
-            } catch (error) {
-                console.error('Error loading AI suggestions:', error);
-            }
-        }
-
-        function displayAISuggestions(suggestions) {
-            const container = document.getElementById('aiSuggestionsList');
-            container.innerHTML = '';
-
-            if (suggestions.length === 0) {
-                container.innerHTML = '<p class="text-muted text-center">Chưa có gợi ý AI nào</p>';
-                return;
-            }
-
-            suggestions.forEach(suggestion => {
-                const suggestionDiv = document.createElement('div');
-                suggestionDiv.className = 'ai-suggestion';
-                suggestionDiv.innerHTML = `
-                        <div class="ai-suggestion-content">
-                            <div class="ai-suggestion-text">
-                                <i class="fas fa-lightbulb" style="margin-right: 8px; color: #f59e0b;"></i>
-                                ${suggestion.suggestion}
-                            </div>
-                            <div class="ai-suggestion-time">${formatDate(suggestion.createdAt)}</div>
-                        </div>
-                    `;
-                container.appendChild(suggestionDiv);
-            });
-        }
-
-        async function loadGlobalCategories() {
-            try {
-                const response = await fetch('/api/admin/categories');
-                if (response.ok) {
-                    const categories = await response.json();
-                    displayGlobalCategories(categories);
-                } else {
-                    throw new Error('Failed to load categories');
-                }
-            } catch (error) {
-                console.error('Error loading global categories:', error);
-            }
-        }
-
-        function displayGlobalCategories(categories) {
-            const tbody = document.getElementById('globalCategoriesTable');
-            tbody.innerHTML = '';
-
-            if (categories.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Chưa có danh mục nào</td></tr>';
-                return;
-            }
-
-            categories.forEach(category => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                                    <td>${category.name}</td>
-                                    <td>
-                                        <span class="badge bg-${category.type === 'Income' ? 'success' : category.type === 'Expense' ? 'danger' : 'info'}">
-                                            ${category.type}
-                                        </span>
-                                    </td>
-                                    <td>${category.description || '-'}</td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${category.id})">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        async function loadSystemLogs() {
-            try {
-                const response = await fetch('/api/admin/system-logs');
-                if (response.ok) {
-                    const logs = await response.json();
-                    displaySystemLogs(logs);
-                } else {
-                    throw new Error('Failed to load system logs');
-                }
-            } catch (error) {
-                console.error('Error loading system logs:', error);
-            }
-        }
-
-        function displaySystemLogs(logs) {
-            const tbody = document.getElementById('systemLogsTable');
-            tbody.innerHTML = '';
-
-            if (logs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Chưa có nhật ký nào</td></tr>';
-                return;
-            }
-
-            logs.forEach(log => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                                    <td>${formatDateTime(log.timestamp)}</td>
-                                    <td>
-                                        <span class="badge bg-${getLogTypeColor(log.type)}">
-                                            ${log.type}
-                                        </span>
-                                    </td>
-                                    <td>${log.description}</td>
-                                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function showAddCategoryModal() {
-            const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
-            modal.show();
-        }
-
-        async function saveCategory() {
-            const form = document.getElementById('addCategoryForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            const categoryData = {
-                name: document.getElementById('categoryName').value,
-                type: document.getElementById('categoryType').value,
-                description: document.getElementById('categoryDescription').value
-            };
-
-            try {
-                const response = await fetch('/api/admin/categories', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + getToken()
-                    },
-                    body: JSON.stringify(categoryData)
-                });
-
-                if (response.ok) {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
-                    modal.hide();
-                    form.reset();
-                    loadGlobalCategories();
-                } else {
-                    alert('Có lỗi xảy ra khi lưu danh mục');
-                }
-            } catch (error) {
-                console.error('Error saving category:', error);
-                alert('Có lỗi xảy ra khi lưu danh mục');
-            }
-        }
-
-        function refreshAdminDashboard() {
-            loadAdminDashboardData();
-        }
-
-        function exportSystemReport() {
-            // TODO: Implement export functionality
-            alert('Chức năng xuất báo cáo sẽ được cập nhật');
-        }
-
-        function downloadLogs() {
-            // TODO: Implement log download
-            alert('Chức năng tải nhật ký sẽ được cập nhật');
-        }
-
-        function getLogTypeColor(type) {
-            switch (type) {
-                case 'INFO': return 'info';
-                case 'WARNING': return 'warning';
-                case 'ERROR': return 'danger';
-                case 'SUCCESS': return 'success';
-                default: return 'secondary';
-            }
-        }
-
-        function formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('vi-VN');
-        }
-
-        function formatDateTime(dateString) {
-            return new Date(dateString).toLocaleString('vi-VN');
-        }
-
-        function getToken() {
-            return localStorage.getItem('authToken') || '';
-        }
+        });
     </script>
 }

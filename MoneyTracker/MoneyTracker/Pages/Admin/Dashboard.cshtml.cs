@@ -5,6 +5,7 @@ using System.Security.Claims;
 
 namespace MoneyTracker.Pages.Admin
 {
+    [Authorize(Roles = "ADMIN")]
     public class DashboardModel : PageModel
     {
         private readonly ILogger<DashboardModel> _logger;
@@ -14,9 +15,14 @@ namespace MoneyTracker.Pages.Admin
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            // Admin Dashboard page initialization
+            // Set page metadata
+            ViewData["Title"] = "Admin Dashboard - MoneyTracker";
+            ViewData["Description"] = "Admin dashboard for managing Money Tracker system";
+            ViewData["Keywords"] = "admin, dashboard, management, users, system";
+
+            return Page();
         }
 
         public string GetCurrentUserId()
@@ -31,12 +37,12 @@ namespace MoneyTracker.Pages.Admin
 
         public string GetCurrentUserName()
         {
-            return User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+            return User.FindFirst(ClaimTypes.Name)?.Value ?? "Admin";
         }
 
-        public bool IsAdmin()
+        public string GetCurrentUserRole()
         {
-            return User.IsInRole("ADMIN");
+            return User.FindFirst(ClaimTypes.Role)?.Value ?? "ADMIN";
         }
     }
 }

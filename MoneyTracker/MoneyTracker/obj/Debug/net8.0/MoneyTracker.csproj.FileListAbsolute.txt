@@ -166,6 +166,15 @@ F:\PRN212-REVIEW\MoneyTracker\MoneyTracker\bin\Debug\net8.0\runtimes\browser\lib
 F:\PRN212-REVIEW\MoneyTracker\MoneyTracker\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 F:\PRN212-REVIEW\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.csproj.AssemblyReference.cache
 F:\PRN212-REVIEW\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTra.732225F0.Up2Date
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.csproj.AssemblyReference.cache
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.GeneratedMSBuildEditorConfig.editorconfig
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.AssemblyInfoInputs.cache
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.AssemblyInfo.cs
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.csproj.CoreCompileInputs.cache
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.MvcApplicationPartsAssemblyInfo.cache
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.RazorAssemblyInfo.cache
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.RazorAssemblyInfo.cs
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.sourcelink.json
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\appsettings.Development.json
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\appsettings.json
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\MoneyTracker.staticwebassets.runtime.json
@@ -393,15 +402,6 @@ F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.csproj.AssemblyReference.cache
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.GeneratedMSBuildEditorConfig.editorconfig
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.AssemblyInfoInputs.cache
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.AssemblyInfo.cs
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.csproj.CoreCompileInputs.cache
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.MvcApplicationPartsAssemblyInfo.cache
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.RazorAssemblyInfo.cache
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.RazorAssemblyInfo.cs
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.sourcelink.json
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\staticwebassets.build.json
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\staticwebassets.development.json
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\staticwebassets\msbuild.MoneyTracker.Microsoft.AspNetCore.StaticWebAssets.props
@@ -416,3 +416,4 @@ F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.pdb
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.genruntimeconfig.cache
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\ref\MoneyTracker.dll
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

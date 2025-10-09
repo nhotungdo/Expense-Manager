@@ -35,7 +35,7 @@ namespace MoneyTracker.Services
 
                 // Add title
                 var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
-                var title = new Paragraph($"Báo cáo tài chính - {user.FullName ?? user.Username}", titleFont);
+                var title = new Paragraph($"Báo cáo tài chính - {user.FullName ?? user.UserName}", titleFont);
                 title.Alignment = Element.ALIGN_CENTER;
                 document.Add(title);
 
@@ -158,7 +158,7 @@ namespace MoneyTracker.Services
                 var worksheet = workbook.Worksheets.Add("Báo cáo tài chính");
 
                 // Add title
-                worksheet.Cell("A1").Value = $"Báo cáo tài chính - {user.FullName ?? user.Username}";
+                worksheet.Cell("A1").Value = $"Báo cáo tài chính - {user.FullName ?? user.UserName}";
                 worksheet.Cell("A1").Style.Font.Bold = true;
                 worksheet.Cell("A1").Style.Font.FontSize = 16;
                 worksheet.Range("A1:D1").Merge();
