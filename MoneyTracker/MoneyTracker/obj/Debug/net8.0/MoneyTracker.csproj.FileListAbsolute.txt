@@ -208,6 +208,7 @@ F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\MailKit.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.Google.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.Build.Locator.dll
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
@@ -416,4 +417,3 @@ F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.pdb
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\MoneyTracker.genruntimeconfig.cache
 F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\obj\Debug\net8.0\ref\MoneyTracker.dll
-F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

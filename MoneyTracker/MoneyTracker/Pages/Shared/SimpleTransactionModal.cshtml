@@ -1,0 +1,197 @@
+<!-- Simple Transaction Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionModalLabel">Giao dịch Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="transactionForm">
+                    <!-- Transaction Type Toggle -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Loại giao dịch</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transactionType" id="expenseType" value="expense" checked>
+                                <label class="form-check-label" for="expenseType">
+                                    <i class="fas fa-arrow-down text-expense me-2"></i>
+                                    Chi tiêu
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transactionType" id="incomeType" value="income">
+                                <label class="form-check-label" for="incomeType">
+                                    <i class="fas fa-arrow-up text-income me-2"></i>
+                                    Thu nhập
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amount Input -->
+                    <div class="mb-3">
+                        <label for="transactionAmount" class="form-label fw-semibold">Số tiền</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control form-control-lg" id="transactionAmount" 
+                                   placeholder="Nhập số tiền" required min="0" step="1000">
+                            <span class="input-group-text">VND</span>
+                        </div>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="mb-3">
+                        <label for="transactionCategory" class="form-label fw-semibold">Danh mục</label>
+                        <select class="form-select" id="transactionCategory" required>
+                            <option value="">Chọn danh mục</option>
+                            <!-- Income Categories -->
+                            <optgroup label="Thu nhập" id="incomeCategories" style="display: none;">
+                                <option value="salary">Lương</option>
+                                <option value="bonus">Thưởng</option>
+                                <option value="investment">Đầu tư</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="other_income">Khác</option>
+                            </optgroup>
+                            <!-- Expense Categories -->
+                            <optgroup label="Chi tiêu" id="expenseCategories">
+                                <option value="food">Ăn uống</option>
+                                <option value="transport">Giao thông</option>
+                                <option value="entertainment">Giải trí</option>
+                                <option value="utilities">Tiện ích</option>
+                                <option value="shopping">Mua sắm</option>
+                                <option value="healthcare">Y tế</option>
+                                <option value="education">Giáo dục</option>
+                                <option value="housing">Nhà ở</option>
+                                <option value="other_expense">Khác</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Note/Description -->
+                    <div class="mb-3">
+                        <label for="transactionNote" class="form-label fw-semibold">Ghi chú</label>
+                        <textarea class="form-control" id="transactionNote" rows="3" 
+                                  placeholder="Nhập ghi chú về giao dịch này..."></textarea>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="mb-3">
+                        <label for="transactionDate" class="form-label fw-semibold">Ngày giao dịch</label>
+                        <input type="date" class="form-control" id="transactionDate" required>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Hủy
+                </button>
+                <button type="button" class="btn btn-primary" id="saveTransactionBtn">
+                    <i class="fas fa-save me-2"></i>
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('transactionModal');
+        const form = document.getElementById('transactionForm');
+        const saveBtn = document.getElementById('saveTransactionBtn');
+        const transactionTypeRadios = document.querySelectorAll('input[name="transactionType"]');
+        const incomeCategories = document.getElementById('incomeCategories');
+        const expenseCategories = document.getElementById('expenseCategories');
+
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('transactionDate').value = today;
+
+        // Handle transaction type change
+        transactionTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateCategoryOptions();
+            });
+        });
+
+        // Update category options based on transaction type
+        function updateCategoryOptions() {
+            const selectedType = document.querySelector('input[name="transactionType"]:checked').value;
+            
+            if (selectedType === 'income') {
+                incomeCategories.style.display = 'block';
+                expenseCategories.style.display = 'none';
+            } else {
+                incomeCategories.style.display = 'none';
+                expenseCategories.style.display = 'block';
+            }
+            
+            // Reset category selection
+            document.getElementById('transactionCategory').value = '';
+        }
+
+        // Handle save button click
+        saveBtn.addEventListener('click', function() {
+            if (form.checkValidity()) {
+                saveTransaction();
+            } else {
+                form.reportValidity();
+            }
+        });
+
+        // Save transaction function
+        function saveTransaction() {
+            const formData = {
+                type: document.querySelector('input[name="transactionType"]:checked').value,
+                amount: parseFloat(document.getElementById('transactionAmount').value),
+                category: document.getElementById('transactionCategory').value,
+                date: document.getElementById('transactionDate').value,
+                note: document.getElementById('transactionNote').value
+            };
+
+            console.log('Transaction data:', formData);
+            
+            // Here you would typically send the data to your server
+            alert('Giao dịch đã được lưu thành công!');
+            
+            // Close modal and reset form
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+            form.reset();
+            setDefaultValues();
+        }
+
+        // Set default values
+        function setDefaultValues() {
+            document.getElementById('transactionDate').value = today;
+            document.getElementById('expenseType').checked = true;
+            updateCategoryOptions();
+        }
+
+        // Reset form when modal is hidden
+        modal.addEventListener('hidden.bs.modal', function() {
+            form.reset();
+            setDefaultValues();
+        });
+    });
+
+    // Function to open modal for editing
+    function openEditModal(transactionId) {
+        document.getElementById('transactionModalLabel').textContent = 'Chỉnh sửa Giao dịch';
+        const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
+        modal.show();
+    }
+
+    // Function to open modal for adding new transaction
+    function openAddModal() {
+        document.getElementById('transactionModalLabel').textContent = 'Giao dịch Mới';
+        const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
+        modal.show();
+    }
+</script>

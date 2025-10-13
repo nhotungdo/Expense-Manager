@@ -1,7 +1,7 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using MoneyTracker.Models;
 using MoneyTracker.Models.DTOs;
 using MoneyTracker.Services;

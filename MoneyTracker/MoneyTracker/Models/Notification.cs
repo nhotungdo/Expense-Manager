@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MoneyTracker.Models;
 
 public partial class Notification

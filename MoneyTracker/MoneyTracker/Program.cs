@@ -1,15 +1,14 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using MoneyTracker.Middleware;
 using MoneyTracker.Models;
 using MoneyTracker.Services;
-using MoneyTracker.Middleware;
 using Serilog;
-using MoneyTracker.Migrations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,8 +112,11 @@ builder.Services.AddMemoryCache();
 // Add HTTP context accessor
 builder.Services.AddHttpContextAccessor();
 
+// Add HttpClient for external API calls
+builder.Services.AddHttpClient<IGeminiSuggestionService, GeminiSuggestionService>();
 
-
+// Add Gemini AI service
+builder.Services.AddScoped<IGeminiSuggestionService, GeminiSuggestionService>();
 
 // Google Auth configuration is handled in JWT configuration above
 

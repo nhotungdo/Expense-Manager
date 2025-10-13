@@ -1,731 +1,128 @@
 @page
 @model MoneyTracker.Pages.DashboardModel
 @{
-    ViewData["Title"] = "Dashboard - Money Tracker";
+    ViewData["Title"] = "Dashboard";
 }
 
-@section Styles {
-    <style>
-        /* Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f8f9fa;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 280px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-logo {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sidebar-logo i {
-            font-size: 2rem;
-            color: #ffd700;
-        }
-
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-
-        .nav-item {
-            margin: 0.25rem 0;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-radius: 0 25px 25px 0;
-            margin-right: 1rem;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .nav-link i {
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            margin-left: 280px;
-            min-height: 100vh;
-        }
-
-        .content-header {
-            background: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .welcome-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .welcome-text h1 {
-            color: #2c3e50;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .welcome-text p {
-            color: #6c757d;
-            margin: 0.5rem 0 0 0;
-        }
-
-        .quick-actions {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .quick-action-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .quick-action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-
-        /* Dashboard Cards */
-        .dashboard-grid {
-            padding: 0 2rem 2rem 2rem;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-
-        .main-widget {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .widget-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .metric-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 1.5rem;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .metric-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .income {
-            color: #28a745;
-        }
-
-        .expense {
-            color: #dc3545;
-        }
-
-        .savings {
-            color: #17a2b8;
-        }
-
-        .chart-container {
-            height: 300px;
-            position: relative;
-        }
-
-        /* Secondary Cards */
-        .secondary-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .secondary-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .account-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .account-item:last-child {
-            border-bottom: none;
-        }
-
-        .account-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .account-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .account-name {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        .account-balance {
-            font-weight: 600;
-            color: #28a745;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-
-        .transaction-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .transaction-category {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.8rem;
-        }
-
-        .transaction-details {
-            flex: 1;
-        }
-
-        .transaction-description {
-            font-weight: 500;
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-
-        .transaction-category-name {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-
-        .transaction-amount {
-            font-weight: 600;
-        }
-
-        .transaction-income {
-            color: #28a745;
-        }
-
-        .transaction-expense {
-            color: #dc3545;
-        }
-
-        .budget-item {
-            margin-bottom: 1rem;
-        }
-
-        .budget-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .budget-category {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        .budget-amount {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .progress {
-            height: 8px;
-            border-radius: 4px;
-            background: #e9ecef;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-success {
-            background: #28a745;
-        }
-
-        .progress-warning {
-            background: #ffc107;
-        }
-
-        .progress-danger {
-            background: #dc3545;
-        }
-
-        /* AI Suggestions Card */
-        .ai-suggestion {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 15px;
-            margin-bottom: 1rem;
-        }
-
-        .ai-suggestion h4 {
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .ai-suggestion p {
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
-        }
-
-        .ai-suggestion .suggestion-action {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .ai-suggestion .suggestion-action:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Responsive Design */
-        @@media (max-width: 1200px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @@media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .content-header {
-                padding: 1rem;
-            }
-
-            .dashboard-grid {
-                padding: 0 1rem 1rem 1rem;
-            }
-
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .welcome-section {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .quick-actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
-        }
-
-        /* Loading Animation */
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @@keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-    </style>
-}
-
-<div class="homepage-container">
-    <!-- Left Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <a href="/" class="sidebar-logo">
-                <i class="fas fa-wallet"></i>
-                Money Tracker
-            </a>
+<!-- Top Row: Summary Stats -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-arrow-up text-income" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h5 class="card-title">Tổng Thu Nhập</h5>
+                <h2 class="text-income mb-0">15,500,000 VND</h2>
+            </div>
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-item">
-                <a href="/Dashboard" class="nav-link active">
-                    <i class="fas fa-home"></i>
-                    Dashboard
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Transactions" class="nav-link">
-                    <i class="fas fa-exchange-alt"></i>
-                    Transactions
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Reports" class="nav-link">
-                    <i class="fas fa-chart-bar"></i>
-                    Reports
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Budgets" class="nav-link">
-                    <i class="fas fa-piggy-bank"></i>
-                    Budgets
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/Profile" class="nav-link">
-                    <i class="fas fa-user-circle"></i>
-                    Profile
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/AI" class="nav-link">
-                    <i class="fas fa-robot"></i>
-                    AI Suggestions
-                </a>
-            </div>
-        </nav>
     </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header Section -->
-        <div class="content-header">
-            <div class="welcome-section">
-                <div class="welcome-text">
-                    <h1>Welcome back, @Model.GetCurrentUserName()!</h1>
-                    <p>Here's your financial overview for today</p>
-                </div>
-                <div class="quick-actions">
-                    <a href="/Incomes" class="quick-action-btn">
-                        <i class="fas fa-plus"></i>
-                        Add Income
-                    </a>
-                    <a href="/Expenses" class="quick-action-btn">
-                        <i class="fas fa-minus"></i>
-                        Add Expense
-                    </a>
-                    <a href="/Transactions" class="quick-action-btn">
-                        <i class="fas fa-exchange-alt"></i>
-                        Transfer Funds
-                    </a>
-                    <a href="/Reports" class="quick-action-btn">
-                        <i class="fas fa-chart-line"></i>
-                        View Reports
-                    </a>
-                </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-arrow-down text-expense" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h5 class="card-title">Tổng Chi Tiêu</h5>
+                <h2 class="text-expense mb-0">12,300,000 VND</h2>
             </div>
         </div>
-
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- Main Widget -->
-            <div class="main-widget">
-                <h2 class="widget-title">
-                    <i class="fas fa-chart-pie"></i>
-                    This Month's Overview
-                </h2>
-
-                <!-- Metrics -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value income" id="totalIncome">15,500,000</div>
-                        <div class="metric-label">Total Income</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value expense" id="totalExpense">12,300,000</div>
-                        <div class="metric-label">Total Expenses</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value savings" id="netSavings">3,200,000</div>
-                        <div class="metric-label">Net Savings</div>
-                    </div>
-                </div>
-
-                <!-- Chart -->
-                <div class="chart-container">
-                    <canvas id="cashFlowChart"></canvas>
-                </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-wallet text-primary" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h5 class="card-title">Số Dư</h5>
+                <h2 class="text-primary mb-0">3,200,000 VND</h2>
             </div>
+        </div>
+    </div>
+</div>
 
-            <!-- Secondary Cards -->
-            <div class="secondary-cards">
-                <!-- AI Suggestions Card -->
-                <div class="ai-suggestion">
-                    <h4>
-                        <i class="fas fa-robot"></i>
-                        AI Suggestion
-                    </h4>
-                    <p>Tháng này bạn đã chi tiêu nhiều hơn cho việc ăn ngoài. Hãy cân nhắc nấu ăn tại nhà để tiết kiệm.
-                    </p>
-                    <button class="suggestion-action">Xem chi tiết</button>
-                </div>
+<!-- Middle Row: Charts -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Xu Hướng Thu Chi
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="incomeExpenseChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Chi Tiêu Theo Danh Mục
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="categoryChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- My Accounts Card -->
-                <div class="secondary-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-credit-card"></i>
-                        My Accounts
-                    </h3>
-                    <div class="account-item">
-                        <div class="account-info">
-                            <div class="account-icon" style="background: #28a745;">C</div>
-                            <div class="account-name">Cash</div>
-                        </div>
-                        <div class="account-balance">2,500,000 VND</div>
-                    </div>
-                    <div class="account-item">
-                        <div class="account-info">
-                            <div class="account-icon" style="background: #007bff;">B</div>
-                            <div class="account-name">Bank Account</div>
-                        </div>
-                        <div class="account-balance">8,750,000 VND</div>
-                    </div>
-                    <div class="account-item">
-                        <div class="account-info">
-                            <div class="account-icon" style="background: #dc3545;">CC</div>
-                            <div class="account-name">Credit Card</div>
-                        </div>
-                        <div class="account-balance">-1,200,000 VND</div>
-                    </div>
-                </div>
-
-                <!-- Recent Transactions Card -->
-                <div class="secondary-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-history"></i>
-                        Recent Transactions
-                    </h3>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #28a745;">F</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Salary</div>
-                                <div class="transaction-category-name">Income</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-income">+15,000,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #ffc107;">F</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Grocery Shopping</div>
-                                <div class="transaction-category-name">Food</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-450,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #17a2b8;">T</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Gas Station</div>
-                                <div class="transaction-category-name">Transport</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-200,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #6f42c1;">E</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Netflix Subscription</div>
-                                <div class="transaction-category-name">Entertainment</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-180,000</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-category" style="background: #fd7e14;">U</div>
-                            <div class="transaction-details">
-                                <div class="transaction-description">Electricity Bill</div>
-                                <div class="transaction-category-name">Utilities</div>
-                            </div>
-                        </div>
-                        <div class="transaction-amount transaction-expense">-350,000</div>
-                    </div>
-                </div>
-
-                <!-- Budget Status Card -->
-                <div class="secondary-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-line"></i>
-                        Budget Status
-                    </h3>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Food</span>
-                            <span class="budget-amount">450,000 / 600,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-warning" style="width: 75%"></div>
-                        </div>
-                    </div>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Transport</span>
-                            <span class="budget-amount">200,000 / 300,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-success" style="width: 67%"></div>
-                        </div>
-                    </div>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Entertainment</span>
-                            <span class="budget-amount">180,000 / 200,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-warning" style="width: 90%"></div>
-                        </div>
-                    </div>
-                    <div class="budget-item">
-                        <div class="budget-header">
-                            <span class="budget-category">Utilities</span>
-                            <span class="budget-amount">350,000 / 400,000</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-success" style="width: 88%"></div>
-                        </div>
-                    </div>
+<!-- Bottom Row: Recent Transactions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Giao Dịch Gần Đây
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Danh mục</th>
+                                <th>Ghi chú</th>
+                                <th>Số tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-success">Thu nhập</span>
+                                </td>
+                                <td>Lương tháng 12</td>
+                                <td class="text-income">+15,000,000 VND</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-warning">Ăn uống</span>
+                                </td>
+                                <td>Mua sắm thực phẩm</td>
+                                <td class="text-expense">-450,000 VND</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-info">Giao thông</span>
+                                </td>
+                                <td>Xăng xe</td>
+                                <td class="text-expense">-200,000 VND</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">Giải trí</span>
+                                </td>
+                                <td>Netflix</td>
+                                <td class="text-expense">-180,000 VND</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-primary">Tiện ích</span>
+                                </td>
+                                <td>Hóa đơn điện</td>
+                                <td class="text-expense">-350,000 VND</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -735,26 +132,24 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Cash Flow Chart
-        const ctx = document.getElementById('cashFlowChart').getContext('2d');
-        const cashFlowChart = new Chart(ctx, {
-            type: 'line',
+        // Income vs Expense Bar Chart
+        const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+        new Chart(incomeExpenseCtx, {
+            type: 'bar',
             data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
                 datasets: [{
-                    label: 'Income',
-                    data: [3.5, 4.2, 3.8, 4.0],
-                    borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.4,
-                    fill: true
+                    label: 'Thu nhập',
+                    data: [12000000, 13500000, 12800000, 14200000, 13800000, 15500000],
+                    backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    borderWidth: 1
                 }, {
-                    label: 'Expenses',
-                    data: [2.8, 3.1, 3.2, 3.2],
-                    borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                    tension: 0.4,
-                    fill: true
+                    label: 'Chi tiêu',
+                    data: [9800000, 11200000, 10500000, 11800000, 11500000, 12300000],
+                    backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    borderWidth: 1
                 }]
             },
             options: {
@@ -763,10 +158,6 @@
                 plugins: {
                     legend: {
                         position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Cash Flow Trend (Last 30 Days)'
                     }
                 },
                 scales: {
@@ -774,7 +165,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function (value) {
-                                return value + 'M VND';
+                                return (value / 1000000).toFixed(0) + 'M VND';
                             }
                         }
                     }
@@ -782,34 +173,40 @@
             }
         });
 
-        // Format numbers with commas
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        // Update metrics with formatted numbers
-        document.getElementById('totalIncome').textContent = formatNumber(15500000) + ' VND';
-        document.getElementById('totalExpense').textContent = formatNumber(12300000) + ' VND';
-        document.getElementById('netSavings').textContent = formatNumber(3200000) + ' VND';
-
-        // Add loading animation to cards
-        document.addEventListener('DOMContentLoaded', function () {
-            const cards = document.querySelectorAll('.secondary-card, .main-widget');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
+        // Category Doughnut Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ăn uống', 'Giao thông', 'Giải trí', 'Tiện ích', 'Khác'],
+                datasets: [{
+                    data: [450000, 200000, 180000, 350000, 120000],
+                    backgroundColor: [
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(23, 162, 184, 0.8)',
+                        'rgba(108, 117, 125, 0.8)',
+                        'rgba(13, 110, 253, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(23, 162, 184, 1)',
+                        'rgba(108, 117, 125, 1)',
+                        'rgba(13, 110, 253, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
         });
-
-        // Mobile sidebar toggle (if needed)
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('show');
-        }
     </script>
 }

@@ -1,0 +1,368 @@
+<!-- Transaction Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionModalLabel">Giao dịch Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="transactionForm">
+                    <!-- Transaction Type Toggle -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Loại giao dịch</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transactionType" id="expenseType" value="expense" checked>
+                                <label class="form-check-label" for="expenseType">
+                                    <i class="fas fa-arrow-down text-expense me-2"></i>
+                                    Chi tiêu
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transactionType" id="incomeType" value="income">
+                                <label class="form-check-label" for="incomeType">
+                                    <i class="fas fa-arrow-up text-income me-2"></i>
+                                    Thu nhập
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amount Input -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="transactionAmount" class="form-label fw-semibold">Số tiền</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control form-control-lg" id="transactionAmount" 
+                                       placeholder="Nhập số tiền" required min="0" step="1000">
+                                <span class="input-group-text">VND</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="transactionCurrency" class="form-label fw-semibold">Đơn vị tiền tệ</label>
+                            <select class="form-select form-select-lg" id="transactionCurrency">
+                                <option value="VND" selected>VND</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="transactionCategory" class="form-label fw-semibold">Danh mục</label>
+                            <select class="form-select" id="transactionCategory" required>
+                                <option value="">Chọn danh mục</option>
+                                <!-- Income Categories -->
+                                <optgroup label="Thu nhập" id="incomeCategories" style="display: none;">
+                                    <option value="salary">Lương</option>
+                                    <option value="bonus">Thưởng</option>
+                                    <option value="investment">Đầu tư</option>
+                                    <option value="freelance">Freelance</option>
+                                    <option value="other_income">Khác</option>
+                                </optgroup>
+                                <!-- Expense Categories -->
+                                <optgroup label="Chi tiêu" id="expenseCategories">
+                                    <option value="food">Ăn uống</option>
+                                    <option value="transport">Giao thông</option>
+                                    <option value="entertainment">Giải trí</option>
+                                    <option value="utilities">Tiện ích</option>
+                                    <option value="shopping">Mua sắm</option>
+                                    <option value="healthcare">Y tế</option>
+                                    <option value="education">Giáo dục</option>
+                                    <option value="housing">Nhà ở</option>
+                                    <option value="other_expense">Khác</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="transactionDate" class="form-label fw-semibold">Ngày giao dịch</label>
+                            <input type="date" class="form-control" id="transactionDate" required>
+                        </div>
+                    </div>
+
+                    <!-- Note/Description -->
+                    <div class="mb-3">
+                        <label for="transactionNote" class="form-label fw-semibold">Ghi chú</label>
+                        <textarea class="form-control" id="transactionNote" rows="3" 
+                                  placeholder="Nhập ghi chú về giao dịch này..."></textarea>
+                    </div>
+
+                    <!-- Additional Fields (Optional) -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="transactionAccount" class="form-label fw-semibold">Tài khoản</label>
+                            <select class="form-select" id="transactionAccount">
+                                <option value="">Chọn tài khoản</option>
+                                <option value="cash">Tiền mặt</option>
+                                <option value="bank">Ngân hàng</option>
+                                <option value="credit_card">Thẻ tín dụng</option>
+                                <option value="savings">Tiết kiệm</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="transactionTags" class="form-label fw-semibold">Thẻ (Tags)</label>
+                            <input type="text" class="form-control" id="transactionTags" 
+                                   placeholder="Ví dụ: công việc, cá nhân, khẩn cấp">
+                            <div class="form-text">Phân cách các thẻ bằng dấu phẩy</div>
+                        </div>
+                    </div>
+
+                    <!-- Recurring Transaction (Optional) -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isRecurring">
+                            <label class="form-check-label" for="isRecurring">
+                                Giao dịch định kỳ
+                            </label>
+                        </div>
+                        <div id="recurringOptions" style="display: none;" class="mt-2">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select class="form-select" id="recurringFrequency">
+                                        <option value="weekly">Hàng tuần</option>
+                                        <option value="monthly">Hàng tháng</option>
+                                        <option value="quarterly">Hàng quý</option>
+                                        <option value="yearly">Hàng năm</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="number" class="form-control" id="recurringEndDate" 
+                                           placeholder="Số lần lặp lại (để trống = vô hạn)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Hủy
+                </button>
+                <button type="button" class="btn btn-primary" id="saveTransactionBtn">
+                    <i class="fas fa-save me-2"></i>
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles for the Modal -->
+<style>
+    .modal-lg {
+        max-width: 600px;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .form-check-label i {
+        font-size: 1.1rem;
+    }
+
+    .input-group-text {
+        background-color: var(--background-color);
+        border-color: var(--border-color);
+        color: var(--text-secondary);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+    }
+
+    .modal-header {
+        background-color: var(--background-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .modal-footer {
+        background-color: var(--background-color);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: #357ABD;
+        border-color: #357ABD;
+    }
+
+    .form-label.fw-semibold {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    /* Animation for category groups */
+    .optgroup {
+        transition: all 0.3s ease;
+    }
+
+    /* Custom radio button styling */
+    .form-check-input[type="radio"] {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-top: 0.1rem;
+    }
+
+    .form-check-input[type="radio"]:checked {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e");
+    }
+</style>
+
+<!-- JavaScript for Modal Functionality -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('transactionModal');
+        const form = document.getElementById('transactionForm');
+        const saveBtn = document.getElementById('saveTransactionBtn');
+        const transactionTypeRadios = document.querySelectorAll('input[name="transactionType"]');
+        const incomeCategories = document.getElementById('incomeCategories');
+        const expenseCategories = document.getElementById('expenseCategories');
+        const isRecurringCheckbox = document.getElementById('isRecurring');
+        const recurringOptions = document.getElementById('recurringOptions');
+
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('transactionDate').value = today;
+
+        // Handle transaction type change
+        transactionTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateCategoryOptions();
+            });
+        });
+
+        // Handle recurring transaction toggle
+        isRecurringCheckbox.addEventListener('change', function() {
+            recurringOptions.style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Update category options based on transaction type
+        function updateCategoryOptions() {
+            const selectedType = document.querySelector('input[name="transactionType"]:checked').value;
+            
+            if (selectedType === 'income') {
+                incomeCategories.style.display = 'block';
+                expenseCategories.style.display = 'none';
+            } else {
+                incomeCategories.style.display = 'none';
+                expenseCategories.style.display = 'block';
+            }
+            
+            // Reset category selection
+            document.getElementById('transactionCategory').value = '';
+        }
+
+        // Handle save button click
+        saveBtn.addEventListener('click', function() {
+            if (form.checkValidity()) {
+                saveTransaction();
+            } else {
+                form.reportValidity();
+            }
+        });
+
+        // Save transaction function
+        function saveTransaction() {
+            const formData = {
+                type: document.querySelector('input[name="transactionType"]:checked').value,
+                amount: parseFloat(document.getElementById('transactionAmount').value),
+                currency: document.getElementById('transactionCurrency').value,
+                category: document.getElementById('transactionCategory').value,
+                date: document.getElementById('transactionDate').value,
+                note: document.getElementById('transactionNote').value,
+                account: document.getElementById('transactionAccount').value,
+                tags: document.getElementById('transactionTags').value,
+                isRecurring: document.getElementById('isRecurring').checked,
+                recurringFrequency: document.getElementById('recurringFrequency').value,
+                recurringEndDate: document.getElementById('recurringEndDate').value
+            };
+
+            console.log('Transaction data:', formData);
+            
+            // Here you would typically send the data to your server
+            // For now, we'll just show a success message
+            alert('Giao dịch đã được lưu thành công!');
+            
+            // Close modal and reset form
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+            form.reset();
+            setDefaultValues();
+        }
+
+        // Set default values
+        function setDefaultValues() {
+            document.getElementById('transactionDate').value = today;
+            document.getElementById('transactionCurrency').value = 'VND';
+            document.getElementById('expenseType').checked = true;
+            updateCategoryOptions();
+        }
+
+        // Format currency input
+        document.getElementById('transactionAmount').addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value) {
+                this.value = parseInt(value).toLocaleString('vi-VN');
+            }
+        });
+
+        // Reset form when modal is hidden
+        modal.addEventListener('hidden.bs.modal', function() {
+            form.reset();
+            setDefaultValues();
+        });
+    });
+
+    // Function to open modal for editing
+    function openEditModal(transactionId) {
+        // Set modal title for editing
+        document.getElementById('transactionModalLabel').textContent = 'Chỉnh sửa Giao dịch';
+        
+        // Here you would typically load the transaction data
+        // For now, we'll just open the modal
+        const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
+        modal.show();
+    }
+
+    // Function to open modal for adding new transaction
+    function openAddModal() {
+        // Set modal title for adding
+        document.getElementById('transactionModalLabel').textContent = 'Giao dịch Mới';
+        
+        // Open the modal
+        const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
+        modal.show();
+    }
+</script>
