@@ -2,6 +2,13 @@ using System.Collections.Generic;
 
 namespace MoneyTracker.Models;
 
+public enum BudgetPeriod
+{
+    Weekly = 1,
+    Monthly = 2,
+    Yearly = 3
+}
+
 public partial class Budget
 {
     public long Id { get; set; }
@@ -10,19 +17,13 @@ public partial class Budget
 
     public long? CategoryId { get; set; }
 
-    public decimal BudgetAmount { get; set; }
+    public decimal Amount { get; set; }
 
-    public decimal SpentAmount { get; set; }
+    public BudgetPeriod Period { get; set; }
 
-    public string? Currency { get; set; }
+    public DateTime StartDate { get; set; }
 
-    public string PeriodType { get; set; } = null!;
-
-    public DateOnly StartDate { get; set; }
-
-    public DateOnly EndDate { get; set; }
-
-    public bool IsActive { get; set; }
+    public DateTime EndDate { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

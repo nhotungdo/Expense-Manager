@@ -2,6 +2,12 @@ using System.Collections.Generic;
 
 namespace MoneyTracker.Models;
 
+public enum TransactionType
+{
+    Income = 1,
+    Expense = 2
+}
+
 public partial class Transaction
 {
     public long Id { get; set; }
@@ -10,15 +16,13 @@ public partial class Transaction
 
     public long? CategoryId { get; set; }
 
-    public string Type { get; set; } = null!; // "expense" or "income"
+    public TransactionType Type { get; set; }
 
     public decimal Amount { get; set; }
 
-    public string? Currency { get; set; }
+    public string? Description { get; set; }
 
-    public string? Note { get; set; }
-
-    public DateOnly TransactionDate { get; set; }
+    public DateTime TransactionDate { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

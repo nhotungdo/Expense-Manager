@@ -1,381 +1,201 @@
 using Microsoft.EntityFrameworkCore;
+using MoneyTracker.Core.Interfaces;
 using MoneyTracker.Models;
-using MoneyTracker.Models.DTOs;
 
-namespace MoneyTracker.Services
+namespace MoneyTracker.Services;
+
+public class TransactionService : ITransactionService
 {
-    public class TransactionService : ITransactionService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<TransactionService> _logger;
+
+    public TransactionService(IUnitOfWork unitOfWork, ILogger<TransactionService> logger)
     {
-        private readonly ExpenseManagerContext _context;
-        private readonly ILogger<TransactionService> _logger;
+        _unitOfWork = unitOfWork;
+        _logger = logger;
+    }
 
-        public TransactionService(ExpenseManagerContext context, ILogger<TransactionService> logger)
+    public async Task<IEnumerable<Transaction>> GetUserTransactionsAsync(long userId, int page = 1, int pageSize = 10,
+        DateTime? startDate = null, DateTime? endDate = null, string? type = null, long? categoryId = null)
+    {
+        var transactions = await _unitOfWork.Transactions.FindAsync(t => t.UserId == userId);
+
+        if (startDate.HasValue)
         {
-            _context = context;
-            _logger = logger;
+            transactions = transactions.Where(t => t.TransactionDate >= startDate.Value);
         }
 
-        public async Task<IEnumerable<TransactionDto>> GetTransactionsAsync(long userId, TransactionFilterDto filter)
+        if (endDate.HasValue)
         {
-            try
+            transactions = transactions.Where(t => t.TransactionDate <= endDate.Value);
+        }
+
+        if (!string.IsNullOrEmpty(type))
+        {
+            if (Enum.TryParse<TransactionType>(type, true, out var transactionType))
             {
-                var query = _context.Transactions
-                    .Where(t => t.UserId == userId)
-                    .Include(t => t.Category)
-                    .AsQueryable();
-
-                // Apply filters
-                if (filter.StartDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate >= DateOnly.FromDateTime(filter.StartDate.Value));
-                }
-
-                if (filter.EndDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate <= DateOnly.FromDateTime(filter.EndDate.Value));
-                }
-
-                if (filter.CategoryId.HasValue)
-                {
-                    query = query.Where(t => t.CategoryId == filter.CategoryId.Value);
-                }
-
-                if (!string.IsNullOrEmpty(filter.Type))
-                {
-                    query = query.Where(t => t.Type.ToLower() == filter.Type.ToLower());
-                }
-
-                if (filter.MinAmount.HasValue)
-                {
-                    query = query.Where(t => t.Amount >= filter.MinAmount.Value);
-                }
-
-                if (filter.MaxAmount.HasValue)
-                {
-                    query = query.Where(t => t.Amount <= filter.MaxAmount.Value);
-                }
-
-                if (!string.IsNullOrEmpty(filter.SearchTerm))
-                {
-                    query = query.Where(t => t.Note!.Contains(filter.SearchTerm));
-                }
-
-                // Apply sorting
-                query = filter.SortBy?.ToLower() switch
-                {
-                    "amount" => filter.SortOrder?.ToLower() == "asc"
-                        ? query.OrderBy(t => t.Amount)
-                        : query.OrderByDescending(t => t.Amount),
-                    "category" => filter.SortOrder?.ToLower() == "asc"
-                        ? query.OrderBy(t => t.Category!.Name)
-                        : query.OrderByDescending(t => t.Category!.Name),
-                    _ => filter.SortOrder?.ToLower() == "asc"
-                        ? query.OrderBy(t => t.TransactionDate)
-                        : query.OrderByDescending(t => t.TransactionDate)
-                };
-
-                var transactions = await query
-                    .Skip((filter.Page - 1) * filter.PageSize)
-                    .Take(filter.PageSize)
-                    .Select(t => new TransactionDto
-                    {
-                        Id = t.Id,
-                        UserId = t.UserId,
-                        CategoryId = t.CategoryId,
-                        CategoryName = t.Category != null ? t.Category.Name : "Khác",
-                        Type = t.Type,
-                        Amount = t.Amount,
-                        Currency = t.Currency,
-                        Note = t.Note,
-                        TransactionDate = t.TransactionDate,
-                        CreatedAt = t.CreatedAt,
-                        UpdatedAt = t.UpdatedAt
-                    })
-                    .ToListAsync();
-
-                return transactions;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving transactions for user {UserId}", userId);
-                throw;
+                transactions = transactions.Where(t => t.Type == transactionType);
             }
         }
 
-        public async Task<TransactionDto?> GetTransactionByIdAsync(long id, long userId)
+        if (categoryId.HasValue)
         {
-            try
-            {
-                var transaction = await _context.Transactions
-                    .Where(t => t.Id == id && t.UserId == userId)
-                    .Include(t => t.Category)
-                    .Select(t => new TransactionDto
-                    {
-                        Id = t.Id,
-                        UserId = t.UserId,
-                        CategoryId = t.CategoryId,
-                        CategoryName = t.Category != null ? t.Category.Name : "Khác",
-                        Type = t.Type,
-                        Amount = t.Amount,
-                        Currency = t.Currency,
-                        Note = t.Note,
-                        TransactionDate = t.TransactionDate,
-                        CreatedAt = t.CreatedAt,
-                        UpdatedAt = t.UpdatedAt
-                    })
-                    .FirstOrDefaultAsync();
-
-                return transaction;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving transaction {TransactionId} for user {UserId}", id, userId);
-                throw;
-            }
+            transactions = transactions.Where(t => t.CategoryId == categoryId.Value);
         }
 
-        public async Task<TransactionDto> CreateTransactionAsync(long userId, CreateTransactionDto createDto)
+        return transactions
+            .OrderByDescending(t => t.TransactionDate)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public async Task<Transaction?> GetTransactionByIdAsync(long id, long userId)
+    {
+        return await _unitOfWork.Transactions.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+    }
+
+    public async Task<Transaction> CreateTransactionAsync(Transaction transaction)
+    {
+        transaction.CreatedAt = DateTime.UtcNow;
+        await _unitOfWork.Transactions.AddAsync(transaction);
+        await _unitOfWork.SaveChangesAsync();
+
+        // Update budget spent amount if applicable
+        if (transaction.CategoryId.HasValue)
         {
-            try
-            {
-                var transaction = new Transaction
-                {
-                    UserId = userId,
-                    CategoryId = createDto.CategoryId,
-                    Type = createDto.Type.ToLower(),
-                    Amount = createDto.Amount,
-                    Currency = createDto.Currency ?? "VND",
-                    Note = createDto.Note,
-                    TransactionDate = createDto.TransactionDate,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-
-                _context.Transactions.Add(transaction);
-                await _context.SaveChangesAsync();
-
-                // Also create in the appropriate table (Expense or Income)
-                if (createDto.Type.ToLower() == "expense")
-                {
-                    var expense = new Expense
-                    {
-                        UserId = userId,
-                        CategoryId = createDto.CategoryId,
-                        Amount = createDto.Amount,
-                        Currency = createDto.Currency ?? "VND",
-                        Note = createDto.Note,
-                        ExpenseDate = createDto.TransactionDate,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.Expenses.Add(expense);
-                }
-                else if (createDto.Type.ToLower() == "income")
-                {
-                    var income = new Income
-                    {
-                        UserId = userId,
-                        CategoryId = createDto.CategoryId,
-                        Amount = createDto.Amount,
-                        Currency = createDto.Currency ?? "VND",
-                        Note = createDto.Note,
-                        IncomeDate = createDto.TransactionDate,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.Incomes.Add(income);
-                }
-
-                await _context.SaveChangesAsync();
-
-                // Return the created transaction
-                return await GetTransactionByIdAsync(transaction.Id, userId) ??
-                    throw new InvalidOperationException("Failed to retrieve created transaction");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating transaction for user {UserId}", userId);
-                throw;
-            }
+            await UpdateBudgetSpentAmountAsync(transaction.CategoryId.Value, transaction.UserId);
         }
 
-        public async Task<TransactionDto?> UpdateTransactionAsync(long id, long userId, UpdateTransactionDto updateDto)
+        _logger.LogInformation("Created transaction {TransactionId} for user {UserId}", transaction.Id, transaction.UserId);
+        return transaction;
+    }
+
+    public async Task<Transaction> UpdateTransactionAsync(Transaction transaction)
+    {
+        transaction.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.Transactions.UpdateAsync(transaction);
+        await _unitOfWork.SaveChangesAsync();
+
+        // Update budget spent amount if applicable
+        if (transaction.CategoryId.HasValue)
         {
-            try
-            {
-                var transaction = await _context.Transactions
-                    .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
-
-                if (transaction == null)
-                {
-                    return null;
-                }
-
-                transaction.CategoryId = updateDto.CategoryId;
-                transaction.Type = updateDto.Type.ToLower();
-                transaction.Amount = updateDto.Amount;
-                transaction.Currency = updateDto.Currency ?? "VND";
-                transaction.Note = updateDto.Note;
-                transaction.TransactionDate = updateDto.TransactionDate;
-                transaction.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                return await GetTransactionByIdAsync(id, userId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating transaction {TransactionId} for user {UserId}", id, userId);
-                throw;
-            }
+            await UpdateBudgetSpentAmountAsync(transaction.CategoryId.Value, transaction.UserId);
         }
 
-        public async Task<bool> DeleteTransactionAsync(long id, long userId)
+        _logger.LogInformation("Updated transaction {TransactionId} for user {UserId}", transaction.Id, transaction.UserId);
+        return transaction;
+    }
+
+    public async Task<bool> DeleteTransactionAsync(long id, long userId)
+    {
+        var transaction = await GetTransactionByIdAsync(id, userId);
+        if (transaction == null)
         {
-            try
-            {
-                var transaction = await _context.Transactions
-                    .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
-
-                if (transaction == null)
-                {
-                    return false;
-                }
-
-                _context.Transactions.Remove(transaction);
-                await _context.SaveChangesAsync();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting transaction {TransactionId} for user {UserId}", id, userId);
-                throw;
-            }
+            return false;
         }
 
-        public async Task<TransactionSummaryDto> GetTransactionSummaryAsync(long userId, DateTime? startDate = null, DateTime? endDate = null)
+        await _unitOfWork.Transactions.DeleteAsync(transaction);
+        await _unitOfWork.SaveChangesAsync();
+
+        // Update budget spent amount if applicable
+        if (transaction.CategoryId.HasValue)
         {
-            try
-            {
-                var query = _context.Transactions.Where(t => t.UserId == userId);
-
-                if (startDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate >= DateOnly.FromDateTime(startDate.Value));
-                }
-
-                if (endDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate <= DateOnly.FromDateTime(endDate.Value));
-                }
-
-                var totalIncome = await query.Where(t => t.Type.ToLower() == "income").SumAsync(t => t.Amount);
-                var totalExpense = await query.Where(t => t.Type.ToLower() == "expense").SumAsync(t => t.Amount);
-                var totalTransactions = await query.CountAsync();
-                var incomeTransactions = await query.Where(t => t.Type.ToLower() == "income").CountAsync();
-                var expenseTransactions = await query.Where(t => t.Type.ToLower() == "expense").CountAsync();
-
-                var recentTransactions = await GetRecentTransactionsAsync(userId, 10);
-
-                return new TransactionSummaryDto
-                {
-                    TotalIncome = totalIncome,
-                    TotalExpense = totalExpense,
-                    NetAmount = totalIncome - totalExpense,
-                    TotalTransactions = totalTransactions,
-                    IncomeTransactions = incomeTransactions,
-                    ExpenseTransactions = expenseTransactions,
-                    RecentTransactions = recentTransactions.ToList()
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving transaction summary for user {UserId}", userId);
-                throw;
-            }
+            await UpdateBudgetSpentAmountAsync(transaction.CategoryId.Value, transaction.UserId);
         }
 
-        public async Task<IEnumerable<TransactionDto>> GetRecentTransactionsAsync(long userId, int count = 10)
-        {
-            try
-            {
-                var transactions = await _context.Transactions
-                    .Where(t => t.UserId == userId)
-                    .Include(t => t.Category)
-                    .OrderByDescending(t => t.TransactionDate)
-                    .Take(count)
-                    .Select(t => new TransactionDto
-                    {
-                        Id = t.Id,
-                        UserId = t.UserId,
-                        CategoryId = t.CategoryId,
-                        CategoryName = t.Category != null ? t.Category.Name : "Khác",
-                        Type = t.Type,
-                        Amount = t.Amount,
-                        Currency = t.Currency,
-                        Note = t.Note,
-                        TransactionDate = t.TransactionDate,
-                        CreatedAt = t.CreatedAt,
-                        UpdatedAt = t.UpdatedAt
-                    })
-                    .ToListAsync();
+        _logger.LogInformation("Deleted transaction {TransactionId} for user {UserId}", id, userId);
+        return true;
+    }
 
-                return transactions;
-            }
-            catch (Exception ex)
+    public async Task<(decimal totalIncome, decimal totalExpense, decimal netIncome)> GetUserSummaryAsync(long userId, DateTime startDate, DateTime endDate)
+    {
+        var transactions = await _unitOfWork.Transactions.FindAsync(t =>
+            t.UserId == userId &&
+            t.TransactionDate >= startDate &&
+            t.TransactionDate <= endDate);
+
+        var totalIncome = transactions.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
+        var totalExpense = transactions.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
+        var netIncome = totalIncome - totalExpense;
+
+        return (totalIncome, totalExpense, netIncome);
+    }
+
+    public async Task<IEnumerable<dynamic>> GetCategoryBreakdownAsync(long userId, DateTime startDate, DateTime endDate)
+    {
+        var transactions = await _unitOfWork.Transactions.FindAsync(t =>
+            t.UserId == userId &&
+            t.Type == TransactionType.Expense &&
+            t.TransactionDate >= startDate &&
+            t.TransactionDate <= endDate);
+
+        var categoryBreakdown = transactions
+            .GroupBy(t => new { t.CategoryId, t.Category?.Name, t.Category?.Icon, t.Category?.Color })
+            .Select(g => new
             {
-                _logger.LogError(ex, "Error retrieving recent transactions for user {UserId}", userId);
-                throw;
-            }
+                CategoryId = g.Key.CategoryId,
+                CategoryName = g.Key.Name ?? "Uncategorized",
+                CategoryIcon = g.Key.Icon,
+                CategoryColor = g.Key.Color,
+                TotalAmount = g.Sum(t => t.Amount),
+                TransactionCount = g.Count()
+            })
+            .OrderByDescending(x => x.TotalAmount)
+            .ToList();
+
+        return categoryBreakdown;
+    }
+
+    public async Task<IEnumerable<dynamic>> GetIncomeExpenseTrendAsync(long userId, int months = 12)
+    {
+        var startDate = DateTime.UtcNow.AddMonths(-months);
+        var transactions = await _unitOfWork.Transactions.FindAsync(t =>
+            t.UserId == userId &&
+            t.TransactionDate >= startDate);
+
+        var monthlyTrends = transactions
+            .GroupBy(t => new
+            {
+                Year = t.TransactionDate.Year,
+                Month = t.TransactionDate.Month
+            })
+            .Select(g => new
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                Income = g.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
+                Expense = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount),
+                Net = g.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount) - g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
+            })
+            .OrderBy(x => x.Year)
+            .ThenBy(x => x.Month)
+            .ToList();
+
+        return monthlyTrends;
+    }
+
+    private async Task UpdateBudgetSpentAmountAsync(long categoryId, long userId)
+    {
+        var budgets = await _unitOfWork.Budgets.FindAsync(b =>
+            b.UserId == userId &&
+            b.CategoryId == categoryId &&
+            b.StartDate <= DateTime.UtcNow &&
+            b.EndDate >= DateTime.UtcNow);
+
+        foreach (var budget in budgets)
+        {
+            var spentAmount = await _unitOfWork.Transactions.FindAsync(t =>
+                t.UserId == userId &&
+                t.CategoryId == categoryId &&
+                t.Type == TransactionType.Expense &&
+                t.TransactionDate >= budget.StartDate &&
+                t.TransactionDate <= budget.EndDate);
+
+            // Note: SpentAmount is now calculated dynamically, not stored in the model
+            // This method can be used to trigger budget notifications or other logic
         }
 
-        public async Task<decimal> GetTotalIncomeAsync(long userId, DateTime? startDate = null, DateTime? endDate = null)
-        {
-            try
-            {
-                var query = _context.Transactions.Where(t => t.UserId == userId && t.Type.ToLower() == "income");
-
-                if (startDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate >= DateOnly.FromDateTime(startDate.Value));
-                }
-
-                if (endDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate <= DateOnly.FromDateTime(endDate.Value));
-                }
-
-                return await query.SumAsync(t => t.Amount);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving total income for user {UserId}", userId);
-                throw;
-            }
-        }
-
-        public async Task<decimal> GetTotalExpenseAsync(long userId, DateTime? startDate = null, DateTime? endDate = null)
-        {
-            try
-            {
-                var query = _context.Transactions.Where(t => t.UserId == userId && t.Type.ToLower() == "expense");
-
-                if (startDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate >= DateOnly.FromDateTime(startDate.Value));
-                }
-
-                if (endDate.HasValue)
-                {
-                    query = query.Where(t => t.TransactionDate <= DateOnly.FromDateTime(endDate.Value));
-                }
-
-                return await query.SumAsync(t => t.Amount);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving total expense for user {UserId}", userId);
-                throw;
-            }
-        }
+        await _unitOfWork.SaveChangesAsync();
     }
 }

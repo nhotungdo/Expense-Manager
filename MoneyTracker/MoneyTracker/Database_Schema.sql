@@ -1,10 +1,4 @@
--- =============================================
--- Money Tracker Database Schema
--- Generated from Entity Framework Models
--- 
--- NOTE: Foreign key constraints use ON DELETE NO ACTION to avoid cascade cycles
--- Use DeleteCategorySafely stored procedure to safely delete categories
--- =============================================
+
 
 -- Create Database
 CREATE DATABASE ExpenseManager;
@@ -19,16 +13,30 @@ GO
 CREATE TABLE [Users] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [GoogleId] nvarchar(450) NOT NULL,
-    [Username] nvarchar(256) NOT NULL,
-    [Email] nvarchar(256) NOT NULL,
+    [UserName] nvarchar(256) NULL,
+    [NormalizedUserName] nvarchar(256) NULL,
+    [Email] nvarchar(256) NULL,
+    [NormalizedEmail] nvarchar(256) NULL,
+    [EmailConfirmed] bit NOT NULL DEFAULT 0,
+    [PasswordHash] nvarchar(max) NULL,
+    [SecurityStamp] nvarchar(max) NULL,
+    [ConcurrencyStamp] nvarchar(max) NULL,
+    [PhoneNumber] nvarchar(20) NULL,
+    [PhoneNumberConfirmed] bit NOT NULL DEFAULT 0,
+    [TwoFactorEnabled] bit NOT NULL DEFAULT 0,
+    [LockoutEnd] datetimeoffset NULL,
+    [LockoutEnabled] bit NOT NULL DEFAULT 1,
+    [AccessFailedCount] int NOT NULL DEFAULT 0,
+    [FirstName] nvarchar(128) NULL,
+    [LastName] nvarchar(128) NULL,
     [FullName] nvarchar(256) NULL,
-    [PictureUrl] nvarchar(512) NULL,
-    [Role] nvarchar(50) NOT NULL DEFAULT 'USER',
+    [ProfilePictureUrl] nvarchar(512) NULL,
+    [OnboardingCompleted] bit NOT NULL DEFAULT 0,
+    [Role] nvarchar(50) NOT NULL DEFAULT 'User',
     [Enabled] bit NOT NULL DEFAULT 1,
     [LastLogin] datetime2 NULL,
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     [UpdatedAt] datetime2 NULL,
-    [PhoneNumber] nvarchar(20) NULL,
     [DateOfBirth] date NULL,
     [Gender] nvarchar(10) NULL,
     [Address] nvarchar(512) NULL,
@@ -38,14 +46,13 @@ CREATE TABLE [Users] (
     [Theme] nvarchar(20) NOT NULL DEFAULT 'light',
     [EmailNotifications] bit NOT NULL DEFAULT 1,
     [PushNotifications] bit NOT NULL DEFAULT 1,
-    [Password] nvarchar(256) NULL,
     CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
 );
 GO
 
 -- Create unique indexes for Users
 CREATE UNIQUE INDEX [IX_Users_GoogleId] ON [Users] ([GoogleId]);
-CREATE UNIQUE INDEX [IX_Users_Username] ON [Users] ([Username]);
+CREATE UNIQUE INDEX [IX_Users_UserName] ON [Users] ([UserName]);
 CREATE UNIQUE INDEX [IX_Users_Email] ON [Users] ([Email]);
 GO
 
@@ -55,7 +62,7 @@ GO
 CREATE TABLE [Categories] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [Name] nvarchar(100) NOT NULL,
-    [Type] nvarchar(20) NOT NULL, -- 'expense' or 'income'
+    [Type] int NOT NULL, -- 1 = Income, 2 = Expense
     [Description] nvarchar(512) NULL,
     [Icon] nvarchar(50) NULL,
     [Color] nvarchar(20) NULL,
@@ -132,11 +139,10 @@ CREATE TABLE [Transactions] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
     [CategoryId] bigint NULL,
-    [Type] nvarchar(20) NOT NULL, -- 'expense' or 'income'
+    [Type] int NOT NULL, -- 1 = Income, 2 = Expense
     [Amount] decimal(18,2) NOT NULL,
-    [Currency] nvarchar(3) NULL DEFAULT 'VND',
-    [Note] nvarchar(512) NULL,
-    [TransactionDate] date NOT NULL,
+    [Description] nvarchar(512) NULL,
+    [TransactionDate] datetime2 NOT NULL,
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     [UpdatedAt] datetime2 NULL,
     CONSTRAINT [PK_Transactions] PRIMARY KEY ([Id]),
@@ -160,13 +166,10 @@ CREATE TABLE [Budgets] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
     [CategoryId] bigint NULL,
-    [BudgetAmount] decimal(18,2) NOT NULL,
-    [SpentAmount] decimal(18,2) NOT NULL DEFAULT 0,
-    [Currency] nvarchar(3) NULL DEFAULT 'VND',
-    [PeriodType] nvarchar(20) NOT NULL, -- 'monthly', 'weekly', 'yearly', 'custom'
-    [StartDate] date NOT NULL,
-    [EndDate] date NOT NULL,
-    [IsActive] bit NOT NULL DEFAULT 1,
+    [Amount] decimal(18,2) NOT NULL,
+    [Period] int NOT NULL, -- 1 = Weekly, 2 = Monthly, 3 = Yearly
+    [StartDate] datetime2 NOT NULL,
+    [EndDate] datetime2 NOT NULL,
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     [UpdatedAt] datetime2 NULL,
     CONSTRAINT [PK_Budgets] PRIMARY KEY ([Id]),
@@ -178,10 +181,9 @@ GO
 -- Create indexes for Budgets
 CREATE INDEX [IX_Budgets_UserId] ON [Budgets] ([UserId]);
 CREATE INDEX [IX_Budgets_CategoryId] ON [Budgets] ([CategoryId]);
-CREATE INDEX [IX_Budgets_PeriodType] ON [Budgets] ([PeriodType]);
+CREATE INDEX [IX_Budgets_Period] ON [Budgets] ([Period]);
 CREATE INDEX [IX_Budgets_StartDate] ON [Budgets] ([StartDate]);
 CREATE INDEX [IX_Budgets_EndDate] ON [Budgets] ([EndDate]);
-CREATE INDEX [IX_Budgets_IsActive] ON [Budgets] ([IsActive]);
 GO
 
 -- =============================================
@@ -218,6 +220,8 @@ CREATE TABLE [AiSuggestions] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
     [Suggestion] nvarchar(1024) NOT NULL,
+    [SuggestionType] nvarchar(50) NOT NULL DEFAULT 'Financial Advice',
+    [IsRead] bit NOT NULL DEFAULT 0,
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     CONSTRAINT [PK_AiSuggestions] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_AiSuggestions_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
@@ -306,7 +310,84 @@ CREATE INDEX [IX_Reports_CreatedAt] ON [Reports] ([CreatedAt]);
 GO
 
 -- =============================================
--- 12. SYSTEM SETTINGS TABLE
+-- 12. ASP.NET CORE IDENTITY TABLES
+-- =============================================
+
+-- AspNetRoles table
+CREATE TABLE [AspNetRoles] (
+    [Id] nvarchar(450) NOT NULL,
+    [Name] nvarchar(256) NULL,
+    [NormalizedName] nvarchar(256) NULL,
+    [ConcurrencyStamp] nvarchar(max) NULL,
+    CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
+);
+GO
+
+-- AspNetRoleClaims table
+CREATE TABLE [AspNetRoleClaims] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [RoleId] nvarchar(450) NOT NULL,
+    [ClaimType] nvarchar(max) NULL,
+    [ClaimValue] nvarchar(max) NULL,
+    CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE
+);
+GO
+
+-- AspNetUserClaims table
+CREATE TABLE [AspNetUserClaims] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [UserId] bigint NOT NULL,
+    [ClaimType] nvarchar(max) NULL,
+    [ClaimValue] nvarchar(max) NULL,
+    CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_AspNetUserClaims_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+-- AspNetUserLogins table
+CREATE TABLE [AspNetUserLogins] (
+    [LoginProvider] nvarchar(128) NOT NULL,
+    [ProviderKey] nvarchar(128) NOT NULL,
+    [ProviderDisplayName] nvarchar(max) NULL,
+    [UserId] bigint NOT NULL,
+    CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey]),
+    CONSTRAINT [FK_AspNetUserLogins_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+-- AspNetUserRoles table
+CREATE TABLE [AspNetUserRoles] (
+    [UserId] bigint NOT NULL,
+    [RoleId] nvarchar(450) NOT NULL,
+    CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY ([UserId], [RoleId]),
+    CONSTRAINT [FK_AspNetUserRoles_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE
+);
+GO
+
+-- AspNetUserTokens table
+CREATE TABLE [AspNetUserTokens] (
+    [UserId] bigint NOT NULL,
+    [LoginProvider] nvarchar(128) NOT NULL,
+    [Name] nvarchar(128) NOT NULL,
+    [Value] nvarchar(max) NULL,
+    CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY ([UserId], [LoginProvider], [Name]),
+    CONSTRAINT [FK_AspNetUserTokens_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+-- Create indexes for Identity tables
+CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [AspNetRoleClaims] ([RoleId]);
+CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName]) WHERE [NormalizedName] IS NOT NULL;
+CREATE INDEX [IX_AspNetUserClaims_UserId] ON [AspNetUserClaims] ([UserId]);
+CREATE INDEX [IX_AspNetUserLogins_UserId] ON [AspNetUserLogins] ([UserId]);
+CREATE INDEX [IX_AspNetUserRoles_UserId] ON [AspNetUserRoles] ([UserId]);
+CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [AspNetUserRoles] ([RoleId]);
+GO
+
+-- =============================================
+-- 13. SYSTEM SETTINGS TABLE
 -- =============================================
 CREATE TABLE [SystemSettings] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -332,31 +413,45 @@ GO
 
 -- =============================================
 
+-- Insert default roles
+INSERT INTO [AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp])
+VALUES 
+('1', 'Admin', 'ADMIN', NEWID()),
+('2', 'User', 'USER', NEWID());
+GO
+
 -- Insert default admin user
-INSERT INTO [Users] ([GoogleId], [Username], [Email], [FullName], [Role], [Enabled], [CreatedAt])
-VALUES ('admin', 'admin', 'nhotungdo89@gmail.com', 'System Administrator', 'ADMIN', 1, GETUTCDATE());
+INSERT INTO [Users] ([GoogleId], [UserName], [Email], [FullName], [Role], [Enabled], [CreatedAt])
+VALUES ('admin', 'admin', 'nhotungdo89@gmail.com', 'System Administrator', 'Admin', 1, GETUTCDATE());
+GO
+
+-- Assign admin role to admin user
+INSERT INTO [AspNetUserRoles] ([UserId], [RoleId])
+SELECT u.[Id], r.[Id]
+FROM [Users] u, [AspNetRoles] r
+WHERE u.[GoogleId] = 'admin' AND r.[Name] = 'Admin';
 GO
 
 -- Insert default categories
 INSERT INTO [Categories] ([Name], [Type], [Description], [Icon], [Color], [UserId], [IsDefault], [IsActive], [CreatedAt])
 VALUES 
--- Expense Categories
-(N'Ăn uống', 'expense', N'Chi phí ăn uống hàng ngày', 'fas fa-utensils', '#FF6B6B', NULL, 1, 1, GETUTCDATE()),
-(N'Giao thông', 'expense', N'Chi phí đi lại, xăng xe', 'fas fa-car', '#4ECDC4', NULL, 1, 1, GETUTCDATE()),
-(N'Mua sắm', 'expense', N'Mua sắm quần áo, đồ dùng', 'fas fa-shopping-bag', '#45B7D1', NULL, 1, 1, GETUTCDATE()),
-(N'Giải trí', 'expense', N'Chi phí giải trí, du lịch', 'fas fa-gamepad', '#96CEB4', NULL, 1, 1, GETUTCDATE()),
-(N'Y tế', 'expense', N'Chi phí khám chữa bệnh', 'fas fa-heartbeat', '#FFEAA7', NULL, 1, 1, GETUTCDATE()),
-(N'Học tập', 'expense', N'Chi phí học tập, sách vở', 'fas fa-book', '#DDA0DD', NULL, 1, 1, GETUTCDATE()),
-(N'Hóa đơn', 'expense', N'Điện, nước, internet', 'fas fa-file-invoice', '#98D8C8', NULL, 1, 1, GETUTCDATE()),
-(N'Khác', 'expense', N'Chi phí khác', 'fas fa-ellipsis-h', '#F7DC6F', NULL, 1, 1, GETUTCDATE()),
+-- Expense Categories (Type = 2)
+(N'Ăn uống', 2, N'Chi phí ăn uống hàng ngày', 'fas fa-utensils', '#FF6B6B', NULL, 1, 1, GETUTCDATE()),
+(N'Giao thông', 2, N'Chi phí đi lại, xăng xe', 'fas fa-car', '#4ECDC4', NULL, 1, 1, GETUTCDATE()),
+(N'Mua sắm', 2, N'Mua sắm quần áo, đồ dùng', 'fas fa-shopping-bag', '#45B7D1', NULL, 1, 1, GETUTCDATE()),
+(N'Giải trí', 2, N'Chi phí giải trí, du lịch', 'fas fa-gamepad', '#96CEB4', NULL, 1, 1, GETUTCDATE()),
+(N'Y tế', 2, N'Chi phí khám chữa bệnh', 'fas fa-heartbeat', '#FFEAA7', NULL, 1, 1, GETUTCDATE()),
+(N'Học tập', 2, N'Chi phí học tập, sách vở', 'fas fa-book', '#DDA0DD', NULL, 1, 1, GETUTCDATE()),
+(N'Hóa đơn', 2, N'Điện, nước, internet', 'fas fa-file-invoice', '#98D8C8', NULL, 1, 1, GETUTCDATE()),
+(N'Khác', 2, N'Chi phí khác', 'fas fa-ellipsis-h', '#F7DC6F', NULL, 1, 1, GETUTCDATE()),
 
--- Income Categories
-(N'Lương', 'income', N'Lương cơ bản hàng tháng', 'fas fa-briefcase', '#2ECC71', NULL, 1, 1, GETUTCDATE()),
-(N'Thưởng', 'income', N'Tiền thưởng, phụ cấp', 'fas fa-gift', '#F39C12', NULL, 1, 1, GETUTCDATE()),
-(N'Đầu tư', 'income', N'Lợi nhuận từ đầu tư', 'fas fa-chart-line', '#9B59B6', NULL, 1, 1, GETUTCDATE()),
-(N'Kinh doanh', 'income', N'Thu nhập từ kinh doanh', 'fas fa-store', '#E74C3C', NULL, 1, 1, GETUTCDATE()),
-(N'Làm thêm', 'income', N'Thu nhập từ việc làm thêm', 'fas fa-clock', '#3498DB', NULL, 1, 1, GETUTCDATE()),
-(N'Khác', 'income', N'Thu nhập khác', 'fas fa-plus-circle', '#1ABC9C', NULL, 1, 1, GETUTCDATE());
+-- Income Categories (Type = 1)
+(N'Lương', 1, N'Lương cơ bản hàng tháng', 'fas fa-briefcase', '#2ECC71', NULL, 1, 1, GETUTCDATE()),
+(N'Thưởng', 1, N'Tiền thưởng, phụ cấp', 'fas fa-gift', '#F39C12', NULL, 1, 1, GETUTCDATE()),
+(N'Đầu tư', 1, N'Lợi nhuận từ đầu tư', 'fas fa-chart-line', '#9B59B6', NULL, 1, 1, GETUTCDATE()),
+(N'Kinh doanh', 1, N'Thu nhập từ kinh doanh', 'fas fa-store', '#E74C3C', NULL, 1, 1, GETUTCDATE()),
+(N'Làm thêm', 1, N'Thu nhập từ việc làm thêm', 'fas fa-clock', '#3498DB', NULL, 1, 1, GETUTCDATE()),
+(N'Khác', 1, N'Thu nhập khác', 'fas fa-plus-circle', '#1ABC9C', NULL, 1, 1, GETUTCDATE());
 GO
 
 -- Insert default system settings
@@ -389,11 +484,11 @@ BEGIN
     
     SELECT 
         -- Total Income
-        ISNULL(SUM(CASE WHEN Type = 'income' THEN Amount ELSE 0 END), 0) AS TotalIncome,
+        ISNULL(SUM(CASE WHEN Type = 1 THEN Amount ELSE 0 END), 0) AS TotalIncome,
         -- Total Expense
-        ISNULL(SUM(CASE WHEN Type = 'expense' THEN Amount ELSE 0 END), 0) AS TotalExpense,
+        ISNULL(SUM(CASE WHEN Type = 2 THEN Amount ELSE 0 END), 0) AS TotalExpense,
         -- Net Income
-        ISNULL(SUM(CASE WHEN Type = 'income' THEN Amount ELSE -Amount END), 0) AS NetIncome,
+        ISNULL(SUM(CASE WHEN Type = 1 THEN Amount ELSE -Amount END), 0) AS NetIncome,
         -- Transaction Count
         COUNT(*) AS TransactionCount
     FROM [Transactions]
@@ -420,9 +515,9 @@ BEGIN
     FROM [Categories] c
     LEFT JOIN [Transactions] t ON c.[Id] = t.[CategoryId] 
         AND t.[UserId] = @UserId 
-        AND t.[Type] = 'expense'
+        AND t.[Type] = 2
         AND t.[TransactionDate] BETWEEN @StartDate AND @EndDate
-    WHERE c.[Type] = 'expense' AND c.[IsActive] = 1
+    WHERE c.[Type] = 2 AND c.[IsActive] = 1
     GROUP BY c.[Id], c.[Name], c.[Icon], c.[Color]
     ORDER BY TotalAmount DESC;
 END
@@ -450,9 +545,9 @@ BEGIN
     SELECT 
         [Year],
         [Month],
-        ISNULL(SUM(CASE WHEN [Type] = 'income' THEN [Amount] ELSE 0 END), 0) AS [Income],
-        ISNULL(SUM(CASE WHEN [Type] = 'expense' THEN [Amount] ELSE 0 END), 0) AS [Expense],
-        ISNULL(SUM(CASE WHEN [Type] = 'income' THEN [Amount] ELSE -[Amount] END), 0) AS [Net]
+        ISNULL(SUM(CASE WHEN [Type] = 1 THEN [Amount] ELSE 0 END), 0) AS [Income],
+        ISNULL(SUM(CASE WHEN [Type] = 2 THEN [Amount] ELSE 0 END), 0) AS [Expense],
+        ISNULL(SUM(CASE WHEN [Type] = 1 THEN [Amount] ELSE -[Amount] END), 0) AS [Net]
     FROM MonthlyData
     GROUP BY [Year], [Month]
     ORDER BY [Year], [Month];
@@ -516,18 +611,18 @@ GO
 CREATE VIEW [vw_UserTransactionSummary] AS
 SELECT 
     u.[Id] AS [UserId],
-    u.[Username],
+    u.[UserName],
     u.[Email],
     u.[FullName],
     COUNT(t.[Id]) AS [TotalTransactions],
-    ISNULL(SUM(CASE WHEN t.[Type] = 'income' THEN t.[Amount] ELSE 0 END), 0) AS [TotalIncome],
-    ISNULL(SUM(CASE WHEN t.[Type] = 'expense' THEN t.[Amount] ELSE 0 END), 0) AS [TotalExpense],
-    ISNULL(SUM(CASE WHEN t.[Type] = 'income' THEN t.[Amount] ELSE -t.[Amount] END), 0) AS [NetIncome],
+    ISNULL(SUM(CASE WHEN t.[Type] = 1 THEN t.[Amount] ELSE 0 END), 0) AS [TotalIncome],
+    ISNULL(SUM(CASE WHEN t.[Type] = 2 THEN t.[Amount] ELSE 0 END), 0) AS [TotalExpense],
+    ISNULL(SUM(CASE WHEN t.[Type] = 1 THEN t.[Amount] ELSE -t.[Amount] END), 0) AS [NetIncome],
     MAX(t.[TransactionDate]) AS [LastTransactionDate]
 FROM [Users] u
 LEFT JOIN [Transactions] t ON u.[Id] = t.[UserId]
 WHERE u.[Enabled] = 1
-GROUP BY u.[Id], u.[Username], u.[Email], u.[FullName];
+GROUP BY u.[Id], u.[UserName], u.[Email], u.[FullName];
 GO
 
 -- View for category usage statistics
@@ -611,39 +706,4 @@ BEGIN
     FROM [SystemSettings] s
     INNER JOIN inserted i ON s.[Id] = i.[Id];
 END
-GO
-
--- =============================================
--- GRANT PERMISSIONS
--- =============================================
-
--- Create application user (replace with your actual connection string details)
--- CREATE LOGIN [MoneyTrackerApp] WITH PASSWORD = 'YourSecurePassword123!';
--- CREATE USER [MoneyTrackerApp] FOR LOGIN [MoneyTrackerApp];
-
--- Grant permissions
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Users] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Categories] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Expenses] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Incomes] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Transactions] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Budgets] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Notifications] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [AiSuggestions] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [AuditLogs] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Emails] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [Reports] TO [MoneyTrackerApp];
--- GRANT SELECT, INSERT, UPDATE, DELETE ON [SystemSettings] TO [MoneyTrackerApp];
-
--- GRANT EXECUTE ON [dbo].[GetUserDashboardStats] TO [MoneyTrackerApp];
--- GRANT EXECUTE ON [dbo].[GetCategorySpendingSummary] TO [MoneyTrackerApp];
--- GRANT EXECUTE ON [dbo].[GetMonthlyTrends] TO [MoneyTrackerApp];
--- GRANT EXECUTE ON [dbo].[DeleteCategorySafely] TO [MoneyTrackerApp];
-
--- GRANT SELECT ON [vw_UserTransactionSummary] TO [MoneyTrackerApp];
--- GRANT SELECT ON [vw_CategoryUsageStats] TO [MoneyTrackerApp];
-
-PRINT 'Database schema created successfully!';
-PRINT 'Default data inserted successfully!';
-PRINT 'Stored procedures, views, and triggers created successfully!';
 GO

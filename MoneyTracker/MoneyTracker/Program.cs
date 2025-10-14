@@ -1,181 +1,162 @@
-using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MoneyTracker.Middleware;
-using MoneyTracker.Models;
-using MoneyTracker.Services;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Text;
+using MoneyTracker.Data;
+using MoneyTracker.Models;
+using MoneyTracker.Core.Interfaces;
+using MoneyTracker.Infrastructure.Repositories;
+using MoneyTracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/moneytracker-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+// Add services to the container
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 
-// Add Entity Framework
-builder.Services.AddDbContext<ExpenseManagerContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Add ASP.NET Core Identity
-builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
+// Configure Swagger/OpenAPI
+builder.Services.AddSwaggerGen(c =>
 {
-    // Password settings
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Money Tracker API",
+        Version = "v1",
+        Description = "A comprehensive money tracking and budgeting API"
+    });
 
-    // User settings
-    options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false;
-    options.SignIn.RequireConfirmedPhoneNumber = false;
-})
-.AddEntityFrameworkStores<ExpenseManagerContext>()
-.AddDefaultTokenProviders();
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
 
-// Configure Identity Authentication
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Identity/Account/Login";
-    options.LogoutPath = "/Identity/Account/Logout";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-    options.SlidingExpiration = true;
-    options.Cookie.Name = "MoneyTrackerAuth";
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
-// Add Google Authentication
+// Configure Entity Framework
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configure Identity
+builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key not configured");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings["Issuer"] ?? "MoneyTracker",
+        ValidateAudience = true,
+        ValidAudience = jwtSettings["Audience"] ?? "MoneyTrackerUsers",
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// Configure Google Authentication
 builder.Services.AddAuthentication()
     .AddGoogle(options =>
     {
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
-        options.CallbackPath = "/signin-google";
     });
 
-builder.Services.AddAuthorization();
+// Register services
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IAiService, AiService>();
 
-// Add CORS
+// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
-// Add Services
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IAuditService, AuditService>();
-builder.Services.AddScoped<IDefaultCategoryService, DefaultCategoryService>();
-builder.Services.AddScoped<IReportExportService, ReportExportService>();
-builder.Services.AddScoped<IAdvancedSearchService, AdvancedSearchService>();
-builder.Services.AddScoped<ILocalizationService, LocalizationService>();
-builder.Services.AddScoped<IAdvancedAnalyticsService, AdvancedAnalyticsService>();
-builder.Services.AddScoped<DefaultAdminService>();
-
-// Add new services
-builder.Services.AddScoped<IExpenseService, ExpenseService>();
-builder.Services.AddScoped<IIncomeService, IncomeService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAISuggestionService, AISuggestionService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
-builder.Services.AddScoped<IScheduledEmailService, ScheduledEmailService>();
-builder.Services.AddScoped<IValidationService, ValidationService>();
-builder.Services.AddScoped<IPerformanceService, PerformanceService>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<IBudgetService, BudgetService>();
-
-// Add background services
-builder.Services.AddHostedService<EmailBackgroundService>();
-
-// Add caching
-builder.Services.AddMemoryCache();
-
-// Add HTTP context accessor
-builder.Services.AddHttpContextAccessor();
-
-// Add HttpClient for external API calls
-builder.Services.AddHttpClient<IGeminiSuggestionService, GeminiSuggestionService>();
-
-// Add Gemini AI service
-builder.Services.AddScoped<IGeminiSuggestionService, GeminiSuggestionService>();
-
-// Google Auth configuration is handled in JWT configuration above
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Money Tracker API v1");
+        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+    });
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
 app.UseCors("AllowAll");
-app.UseRouting();
-
-// Add authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSerilogRequestLogging();
 
-// Temporarily disable custom middleware to isolate the issue
-// app.UseMiddleware<GlobalExceptionMiddleware>();
-// app.UseMiddleware<AuditMiddleware>();
-
-app.MapRazorPages();
 app.MapControllers();
 
-// Default route to HomePage
-app.MapGet("/", () => Results.Redirect("/HomePage"));
-
-// Ensure database is created and run migrations
+// Ensure database is created
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<ExpenseManagerContext>();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     context.Database.EnsureCreated();
-
-    // Apply migrations to ensure default admin user is created
-    try
-    {
-        context.Database.Migrate();
-        Log.Information("Database migrations applied successfully");
-    }
-    catch (Exception ex)
-    {
-        Log.Error(ex, "Error applying database migrations");
-    }
-
-    // Ensure default admin user exists
-    try
-    {
-        var defaultAdminService = scope.ServiceProvider.GetRequiredService<DefaultAdminService>();
-        await defaultAdminService.EnsureDefaultAdminExistsAsync();
-    }
-    catch (Exception ex)
-    {
-        Log.Error(ex, "Error ensuring default admin user exists");
-    }
 }
 
 app.Run();

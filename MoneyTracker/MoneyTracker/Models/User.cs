@@ -7,11 +7,17 @@ public partial class User : IdentityUser<long>
 {
     public string GoogleId { get; set; } = null!;
 
+    public string? FirstName { get; set; }
+
+    public string? LastName { get; set; }
+
     public string? FullName { get; set; }
 
-    public string? PictureUrl { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 
-    public string Role { get; set; } = null!;
+    public bool OnboardingCompleted { get; set; } = false;
+
+    public string Role { get; set; } = "User";
 
     public bool Enabled { get; set; } = true;
 
@@ -54,4 +60,6 @@ public partial class User : IdentityUser<long>
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Email> Emails { get; set; } = new List<Email>();
+
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

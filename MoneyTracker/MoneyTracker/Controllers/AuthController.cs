@@ -1,269 +1,88 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Google.Apis.Auth;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using MoneyTracker.Core.Interfaces;
+using MoneyTracker.DTOs.Auth;
 using MoneyTracker.Models;
-using MoneyTracker.Models.DTOs;
 
-namespace MoneyTracker.Controllers
+namespace MoneyTracker.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
+
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
-        private readonly ExpenseManagerContext _context;
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<AuthController> _logger;
+        _authService = authService;
+        _logger = logger;
+    }
 
-        public AuthController(ExpenseManagerContext context, IConfiguration configuration, ILogger<AuthController> logger)
+    [HttpPost("google-login")]
+    public async Task<ActionResult<LoginResponse>> GoogleLogin([FromBody] GoogleLoginRequest request)
+    {
+        try
         {
-            _context = context;
-            _configuration = configuration;
-            _logger = logger;
-        }
-
-        [HttpGet("google-login")]
-        public IActionResult GoogleLoginInfo()
-        {
-            // When users open the API URL directly in the browser (GET),
-            // guide them to the proper login page instead of returning 405.
-            return Redirect("/Login");
-        }
-
-        [HttpPost("google-login")]
-        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto request)
-        {
-            try
+            if (string.IsNullOrEmpty(request.Token))
             {
-                // Verify Google token
-                var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings()
-                {
-                    Audience = new[] { _configuration["Authentication:Google:ClientId"] }
-                });
-
-                if (payload == null)
-                {
-                    return BadRequest("Invalid Google token");
-                }
-
-                // Find or create user
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == payload.Subject);
-
-                if (user == null)
-                {
-                    // Check if this is the default admin email
-                    var isDefaultAdmin = payload.Email == "nhotungdo89@gmail.com";
-
-                    user = new User
-                    {
-                        GoogleId = payload.Subject,
-                        Email = payload.Email,
-                        UserName = payload.Email.Split('@')[0],
-                        FullName = payload.Name,
-                        PictureUrl = payload.Picture,
-                        Role = isDefaultAdmin ? "ADMIN" : "USER",
-                        Enabled = true,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-
-                    _context.Users.Add(user);
-                }
-                else
-                {
-                    if (!user.Enabled)
-                    {
-                        return BadRequest("Tài khoản đã bị vô hiệu hóa");
-                    }
-
-                    // Check if this is the default admin email and update role if needed
-                    if (user.Email == "nhotungdo89@gmail.com" && user.Role != "ADMIN")
-                    {
-                        user.Role = "ADMIN";
-                    }
-
-                    // Update last login and user info
-                    user.LastLogin = DateTime.UtcNow;
-                    user.UpdatedAt = DateTime.UtcNow;
-                    user.FullName = payload.Name;
-                    user.PictureUrl = payload.Picture;
-                }
-
-                await _context.SaveChangesAsync();
-
-                // Check if this is a new user (first login)
-                var isNewUser = user.LastLogin == null || user.CreatedAt?.Date == DateTime.UtcNow.Date;
-
-                // Create claims for cookie authentication
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("GoogleId", user.GoogleId)
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                // Sign in with cookie authentication
-                await HttpContext.SignInAsync(claimsPrincipal, new Microsoft.AspNetCore.Authentication.AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(60)
-                });
-
-                _logger.LogInformation("User {UserId} logged in successfully", user.Id);
-
-                return Ok(new AuthResponseDto
-                {
-                    Token = "cookie-auth", // Placeholder for compatibility
-                    IsNewUser = isNewUser,
-                    User = new UserDto
-                    {
-                        Id = user.Id,
-                        Username = user.UserName,
-                        Email = user.Email,
-                        FullName = user.FullName,
-                        PictureUrl = user.PictureUrl,
-                        Role = user.Role,
-                        Enabled = user.Enabled,
-                        LastLogin = user.LastLogin,
-                        CreatedAt = user.CreatedAt,
-                        UpdatedAt = user.UpdatedAt
-                    }
-                });
+                return BadRequest("Token is required");
             }
-            catch (Exception ex)
+
+            var user = await _authService.AuthenticateGoogleUserAsync(request.Token);
+            if (user == null)
             {
-                _logger.LogError(ex, "Error during Google login");
-                return StatusCode(500, "Internal server error during authentication");
+                return Unauthorized("Invalid Google token");
             }
-        }
 
-        [HttpGet("logout")]
-        public IActionResult LogoutGet()
-        {
-            // Redirect to logout page for GET requests
-            return Redirect("/Account/Logout");
-        }
+            var token = await _authService.GenerateJwtTokenAsync(user);
+            var isNewUser = user.CreatedAt?.Date == DateTime.UtcNow.Date;
 
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            try
+            var response = new LoginResponse
             {
-                var userId = GetCurrentUserId();
-                if (userId.HasValue)
-                {
-                    _logger.LogInformation("User {UserId} logged out", userId.Value);
-                }
-                else
-                {
-                    _logger.LogInformation("Anonymous user logged out");
-                }
-
-                // Sign out from cookie authentication
-                await HttpContext.SignOutAsync();
-
-                return Ok(new { message = "Logged out successfully" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during logout");
-                return Ok(new { message = "Logged out successfully" }); // Still return success for client-side cleanup
-            }
-        }
-
-
-        [HttpGet("me")]
-        public async Task<IActionResult> GetCurrentUser()
-        {
-            try
-            {
-                var userId = GetCurrentUserId();
-                if (userId == null)
-                {
-                    return Unauthorized();
-                }
-
-                var user = await _context.Users.FindAsync(userId);
-                if (user == null || !user.Enabled)
-                {
-                    return Unauthorized();
-                }
-
-                return Ok(new UserDto
+                Token = token,
+                User = new UserDto
                 {
                     Id = user.Id,
-                    Username = user.UserName,
-                    Email = user.Email,
-                    FullName = user.FullName,
-                    PictureUrl = user.PictureUrl,
+                    Email = user.Email ?? "",
+                    FirstName = user.FirstName ?? "",
+                    LastName = user.LastName ?? "",
+                    FullName = user.FullName ?? "",
+                    ProfilePictureUrl = user.ProfilePictureUrl ?? "",
+                    OnboardingCompleted = user.OnboardingCompleted,
                     Role = user.Role,
                     Enabled = user.Enabled,
+                    LastLogin = user.LastLogin,
                     CreatedAt = user.CreatedAt,
-                    LastLogin = user.LastLogin
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting current user");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!);
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role),
-                new Claim("GoogleId", user.GoogleId)
+                    Language = user.Language,
+                    DefaultCurrency = user.DefaultCurrency,
+                    Timezone = user.Timezone,
+                    Theme = user.Theme
+                },
+                IsNewUser = isNewUser
             };
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiryMinutes"]!)),
-                Issuer = jwtSettings["Issuer"],
-                Audience = jwtSettings["Audience"],
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            _logger.LogInformation("User {UserId} logged in successfully", user.Id);
+            return Ok(response);
         }
-
-        private long? GetCurrentUserId()
+        catch (Exception ex)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return long.TryParse(userIdClaim, out var userId) ? userId : null;
+            _logger.LogError(ex, "Error during Google login");
+            return StatusCode(500, "Internal server error");
         }
     }
 
-    public class GoogleLoginDto
+    [HttpPost("validate-token")]
+    public async Task<ActionResult<bool>> ValidateToken([FromBody] string token)
     {
-        public string IdToken { get; set; } = string.Empty;
-    }
-
-    public class AuthResponseDto
-    {
-        public string Token { get; set; } = string.Empty;
-        public bool IsNewUser { get; set; }
-        public UserDto User { get; set; } = null!;
+        try
+        {
+            var isValid = await _authService.ValidateTokenAsync(token);
+            return Ok(isValid);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error validating token");
+            return StatusCode(500, "Internal server error");
+        }
     }
 }

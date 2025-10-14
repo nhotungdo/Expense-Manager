@@ -1,278 +1,243 @@
-# Money Tracker - Ứng Dụng Quản Lý Tài Chính Thông Minh
+# Money Tracker - Ứng dụng Quản lý Tài chính Cá nhân
 
-## 📋 Tổng Quan
+Ứng dụng Money Tracker là một hệ thống quản lý tài chính cá nhân hoàn chỉnh với backend ASP.NET Core và frontend React TypeScript.
 
-Money Tracker là một ứng dụng web quản lý tài chính cá nhân được xây dựng bằng ASP.NET Core 8.0, cung cấp các tính năng quản lý thu chi, ngân sách, báo cáo thống kê và gợi ý thông minh từ AI.
+## 🚀 Tính năng chính
 
-## ✨ Tính Năng Chính
+### Backend (ASP.NET Core Web API)
+- ✅ **Clean Architecture** với Repository Pattern và Unit of Work
+- ✅ **JWT Authentication** kết hợp Google OAuth2
+- ✅ **Entity Framework Core** với SQL Server
+- ✅ **Swagger/OpenAPI** documentation
+- ✅ **Serilog** logging
+- ✅ **Comprehensive API endpoints** cho tất cả tính năng
 
-### 👤 Cho Người Dùng
-- **🔐 Xác thực & Tài khoản**
-  - Đăng nhập bằng Google OAuth2
-  - Quản lý hồ sơ cá nhân
-  - Onboarding cho người dùng mới
+### Frontend (React TypeScript)
+- ✅ **Modern React 18** với TypeScript
+- ✅ **Material-UI (MUI)** cho giao diện đẹp
+- ✅ **React Router** cho navigation
+- ✅ **React Query** cho data fetching
+- ✅ **Zustand** cho state management
+- ✅ **Recharts** cho biểu đồ
+- ✅ **Responsive design** cho mobile và desktop
 
-- **💸 Quản lý Giao dịch**
-  - Thêm, sửa, xóa giao dịch thu/chi
-  - Tìm kiếm và lọc giao dịch
-  - Xem danh sách giao dịch theo thời gian
+### Tính năng nghiệp vụ
+- 🔐 **Đăng nhập bằng Google OAuth2**
+- 📊 **Dashboard** với biểu đồ thu chi
+- 💰 **Quản lý giao dịch** (thu nhập/chi tiêu)
+- 📂 **Quản lý danh mục** (hệ thống + cá nhân)
+- 💳 **Quản lý ngân sách** với cảnh báo
+- 📈 **Báo cáo và thống kê** chi tiết
+- 🤖 **AI Suggestions** thông minh
+- 📤 **Xuất báo cáo** Excel/PDF
 
-- **🧾 Quản lý Danh mục**
-  - Tạo, sửa, xóa danh mục cá nhân
-  - Danh mục mặc định cho thu nhập và chi tiêu
-  - Hỗ trợ icon và màu sắc cho danh mục
-
-- **💰 Ngân sách cá nhân**
-  - Đặt ngân sách theo tháng/tuần/năm
-  - Theo dõi chi tiêu so với ngân sách
-  - Cảnh báo khi vượt hạn mức
-
-- **🤖 AI Gợi ý**
-  - Gợi ý chi tiêu thông minh
-  - Khuyến nghị ngân sách tự động
-  - Phân tích xu hướng chi tiêu
-
-- **📊 Báo cáo & Thống kê**
-  - Báo cáo tháng/tuần/năm
-  - Biểu đồ thu/chi trực quan
-  - So sánh kỳ trước
-  - Xuất file Excel/PDF
-
-### 🧑‍💼 Cho Quản trị viên
-- **👥 Quản lý người dùng**
-  - Xem danh sách người dùng
-  - Phân quyền User/Admin
-  - Khóa/mở khóa tài khoản
-
-- **🗂️ Quản lý danh mục hệ thống**
-  - Tạo danh mục mặc định
-  - Chỉnh sửa danh mục toàn cục
-
-- **📈 Giám sát hệ thống**
-  - Theo dõi hoạt động người dùng
-  - Thống kê tổng chi tiêu toàn hệ thống
-  - Kiểm tra gợi ý AI
-
-## 🛠️ Công Nghệ Sử Dụng
+## 🛠️ Công nghệ sử dụng
 
 ### Backend
-- **ASP.NET Core 8.0** - Framework web
-- **Entity Framework Core** - ORM
-- **SQL Server** - Database
-- **JWT Authentication** - Xác thực
-- **Google OAuth2** - Đăng nhập Google
-- **Serilog** - Logging
-- **AutoMapper** - Object mapping
+- .NET 8
+- ASP.NET Core Web API
+- Entity Framework Core
+- SQL Server
+- JWT Authentication
+- Google OAuth2
+- Swagger/OpenAPI
+- Serilog
+- AutoMapper
+- ClosedXML (Excel export)
 
 ### Frontend
-- **Razor Pages** - Server-side rendering
-- **Bootstrap 5** - CSS Framework
-- **Chart.js** - Biểu đồ
-- **Font Awesome** - Icons
-- **JavaScript ES6+** - Client-side logic
+- React 18
+- TypeScript
+- Material-UI (MUI)
+- React Router DOM
+- React Query
+- Zustand
+- Recharts
+- Axios
+- React Hook Form
 
-### Services & Libraries
-- **MailKit** - Email service
-- **iTextSharp** - PDF generation
-- **ClosedXML** - Excel export
-- **EPPlus** - Excel processing
+## 📁 Cấu trúc dự án
 
-## 🚀 Cài Đặt và Chạy
-
-### Yêu Cầu Hệ Thống
-- .NET 8.0 SDK
-- SQL Server 2019+
-- Visual Studio 2022 hoặc VS Code
-
-### Bước 1: Clone Repository
-```bash
-git clone <repository-url>
-cd Expense-Manager/MoneyTracker/MoneyTracker
+```
+Expense-Manager/
+├── MoneyTracker/                    # Backend ASP.NET Core
+│   ├── MoneyTracker/
+│   │   ├── Controllers/            # API Controllers
+│   │   ├── Services/               # Business Logic Services
+│   │   ├── Core/                   # Domain Interfaces
+│   │   ├── Infrastructure/         # Repository Implementation
+│   │   ├── Data/                   # DbContext
+│   │   ├── Models/                 # Entity Models
+│   │   ├── DTOs/                   # Data Transfer Objects
+│   │   └── Program.cs              # Application Entry Point
+│   └── MoneyTracker.sln
+├── money-tracker-frontend/          # Frontend React
+│   ├── src/
+│   │   ├── components/             # React Components
+│   │   ├── services/               # API Services
+│   │   ├── store/                  # State Management
+│   │   ├── types/                  # TypeScript Types
+│   │   └── utils/                  # Utility Functions
+│   └── package.json
+└── README.md
 ```
 
-### Bước 2: Cấu Hình Database
-1. Mở file `appsettings.json`
-2. Cập nhật connection string:
+## 🚀 Hướng dẫn chạy ứng dụng
+
+### 1. Chuẩn bị môi trường
+
+**Yêu cầu:**
+- .NET 8 SDK
+- SQL Server (LocalDB hoặc SQL Server Express)
+- Node.js 16+ và npm
+- Visual Studio 2022 hoặc VS Code
+
+### 2. Chạy Backend
+
+```bash
+# Di chuyển vào thư mục backend
+cd MoneyTracker/MoneyTracker
+
+# Restore packages
+dotnet restore
+
+# Cập nhật database (nếu cần)
+dotnet ef database update
+
+# Chạy ứng dụng
+dotnet run
+```
+
+Backend sẽ chạy tại: `https://localhost:7000`
+Swagger UI: `https://localhost:7000`
+
+### 3. Chạy Frontend
+
+```bash
+# Di chuyển vào thư mục frontend
+cd money-tracker-frontend
+
+# Cài đặt dependencies
+npm install
+
+# Tạo file environment
+echo "REACT_APP_API_URL=https://localhost:7000/api" > .env.local
+echo "REACT_APP_GOOGLE_CLIENT_ID=294978301369-6b2q7e4pdo503srrn6vuvv7dppqntuuv.apps.googleusercontent.com" >> .env.local
+
+# Chạy ứng dụng
+npm start
+```
+
+Frontend sẽ chạy tại: `http://localhost:3000`
+
+### 4. Cấu hình Database
+
+Database sẽ được tạo tự động khi chạy lần đầu. Nếu cần tạo thủ công:
+
+```sql
+-- Chạy script Database_Schema.sql trong SQL Server Management Studio
+-- Hoặc sử dụng Entity Framework migrations
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```
+
+## 🔧 Cấu hình
+
+### Backend Configuration (appsettings.json)
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Data Source=YOUR_SERVER;Initial Catalog=ExpenseManager;User ID=YOUR_USER;Password=YOUR_PASSWORD;Trusted_Connection=True;Trust Server Certificate=True"
-  }
-}
-```
-
-### Bước 3: Cấu Hình Google OAuth
-1. Tạo project trên [Google Cloud Console](https://console.cloud.google.com/)
-2. Bật Google+ API
-3. Tạo OAuth 2.0 credentials
-4. Cập nhật trong `appsettings.json`:
-```json
-{
+    "DefaultConnection": "Data Source=NHOTUNG\\SQLEXPRESS;Initial Catalog=ExpenseManager;..."
+  },
+  "Jwt": {
+    "Key": "YourSuperSecretKeyThatIsAtLeast32CharactersLong!",
+    "Issuer": "MoneyTracker",
+    "Audience": "MoneyTrackerUsers",
+    "ExpiryMinutes": 60
+  },
   "Authentication": {
     "Google": {
-      "ClientId": "YOUR_CLIENT_ID",
-      "ClientSecret": "YOUR_CLIENT_SECRET"
+      "ClientId": "your-google-client-id",
+      "ClientSecret": "your-google-client-secret"
     }
   }
 }
 ```
 
-### Bước 4: Chạy Migration
-```bash
-dotnet ef database update
+### Frontend Configuration (.env.local)
+```
+REACT_APP_API_URL=https://localhost:7000/api
+REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 
-### Bước 5: Chạy Ứng Dụng
-```bash
-dotnet run
-```
+## 📚 API Documentation
 
-Truy cập: `https://localhost:5001`
+Sau khi chạy backend, truy cập Swagger UI tại `https://localhost:7000` để xem tài liệu API đầy đủ.
 
-## 📁 Cấu Trúc Dự Án
-
-```
-MoneyTracker/
-├── Controllers/          # API Controllers
-│   ├── AuthController.cs
-│   ├── DashboardController.cs
-│   ├── TransactionController.cs
-│   ├── BudgetController.cs
-│   ├── ReportController.cs
-│   └── AdminController.cs
-├── Models/              # Data Models
-│   ├── User.cs
-│   ├── Expense.cs
-│   ├── Income.cs
-│   ├── Budget.cs
-│   ├── Category.cs
-│   └── DTOs/           # Data Transfer Objects
-├── Services/            # Business Logic
-│   ├── ITransactionService.cs
-│   ├── TransactionService.cs
-│   ├── IBudgetService.cs
-│   ├── BudgetService.cs
-│   └── ...
-├── Pages/              # Razor Pages
-│   ├── Login.cshtml
-│   ├── Dashboard.cshtml
-│   ├── Transactions.cshtml
-│   ├── Budgets.cshtml
-│   ├── Reports.cshtml
-│   ├── AI.cshtml
-│   └── Admin.cshtml
-├── Migrations/         # Database Migrations
-├── wwwroot/           # Static Files
-│   ├── css/
-│   ├── js/
-│   └── lib/
-└── Program.cs         # Application Entry Point
-```
-
-## 🔧 API Endpoints
-
-### Authentication
-- `POST /api/auth/login` - Đăng nhập
-- `POST /api/auth/google` - Đăng nhập Google
-- `POST /api/auth/logout` - Đăng xuất
-
-### Transactions
+### Các endpoint chính:
+- `POST /api/auth/google-login` - Đăng nhập Google
+- `GET /api/users/me` - Lấy thông tin user
 - `GET /api/transactions` - Lấy danh sách giao dịch
 - `POST /api/transactions` - Tạo giao dịch mới
-- `PUT /api/transactions/{id}` - Cập nhật giao dịch
-- `DELETE /api/transactions/{id}` - Xóa giao dịch
+- `GET /api/categories` - Lấy danh mục
+- `GET /api/budgets` - Lấy ngân sách
+- `GET /api/reports/summary` - Báo cáo tổng quan
+- `GET /api/ai/suggestions` - Gợi ý AI
 
-### Budgets
-- `GET /api/budgets` - Lấy danh sách ngân sách
-- `POST /api/budgets` - Tạo ngân sách mới
-- `PUT /api/budgets/{id}` - Cập nhật ngân sách
-- `DELETE /api/budgets/{id}` - Xóa ngân sách
+## 🎯 Sử dụng ứng dụng
 
-### Reports
-- `GET /api/reports/monthly` - Báo cáo tháng
-- `GET /api/reports/yearly` - Báo cáo năm
-- `GET /api/reports/custom` - Báo cáo tùy chỉnh
-- `GET /api/reports/export/{format}` - Xuất báo cáo
+1. **Đăng nhập**: Sử dụng Google OAuth2
+2. **Dashboard**: Xem tổng quan tài chính với biểu đồ
+3. **Giao dịch**: Thêm, sửa, xóa thu nhập/chi tiêu
+4. **Danh mục**: Quản lý danh mục cá nhân
+5. **Ngân sách**: Tạo và theo dõi ngân sách
+6. **Báo cáo**: Xem báo cáo chi tiết và xuất file
+7. **AI Suggestions**: Nhận gợi ý thông minh
 
-### Admin
-- `GET /api/admin/users` - Quản lý người dùng
-- `GET /api/admin/stats` - Thống kê hệ thống
-- `GET /api/admin/logs` - Nhật ký hoạt động
+## 🔒 Bảo mật
 
-## 🎨 Giao Diện
+- JWT token authentication
+- Google OAuth2 integration
+- CORS configuration
+- Input validation
+- SQL injection protection
+- XSS protection
 
-Ứng dụng sử dụng thiết kế hiện đại với:
-- **Glassmorphism** - Hiệu ứng kính mờ
-- **Gradient Backgrounds** - Nền gradient đẹp mắt
-- **Responsive Design** - Tương thích mọi thiết bị
-- **Dark Theme** - Giao diện tối hiện đại
-- **Smooth Animations** - Hiệu ứng mượt mà
+## 📱 Responsive Design
 
-## 🔒 Bảo Mật
+Ứng dụng được thiết kế responsive, hoạt động tốt trên:
+- Desktop (1200px+)
+- Tablet (768px - 1199px)
+- Mobile (< 768px)
 
-- **JWT Authentication** - Xác thực token
-- **Google OAuth2** - Đăng nhập an toàn
-- **HTTPS** - Mã hóa dữ liệu
-- **Input Validation** - Kiểm tra đầu vào
-- **SQL Injection Protection** - Bảo vệ khỏi SQL injection
-- **CORS Configuration** - Cấu hình CORS
+## 🚀 Deployment
 
-## 📊 Database Schema
+### Backend
+- Deploy lên Azure App Service hoặc IIS
+- Cấu hình connection string cho production database
+- Cập nhật Google OAuth2 redirect URLs
 
-### Bảng chính:
-- **Users** - Thông tin người dùng
-- **Expenses** - Giao dịch chi tiêu
-- **Incomes** - Giao dịch thu nhập
-- **Categories** - Danh mục
-- **Budgets** - Ngân sách
-- **Transactions** - Giao dịch tổng hợp
-- **Reports** - Báo cáo
-- **AuditLogs** - Nhật ký hoạt động
+### Frontend
+- Build production: `npm run build`
+- Deploy lên Netlify, Vercel hoặc Azure Static Web Apps
+- Cấu hình environment variables
 
-## 🚀 Triển Khai
-
-### Docker
-```bash
-docker build -t money-tracker .
-docker run -p 5000:80 money-tracker
-```
-
-### Azure
-1. Tạo App Service trên Azure
-2. Cấu hình connection string
-3. Deploy từ GitHub Actions
-
-### IIS
-1. Publish ứng dụng
-2. Cấu hình IIS
-3. Thiết lập SSL certificate
-
-## 🤝 Đóng Góp
+## 🤝 Đóng góp
 
 1. Fork repository
-2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Mở Pull Request
+2. Tạo feature branch
+3. Commit changes
+4. Push to branch
+5. Tạo Pull Request
 
-## 📝 License
+## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+MIT License
 
-## 📞 Liên Hệ
+## 📞 Hỗ trợ
 
-- **Email**: support@moneytracker.com
-- **Website**: https://moneytracker.com
-- **GitHub**: https://github.com/yourusername/money-tracker
-
-## 🙏 Acknowledgments
-
-- [ASP.NET Core](https://dotnet.microsoft.com/apps/aspnet) - Web framework
-- [Bootstrap](https://getbootstrap.com/) - CSS framework
-- [Chart.js](https://www.chartjs.org/) - Chart library
-- [Font Awesome](https://fontawesome.com/) - Icons
-- [Google OAuth](https://developers.google.com/identity) - Authentication
+Nếu có vấn đề, vui lòng tạo issue trên GitHub hoặc liên hệ qua email.
 
 ---
 
-**Money Tracker** - Quản lý tài chính thông minh, đơn giản và hiệu quả! 💰✨
+**Chúc bạn sử dụng ứng dụng Money Tracker hiệu quả! 💰📊**
