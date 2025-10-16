@@ -1,0 +1,71 @@
+@page "/Reports"
+@model MoneyTracker.Pages.Reports.IndexModel
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<h2 class="mb-3">Báo cáo</h2>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form class="row g-2">
+            <div class="col-md-3"><input type="month" class="form-control" /></div>
+            <div class="col-md-3"><select class="form-select">
+                    <option>Danh mục</option>
+                </select></div>
+            <div class="col-md-3"><select class="form-select">
+                    <option>Ví</option>
+                </select></div>
+            <div class="col-md-3 d-grid gap-2 d-md-block">
+                <button class="btn btn-outline-secondary"><i class="fa-solid fa-filter me-1"></i>Lọc</button>
+                <button class="btn btn-outline-primary"><i class="fa-solid fa-file-csv me-1"></i>Xuất CSV</button>
+                <button class="btn btn-outline-danger"><i class="fa-solid fa-file-pdf me-1"></i>Xuất PDF</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Tỷ lệ chi theo danh mục</h5>
+                <canvas id="reportPie"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Tổng chi từng tháng</h5>
+                <canvas id="reportBar"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mt-3">
+    <div class="card-body">
+        <h5 class="card-title">Phân tích AI</h5>
+        <ul>
+            <li>Cân đối chi tiêu ăn uống, đặt giới hạn hợp lý.</li>
+            <li>Tận dụng khuyến mãi khi mua sắm thiết yếu.</li>
+            <li>Ghi chép đầy đủ để theo dõi thói quen chi tiêu.</li>
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        new Chart(document.getElementById('reportPie'), {
+            type: 'doughnut',
+            data: { labels: ['Ăn uống', 'Di chuyển', 'Hóa đơn', 'Khác'], datasets: [{ data: [40, 20, 25, 15], backgroundColor: ['#0ea5a4', '#94a3b8', '#f59e0b', '#ef4444'] }] },
+            options: { responsive: true }
+        });
+        new Chart(document.getElementById('reportBar'), {
+            type: 'bar',
+            data: { labels: ['1', '2', '3', '4', '5', '6'], datasets: [{ label: 'Chi', data: [3, 4, 2, 5, 3, 6], backgroundColor: '#0ea5a4' }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+}

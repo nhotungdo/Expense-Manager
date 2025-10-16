@@ -1,3 +1,6 @@
+﻿using System;
+using System.Collections.Generic;
+
 namespace MoneyTracker.Models;
 
 public partial class Report
@@ -6,7 +9,7 @@ public partial class Report
 
     public long UserId { get; set; }
 
-    public string ReportType { get; set; } = null!; // "monthly", "weekly", "yearly", "custom"
+    public string ReportType { get; set; } = null!;
 
     public string ReportName { get; set; } = null!;
 
@@ -14,11 +17,11 @@ public partial class Report
 
     public DateOnly EndDate { get; set; }
 
-    public string? Parameters { get; set; } // JSON string for additional parameters
+    public string? Parameters { get; set; }
 
-    public string? FilePath { get; set; } // Path to generated report file
+    public string? FilePath { get; set; }
 
-    public string? FileFormat { get; set; } // "pdf", "excel", "csv"
+    public string? FileFormat { get; set; }
 
     public DateTime? GeneratedAt { get; set; }
 

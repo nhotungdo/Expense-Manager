@@ -1,3 +1,6 @@
+﻿using System;
+using System.Collections.Generic;
+
 namespace MoneyTracker.Models;
 
 public partial class Email
@@ -18,4 +21,3 @@ public partial class Email
 
     public virtual User User { get; set; } = null!;
 }
-

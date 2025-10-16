@@ -1,0 +1,37 @@
+@page "/Settings"
+@model MoneyTracker.Pages.Settings.IndexModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<h2 class="mb-3">Cài đặt</h2>
+<form class="card border-0 shadow-sm p-3">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Giờ gửi email hằng ngày</label>
+            <input type="time" class="form-control" value="08:00" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Múi giờ</label>
+            <select class="form-select">
+                <option selected>Asia/Ho_Chi_Minh</option>
+                <option>UTC</option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="emailSwitch" checked>
+                <label class="form-check-label" for="emailSwitch">Bật email nhắc nhở</label>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="aiSwitch" checked>
+                <label class="form-check-label" for="aiSwitch">Bật gợi ý AI</label>
+            </div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <button class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-1"></i>Lưu thay đổi</button>
+    </div>
+</form>

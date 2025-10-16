@@ -1,0 +1,36 @@
+@page "/Categories"
+@model MoneyTracker.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="mb-0">Danh mục</h2>
+    <a class="btn btn-primary" asp-page="/Categories/Create"><i class="fa-solid fa-plus me-1"></i>Thêm danh mục</a>
+</div>
+
+<div class="table-responsive card border-0 shadow-sm">
+    <table class="table align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Tên</th>
+                <th>Loại</th>
+                <th>Mô tả</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Ăn uống</td>
+                <td>Chi</td>
+                <td>Ăn, uống</td>
+                <td class="text-nowrap">
+                    <a class="btn btn-sm btn-outline-primary" asp-page="/Categories/Edit"><i
+                            class="fa-solid fa-pen-to-square"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" asp-page="/Categories/Delete"><i
+                            class="fa-solid fa-trash"></i></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

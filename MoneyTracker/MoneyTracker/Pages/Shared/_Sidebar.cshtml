@@ -1,0 +1,21 @@
+@inject Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper HtmlHelper
+@{
+    string Active(string page) => ViewContext?.ActionDescriptor?.DisplayName?.Contains(page, System.StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty;
+}
+<div class="d-flex flex-column flex-shrink-0 p-3 sidebar bg-white border-end">
+    <a class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+        <span class="fs-5">💰 <strong>Money Tracker</strong></span>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item"><a class="nav-link @Active("Dashboard")" asp-page="/Dashboard/Index"><i class="fa-solid fa-gauge-high me-2"></i>Dashboard</a></li>
+        <li><a class="nav-link @Active("Transactions")" asp-page="/Transactions/Index"><i class="fa-solid fa-right-left me-2"></i>Transactions</a></li>
+        <li><a class="nav-link @Active("Categories")" asp-page="/Categories/Index"><i class="fa-solid fa-tags me-2"></i>Categories</a></li>
+        <li><a class="nav-link @Active("Wallets")" asp-page="/Wallets/Index"><i class="fa-solid fa-wallet me-2"></i>Wallets</a></li>
+        <li><a class="nav-link @Active("Budgets")" asp-page="/Budgets/Index"><i class="fa-solid fa-piggy-bank me-2"></i>Budgets</a></li>
+        <li><a class="nav-link @Active("Reports")" asp-page="/Reports/Index"><i class="fa-solid fa-chart-column me-2"></i>Reports</a></li>
+        <li><a class="nav-link @Active("Profile")" asp-page="/Profile/Index"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+        <li><a class="nav-link @Active("Settings")" asp-page="/Settings/Index"><i class="fa-solid fa-gear me-2"></i>Settings</a></li>
+    </ul>
+</div>
+

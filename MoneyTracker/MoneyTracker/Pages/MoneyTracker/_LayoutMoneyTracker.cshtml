@@ -1,0 +1,98 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-100">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - MoneyTracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] } } } }</script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="h-full text-slate-800">
+    <div class="min-h-screen grid grid-cols-12">
+        <!-- Sidebar -->
+        <aside
+            class="col-span-12 md:col-span-3 lg:col-span-2 bg-slate-900 text-slate-200 md:h-screen md:sticky md:top-0"
+            x-data="{ open: true }">
+            <div class="flex items-center justify-between px-4 py-4 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-indigo-400"><i data-lucide="pie-chart"></i></span>
+                    <span class="font-semibold">MoneyTracker</span>
+                </div>
+                <button class="md:hidden" x-on:click="open = !open"><i data-lucide="menu"></i></button>
+            </div>
+            <nav class="px-3 py-4 space-y-1" :class="{'hidden': !open, 'block': open}" x-cloak>
+                <a asp-page="/MoneyTracker/Dashboard"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 @((ViewContext?.ActionDescriptor?.DisplayName?.Contains("Dashboard") == true) ? "bg-slate-700" : "")">
+                    <i data-lucide="gauge"></i><span>Dashboard</span>
+                </a>
+                <a asp-page="/MoneyTracker/Transactions/Index"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 @((ViewContext?.ActionDescriptor?.DisplayName?.Contains("Transactions") == true) ? "bg-slate-700" : "")">
+                    <i data-lucide="arrows-up-from-line"></i><span>Giao dịch</span>
+                </a>
+                <a asp-page="/MoneyTracker/Reports/Index"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 @((ViewContext?.ActionDescriptor?.DisplayName?.Contains("Reports") == true) ? "bg-slate-700" : "")">
+                    <i data-lucide="bar-chart-3"></i><span>Báo cáo</span>
+                </a>
+                <a asp-page="/MoneyTracker/Accounts/Index"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 @((ViewContext?.ActionDescriptor?.DisplayName?.Contains("Accounts") == true) ? "bg-slate-700" : "")">
+                    <i data-lucide="wallet"></i><span>Tài khoản</span>
+                </a>
+                <a asp-page="/MoneyTracker/Categories/Index"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 @((ViewContext?.ActionDescriptor?.DisplayName?.Contains("Categories") == true) ? "bg-slate-700" : "")">
+                    <i data-lucide="tags"></i><span>Danh mục</span>
+                </a>
+                <a asp-page="/MoneyTracker/AIAssistant/Index"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 @((ViewContext?.ActionDescriptor?.DisplayName?.Contains("AIAssistant") == true) ? "bg-slate-700" : "")">
+                    <i data-lucide="bot"></i><span>Trợ lý AI</span>
+                </a>
+                <a asp-page="/MoneyTracker/Settings/Index"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 @((ViewContext?.ActionDescriptor?.DisplayName?.Contains("Settings") == true) ? "bg-slate-700" : "")">
+                    <i data-lucide="settings"></i><span>Cài đặt</span>
+                </a>
+            </nav>
+            <div class="mt-auto px-4 py-4 border-t border-slate-800 hidden md:block">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-full bg-slate-700"></div>
+                    <div>
+                        <div class="text-sm font-medium">Người dùng</div>
+                        <div class="text-xs text-slate-400">@((User?.Identity?.IsAuthenticated == true) ? (User.FindFirst("email")?.Value ?? User.Identity?.Name ?? "") : "Khách")</div>
+                    </div>
+                    <a asp-page="/MoneyTracker/Settings/Index" class="ml-auto text-indigo-400 hover:text-indigo-300"><i
+                            data-lucide="settings"></i></a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <div class="col-span-12 md:col-span-9 lg:col-span-10">
+            <header class="flex items-center justify-between px-6 py-4 border-b bg-white">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-lg font-semibold">@ViewData["Title"]</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    @RenderSection("HeaderActions", required: false)
+                </div>
+            </header>
+            <main class="p-6">
+                @RenderBody()
+            </main>
+            <footer class="px-6 py-6 text-sm text-slate-500">
+                © 2025 MoneyTracker
+            </footer>
+        </div>
+    </div>
+
+    <script>document.addEventListener('DOMContentLoaded', () => { if (window.lucide) { lucide.createIcons(); } });</script>
+</body>
+
+</html>

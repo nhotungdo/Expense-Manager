@@ -1,0 +1,144 @@
+@page
+@model dynamic
+@{
+    ViewData["Title"] = "Danh mục";
+}
+
+<div x-data="{ tab: 'expense', showModal: false, name: '', selectedIcon: 'utensils', iconPicker: false }" class="space-y-6">
+    <!-- Header actions -->
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold">Danh mục</h1>
+        <button class="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500"
+            x-on:click="name=''; selectedIcon='utensils'; iconPicker=false; showModal=true">
+            <i data-lucide="plus"></i>
+            <span>Thêm danh mục mới</span>
+        </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-2xl shadow">
+        <div class="border-b">
+            <nav class="flex gap-4 px-5 pt-4">
+                <button class="px-3 py-2 border-b-2 -mb-px"
+                    :class="tab==='expense' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500'"
+                    x-on:click="tab='expense'">Chi tiêu</button>
+                <button class="px-3 py-2 border-b-2 -mb-px"
+                    :class="tab==='income' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500'"
+                    x-on:click="tab='income'">Thu nhập</button>
+            </nav>
+        </div>
+
+        <!-- Expense list -->
+        <div x-show="tab==='expense'" x-transition class="p-5 space-y-3">
+            <template x-for="item in [
+                { icon: 'utensils', name: 'Ăn uống' },
+                { icon: 'bus', name: 'Di chuyển' },
+                { icon: 'shopping-bag', name: 'Mua sắm' },
+                { icon: 'home', name: 'Nhà cửa' }
+            ]" :key="item.name">
+                <div class="bg-white rounded-xl border shadow-sm hover:shadow transition-shadow">
+                    <div class="px-4 py-3 flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-full bg-slate-100 grid place-items-center">
+                            <i :data-lucide="item.icon" class="h-5 w-5 text-slate-700"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium" x-text="item.name"></div>
+                        </div>
+                        <button class="h-9 w-9 grid place-items-center rounded-lg hover:bg-slate-50" title="Chỉnh sửa / Xóa"
+                            x-on:click="name=item.name; selectedIcon=item.icon; iconPicker=false; showModal=true">
+                            <i data-lucide="more-horizontal" class="h-5 w-5 text-slate-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Income list -->
+        <div x-show="tab==='income'" x-transition class="p-5 space-y-3">
+            <template x-for="item in [
+                { icon: 'briefcase', name: 'Lương' },
+                { icon: 'gift', name: 'Thưởng' },
+                { icon: 'banknote', name: 'Khác' }
+            ]" :key="item.name">
+                <div class="bg-white rounded-xl border shadow-sm hover:shadow transition-shadow">
+                    <div class="px-4 py-3 flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-full bg-slate-100 grid place-items-center">
+                            <i :data-lucide="item.icon" class="h-5 w-5 text-slate-700"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium" x-text="item.name"></div>
+                        </div>
+                        <button class="h-9 w-9 grid place-items-center rounded-lg hover:bg-slate-50" title="Chỉnh sửa / Xóa"
+                            x-on:click="name=item.name; selectedIcon=item.icon; iconPicker=false; showModal=true">
+                            <i data-lucide="more-horizontal" class="h-5 w-5 text-slate-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Add/Edit Category Modal -->
+    <div x-show="showModal" x-transition class="fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-black/40" x-on:click="showModal=false"></div>
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-2xl shadow">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b flex items-center justify-between">
+                <div class="font-medium" x-text="name ? 'Chỉnh sửa danh mục' : 'Thêm danh mục'"></div>
+                <button class="h-10 w-10 grid place-items-center rounded-lg hover:bg-slate-50" x-on:click="showModal=false">
+                    <i data-lucide="x" class="h-5 w-5 text-slate-600"></i>
+                </button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="p-6 space-y-5">
+                <!-- Name input -->
+                <div>
+                    <label class="block text-sm text-slate-600">Tên danh mục</label>
+                    <input x-model="name" type="text" class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3"
+                        placeholder="Ví dụ: Du lịch" />
+                </div>
+
+                <!-- Icon picker trigger -->
+                <div>
+                    <label class="block text-sm text-slate-600">Biểu tượng</label>
+                    <button x-on:click="iconPicker = true"
+                        class="mt-2 w-full flex items-center justify-between rounded-lg border border-slate-300 px-4 py-3 hover:bg-slate-50">
+                        <div class="flex items-center gap-2 text-slate-700">
+                            <i :data-lucide="selectedIcon" class="h-5 w-5"></i>
+                            <span x-text="selectedIcon"></span>
+                        </div>
+                        <i data-lucide="chevron-right" class="h-5 w-5 text-slate-400"></i>
+                    </button>
+                </div>
+
+                <!-- Icon library modal (nested) -->
+                <div x-show="iconPicker" x-transition class="fixed inset-0 z-50">
+                    <div class="absolute inset-0 bg-black/30" x-on:click="iconPicker=false"></div>
+                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-white rounded-2xl shadow">
+                        <div class="px-6 py-4 border-b flex items-center justify-between">
+                            <div class="font-medium">Chọn biểu tượng</div>
+                            <button class="h-10 w-10 grid place-items-center rounded-lg hover:bg-slate-50" x-on:click="iconPicker=false">
+                                <i data-lucide="x" class="h-5 w-5 text-slate-600"></i>
+                            </button>
+                        </div>
+                        <div class="p-5 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3 max-h-[60vh] overflow-y-auto">
+                            <template x-for="icon in ['utensils','shopping-bag','bus','coffee','home','gamepad-2','book-open','cpu','pill','sparkles','gift','music','camera','car','cat','cloud','film','flame','flower-2','glasses','heart','key','library','map','medal','monitor','palette','pizza','plug','scissors','shirt','smartphone','stethoscope','train','tv','watch','wrench']" :key="icon">
+                                <button x-on:click="selectedIcon=icon; iconPicker=false"
+                                    class="p-3 rounded-lg border hover:bg-slate-50 grid place-items-center">
+                                    <i :data-lucide="icon" class="h-6 w-6"></i>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="px-6 py-4 border-t flex items-center justify-end gap-2">
+                <button class="px-4 py-2 rounded-lg border hover:bg-slate-50" x-on:click="showModal=false">Hủy</button>
+                <button class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>

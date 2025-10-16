@@ -1,0 +1,120 @@
+@page
+@model dynamic
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<div x-data="dashApp()" x-init="init()" class="space-y-6">
+    <!-- Top: Total Balance and summary from onboarding -->
+    <div class="bg-white rounded-2xl shadow p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-slate-500">Tổng số dư</div>
+         
+                <div class="mt-2 text-sm text-slate-500">
+                    <span class="mr-3">💼 <span x-text="defaultWallet || 'Ví tiền mặt'"></span></span>
+                    <span>🎯 Mục tiêu: <span x-text="formatCurrency(savingGoal)"></span>/tháng</span>
+                </div>
+            </div>
+            <div class="hidden sm:block">
+                <i data-lucide="wallet" class="h-10 w-10 text-indigo-600"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary cards: Income and Expense (current month) -->
+    <div class="grid sm:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl shadow p-6">
+            <div class="flex items-center justify-between">
+                <div class="text-slate-500">Tổng thu (tháng này)</div>
+                <i data-lucide="arrow-down-circle" class="h-5 w-5 text-emerald-500"></i>
+            </div>
+            <div class="mt-2 text-2xl font-semibold" x-text="formatCurrency(totalIncome)"></div>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-6">
+            <div class="flex items-center justify-between">
+                <div class="text-slate-500">Tổng chi (tháng này)</div>
+                <i data-lucide="arrow-up-circle" class="h-5 w-5 text-red-500"></i>
+            </div>
+            <div class="mt-2 text-2xl font-semibold" x-text="formatCurrency(totalExpense)"></div>
+        </div>
+    </div>
+
+    <!-- Main: Weekly spending chart (past month) -->
+    <div class="bg-white rounded-2xl shadow p-6">
+        <div class="flex items-center justify-between">
+            <div class="font-medium">Chi tiêu theo tuần (4 tuần gần đây)</div>
+        </div>
+        <!-- Simple bar chart placeholder -->
+        <div class="mt-6 grid grid-cols-4 gap-4 items-end h-56">
+            <template x-for="(val, idx) in [40, 65, 80, 55]" :key="idx">
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-10 rounded" :class="'bg-indigo-' + (200 + idx*100)" :style="`height: ${val}%`"></div>
+                    <div class="text-xs text-slate-500">Tuần <span x-text="idx+1"></span></div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Recent transactions -->
+    <div class="bg-white rounded-2xl shadow">
+        <div class="p-6 border-b font-medium">Giao dịch gần nhất</div>
+        <div class="divide-y">
+            <div class="px-6 py-4 flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-slate-100 grid place-items-center">
+                    <i data-lucide="utensils" class="h-5 w-5 text-slate-600"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium">Ăn uống</div>
+                    <div class="text-xs text-slate-500">Hôm nay</div>
+            
+            <div class="px-6 py-4 flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-slate-100 grid place-items-center">
+                    <i data-lucide="briefcase" class="h-5 w-5 text-slate-600"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium">Lương</div>
+                    <div class="text-xs text-slate-500">Hôm qua</div>
+             
+            <div class="px-6 py-4 flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-slate-100 grid place-items-center">
+                    <i data-lucide="bus" class="h-5 w-5 text-slate-600"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium">Di chuyển</div>
+                    <div class="text-xs text-slate-500">2 ngày trước</div>
+               
+        </div>
+    </div>
+</div>
+
+<!-- FAB: Add transaction -->
+<button class="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-indigo-600 text-white shadow-lg grid place-items-center hover:bg-indigo-500"
+    title="Thêm giao dịch mới">
+    <i data-lucide="plus" class="h-6 w-6"></i>
+</button>
+
+<script>
+function dashApp(){
+    return {
+        defaultWallet: '',
+        savingGoal: 0,
+        totalBalance: 36500000,
+        totalIncome: 12500000,
+        totalExpense: 9300000,
+        init(){
+            try{
+                const raw = localStorage.getItem('mt_onboarding');
+                if(raw){
+                    const o = JSON.parse(raw);
+                    this.defaultWallet = o.defaultWallet || this.defaultWallet;
+                    this.savingGoal = Number(o.savingGoal || 0);
+                }
+            }catch(e){}
+        },
+        formatCurrency(v){
+            try{ return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(v||0)); }catch{ return v; }
+        }
+    }
+}
+</script>

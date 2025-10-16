@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "JgITIjVkcryib9WPXBp9q/sP3nfL8w6UQ7Tyo8k7ViE=",
+  "Hash": "kkyiE+KdSuEZGK0+AUDdIsiXrtkUavgqnkH5PVuLMwc=",
   "Source": "MoneyTracker",
   "BasePath": "_content/MoneyTracker",
   "Mode": "Default",
@@ -17,23 +17,42 @@
   ],
   "Assets": [
     {
-      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\design-system.css",
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\Debug\\net8.0\\scopedcss\\bundle\\MoneyTracker.styles.css",
       "SourceId": "MoneyTracker",
-      "SourceType": "Discovered",
-      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\",
+      "SourceType": "Computed",
+      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
       "BasePath": "_content/MoneyTracker",
-      "RelativePath": "css/design-system.css",
+      "RelativePath": "MoneyTracker.styles.css",
       "AssetKind": "All",
-      "AssetMode": "All",
+      "AssetMode": "CurrentProject",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
+      "AssetTraitName": "ScopedCss",
+      "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\css\\design-system.css"
+      "OriginalItemSpec": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\Debug\\net8.0\\scopedcss\\bundle\\MoneyTracker.styles.css"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\MoneyTracker.bundle.scp.css",
+      "SourceId": "MoneyTracker",
+      "SourceType": "Computed",
+      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
+      "BasePath": "_content/MoneyTracker",
+      "RelativePath": "MoneyTracker.bundle.scp.css",
+      "AssetKind": "All",
+      "AssetMode": "Reference",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "ScopedCss",
+      "AssetTraitValue": "ProjectBundle",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\MoneyTracker.bundle.scp.css"
     },
     {
       "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\css\\site.css",
@@ -74,12 +93,12 @@
       "OriginalItemSpec": "wwwroot\\favicon.ico"
     },
     {
-      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\design-system.js",
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\js\\site.js",
       "SourceId": "MoneyTracker",
       "SourceType": "Discovered",
       "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\",
       "BasePath": "_content/MoneyTracker",
-      "RelativePath": "js/design-system.js",
+      "RelativePath": "js/site.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -90,7 +109,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\js\\design-system.js"
+      "OriginalItemSpec": "wwwroot\\js\\site.js"
     },
     {
       "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
@@ -129,6 +148,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+      "SourceId": "MoneyTracker",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\",
+      "BasePath": "_content/MoneyTracker",
+      "RelativePath": "lib/bootstrap/dist/css/bootstrap.min.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css"
     },
     {
       "Identity": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map",

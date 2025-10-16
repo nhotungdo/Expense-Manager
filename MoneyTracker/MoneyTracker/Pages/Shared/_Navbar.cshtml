@@ -1,0 +1,18 @@
+<nav class="navbar navbar-expand bg-white border-bottom sticky-top">
+    <div class="container-fluid">
+        <button class="btn btn-outline-secondary d-md-none" type="button" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="ms-auto dropdown">
+            <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://www.gravatar.com/avatar/?d=mp" alt="avatar" width="32" height="32" class="rounded-circle me-2" />
+                <strong>@User?.Identity?.Name ?? "Khách"</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li><a class="dropdown-item" asp-page="/Profile/Index"><i class="fa-solid fa-user me-2"></i>Hồ sơ</a></li>
+                <li><a class="dropdown-item" asp-page="/Settings/Index"><i class="fa-solid fa-gear me-2"></i>Cài đặt</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+            </ul>
+        </div>
+    </div>
+    </nav>
+

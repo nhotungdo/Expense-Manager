@@ -1,4 +1,7 @@
-﻿namespace MoneyTracker.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace MoneyTracker.Models;
 
 public partial class AiSuggestion
 {
@@ -8,9 +11,9 @@ public partial class AiSuggestion
 
     public string Suggestion { get; set; } = null!;
 
-    public string SuggestionType { get; set; } = "Financial Advice";
+    public string SuggestionType { get; set; } = null!;
 
-    public bool IsRead { get; set; } = false;
+    public bool IsRead { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

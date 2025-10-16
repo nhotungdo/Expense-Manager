@@ -1,0 +1,122 @@
+@page
+@model MoneyTracker.Pages.Home.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+@if (!User.Identity.IsAuthenticated)
+{
+    <div class="bg-white rounded-xl shadow p-8 text-center space-y-4">
+        <div class="text-2xl">Welcome to MoneyTracker</div>
+        <div class="text-slate-600">Track your income, expenses and budgets with ease.</div>
+        <div class="flex items-center justify-center gap-4">
+            <a href="/Auth/Login" class="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500">Login</a>
+            <a href="/Auth/Register" class="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50">Register</a>
+        </div>
+    </div>
+}
+else
+{
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-3 bg-white rounded-xl shadow p-5 flex items-center justify-between">
+        <div class="text-lg">Hello, @Model.GreetingName!</div>
+        <div class="flex gap-6">
+            <div class="text-center">
+                <div class="text-sm text-slate-500">Total Income</div>
+                <div class="mt-1 text-2xl font-semibold text-emerald-600">@Model.TotalIncomeThisMonth.ToString("N0")</div>
+            </div>
+            <div class="text-center">
+                <div class="text-sm text-slate-500">Total Spending</div>
+                <div class="mt-1 text-2xl font-semibold text-red-600">@Model.TotalExpenseThisMonth.ToString("N0")</div>
+            </div>
+            <div class="text-center">
+                <div class="text-sm text-slate-500">Balance</div>
+                <div class="mt-1 text-2xl font-semibold text-indigo-600">@Model.BalanceThisMonth.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5 lg:col-span-1">
+        <div class="font-medium">Spending Analysis</div>
+        <div class="mt-4 h-64 bg-slate-100 rounded grid place-items-center text-slate-400">Doughnut chart placeholder</div>
+        <div class="mt-4 space-y-2">
+            @foreach (var item in Model.SpendingByCategoryThisMonth)
+            {
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background:@item.Color"></span>
+                        <span>@item.CategoryName</span>
+                    </div>
+                    <div class="font-medium">@item.TotalAmount.ToString("N0")</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5 lg:col-span-2">
+        <div class="font-medium">Income and Spending Trend</div>
+        <div class="mt-4 h-64 bg-slate-100 rounded grid place-items-center text-slate-400">Bar/Line chart placeholder</div>
+        <div class="mt-4 grid grid-cols-3 gap-3 text-sm text-slate-600">
+            @foreach (var p in Model.MonthlyIncomeExpenseTrend)
+            {
+                <div class="flex items-center justify-between">
+                    <span>@p.Label</span>
+                    <span>
+                        <span class="text-emerald-600">@p.Income.ToString("N0")</span> /
+                        <span class="text-red-600">@p.Expense.ToString("N0")</span> |
+                        <span class="text-indigo-600">@p.Surplus.ToString("N0")</span>
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow lg:col-span-2">
+        <div class="p-5 font-medium">Recent Transactions</div>
+        <div class="px-5 pb-5 overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="text-slate-500 text-sm">
+                    <tr>
+                        <th class="py-2">Date</th>
+                        <th class="py-2">Category</th>
+                        <th class="py-2">Description</th>
+                        <th class="py-2">Amount</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    @foreach (var t in Model.RecentTransactions)
+                    {
+                        var isExpense = t.Type == 2;
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2">@t.Date.ToString("yyyy-MM-dd")</td>
+                            <td class="py-2">@t.CategoryName</td>
+                            <td class="py-2">@t.Description</td>
+                            <td class="py-2 @(isExpense ? "text-red-600" : "text-emerald-600")">@(isExpense ? "-" : "+")@t.Amount.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5">
+        <div class="font-medium">Budget Tracking</div>
+        <div class="mt-4 space-y-3">
+            @foreach (var b in Model.BudgetProgress)
+            {
+                var width = b.Percent + "%";
+                <div>
+                    <div class="flex justify-between text-sm"><span>@b.CategoryName</span><span>@b.Percent%</span></div>
+                    <div class="h-2 bg-slate-200 rounded"><div class="h-2 rounded" style="width:@width;background:@b.Color"></div></div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<a href="/Transactions/Create" class="fixed bottom-6 right-6 w-14 h-14 grid place-items-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-500">
+    <span class="text-2xl">+</span>
+</a>
+}
+
+

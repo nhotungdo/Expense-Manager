@@ -1,0 +1,110 @@
+@page "/Dashboard"
+@model MoneyTracker.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 class="mb-4">Tổng quan</h2>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Tổng thu tháng này</h6>
+                <div class="fs-4 fw-bold text-success">@Model.TotalIncomeThisMonth.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Tổng chi tháng này</h6>
+                <div class="fs-4 fw-bold text-danger">@Model.TotalExpenseThisMonth.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Cân đối</h6>
+                <div class="fs-4 fw-bold">@(Model.TotalIncomeThisMonth - Model.TotalExpenseThisMonth).ToString("N0")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Chi theo danh mục</h5>
+                <canvas id="pieByCategory"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Chi theo ngày</h5>
+                <canvas id="barByDay"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Gợi ý từ AI</h5>
+                <ul class="mb-0">
+                    @foreach (var tip in Model.AiSuggestions)
+                    {
+                        <li>@tip</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Giao dịch gần đây</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Danh mục</th>
+                                <th class="text-end">Số tiền</th>
+                            </tr>
+                        </thead>
+                       
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Demo charts
+        const pieCtx = document.getElementById('pieByCategory');
+        if (pieCtx) {
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: { labels: ['Ăn uống', 'Di chuyển', 'Giải trí', 'Khác'], datasets: [{ data: [35, 25, 20, 20], backgroundColor: ['#0ea5a4', '#94a3b8', '#f59e0b', '#ef4444'] }] },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+        const barCtx = document.getElementById('barByDay');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: { labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], datasets: [{ label: 'Chi', data: [200, 300, 500, 250, 400, 350, 150], backgroundColor: '#0ea5a4' }] },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        }
+    </script>
+}

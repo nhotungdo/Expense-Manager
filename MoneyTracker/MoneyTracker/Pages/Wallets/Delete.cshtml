@@ -1,0 +1,15 @@
+@page
+@model dynamic
+@{
+    ViewData["Title"] = "Xóa ví";
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Xóa ví</h5>
+        <p>Bạn có chắc muốn xóa ví "Tiền mặt"?</p>
+        <button class="btn btn-danger"><i class="fa-solid fa-trash me-1"></i>Xóa</button>
+        <a class="btn btn-outline-secondary" asp-page="/Wallets/Index">Hủy</a>
+    </div>
+    </div>
+

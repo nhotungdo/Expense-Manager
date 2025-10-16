@@ -1,0 +1,56 @@
+@page "/Transactions"
+@model MoneyTracker.Pages.Transactions.IndexModel
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="mb-0">Giao dịch</h2>
+    <a class="btn btn-primary" asp-page="/Transactions/Create"><i class="fa-solid fa-plus me-1"></i>Thêm giao dịch</a>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form class="row g-2">
+            <div class="col-md-3"><input type="date" class="form-control" /></div>
+            <div class="col-md-3"><select class="form-select">
+                    <option>Danh mục</option>
+                </select></div>
+            <div class="col-md-3"><select class="form-select">
+                    <option>Ví</option>
+                </select></div>
+            <div class="col-md-3"><button class="btn btn-outline-secondary w-100"><i
+                        class="fa-solid fa-filter me-1"></i>Lọc</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Ngày</th>
+                <th>Danh mục</th>
+                <th>Ví</th>
+                <th class="text-end">Số tiền</th>
+                <th>Ghi chú</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2025-10-01</td>
+                <td>Ăn uống</td>
+                <td>Tiền mặt</td>
+                <td class="text-end text-danger">-50,000</td>
+                <td>Bữa trưa</td>
+                <td class="text-nowrap">
+                    <a class="btn btn-sm btn-outline-primary" asp-page="/Transactions/Edit"><i
+                            class="fa-solid fa-pen-to-square"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" asp-page="/Transactions/Delete"><i
+                            class="fa-solid fa-trash"></i></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

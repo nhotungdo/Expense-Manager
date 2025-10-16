@@ -1,0 +1,75 @@
+@page
+@model dynamic
+@{
+    ViewData["Title"] = "Trợ lý AI";
+}
+
+<div x-data="aiApp()" class="bg-white rounded-xl shadow">
+    <div class="p-5 border-b font-medium">Chat với MoneyTracker AI</div>
+    <div class="p-5 h-[420px] overflow-y-auto space-y-3">
+        <template x-for="(m, idx) in messages" :key="idx">
+            <div>
+                <div x-show="m.from === 'user'" class="flex justify-end">
+                    <div class="max-w-[70%] bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-2"
+                        x-text="m.text"></div>
+                </div>
+                <div x-show="m.from === 'ai'" class="flex justify-start">
+                    <div class="max-w-[70%] bg-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2"
+                        x-text="m.text"></div>
+                </div>
+            </div>
+        </template>
+        <template x-if="typing">
+            <div class="flex justify-start">
+                <div class="max-w-[70%] bg-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2">
+                    <span class="inline-flex gap-1">
+                        <span class="w-2 h-2 bg-slate-500 rounded-full animate-pulse"></span>
+                        <span class="w-2 h-2 bg-slate-500 rounded-full animate-pulse [animation-delay:150ms]"></span>
+                        <span class="w-2 h-2 bg-slate-500 rounded-full animate-pulse [animation-delay:300ms]"></span>
+                    </span>
+                </div>
+            </div>
+        </template>
+    </div>
+    <div class="p-4 border-t">
+        <form x-on:submit.prevent="send" class="flex items-center gap-2">
+            <input x-model="input" type="text" placeholder="Nhập câu hỏi của bạn..."
+                class="flex-1 rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button type="submit"
+                class="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500">
+                <i data-lucide="send"></i>
+                <span>Gửi</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function aiApp(){
+    return {
+        messages: [
+            { from: 'ai', text: 'Xin chào! Tôi có thể giúp gì cho bạn về chi tiêu hôm nay?' }
+        ],
+        input: '',
+        typing: false,
+        async send(){
+            if(!this.input) return;
+            const userText = this.input;
+            this.messages.push({ from: 'user', text: userText });
+            this.input = '';
+            this.typing = true;
+            try{
+                const res = await fetch('/api/ai/suggestions', { method: 'POST' });
+                const data = await res.json();
+                const tips = Array.isArray(data?.suggestions) ? data.suggestions : ['Hiện chưa có gợi ý.'];
+                const combined = tips.map((t, i) => `• ${t}`).join('\n');
+                this.messages.push({ from: 'ai', text: combined });
+            }catch(e){
+                this.messages.push({ from: 'ai', text: 'Không thể lấy gợi ý AI lúc này.' });
+            }finally{
+                this.typing = false;
+            }
+        }
+    }
+}
+</script>

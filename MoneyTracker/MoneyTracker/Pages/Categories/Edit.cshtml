@@ -1,0 +1,26 @@
+@page
+@model dynamic
+@{
+    ViewData["Title"] = "Chỉnh sửa danh mục";
+}
+
+<h3 class="mb-3"><i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh sửa danh mục</h3>
+<form class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Tên</label>
+        <input class="form-control" value="Ăn uống" />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Loại</label>
+        <select class="form-select"><option selected>Chi</option><option>Thu</option></select>
+    </div>
+    <div class="col-12">
+        <label class="form-label">Mô tả</label>
+        <textarea class="form-control" rows="3">Ăn, uống</textarea>
+    </div>
+    <div class="col-12">
+        <button class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-1"></i>Cập nhật</button>
+        <a class="btn btn-outline-secondary" asp-page="/Categories/Index">Hủy</a>
+    </div>
+    </form>
+
