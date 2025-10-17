@@ -1,53 +1,60 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using MoneyTracker.Models;
-using MoneyTracker.Services;
 
-namespace MoneyTracker.Pages.Dashboard
+[MoneyTracker.Filters.RequireJwtCookie]
+public class DashboardIndexModel : PageModel
 {
-    [Authorize]
-    public class IndexModel : PageModel
+    private readonly IHttpClientFactory _httpClientFactory;
+    public DashboardIndexModel(IHttpClientFactory httpClientFactory) { _httpClientFactory = httpClientFactory; }
+
+    public decimal TotalIncome { get; set; }
+    public decimal TotalExpense { get; set; }
+    public decimal Balance => TotalIncome - TotalExpense;
+    public List<CategorySummaryItem> CategorySummary { get; set; } = new();
+
+    public class CategorySummaryItem
     {
-        private readonly ExpenseManagerContext _db;
-        private readonly IAiService _aiService;
+        public string CategoryName { get; set; } = string.Empty;
+        public decimal TotalAmount { get; set; }
+    }
 
-        public decimal TotalIncomeThisMonth { get; private set; }
-        public decimal TotalExpenseThisMonth { get; private set; }
-        public List<string> AiSuggestions { get; private set; } = new();
-
-        public IndexModel(ExpenseManagerContext db, IAiService aiService)
+    public async Task OnGet()
+    {
+        var token = Request.Cookies["jwt"] ?? string.Empty;
+        var client = _httpClientFactory.CreateClient();
+        client.BaseAddress = new Uri(Request.Scheme + "://" + Request.Host);
+        if (!string.IsNullOrEmpty(token))
         {
-            _db = db;
-            _aiService = aiService;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        public async Task OnGet()
+        var overview = await client.GetFromJsonAsync<List<Dictionary<string, object>>>("/api/dashboard/overview");
+        if (overview != null && overview.Count > 0)
         {
-            var now = System.DateTime.UtcNow;
-            var monthStart = new System.DateTime(now.Year, now.Month, 1);
-            var monthStartDateOnly = System.DateOnly.FromDateTime(monthStart);
-            var nowDateOnly = System.DateOnly.FromDateTime(now);
+            var row = overview[0];
+            if (row.TryGetValue("TotalIncome", out var ti)) TotalIncome = Convert.ToDecimal(ti);
+            if (row.TryGetValue("TotalExpense", out var te)) TotalExpense = Convert.ToDecimal(te);
+        }
 
-            TotalIncomeThisMonth = await _db.Incomes
-                .Where(i => i.IncomeDate >= monthStartDateOnly && i.IncomeDate <= nowDateOnly)
-                .SumAsync(i => (decimal?)i.Amount) ?? 0m;
-
-            TotalExpenseThisMonth = await _db.Expenses
-                .Where(e => e.ExpenseDate >= monthStartDateOnly && e.ExpenseDate <= nowDateOnly)
-                .SumAsync(e => (decimal?)e.Amount) ?? 0m;
-
-            var last30 = await _db.Transactions
-                .OrderByDescending(t => t.TransactionDate)
-                .Take(30)
-                .Select(t => new AiTransactionInput { Date = t.TransactionDate, CategoryId = t.CategoryId, Amount = t.Amount })
-                .ToListAsync();
-
-            AiSuggestions = await _aiService.GetSuggestionsAsync(last30);
+        var summary = await client.GetFromJsonAsync<List<Dictionary<string, object>>>("/api/dashboard/category-summary");
+        if (summary != null)
+        {
+            foreach (var s in summary)
+            {
+                var item = new CategorySummaryItem
+                {
+                    CategoryName = s.ContainsKey("CategoryName") ? Convert.ToString(s["CategoryName"]) ?? string.Empty : string.Empty,
+                    TotalAmount = s.ContainsKey("TotalAmount") ? Convert.ToDecimal(s["TotalAmount"]) : 0m
+                };
+                CategorySummary.Add(item);
+            }
         }
     }
 }
+
 

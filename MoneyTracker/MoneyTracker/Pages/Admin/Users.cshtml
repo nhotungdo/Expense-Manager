@@ -1,0 +1,36 @@
+@page
+@model AdminUsersModel
+@{
+    ViewData["Title"] = "Admin - Users";
+}
+
+<h2>Users</h2>
+
+<table class="table">
+    <thead><tr><th>ID</th><th>Email</th><th>Name</th><th>Role</th><th>Enabled</th><th>Lockout</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var u in Model.Items)
+    {
+        <tr>
+            <td>@u.Id</td>
+            <td>@u.Email</td>
+            <td>@u.FullName</td>
+            <td>@u.Role</td>
+            <td>@u.Enabled</td>
+            <td>@(u.LockoutEnd != null ? "Locked" : "")</td>
+            <td>
+                <form method="post" class="d-inline">
+                    <input type="hidden" name="Id" value="@u.Id" />
+                    <button name="action" value="lock" class="btn btn-sm btn-warning" type="submit">Lock</button>
+                </form>
+                <form method="post" class="d-inline">
+                    <input type="hidden" name="Id" value="@u.Id" />
+                    <button name="action" value="unlock" class="btn btn-sm btn-success" type="submit">Unlock</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+

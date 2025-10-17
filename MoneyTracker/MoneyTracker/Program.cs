@@ -1,101 +1,69 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
-using MoneyTracker.Models;
-using MoneyTracker.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages(options =>
-{
-    options.Conventions.AuthorizeFolder("/");
-    options.Conventions.AllowAnonymousToFolder("/Home");
-    options.Conventions.AllowAnonymousToFolder("/Auth");
-    options.Conventions.AllowAnonymousToPage("/MoneyTracker/Onboarding");
-});
-
-// DbContext
-builder.Services.AddDbContext<ExpenseManagerContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBDefault")));
-
+builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
 
-// App services
-builder.Services.AddScoped<IAiService, OpenAiService>();
-builder.Services.AddScoped<IEmailService, MailKitEmailService>();
-builder.Services.AddScoped<IReportService, ReportService>();
-builder.Services.AddHostedService<DailyReminderService>();
-builder.Services.AddHostedService<RecurringTransactionService>();
+// Add controllers for APIs
+builder.Services.AddControllers();
 
-// Authentication
+// Configure EF DbContext using connection string
+builder.Services.AddDbContext<MoneyTracker.Models.ExpenseManagerContext>(options =>
+{
+    var cs = builder.Configuration.GetConnectionString("ExpenseManager");
+    options.UseSqlServer(cs);
+});
+
+// Configure JWT Authentication
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtIssuer = jwtSection["Issuer"];
+var jwtAudience = jwtSection["Audience"];
+var jwtKey = jwtSection["Key"];
+var keyBytes = System.Text.Encoding.UTF8.GetBytes(jwtKey ?? string.Empty);
+
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(options =>
+    options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
 {
-    options.LoginPath = "/login";
-    options.LogoutPath = "/logout";
-    options.AccessDeniedPath = "/";
-})
-.AddGoogle(googleOptions =>
-{
-    googleOptions.ClientId = builder.Configuration["GoogleAuth:ClientId"] ?? string.Empty;
-    googleOptions.ClientSecret = builder.Configuration["GoogleAuth:ClientSecret"] ?? string.Empty;
-    googleOptions.CallbackPath = builder.Configuration["GoogleAuth:CallbackPath"] ?? "/signin-google";
-    googleOptions.Events = new OAuthEvents
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
-        OnCreatingTicket = async context =>
-        {
-            var db = context.HttpContext.RequestServices.GetRequiredService<ExpenseManagerContext>();
-            var googleId = context.Identity?.FindFirst("sub")?.Value
-                            ?? context.Identity?.FindFirst("urn:google:userid")?.Value
-                            ?? context.Identity?.FindFirst("https://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
-            var email = context.Identity?.FindFirst("email")?.Value
-                        ?? context.Identity?.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-            var name = context.Identity?.FindFirst("name")?.Value
-                       ?? context.Identity?.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
-
-            if (!string.IsNullOrWhiteSpace(googleId) && !string.IsNullOrWhiteSpace(email))
-            {
-                var user = await db.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
-                if (user == null)
-                {
-                    user = new User
-                    {
-                        GoogleId = googleId,
-                        Email = email,
-                        UserName = email,
-                        FullName = name,
-                        Enabled = true,
-                        CreatedAt = DateTime.UtcNow,
-                        Language = "vi",
-                        DefaultCurrency = "VND",
-                        Timezone = "Asia/Ho_Chi_Minh",
-                        Theme = "light",
-                        EmailNotifications = true,
-                        PushNotifications = true,
-                        Role = "User",
-                        OnboardingCompleted = false
-                    };
-                    db.Users.Add(user);
-                }
-                else
-                {
-                    user.Email = email;
-                    user.FullName = name;
-                    user.LastLogin = DateTime.UtcNow;
-                }
-                await db.SaveChangesAsync();
-            }
-        }
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(keyBytes),
+        ClockSkew = TimeSpan.FromMinutes(1)
     };
 });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
+
+// Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// CORS for local dev
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCors", policy =>
+        policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().SetIsOriginAllowed(_ => true));
+});
+
+// Background workers
+builder.Services.AddHostedService<MoneyTracker.Services.EmailSenderService>();
+builder.Services.AddHostedService<MoneyTracker.Services.AiSuggestionService>();
 
 var app = builder.Build();
 
@@ -103,7 +71,13 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -111,89 +85,29 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// If JWT cookie exists, forward it as Authorization header for auth middleware
+app.Use(async (context, next) =>
+{
+    if (!context.Request.Headers.ContainsKey("Authorization") &&
+        context.Request.Cookies.TryGetValue("jwt", out var cookieToken) &&
+        !string.IsNullOrWhiteSpace(cookieToken))
+    {
+        context.Request.Headers["Authorization"] = $"Bearer {cookieToken}";
+    }
+    await next();
+});
+
+app.UseCors("DevCors");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// --- AI suggestions endpoint ---
-app.MapPost("/api/ai/suggestions", async (ExpenseManagerContext db, IAiService ai) =>
-{
-    var last30 = await db.Transactions
-        .OrderByDescending(t => t.TransactionDate)
-        .Take(30)
-        .Select(t => new AiTransactionInput
-        {
-            Date = t.TransactionDate,
-            CategoryId = t.CategoryId,
-            Amount = t.Amount
-        })
-        .ToListAsync();
+// Map APIs
+app.MapControllers();
 
-    var tips = await ai.GetSuggestionsAsync(last30);
-    return Results.Ok(new { suggestions = tips });
-});
+// Minimal health endpoint
+app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }));
 
-// --- Onboarding completion endpoint ---
-app.MapPost("/api/onboarding/complete", async (ExpenseManagerContext db, HttpContext ctx, dynamic body) =>
-{
-    var googleId = ctx.User?.FindFirst("sub")?.Value
-        ?? ctx.User?.FindFirst("urn:google:userid")?.Value;
-    if (string.IsNullOrWhiteSpace(googleId)) return Results.Unauthorized();
-
-    var user = await db.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
-    if (user == null) return Results.NotFound();
-
-    // Read optional fields (not persisted yet except onboarding flag)
-    string defaultWallet = body?.defaultWallet;
-    decimal? savingGoal = body?.savingGoal;
-    bool? enableAi = body?.enableAi;
-
-    user.OnboardingCompleted = true;
-    user.UpdatedAt = DateTime.UtcNow;
-    await db.SaveChangesAsync();
-    return Results.Ok();
-});
-
-app.MapGet("/login", async context =>
-{
-    await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
-    {
-        RedirectUri = "/MoneyTracker/Onboarding"
-    });
-}).AllowAnonymous();
-
-app.MapGet("/logout", async context =>
-{
-    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties
-    {
-        RedirectUri = "/"
-    });
-});
-
-// Redirect root path to Home
-app.MapGet("/", context =>
-{
-    context.Response.Redirect("/Home");
-    return Task.CompletedTask;
-}).AllowAnonymous();
-
-// Redirect legacy/top-level Pages routes to Home
-app.MapGet("/Dashboard/{*path}", context =>
-{
-    context.Response.Redirect("/Home");
-    return Task.CompletedTask;
-}).AllowAnonymous();
-
-// Redirect old FinTrack area to new MoneyTracker area
-app.MapGet("/FinTrack/{*path}", context =>
-{
-    var path = context.Request.Path.Value?.Substring("/FinTrack".Length) ?? string.Empty;
-    context.Response.Redirect($"/MoneyTracker{path}");
-    return Task.CompletedTask;
-}).AllowAnonymous();
-
-// Map MoneyTracker area (no redirect to Home)
 app.MapRazorPages();
 
 app.Run();
-
-public partial class Program { }

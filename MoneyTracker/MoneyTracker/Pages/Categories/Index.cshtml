@@ -1,36 +1,72 @@
-@page "/Categories"
-@model MoneyTracker.Pages.Categories.IndexModel
+@page
+@model CategoriesIndexModel
 @{
     ViewData["Title"] = "Categories";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="mb-0">Danh mục</h2>
-    <a class="btn btn-primary" asp-page="/Categories/Create"><i class="fa-solid fa-plus me-1"></i>Thêm danh mục</a>
-</div>
+<h2>Categories</h2>
 
-<div class="table-responsive card border-0 shadow-sm">
-    <table class="table align-middle mb-0">
-        <thead>
-            <tr>
-                <th>Tên</th>
-                <th>Loại</th>
-                <th>Mô tả</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Ăn uống</td>
-                <td>Chi</td>
-                <td>Ăn, uống</td>
-                <td class="text-nowrap">
-                    <a class="btn btn-sm btn-outline-primary" asp-page="/Categories/Edit"><i
-                            class="fa-solid fa-pen-to-square"></i></a>
-                    <a class="btn btn-sm btn-outline-danger" asp-page="/Categories/Delete"><i
-                            class="fa-solid fa-trash"></i></a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+<form method="post" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <input asp-for="Upsert.Name" class="form-control" placeholder="Name" />
+    </div>
+    <div class="col-md-2">
+        <select asp-for="Upsert.Type" class="form-select">
+            <option value="0">Expense</option>
+            <option value="1">Income</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input asp-for="Upsert.Icon" class="form-control" placeholder="Icon" list="iconList" />
+        <datalist id="iconList">
+            <option value="wallet" />
+            <option value="food" />
+            <option value="transport" />
+            <option value="shopping" />
+            <option value="home" />
+            <option value="gift" />
+        </datalist>
+    </div>
+    <div class="col-md-2">
+        <input asp-for="Upsert.Color" type="color" class="form-control form-control-color" />
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-success" name="action" value="create" type="submit">Add</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead><tr><th>Name</th><th>Type</th><th>Icon</th><th>Color</th><th>Default</th><th>Active</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var c in Model.Items)
+    {
+        <tr>
+            <td>@c.Name</td>
+            <td>@(c.Type == 0 ? "Expense" : "Income")</td>
+            <td>@c.Icon</td>
+            <td><span style="display:inline-block;width:16px;height:16px;background:@c.Color;border:1px solid #ccc;"></span> @c.Color</td>
+            <td>@(c.IsDefault ? "Yes" : "No")</td>
+            <td>@(c.IsActive ? "Yes" : "No")</td>
+            <td>
+                @if (!c.IsDefault)
+                {
+                    <form method="post" class="d-inline">
+                        <input type="hidden" name="Id" value="@c.Id" />
+                        <input type="hidden" name="Upsert.Name" value="@c.Name" />
+                        <input type="hidden" name="Upsert.Type" value="@c.Type" />
+                        <input type="hidden" name="Upsert.Icon" value="@c.Icon" />
+                        <input type="hidden" name="Upsert.Color" value="@c.Color" />
+                        <button class="btn btn-sm btn-primary" name="action" value="update" type="submit">Save</button>
+                    </form>
+                    <form method="post" class="d-inline" onsubmit="return confirm('Delete this category?')">
+                        <input type="hidden" name="Id" value="@c.Id" />
+                        <button class="btn btn-sm btn-danger" name="action" value="delete" type="submit">Delete</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+

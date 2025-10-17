@@ -3,56 +3,40 @@
   "WorkspaceRootPath": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\services\\aisuggestionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\services\\aisuggestionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\transactions\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\transactions\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\moneytracker\\_layoutmoneytracker.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\moneytracker\\_layoutmoneytracker.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\moneytracker\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\moneytracker\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\controllers\\budgetscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\controllers\\budgetscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\moneytracker\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\moneytracker\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\services\\emailsenderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\services\\emailsenderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\moneytracker\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\moneytracker\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\home\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\home\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\categories\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\categories\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\home\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\home\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\services\\dailyreminderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\services\\dailyreminderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\models\\auditlog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2B0F09DA-A892-4C17-A3FB-1BAF7EB22C42}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\models\\auditlog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|f:\\ojt-review\\myexpense\\expense-manager\\moneytracker\\moneytracker\\pages\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3E7EF2FD-C338-4F17-A288-7FBE78D16552}|MoneyTracker\\MoneyTracker.csproj|solutionrelative:moneytracker\\pages\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -66,168 +50,120 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Transactions\\Index.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Transactions\\Index.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Transactions\\Index.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\Transactions\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T12:59:03.201Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "_LayoutMoneyTracker.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\_LayoutMoneyTracker.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\MoneyTracker\\_LayoutMoneyTracker.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\_LayoutMoneyTracker.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\MoneyTracker\\_LayoutMoneyTracker.cshtml",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAACMAAABFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T12:57:45.573Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "_ViewStart.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\_ViewStart.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\MoneyTracker\\_ViewStart.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\_ViewStart.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\MoneyTracker\\_ViewStart.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T12:57:44.7Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\Index.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\MoneyTracker\\Index.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\Index.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\MoneyTracker\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T12:57:23.954Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Dashboard.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\Dashboard.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\MoneyTracker\\Dashboard.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\MoneyTracker\\Dashboard.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\MoneyTracker\\Dashboard.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T12:57:23.201Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Index.cshtml.cs",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Home\\Index.cshtml.cs",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Home\\Index.cshtml.cs",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Home\\Index.cshtml.cs",
-              "RelativeToolTip": "MoneyTracker\\Pages\\Home\\Index.cshtml.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAIAzwB4AAAAAAAAAAAAAAA==",
+              "Title": "TransactionsController.cs",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Controllers\\TransactionsController.cs",
+              "RelativeDocumentMoniker": "MoneyTracker\\Controllers\\TransactionsController.cs",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Controllers\\TransactionsController.cs",
+              "RelativeToolTip": "MoneyTracker\\Controllers\\TransactionsController.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAAGMAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-16T10:18:05.517Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\appsettings.json",
-              "RelativeDocumentMoniker": "MoneyTracker\\appsettings.json",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\appsettings.json",
-              "RelativeToolTip": "MoneyTracker\\appsettings.json",
-              "ViewState": "AgIAAAIAAAAAAAAAAADwvx4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-15T09:11:10.802Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T10:18:45.951Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Home\\Index.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Home\\Index.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\Home\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAACAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T10:06:36.374Z",
+              "WhenOpened": "2025-10-17T14:25:29.969Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "_ViewStart.cshtml",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Home\\_ViewStart.cshtml",
-              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Home\\_ViewStart.cshtml",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Home\\_ViewStart.cshtml",
-              "RelativeToolTip": "MoneyTracker\\Pages\\Home\\_ViewStart.cshtml",
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Categories\\Index.cshtml",
+              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Categories\\Index.cshtml",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Categories\\Index.cshtml",
+              "RelativeToolTip": "MoneyTracker\\Pages\\Categories\\Index.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-16T10:06:34.394Z",
+              "WhenOpened": "2025-10-17T14:04:48.058Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 8,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
+              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
+              "RelativeToolTip": "MoneyTracker\\Pages\\Dashboard\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-17T14:04:20.377Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Program.cs",
               "RelativeDocumentMoniker": "MoneyTracker\\Program.cs",
               "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Program.cs",
               "RelativeToolTip": "MoneyTracker\\Program.cs",
-              "ViewState": "AgIAADQAAAAAAAAAAAAAAMUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAAwB0AAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T13:02:47.147Z"
+              "WhenOpened": "2025-10-17T14:03:56.608Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "DailyReminderService.cs",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Services\\DailyReminderService.cs",
-              "RelativeDocumentMoniker": "MoneyTracker\\Services\\DailyReminderService.cs",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Services\\DailyReminderService.cs",
-              "RelativeToolTip": "MoneyTracker\\Services\\DailyReminderService.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAAAC4AAABhAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "EmailSenderService.cs",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Services\\EmailSenderService.cs",
+              "RelativeDocumentMoniker": "MoneyTracker\\Services\\EmailSenderService.cs",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Services\\EmailSenderService.cs",
+              "RelativeToolTip": "MoneyTracker\\Services\\EmailSenderService.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAAAC4AAABhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T11:56:59.079Z"
+              "WhenOpened": "2025-10-17T14:03:48.752Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "AuditLog.cs",
-              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Models\\AuditLog.cs",
-              "RelativeDocumentMoniker": "MoneyTracker\\Models\\AuditLog.cs",
-              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Models\\AuditLog.cs",
-              "RelativeToolTip": "MoneyTracker\\Models\\AuditLog.cs",
+              "DocumentIndex": 3,
+              "Title": "BudgetsController.cs",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Controllers\\BudgetsController.cs",
+              "RelativeDocumentMoniker": "MoneyTracker\\Controllers\\BudgetsController.cs",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Controllers\\BudgetsController.cs",
+              "RelativeToolTip": "MoneyTracker\\Controllers\\BudgetsController.cs",
+              "ViewState": "AgIAAFsAAAAAAAAAAAAuwHAAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-17T14:03:51.839Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AiSuggestionService.cs",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Services\\AiSuggestionService.cs",
+              "RelativeDocumentMoniker": "MoneyTracker\\Services\\AiSuggestionService.cs",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Services\\AiSuggestionService.cs",
+              "RelativeToolTip": "MoneyTracker\\Services\\AiSuggestionService.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAwC4AAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-17T14:03:57.862Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "MoneyTracker\\Pages\\Shared\\_Layout.cshtml",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "MoneyTracker\\Pages\\Shared\\_Layout.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T09:16:04.167Z"
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-17T14:06:07.382Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\appsettings.json",
+              "RelativeDocumentMoniker": "MoneyTracker\\appsettings.json",
+              "ToolTip": "F:\\OJT-Review\\MyExpense\\Expense-Manager\\MoneyTracker\\MoneyTracker\\appsettings.json",
+              "RelativeToolTip": "MoneyTracker\\appsettings.json",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-17T13:15:40.312Z",
+              "EditorCaption": ""
             }
           ]
         }

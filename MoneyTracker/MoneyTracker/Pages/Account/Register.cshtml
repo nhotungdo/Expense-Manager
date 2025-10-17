@@ -1,0 +1,46 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>Register</h2>
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Input.Email" class="form-control" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input asp-for="Input.Password" type="password" class="form-control" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">First Name</label>
+        <input asp-for="Input.FirstName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Last Name</label>
+        <input asp-for="Input.LastName" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Account</button>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="text-danger mt-2">@Model.Error</div>
+    }
+    <script>
+        if ('@Model.Token' && '@Model.Token'.length > 0) {
+            localStorage.setItem('jwt', '@Model.Token');
+            window.location = '/';
+        }
+    </script>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
