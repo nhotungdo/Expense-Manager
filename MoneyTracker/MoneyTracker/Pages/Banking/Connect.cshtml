@@ -1,0 +1,43 @@
+@page
+@model MoneyTracker.Pages.Banking.ConnectModel
+@{
+    ViewData["Title"] = "Connect Bank";
+}
+
+<h2>Connect Bank Account</h2>
+
+<form method="post">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="Input.Provider" class="form-label">Bank Provider</label>
+            <select asp-for="Input.Provider" class="form-select">
+                <option value="">Select Provider</option>
+                <option value="Demo Bank">Demo Bank</option>
+                <option value="Test Credit Union">Test Credit Union</option>
+                <option value="Mock Savings">Mock Savings</option>
+            </select>
+            <span asp-validation-for="Input.Provider" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Input.AccountId" class="form-label">Link to Account</label>
+            <select asp-for="Input.AccountId" class="form-select">
+                <option value="">Select Account</option>
+                @foreach (var account in Model.Accounts)
+                {
+                    <option value="@account.Id">@account.Name</option>
+                }
+            </select>
+            <span asp-validation-for="Input.AccountId" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <label asp-for="Input.Credentials" class="form-label">Bank Credentials (Demo)</label>
+            <input asp-for="Input.Credentials" class="form-control" placeholder="username:password" />
+            <span asp-validation-for="Input.Credentials" class="text-danger"></span>
+            <div class="form-text">This is a demo - enter any credentials</div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Connect</button>
+        <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>

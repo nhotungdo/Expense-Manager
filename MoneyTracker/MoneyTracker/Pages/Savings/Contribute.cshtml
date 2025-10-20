@@ -1,0 +1,27 @@
+@page "{id:long}"
+@model MoneyTracker.Pages.Savings.ContributeModel
+@{
+    ViewData["Title"] = "Contribute to Goal";
+}
+
+<h2>Contribute to @Model.GoalName</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="Input.Id" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.Amount" class="form-label"></label>
+                <input asp-for="Input.Amount" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Note" class="form-label"></label>
+                <input asp-for="Input.Note" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-success" type="submit">Contribute</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+

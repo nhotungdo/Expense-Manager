@@ -1,46 +1,22 @@
 @page
-@model RegisterModel
+@model MoneyTracker.Pages.Account.RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Tạo tài khoản";
 }
 
-<h2>Register</h2>
-
-<form method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
-    <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input asp-for="Input.Email" class="form-control" />
-        <span asp-validation-for="Input.Email" class="text-danger"></span>
+<!-- Lightweight redirect to the sliding login page in register mode -->
+<div style="min-height:60vh;display:flex;align-items:center;justify-content:center;padding:40px">
+    <div
+        style="max-width:680px;text-align:center;padding:22px;border-radius:10px;background:#fff;box-shadow:0 8px 26px rgba(0,0,0,0.06)">
+        <h3>Chuyển sang giao diện đăng ký...</h3>
+        <p>Bạn sẽ được đưa tới giao diện đăng ký với hiệu ứng mượt mà.</p>
+        <script>
+            // navigate to Login but with mode=register so the sliding panel shows register
+            window.location.replace('/Account/Login?mode=register');
+        </script>
+        <noscript>
+            <div>JavaScript cần để hiển thị giao diện. <a href="/Account/Login?mode=register">Nhấn vào đây</a> để tiếp
+                tục.</div>
+        </noscript>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input asp-for="Input.Password" type="password" class="form-control" />
-        <span asp-validation-for="Input.Password" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">First Name</label>
-        <input asp-for="Input.FirstName" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Last Name</label>
-        <input asp-for="Input.LastName" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Create Account</button>
-    @if (!string.IsNullOrEmpty(Model.Error))
-    {
-        <div class="text-danger mt-2">@Model.Error</div>
-    }
-    <script>
-        if ('@Model.Token' && '@Model.Token'.length > 0) {
-            localStorage.setItem('jwt', '@Model.Token');
-            window.location = '/';
-        }
-    </script>
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
-
-
+</div>

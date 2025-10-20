@@ -1,0 +1,30 @@
+@page "{id:long}"
+@model MoneyTracker.Pages.Categories.SetLimitModel
+@{
+    ViewData["Title"] = "Set Category Limit";
+}
+
+<h2>Set Monthly Limit for @Model.CategoryName</h2>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.Amount" class="form-label"></label>
+                <input asp-for="Input.Amount" class="form-control" />
+                <span asp-validation-for="Input.Amount" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Month" class="form-label"></label>
+                <input asp-for="Input.Month" type="month" class="form-control" />
+                <span asp-validation-for="Input.Month" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<partial name="_ValidationScriptsPartial" />
+
+

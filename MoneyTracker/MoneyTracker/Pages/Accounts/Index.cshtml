@@ -1,0 +1,29 @@
+@page
+@model MoneyTracker.Pages.Accounts.IndexModel
+@{
+    ViewData["Title"] = "Accounts";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Accounts</h2>
+    <a asp-page="Create" class="btn btn-primary">Add Account</a>
+</div>
+
+<table class="table table-striped">
+    <thead><tr><th>Name</th><th>Currency</th><th class="text-end">Balance</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var a in Model.Items)
+    {
+        <tr>
+            <td>@a.Name</td>
+            <td>@a.Currency</td>
+            <td class="text-end">@a.CurrentBalance.ToString("N2")</td>
+            <td class="text-end">
+                <a asp-page="Details" asp-route-id="@a.Id" class="btn btn-sm btn-secondary">View</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+  </table>
+
+

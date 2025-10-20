@@ -1,0 +1,15 @@
+@page "{id:long}"
+@model MoneyTracker.Pages.Savings.DeleteModel
+@{
+    ViewData["Title"] = "Delete Goal";
+}
+
+<h2>Delete Goal</h2>
+<div class="alert alert-danger">Are you sure?</div>
+<form method="post">
+    <input type="hidden" asp-for="Id" />
+    <button class="btn btn-danger" type="submit">Delete</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+

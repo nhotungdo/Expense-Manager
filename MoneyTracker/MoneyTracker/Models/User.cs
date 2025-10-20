@@ -75,6 +75,8 @@ public partial class User
 
     public bool PushNotifications { get; set; }
 
+    public virtual ICollection<Account> Accounts { get; set; } = new List<Account>();
+
     public virtual ICollection<AiSuggestion> AiSuggestions { get; set; } = new List<AiSuggestion>();
 
     public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; } = new List<AspNetUserClaim>();
@@ -85,19 +87,29 @@ public partial class User
 
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
+    public virtual ICollection<BankConnection> BankConnections { get; set; } = new List<BankConnection>();
+
     public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
 
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
 
+    public virtual ICollection<Debt> Debts { get; set; } = new List<Debt>();
+
     public virtual ICollection<Email> Emails { get; set; } = new List<Email>();
 
-    public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
-
-    public virtual ICollection<Income> Incomes { get; set; } = new List<Income>();
+    public virtual ICollection<Investment> Investments { get; set; } = new List<Investment>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
+
+    public virtual ICollection<SavingsGoal> SavingsGoals { get; set; } = new List<SavingsGoal>();
+
+    public virtual ICollection<ScheduledTransaction> ScheduledTransactions { get; set; } = new List<ScheduledTransaction>();
+
+    public virtual ICollection<SharedAccount> SharedAccountSharedByUsers { get; set; } = new List<SharedAccount>();
+
+    public virtual ICollection<SharedAccount> SharedAccountUsers { get; set; } = new List<SharedAccount>();
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 

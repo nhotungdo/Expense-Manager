@@ -1,0 +1,35 @@
+@page
+@model MoneyTracker.Pages.Scheduled.IndexModel
+@{
+    ViewData["Title"] = "Scheduled Transactions";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Scheduled Transactions</h2>
+    <a asp-page="Edit" class="btn btn-primary">Add Scheduled</a>
+  </div>
+
+<table class="table table-striped">
+    <thead>
+        <tr><th>Account</th><th>Type</th><th class="text-end">Amount</th><th>Frequency</th><th>Next Run</th><th>Active</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var s in Model.Items)
+    {
+        <tr>
+            <td>@s.Account?.Name</td>
+            <td>@(s.TransactionType==0?"Expense":s.TransactionType==1?"Income":"Transfer")</td>
+            <td class="text-end">@s.Amount.ToString("N2")</td>
+            <td>@s.Frequency x@s.Interval</td>
+            <td>@s.NextRunDate.ToString("yyyy-MM-dd")</td>
+            <td>@(s.IsActive?"Yes":"No")</td>
+            <td class="text-end">
+                <a asp-page="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-secondary">Edit</a>
+                <a asp-page="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+  </table>
+
+

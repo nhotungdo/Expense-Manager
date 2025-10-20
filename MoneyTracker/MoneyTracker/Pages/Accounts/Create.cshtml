@@ -1,0 +1,32 @@
+@page
+@model MoneyTracker.Pages.Accounts.CreateModel
+@{
+    ViewData["Title"] = "Add Account";
+}
+
+<h2>Add Account</h2>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label"></label>
+                <input asp-for="Input.Name" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.InitialBalance" class="form-label"></label>
+                <input asp-for="Input.InitialBalance" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.Currency" class="form-label"></label>
+                <input asp-for="Input.Currency" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+

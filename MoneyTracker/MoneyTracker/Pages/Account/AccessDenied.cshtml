@@ -1,0 +1,12 @@
+@page
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="alert alert-warning mt-3">
+    You do not have access to this resource.
+    <a asp-page="/Index" class="btn btn-link">Go Home</a>
+    <a asp-page="/Account/Login" class="btn btn-link">Login</a>
+</div>
+
+

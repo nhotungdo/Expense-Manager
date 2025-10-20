@@ -7,6 +7,8 @@ public partial class Category
 {
     public long Id { get; set; }
 
+    public long? ParentCategoryId { get; set; }
+
     public string Name { get; set; } = null!;
 
     public int Type { get; set; }
@@ -29,9 +31,11 @@ public partial class Category
 
     public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
 
-    public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+    public virtual ICollection<Category> InverseParentCategory { get; set; } = new List<Category>();
 
-    public virtual ICollection<Income> Incomes { get; set; } = new List<Income>();
+    public virtual Category? ParentCategory { get; set; }
+
+    public virtual ICollection<ScheduledTransaction> ScheduledTransactions { get; set; } = new List<ScheduledTransaction>();
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 

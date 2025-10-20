@@ -1,33 +1,45 @@
-using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using MoneyTracker.Models;
+
+namespace MoneyTracker.Pages.Account;
 
 public class RegisterModel : PageModel
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    public string? Error { get; set; }
-    public string? Token { get; set; }
+    private readonly ExpenseManagerContext _db;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    public RegisterModel(IHttpClientFactory httpClientFactory)
+    public RegisterModel(ExpenseManagerContext db, IPasswordHasher<User> passwordHasher)
     {
-        _httpClientFactory = httpClientFactory;
+        _db = db;
+        _passwordHasher = passwordHasher;
     }
 
     [BindProperty]
-    public RegisterInput Input { get; set; } = new();
+    public InputModel Input { get; set; } = new();
 
-    public class RegisterInput
+    public class InputModel
     {
-        [Required, EmailAddress]
+        [Required]
+        [StringLength(256, MinimumLength = 3)]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
-        [Required, MinLength(6)]
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
+
+        [Required]
+        [Compare("Password")]
+        [DataType(DataType.Password)]
+        public string ConfirmPassword { get; set; } = string.Empty;
     }
 
     public void OnGet()
@@ -40,37 +52,40 @@ public class RegisterModel : PageModel
         {
             return Page();
         }
-        try
-        {
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(Request.Scheme + "://" + Request.Host);
-            var response = await client.PostAsJsonAsync("/api/auth/register", new { Email = Input.Email, Password = Input.Password, FirstName = Input.FirstName, LastName = Input.LastName });
-            if (!response.IsSuccessStatusCode)
-            {
-                Error = "Registration failed";
-                return Page();
-            }
-            var json = await response.Content.ReadFromJsonAsync<TokenResponse>();
-            Token = json?.token;
-            if (!string.IsNullOrEmpty(Token))
-            {
-                Response.Cookies.Append("jwt", Token!, new Microsoft.AspNetCore.Http.CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = Request.IsHttps,
-                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddHours(1)
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            Error = ex.Message;
-        }
-        return Page();
-    }
 
-    private class TokenResponse { public string token { get; set; } = string.Empty; }
+        var normalizedUserName = Input.UserName.Trim().ToUpperInvariant();
+        var normalizedEmail = Input.Email.Trim().ToUpperInvariant();
+
+        var exists = await _db.Users.AnyAsync(u => u.NormalizedUserName == normalizedUserName || u.NormalizedEmail == normalizedEmail);
+        if (exists)
+        {
+            ModelState.AddModelError(string.Empty, "Username or Email already exists.");
+            return Page();
+        }
+
+        var user = new User
+        {
+            UserName = Input.UserName.Trim(),
+            NormalizedUserName = normalizedUserName,
+            Email = Input.Email.Trim(),
+            NormalizedEmail = normalizedEmail,
+            EmailConfirmed = false,
+            Enabled = true,
+            Language = "vi",
+            DefaultCurrency = "VND",
+            Timezone = "Asia/Ho_Chi_Minh",
+            Theme = "light",
+            Role = "User",
+            CreatedAt = DateTime.UtcNow,
+            SecurityStamp = Guid.NewGuid().ToString("N")
+        };
+        user.PasswordHash = _passwordHasher.HashPassword(user, Input.Password);
+
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+
+        return RedirectToPage("/Account/Login");
+    }
 }
 
 

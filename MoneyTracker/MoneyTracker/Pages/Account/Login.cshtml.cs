@@ -1,74 +1,108 @@
-using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using MoneyTracker.Models;
+
+namespace MoneyTracker.Pages.Account;
 
 public class LoginModel : PageModel
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    public string? Error { get; set; }
-    public string? Token { get; set; }
+    private readonly ExpenseManagerContext _db;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    public LoginModel(IHttpClientFactory httpClientFactory)
+    public LoginModel(ExpenseManagerContext db, IPasswordHasher<User> passwordHasher)
     {
-        _httpClientFactory = httpClientFactory;
+        _db = db;
+        _passwordHasher = passwordHasher;
     }
 
     [BindProperty]
-    public LoginInput Input { get; set; } = new();
+    public InputModel Input { get; set; } = new();
 
-    public class LoginInput
+    public class InputModel
     {
-        [Required, EmailAddress]
-        public string Email { get; set; } = string.Empty;
         [Required]
+        [Display(Name = "Username or Email")]
+        public string UserNameOrEmail { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
+
+        [Display(Name = "Remember me")]
+        public bool RememberMe { get; set; }
     }
 
     public void OnGet()
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
     {
         if (!ModelState.IsValid)
         {
             return Page();
         }
-        try
-        {
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(Request.Scheme + "://" + Request.Host);
-            var response = await client.PostAsJsonAsync("/api/auth/login", new { Email = Input.Email, Password = Input.Password });
-            if (!response.IsSuccessStatusCode)
-            {
-                Error = "Invalid credentials";
-                return Page();
-            }
-            var json = await response.Content.ReadFromJsonAsync<TokenResponse>();
-            Token = json?.token;
-            if (!string.IsNullOrEmpty(Token))
-            {
-                Response.Cookies.Append("jwt", Token!, new Microsoft.AspNetCore.Http.CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = Request.IsHttps,
-                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddHours(1)
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            Error = ex.Message;
-        }
-        return Page();
-    }
 
-    private class TokenResponse { public string token { get; set; } = string.Empty; }
+        var normalized = Input.UserNameOrEmail.Trim().ToUpperInvariant();
+        var user = await _db.Users.FirstOrDefaultAsync(u =>
+            (u.NormalizedUserName == normalized || u.NormalizedEmail == normalized) && u.Enabled);
+
+        if (user == null || string.IsNullOrEmpty(user.PasswordHash))
+        {
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return Page();
+        }
+
+        var verification = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, Input.Password);
+        if (verification == PasswordVerificationResult.Failed)
+        {
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return Page();
+        }
+
+        if (user.TwoFactorEnabled)
+        {
+            TempData["2fa_uid"] = user.Id.ToString();
+            TempData["2fa_remember"] = Input.RememberMe.ToString();
+            TempData["2fa_return"] = returnUrl ?? string.Empty;
+            return RedirectToPage("/Account/TwoFactor/Verify");
+        }
+
+        user.LastLogin = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.UserName ?? user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Role, user.Role)
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = Input.RememberMe
+        };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            authProperties);
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        return RedirectToPage("/Index");
+    }
 }
 
 

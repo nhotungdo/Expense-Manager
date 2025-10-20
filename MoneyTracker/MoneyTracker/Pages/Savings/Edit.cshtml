@@ -1,0 +1,41 @@
+@page "{id?}"
+@model MoneyTracker.Pages.Savings.EditModel
+@{
+    ViewData["Title"] = Model.Input.Id==0?"Add Goal":"Edit Goal";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="Input.Id" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label"></label>
+                <input asp-for="Input.Name" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.TargetAmount" class="form-label"></label>
+                <input asp-for="Input.TargetAmount" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.CurrentAmount" class="form-label"></label>
+                <input asp-for="Input.CurrentAmount" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Status" class="form-label"></label>
+                <select asp-for="Input.Status" class="form-select">
+                    <option value="1">Active</option>
+                    <option value="2">Completed</option>
+                    <option value="0">Paused</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+

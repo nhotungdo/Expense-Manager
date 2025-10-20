@@ -26,8 +26,28 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = F:\OJT-Review\MyExpense\Expense-Manager\MoneyTracker\MoneyTracker
 build_property._RazorSourceGeneratorDebug = 
 
-[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/ChangePassword.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxDaGFuZ2VQYXNzd29yZC5jc2h0bWw=
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Accounts/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudHNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Accounts/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudHNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Accounts/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/ExternalLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxFeHRlcm5hbExvZ2luLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/Login.cshtml]
@@ -46,36 +66,148 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Admin/AuditLogs.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQXVkaXRMb2dzLmNzaHRtbA==
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Admin/SystemSettings.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cU3lzdGVtU2V0dGluZ3MuY3NodG1s
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/TwoFactor/Enable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxUd29GYWN0b3JcRW5hYmxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Admin/Users.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cVXNlcnMuY3NodG1s
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Account/TwoFactor/Verify.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxUd29GYWN0b3JcVmVyaWZ5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Banking/Connect.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmFua2luZ1xDb25uZWN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Banking/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmFua2luZ1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Budgets/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnVkZ2V0c1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Budgets/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnVkZ2V0c1xFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Budgets/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnVkZ2V0c1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Categories/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Categories/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Categories/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Categories/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Dashboard/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Categories/SetLimit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xTZXRMaW1pdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Notifications/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90aWZpY2F0aW9uc1xJbmRleC5jc2h0bWw=
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Data/Import.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGF0YVxJbXBvcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Debts/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVidHNcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Debts/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVidHNcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Debts/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVidHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Debts/Pay.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVidHNcUGF5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Reminders/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVtaW5kZXJzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Reports/BudgetVsActual.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xCdWRnZXRWc0FjdHVhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Reports/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Reports/MonthYear.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xNb250aFllYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Savings/Contribute.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2F2aW5nc1xDb250cmlidXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Savings/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2F2aW5nc1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Savings/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2F2aW5nc1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Savings/Goals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2F2aW5nc1xHb2Fscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Savings/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2F2aW5nc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Scheduled/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2NoZWR1bGVkXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Scheduled/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2NoZWR1bGVkXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Scheduled/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2NoZWR1bGVkXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Settings/Theme.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2V0dGluZ3NcVGhlbWUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Transactions/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJhbnNhY3Rpb25zXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Transactions/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJhbnNhY3Rpb25zXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Transactions/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJhbnNhY3Rpb25zXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MyExpense/Expense-Manager/MoneyTracker/MoneyTracker/Pages/Transactions/Index.cshtml]

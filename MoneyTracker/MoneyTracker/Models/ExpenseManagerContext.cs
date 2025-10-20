@@ -15,6 +15,8 @@ public partial class ExpenseManagerContext : DbContext
     {
     }
 
+    public virtual DbSet<Account> Accounts { get; set; }
+
     public virtual DbSet<AiSuggestion> AiSuggestions { get; set; }
 
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
@@ -29,19 +31,33 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<AuditLog> AuditLogs { get; set; }
 
+    public virtual DbSet<BankConnection> BankConnections { get; set; }
+
     public virtual DbSet<Budget> Budgets { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<CurrencyRate> CurrencyRates { get; set; }
+
+    public virtual DbSet<Debt> Debts { get; set; }
+
+    public virtual DbSet<DebtPayment> DebtPayments { get; set; }
+
     public virtual DbSet<Email> Emails { get; set; }
 
-    public virtual DbSet<Expense> Expenses { get; set; }
-
-    public virtual DbSet<Income> Incomes { get; set; }
+    public virtual DbSet<Investment> Investments { get; set; }
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
     public virtual DbSet<Report> Reports { get; set; }
+
+    public virtual DbSet<SavingsGoal> SavingsGoals { get; set; }
+
+    public virtual DbSet<SavingsTransaction> SavingsTransactions { get; set; }
+
+    public virtual DbSet<ScheduledTransaction> ScheduledTransactions { get; set; }
+
+    public virtual DbSet<SharedAccount> SharedAccounts { get; set; }
 
     public virtual DbSet<SystemSetting> SystemSettings { get; set; }
 
@@ -54,21 +70,39 @@ public partial class ExpenseManagerContext : DbContext
     public virtual DbSet<VwUserTransactionSummary> VwUserTransactionSummaries { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (optionsBuilder.IsConfigured)
+        // Configure only if not configured by DI
         {
-            return;
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Name=DBDefault");
+            }
         }
-        // Fallback if not configured via DI (e.g., design-time tooling). Prefer configuration-based setup.
-        optionsBuilder.UseSqlServer("Name=ConnectionStrings:ExpenseManager");
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_Accounts_UpdatedAt"));
+
+            entity.HasIndex(e => e.UserId, "IX_Accounts_UserId");
+
+            entity.Property(e => e.Color).HasMaxLength(20);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Currency)
+                .HasMaxLength(3)
+                .HasDefaultValue("VND");
+            entity.Property(e => e.CurrentBalance).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Icon).HasMaxLength(50);
+            entity.Property(e => e.IncludeInTotal).HasDefaultValue(true);
+            entity.Property(e => e.InitialBalance).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Name).HasMaxLength(100);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Accounts).HasForeignKey(d => d.UserId);
+        });
+
         modelBuilder.Entity<AiSuggestion>(entity =>
         {
-            entity.HasIndex(e => e.CreatedAt, "IX_AiSuggestions_CreatedAt");
-
             entity.HasIndex(e => e.UserId, "IX_AiSuggestions_UserId");
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -128,12 +162,6 @@ public partial class ExpenseManagerContext : DbContext
 
         modelBuilder.Entity<AuditLog>(entity =>
         {
-            entity.HasIndex(e => e.Action, "IX_AuditLogs_Action");
-
-            entity.HasIndex(e => e.CreatedAt, "IX_AuditLogs_CreatedAt");
-
-            entity.HasIndex(e => e.EntityId, "IX_AuditLogs_EntityId");
-
             entity.HasIndex(e => e.EntityType, "IX_AuditLogs_EntityType");
 
             entity.HasIndex(e => e.UserId, "IX_AuditLogs_UserId");
@@ -150,22 +178,36 @@ public partial class ExpenseManagerContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
+        modelBuilder.Entity<BankConnection>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_BankConnections_UserId");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.ItemId).HasMaxLength(256);
+            entity.Property(e => e.Provider).HasMaxLength(50);
+            entity.Property(e => e.SyncStatus).HasMaxLength(20);
+
+            entity.HasOne(d => d.Account).WithMany(p => p.BankConnections)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.User).WithMany(p => p.BankConnections).HasForeignKey(d => d.UserId);
+        });
+
         modelBuilder.Entity<Budget>(entity =>
         {
             entity.ToTable(tb => tb.HasTrigger("tr_Budgets_UpdatedAt"));
 
+            entity.HasIndex(e => e.AccountId, "IX_Budgets_AccountId");
+
             entity.HasIndex(e => e.CategoryId, "IX_Budgets_CategoryId");
-
-            entity.HasIndex(e => e.EndDate, "IX_Budgets_EndDate");
-
-            entity.HasIndex(e => e.Period, "IX_Budgets_Period");
-
-            entity.HasIndex(e => e.StartDate, "IX_Budgets_StartDate");
 
             entity.HasIndex(e => e.UserId, "IX_Budgets_UserId");
 
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.Budgets).HasForeignKey(d => d.AccountId);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Budgets).HasForeignKey(d => d.CategoryId);
 
@@ -176,7 +218,7 @@ public partial class ExpenseManagerContext : DbContext
         {
             entity.ToTable(tb => tb.HasTrigger("tr_Categories_UpdatedAt"));
 
-            entity.HasIndex(e => e.IsDefault, "IX_Categories_IsDefault");
+            entity.HasIndex(e => e.ParentCategoryId, "IX_Categories_ParentCategoryId");
 
             entity.HasIndex(e => e.Type, "IX_Categories_Type");
 
@@ -189,13 +231,53 @@ public partial class ExpenseManagerContext : DbContext
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name).HasMaxLength(100);
 
+            entity.HasOne(d => d.ParentCategory).WithMany(p => p.InverseParentCategory).HasForeignKey(d => d.ParentCategoryId);
+
             entity.HasOne(d => d.User).WithMany(p => p.Categories).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<CurrencyRate>(entity =>
+        {
+            entity.HasIndex(e => new { e.FromCurrency, e.ToCurrency }, "UK_CurrencyRates_From_To").IsUnique();
+
+            entity.Property(e => e.FromCurrency).HasMaxLength(3);
+            entity.Property(e => e.Rate).HasColumnType("decimal(18, 9)");
+            entity.Property(e => e.ToCurrency).HasMaxLength(3);
+        });
+
+        modelBuilder.Entity<Debt>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_Debts_UpdatedAt"));
+
+            entity.HasIndex(e => e.UserId, "IX_Debts_UserId");
+
+            entity.Property(e => e.AmountPaid).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.InitialAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.InterestRate).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.PersonName).HasMaxLength(100);
+            entity.Property(e => e.Status).HasDefaultValue(1);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Debts).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<DebtPayment>(entity =>
+        {
+            entity.HasIndex(e => e.DebtId, "IX_DebtPayments_DebtId");
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Note).HasMaxLength(512);
+
+            entity.HasOne(d => d.Debt).WithMany(p => p.DebtPayments).HasForeignKey(d => d.DebtId);
+
+            entity.HasOne(d => d.Transaction).WithMany(p => p.DebtPayments)
+                .HasForeignKey(d => d.TransactionId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Email>(entity =>
         {
-            entity.HasIndex(e => e.CreatedAt, "IX_Emails_CreatedAt");
-
             entity.HasIndex(e => e.Status, "IX_Emails_Status");
 
             entity.HasIndex(e => e.UserId, "IX_Emails_UserId");
@@ -207,59 +289,27 @@ public partial class ExpenseManagerContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Emails).HasForeignKey(d => d.UserId);
         });
 
-        modelBuilder.Entity<Expense>(entity =>
+        modelBuilder.Entity<Investment>(entity =>
         {
-            entity.HasIndex(e => e.CategoryId, "IX_Expenses_CategoryId");
+            entity.ToTable(tb => tb.HasTrigger("tr_Investments_UpdatedAt"));
 
-            entity.HasIndex(e => e.CreatedAt, "IX_Expenses_CreatedAt");
+            entity.HasIndex(e => e.UserId, "IX_Investments_UserId");
 
-            entity.HasIndex(e => e.ExpenseDate, "IX_Expenses_ExpenseDate");
-
-            entity.HasIndex(e => e.UserId, "IX_Expenses_UserId");
-
-            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.AssetType).HasMaxLength(50);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Currency)
-                .HasMaxLength(3)
-                .HasDefaultValue("VND");
-            entity.Property(e => e.Note).HasMaxLength(512);
+            entity.Property(e => e.CurrentValue).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.PurchasePrice).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Quantity).HasColumnType("decimal(18, 8)");
 
-            entity.HasOne(d => d.Category).WithMany(p => p.Expenses).HasForeignKey(d => d.CategoryId);
+            entity.HasOne(d => d.Account).WithMany(p => p.Investments).HasForeignKey(d => d.AccountId);
 
-            entity.HasOne(d => d.User).WithMany(p => p.Expenses).HasForeignKey(d => d.UserId);
-        });
-
-        modelBuilder.Entity<Income>(entity =>
-        {
-            entity.HasIndex(e => e.CategoryId, "IX_Incomes_CategoryId");
-
-            entity.HasIndex(e => e.CreatedAt, "IX_Incomes_CreatedAt");
-
-            entity.HasIndex(e => e.IncomeDate, "IX_Incomes_IncomeDate");
-
-            entity.HasIndex(e => e.UserId, "IX_Incomes_UserId");
-
-            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Currency)
-                .HasMaxLength(3)
-                .HasDefaultValue("VND");
-            entity.Property(e => e.Note).HasMaxLength(512);
-
-            entity.HasOne(d => d.Category).WithMany(p => p.Incomes).HasForeignKey(d => d.CategoryId);
-
-            entity.HasOne(d => d.User).WithMany(p => p.Incomes).HasForeignKey(d => d.UserId);
+            entity.HasOne(d => d.User).WithMany(p => p.Investments).HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasIndex(e => e.CreatedAt, "IX_Notifications_CreatedAt");
-
-            entity.HasIndex(e => e.IsImportant, "IX_Notifications_IsImportant");
-
             entity.HasIndex(e => e.IsRead, "IX_Notifications_IsRead");
-
-            entity.HasIndex(e => e.Type, "IX_Notifications_Type");
 
             entity.HasIndex(e => e.UserId, "IX_Notifications_UserId");
 
@@ -274,14 +324,6 @@ public partial class ExpenseManagerContext : DbContext
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasIndex(e => e.CreatedAt, "IX_Reports_CreatedAt");
-
-            entity.HasIndex(e => e.EndDate, "IX_Reports_EndDate");
-
-            entity.HasIndex(e => e.ReportType, "IX_Reports_ReportType");
-
-            entity.HasIndex(e => e.StartDate, "IX_Reports_StartDate");
-
             entity.HasIndex(e => e.UserId, "IX_Reports_UserId");
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -293,11 +335,89 @@ public partial class ExpenseManagerContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Reports).HasForeignKey(d => d.UserId);
         });
 
+        modelBuilder.Entity<SavingsGoal>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_SavingsGoals_UpdatedAt"));
+
+            entity.HasIndex(e => e.UserId, "IX_SavingsGoals_UserId");
+
+            entity.Property(e => e.Color).HasMaxLength(20);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.CurrentAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Icon).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Status).HasDefaultValue(1);
+            entity.Property(e => e.TargetAmount).HasColumnType("decimal(18, 2)");
+
+            entity.HasOne(d => d.User).WithMany(p => p.SavingsGoals).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<SavingsTransaction>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_SavingsTransactions_UpdateGoal"));
+
+            entity.HasIndex(e => e.SavingsGoalId, "IX_SavingsTransactions_SavingsGoalId");
+
+            entity.HasIndex(e => e.TransactionId, "IX_SavingsTransactions_TransactionId");
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Note).HasMaxLength(512);
+
+            entity.HasOne(d => d.SavingsGoal).WithMany(p => p.SavingsTransactions).HasForeignKey(d => d.SavingsGoalId);
+
+            entity.HasOne(d => d.Transaction).WithMany(p => p.SavingsTransactions)
+                .HasForeignKey(d => d.TransactionId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<ScheduledTransaction>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_ScheduledTransactions_UpdatedAt"));
+
+            entity.HasIndex(e => e.NextRunDate, "IX_ScheduledTransactions_NextRunDate");
+
+            entity.HasIndex(e => e.UserId, "IX_ScheduledTransactions_UserId");
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Frequency).HasMaxLength(20);
+            entity.Property(e => e.Interval).HasDefaultValue(1);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Note).HasMaxLength(512);
+
+            entity.HasOne(d => d.Account).WithMany(p => p.ScheduledTransactions)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.ScheduledTransactions).HasForeignKey(d => d.CategoryId);
+
+            entity.HasOne(d => d.User).WithMany(p => p.ScheduledTransactions).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<SharedAccount>(entity =>
+        {
+            entity.HasIndex(e => e.AccountId, "IX_SharedAccounts_AccountId");
+
+            entity.HasIndex(e => e.UserId, "IX_SharedAccounts_UserId");
+
+            entity.HasIndex(e => new { e.AccountId, e.UserId }, "UK_SharedAccounts_AccountId_UserId").IsUnique();
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.SharedAccounts).HasForeignKey(d => d.AccountId);
+
+            entity.HasOne(d => d.SharedByUser).WithMany(p => p.SharedAccountSharedByUsers)
+                .HasForeignKey(d => d.SharedByUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.User).WithMany(p => p.SharedAccountUsers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
         modelBuilder.Entity<SystemSetting>(entity =>
         {
             entity.ToTable(tb => tb.HasTrigger("tr_SystemSettings_UpdatedAt"));
-
-            entity.HasIndex(e => e.IsActive, "IX_SystemSettings_IsActive");
 
             entity.HasIndex(e => e.SettingKey, "IX_SystemSettings_SettingKey").IsUnique();
 
@@ -310,23 +430,39 @@ public partial class ExpenseManagerContext : DbContext
 
         modelBuilder.Entity<Transaction>(entity =>
         {
-            entity.ToTable(tb => tb.HasTrigger("tr_Transactions_UpdatedAt"));
+            entity.ToTable(tb =>
+                {
+                    tb.HasTrigger("tr_Transactions_UpdateAccountBalance");
+                    tb.HasTrigger("tr_Transactions_UpdatedAt");
+                });
+
+            entity.HasIndex(e => e.AccountId, "IX_Transactions_AccountId");
 
             entity.HasIndex(e => e.CategoryId, "IX_Transactions_CategoryId");
 
-            entity.HasIndex(e => e.CreatedAt, "IX_Transactions_CreatedAt");
-
             entity.HasIndex(e => e.TransactionDate, "IX_Transactions_TransactionDate");
 
-            entity.HasIndex(e => e.Type, "IX_Transactions_Type");
+            entity.HasIndex(e => e.TransactionType, "IX_Transactions_TransactionType");
 
             entity.HasIndex(e => e.UserId, "IX_Transactions_UserId");
 
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.AttachmentUrl).HasMaxLength(512);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Description).HasMaxLength(512);
+            entity.Property(e => e.Currency)
+                .HasMaxLength(3)
+                .HasDefaultValue("VND");
+            entity.Property(e => e.Note).HasMaxLength(512);
+
+            entity.HasOne(d => d.Account).WithMany(p => p.TransactionAccounts)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Transactions).HasForeignKey(d => d.CategoryId);
+
+            entity.HasOne(d => d.PairedAccount).WithMany(p => p.TransactionPairedAccounts).HasForeignKey(d => d.PairedAccountId);
+
+            entity.HasOne(d => d.PairedTransaction).WithMany(p => p.InversePairedTransaction).HasForeignKey(d => d.PairedTransactionId);
 
             entity.HasOne(d => d.User).WithMany(p => p.Transactions).HasForeignKey(d => d.UserId);
         });
@@ -383,7 +519,6 @@ public partial class ExpenseManagerContext : DbContext
                         j.HasKey("UserId", "RoleId");
                         j.ToTable("AspNetUserRoles");
                         j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
-                        j.HasIndex(new[] { "UserId" }, "IX_AspNetUserRoles_UserId");
                     });
         });
 

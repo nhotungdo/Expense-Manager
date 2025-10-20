@@ -1,9 +1,5 @@
 ﻿<!DOCTYPE html>
-@{
-    var lang = Context.Request.Cookies["lang"] ?? "en";
-    var theme = Context.Request.Cookies["theme"] ?? "light";
-}
-<html lang="@lang" data-bs-theme="@theme">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,45 +20,53 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Dashboard/Index">Dashboard</a>
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Transactions/Index">Transactions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Budgets/Index">Budgets</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Categories/Index">Categories</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Notifications/Index">Notifications</a>
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Accounts/Index">Accounts</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Budgets/Index">Budgets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Reports/Index">Reports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Reports/BudgetVsActual">Budget vs Actual</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Reports/MonthYear">Month/Year</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Reminders/Index">Reminders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Banking/Index">Banking</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Savings/Goals">Savings Goals</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Data/Import">Import Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Settings/Theme">Settings</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Account/Profile">Profile</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Account/ChangePassword">Change Password</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Account/Logout">Logout</a>
-                        </li>
-                        @{
-                            var isAdmin = false;
-                            var jwtRole = Context.User?.IsInRole("Admin") ?? false;
-                            isAdmin = jwtRole;
-                        }
-                        @if (isAdmin)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Admin/Users">Admin</a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <form class="d-inline" method="post" asp-page="/Account/Logout">
+                                <button class="btn btn-link nav-link">Logout</button>
+                            </form>
                         </li>
                     </ul>
                 </div>
@@ -73,29 +77,6 @@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-    </div>
-
-    <div aria-live="polite" aria-atomic="true" class="position-relative">
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            @if (TempData["Success"] is string success && !string.IsNullOrWhiteSpace(success))
-            {
-                <div class="toast align-items-center text-bg-success border-0 show" role="alert">
-                    <div class="d-flex">
-                        <div class="toast-body">@success</div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                </div>
-            }
-            @if (TempData["Error"] is string error && !string.IsNullOrWhiteSpace(error))
-            {
-                <div class="toast align-items-center text-bg-danger border-0 show" role="alert">
-                    <div class="d-flex">
-                        <div class="toast-body">@error</div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                </div>
-            }
-        </div>
     </div>
 
     <footer class="border-top footer text-muted">

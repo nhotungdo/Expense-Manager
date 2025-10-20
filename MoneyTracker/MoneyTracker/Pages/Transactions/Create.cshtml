@@ -1,0 +1,75 @@
+@page
+@model MoneyTracker.Pages.Transactions.CreateModel
+@{
+    ViewData["Title"] = "Add Transaction";
+}
+
+<h2>Add Transaction</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.TransactionDate" class="form-label"></label>
+                <input asp-for="Input.TransactionDate" class="form-control" type="date" />
+                <span asp-validation-for="Input.TransactionDate" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.TransactionType" class="form-label"></label>
+                <select asp-for="Input.TransactionType" class="form-select">
+                    <option>Income</option>
+                    <option>Expense</option>
+                    <option>Transfer</option>
+                </select>
+                <span asp-validation-for="Input.TransactionType" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Amount" class="form-label"></label>
+                <input asp-for="Input.Amount" class="form-control" />
+                <span asp-validation-for="Input.Amount" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.AccountId" class="form-label"></label>
+                <select asp-for="Input.AccountId" class="form-select" asp-items="Model.AccountOptions"></select>
+                <span asp-validation-for="Input.AccountId" class="text-danger"></span>
+            </div>
+            <div class="mb-3" id="pairedAccountGroup" style="display:none;">
+                <label asp-for="Input.PairedAccountId" class="form-label">To Account</label>
+                <select asp-for="Input.PairedAccountId" class="form-select" asp-items="Model.AccountOptions"></select>
+                <span asp-validation-for="Input.PairedAccountId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.CategoryId" class="form-label"></label>
+                <select asp-for="Input.CategoryId" class="form-select" asp-items="Model.CategoryOptions"></select>
+                <span asp-validation-for="Input.CategoryId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Input.Note" class="form-label"></label>
+                <input asp-for="Input.Note" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Attachment</label>
+                <input type="file" name="attachment" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    (function(){
+        const typeSelect = document.querySelector('[name="Input.TransactionType"]');
+        const pairedGroup = document.getElementById('pairedAccountGroup');
+        function update(){
+            pairedGroup.style.display = typeSelect && typeSelect.value === 'Transfer' ? '' : 'none';
+        }
+        if (typeSelect){ typeSelect.addEventListener('change', update); update(); }
+    })();
+</script>
+
+
