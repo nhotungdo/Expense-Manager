@@ -1,0 +1,685 @@
+@page "/home"
+@model MoneyTrackerApp.Pages.HomeModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="home-container">
+  
+
+    <!-- Filter section -->
+    <section class="filter-section">
+        <h2>Danh sách tài khoản của bạn</h2>
+        <div class="filter-controls">
+            <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Tìm kiếm tài khoản..."
+                onkeyup="filterAccounts()" />
+
+            <select id="typeFilter" class="filter-select" onchange="filterAccounts()">
+                <option value="">📊 Tất cả loại tài khoản</option>
+                <option value="0">💵 Tiền mặt</option>
+                <option value="1">🏦 Tài khoản ngân hàng</option>
+                <option value="2">📱 Ví điện tử</option>
+                <option value="3">💳 Thẻ tín dụng</option>
+                <option value="4">💰 Tài khoản tiết kiệm</option>
+                <option value="5">📈 Đầu tư</option>
+            </select>
+
+            <select id="currencyFilter" class="filter-select" onchange="filterAccounts()">
+                <option value="">💱 Tất cả loại tiền</option>
+                <option value="VND">VND</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+            </select>
+
+            <button class="btn-add" onclick="openCreateAccountModal()">➕ Thêm tài khoản mới</button>
+        </div>
+    </section>
+
+    <!-- Accounts grid -->
+    <section class="accounts-section">
+        <div id="accountsContainer" class="accounts-grid">
+            <!-- Load via JavaScript -->
+        </div>
+    </section>
+
+    <!-- Create Account Modal -->
+    <div id="accountModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tạo tài khoản mới</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="accountForm" class="modal-body">
+                <div class="form-group">
+                    <label>Tên tài khoản *</label>
+                    <input type="text" name="name" placeholder="VD: Tài khoản tiền mặt" required />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Loại tài khoản *</label>
+                        <select name="accountType" required>
+                            <option value="">Chọn loại...</option>
+                            <option value="0">💵 Tiền mặt</option>
+                            <option value="1">🏦 Tài khoản ngân hàng</option>
+                            <option value="2">📱 Ví điện tử</option>
+                            <option value="3">💳 Thẻ tín dụng</option>
+                            <option value="4">💰 Tài khoản tiết kiệm</option>
+                            <option value="5">📈 Đầu tư</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Loại tiền *</label>
+                        <select name="currency" required>
+                            <option value="">Chọn loại...</option>
+                            <option value="VND" selected>VND</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Số dư ban đầu</label>
+                        <input type="number" name="initialBalance" placeholder="0" min="0" step="0.01" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Màu sắc</label>
+                        <input type="color" name="color" value="#667eea" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Biểu tượng (emoji)</label>
+                    <input type="text" name="icon" placeholder="💳" maxlength="2" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="includeInTotal" checked />
+                        Tính vào tổng tài sản
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-primary">Tạo tài khoản</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #f5f7fa;
+    }
+
+    .home-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Header */
+    .home-header {
+        background: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-left h1 {
+        font-size: 24px;
+        color: #333;
+    }
+
+    .header-right {
+        position: relative;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .user-menu-wrapper {
+        position: relative;
+    }
+
+    .user-button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px;
+        background: #f5f7fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .user-button:hover {
+        background: #e8ecf1;
+    }
+
+    .user-avatar {
+        font-size: 18px;
+    }
+
+    .user-name {
+        font-weight: 500;
+    }
+
+    .dropdown-icon {
+        font-size: 12px;
+    }
+
+    .user-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        min-width: 200px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        margin-top: 8px;
+        z-index: 1000;
+    }
+
+    .menu-item {
+        display: block;
+        padding: 12px 16px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .menu-item:hover {
+        background: #f5f7fa;
+    }
+
+    .menu-divider {
+        height: 1px;
+        background: #e0e0e0;
+        margin: 8px 0;
+    }
+
+    .menu-item.logout {
+        color: #e74c3c;
+    }
+
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-section h2 {
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 16px;
+    }
+
+    .filter-controls {
+        display: grid;
+        grid-template-columns: 1fr 180px 150px 180px;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .filter-input,
+    .filter-select {
+        padding: 10px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 13px;
+        transition: border-color 0.3s;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-add {
+        padding: 10px 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+    .btn-add:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Accounts Grid */
+    .accounts-section {
+        padding: 20px 0;
+    }
+
+    .accounts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .account-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+        border-left: 4px solid #667eea;
+    }
+
+    .account-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .account-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 12px;
+    }
+
+    .account-icon {
+        font-size: 32px;
+    }
+
+    .account-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .account-actions button {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: #f5f7fa;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+
+    .account-actions button:hover {
+        background: #e8ecf1;
+    }
+
+    .account-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .account-type {
+        font-size: 12px;
+        color: #999;
+    }
+
+    .account-balance {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin: 12px 0;
+    }
+
+    .account-meta {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+        font-size: 12px;
+        color: #999;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .empty-state svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    .empty-state h3 {
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h2 {
+        font-size: 20px;
+        color: #333;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #999;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #333;
+        font-weight: 500;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 13px;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input[type="checkbox"] {
+        width: auto;
+        margin-right: 8px;
+    }
+
+    .modal-footer {
+        padding: 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .btn-secondary {
+        background: #f5f7fa;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #e8ecf1;
+    }
+
+    @@media (max-width: 768px) {
+        .filter-controls {
+            grid-template-columns: 1fr;
+        }
+
+        .accounts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+            margin: 20px;
+        }
+    }
+</style>
+
+<script>
+    const accountTypeNames = {
+        0: '💵 Tiền mặt',
+        1: '🏦 Tài khoản ngân hàng',
+        2: '📱 Ví điện tử',
+        3: '💳 Thẻ tín dụng',
+        4: '💰 Tài khoản tiết kiệm',
+        5: '📈 Đầu tư'
+    };
+
+    let allAccounts = [];
+
+    async function loadAccounts() {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            window.location.href = '/Auth/Login';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/accounts/summaries', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = '/Auth/Login';
+                }
+                return;
+            }
+
+            allAccounts = await response.json();
+            displayAccounts(allAccounts);
+        } catch (error) {
+            console.error('Load accounts error:', error);
+        }
+    }
+
+    function displayAccounts(accounts) {
+        const container = document.getElementById('accountsContainer');
+
+        if (!accounts || accounts.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1;">
+                    <div class="empty-state">
+                        <div style="font-size: 60px; margin-bottom: 16px;">📭</div>
+                        <h3>Chưa có tài khoản nào</h3>
+                        <p>Tạo tài khoản đầu tiên của bạn để bắt đầu theo dõi chi tiêu</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = accounts.map(acc => `
+            <div class="account-card" style="border-left-color: ${acc.color || '#667eea'}">
+                <div class="account-header">
+                    <div style="flex: 1;">
+                        <div class="account-name">${acc.icon || '💳'} ${acc.name}</div>
+                        <div class="account-type">${accountTypeNames[acc.accountType] || 'Khác'}</div>
+                    </div>
+                    <div class="account-actions">
+                        <button onclick="editAccount(${acc.id})">✏️</button>
+                        <button onclick="deleteAccount(${acc.id})">🗑️</button>
+                    </div>
+                </div>
+                <div class="account-balance">${(acc.currentBalance || 0).toLocaleString('vi-VN')} ${acc.currency}</div>
+                <div class="account-meta">
+                    <span>${acc.isActive ? '✅ Hoạt động' : '⏸️ Ẩn'}</span>
+                    <span>${acc.currency}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterAccounts() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const typeFilter = document.getElementById('typeFilter').value;
+        const currencyFilter = document.getElementById('currencyFilter').value;
+
+        const filtered = allAccounts.filter(acc => {
+            const matchSearch = !search || acc.name.toLowerCase().includes(search);
+            const matchType = !typeFilter || acc.accountType.toString() === typeFilter;
+            const matchCurrency = !currencyFilter || acc.currency === currencyFilter;
+            return matchSearch && matchType && matchCurrency;
+        });
+
+        displayAccounts(filtered);
+    }
+
+    function toggleUserMenu() {
+        const menu = document.getElementById('user-menu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function logout(e) {
+        e.preventDefault();
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            window.location.href = '/Auth/Login';
+        }
+    }
+
+    function openCreateAccountModal() {
+        document.getElementById('accountModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('accountModal').style.display = 'none';
+        document.getElementById('accountForm').reset();
+    }
+
+    document.getElementById('accountForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            const response = await fetch('/api/accounts', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    accountType: parseInt(formData.get('accountType')),
+                    initialBalance: parseFloat(formData.get('initialBalance')) || 0,
+                    currency: formData.get('currency'),
+                    icon: formData.get('icon'),
+                    color: formData.get('color'),
+                    includeInTotal: formData.get('includeInTotal') === 'on'
+                })
+            });
+
+            if (response.ok) {
+                closeModal();
+                loadAccounts();
+            }
+        } catch (error) {
+            console.error('Create account error:', error);
+        }
+    });
+
+    // Load accounts on page load
+    document.addEventListener('DOMContentLoaded', loadAccounts);
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-menu-wrapper')) {
+            document.getElementById('user-menu').style.display = 'none';
+        }
+    });
+</script>

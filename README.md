@@ -1,243 +1,357 @@
-# Money Tracker - Ứng dụng Quản lý Tài chính Cá nhân
+# Expense Manager - Personal Finance Application
 
-Ứng dụng Money Tracker là một hệ thống quản lý tài chính cá nhân hoàn chỉnh với backend ASP.NET Core và frontend React TypeScript.
+A comprehensive, production-ready personal finance management application built with ASP.NET Core 8.0 and React 18 with TypeScript.
 
-## 🚀 Tính năng chính
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-### Backend (ASP.NET Core Web API)
-- ✅ **Clean Architecture** với Repository Pattern và Unit of Work
-- ✅ **JWT Authentication** kết hợp Google OAuth2
-- ✅ **Entity Framework Core** với SQL Server
-- ✅ **Swagger/OpenAPI** documentation
-- ✅ **Serilog** logging
-- ✅ **Comprehensive API endpoints** cho tất cả tính năng
+## ✨ Features
 
-### Frontend (React TypeScript)
-- ✅ **Modern React 18** với TypeScript
-- ✅ **Material-UI (MUI)** cho giao diện đẹp
-- ✅ **React Router** cho navigation
-- ✅ **React Query** cho data fetching
-- ✅ **Zustand** cho state management
-- ✅ **Recharts** cho biểu đồ
-- ✅ **Responsive design** cho mobile và desktop
+### Core Features
 
-### Tính năng nghiệp vụ
-- 🔐 **Đăng nhập bằng Google OAuth2**
-- 📊 **Dashboard** với biểu đồ thu chi
-- 💰 **Quản lý giao dịch** (thu nhập/chi tiêu)
-- 📂 **Quản lý danh mục** (hệ thống + cá nhân)
-- 💳 **Quản lý ngân sách** với cảnh báo
-- 📈 **Báo cáo và thống kê** chi tiết
-- 🤖 **AI Suggestions** thông minh
-- 📤 **Xuất báo cáo** Excel/PDF
+- ✅ **User Authentication** - JWT-based authentication with refresh tokens
+- ✅ **Account Management** - Multiple accounts (Cash, Bank, E-Wallet, Credit Card, Savings)
+- ✅ **Transaction Tracking** - Income, Expense, and Transfer transactions with automatic balance updates
+- ✅ **Category Management** - Hierarchical categories with default and custom categories
+- ✅ **Budget Tracking** - Set budgets by category or account with real-time progress tracking
+- ✅ **Reports & Analytics** - Visual reports with interactive charts and trends
+- ✅ **Multi-Currency Support** - Support for multiple currencies with exchange rates
+- ✅ **Shared Accounts** - Share accounts with other users with permission levels
+- ✅ **File Attachments** - Attach receipts and documents to transactions
+- ✅ **Responsive Design** - Mobile-first design with Tailwind CSS
 
-## 🛠️ Công nghệ sử dụng
+### Technical Highlights
 
-### Backend
-- .NET 8
-- ASP.NET Core Web API
-- Entity Framework Core
-- SQL Server
-- JWT Authentication
-- Google OAuth2
-- Swagger/OpenAPI
-- Serilog
-- AutoMapper
-- ClosedXML (Excel export)
+- 🏗️ **Clean Architecture** - Separation of concerns with Repository Pattern and Unit of Work
+- 🔐 **Security** - BCrypt password hashing, JWT tokens, input validation
+- 📝 **Logging** - Structured logging with Serilog
+- 🔄 **Background Jobs** - Hangfire for scheduled tasks
+- 📚 **API Documentation** - Swagger/OpenAPI with interactive UI
+- 🐳 **Docker Support** - Complete Docker Compose setup
+- 🚀 **CI/CD Ready** - GitHub Actions workflow included
 
-### Frontend
-- React 18
-- TypeScript
-- Material-UI (MUI)
-- React Router DOM
-- React Query
-- Zustand
-- Recharts
-- Axios
-- React Hook Form
+## 🏗️ Architecture
 
-## 📁 Cấu trúc dự án
+This application follows **Clean Architecture** (Onion Architecture) principles:
 
 ```
-Expense-Manager/
-├── MoneyTracker/                    # Backend ASP.NET Core
+┌─────────────────────────────────────┐
+│         API Layer (Controllers)      │
+├─────────────────────────────────────┤
+│      Application Layer (Services)    │
+│  - DTOs, Validators, Mappings        │
+├─────────────────────────────────────┤
+│   Infrastructure Layer (Data Access) │
+│  - Repositories, External Services   │
+├─────────────────────────────────────┤
+│      Core Layer (Domain)             │
+│  - Entities, Interfaces, Enums       │
+└─────────────────────────────────────┘
+```
+
+## 🛠️ Tech Stack
+
+### Backend
+
+- **Framework**: ASP.NET Core 8.0 (LTS)
+- **ORM**: Entity Framework Core 8.0
+- **Database**: SQL Server
+- **Authentication**: JWT Bearer Tokens
+- **Validation**: FluentValidation 11.11
+- **Mapping**: AutoMapper 13.0
+- **Logging**: Serilog 8.0
+- **Background Jobs**: Hangfire 1.8
+- **API Documentation**: Swagger/OpenAPI
+- **Password Hashing**: BCrypt.Net
+
+### Frontend
+
+- **Framework**: React 18.3
+- **Language**: TypeScript 5.7
+- **Build Tool**: Vite 6.0
+- **Styling**: Tailwind CSS 3.4
+- **Routing**: React Router 6.28
+- **State Management**: Zustand 5.0
+- **Data Fetching**: TanStack Query (React Query) 5.62
+- **HTTP Client**: Axios 1.7
+- **Forms**: React Hook Form 7.54 + Zod 3.23
+- **Charts**: Recharts 2.15
+- **Icons**: Lucide React 0.468
+
+## 📋 Prerequisites
+
+- **.NET 8.0 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/8.0)
+- **Node.js 20+** - [Download](https://nodejs.org/)
+- **SQL Server** - LocalDB, Express, or Docker
+- **Docker** (optional) - For containerized deployment
+
+## 🚀 Quick Start
+
+### Option 1: Docker Compose (Recommended)
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd expense-manager
+   ```
+
+2. **Run with Docker Compose**
+
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access the application**
+
+   - Frontend: http://localhost:3000
+   - Backend API: https://localhost:5000
+   - Swagger UI: https://localhost:5000/swagger
+   - Hangfire Dashboard: https://localhost:5000/hangfire
+
+4. **Initialize the database**
+
+   ```bash
+   # Connect to SQL Server container
+   docker exec -it expense-manager-db /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd'
+
+   # Run schema and seed data scripts
+   # Copy and paste contents of Database_Schema.sql
+   # Copy and paste contents of Database_SeedData.sql
+   ```
+
+### Option 2: Local Development
+
+#### Backend Setup
+
+1. **Navigate to backend directory**
+
+   ```bash
+   cd MoneyTracker/MoneyTracker
+   ```
+
+2. **Update connection string in `appsettings.json`**
+
+   ```json
+   {
+     "ConnectionStrings": {
+       "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=ExpenseManager;Trusted_Connection=True;MultipleActiveResultSets=true"
+     }
+   }
+   ```
+
+3. **Create database**
+
+   - Open SQL Server Management Studio or Azure Data Studio
+   - Run `Database_Schema.sql`
+   - Run `Database_SeedData.sql`
+
+4. **Run the API**
+
+   ```bash
+   dotnet restore
+   dotnet run
+   ```
+
+   API will be available at:
+
+   - HTTPS: https://localhost:5000
+   - Swagger: https://localhost:5000/swagger
+
+#### Frontend Setup
+
+1. **Navigate to frontend directory**
+
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Create `.env` file**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit `.env`:
+
+   ```
+   VITE_API_URL=https://localhost:7000/api
+   ```
+
+4. **Run development server**
+
+   ```bash
+   npm run dev
+   ```
+
+   Frontend will be available at http://localhost:3000
+
+## 📝 API Documentation
+
+### Authentication Endpoints
+
+```
+POST   /api/auth/register          - Register new user
+POST   /api/auth/login             - Login user
+POST   /api/auth/refresh           - Refresh access token
+GET    /api/auth/me                - Get current user
+PUT    /api/auth/me                - Update user profile
+```
+
+### Account Endpoints
+
+```
+GET    /api/accounts               - Get all user accounts
+GET    /api/accounts/{id}          - Get account by ID
+POST   /api/accounts               - Create new account
+PUT    /api/accounts/{id}          - Update account
+DELETE /api/accounts/{id}          - Delete account (soft delete)
+POST   /api/accounts/{id}/share    - Share account with another user
+```
+
+### Transaction Endpoints
+
+```
+GET    /api/transactions           - Get transactions (with filtering & pagination)
+GET    /api/transactions/{id}      - Get transaction by ID
+POST   /api/transactions           - Create new transaction
+PUT    /api/transactions/{id}      - Update transaction
+DELETE /api/transactions/{id}      - Delete transaction
+POST   /api/transactions/{id}/attachment - Upload attachment
+```
+
+### Category Endpoints
+
+```
+GET    /api/categories             - Get all categories (hierarchical)
+POST   /api/categories             - Create new category
+DELETE /api/categories/{id}        - Delete category
+```
+
+### Budget Endpoints
+
+```
+GET    /api/budgets                - Get all budgets
+GET    /api/budgets/summary        - Get current month budget summary
+POST   /api/budgets                - Create new budget
+DELETE /api/budgets/{id}           - Delete budget
+```
+
+### Report Endpoints
+
+```
+GET    /api/reports/summary        - Get financial summary with charts
+```
+
+Full API documentation available at `/swagger` when running the application.
+
+## 🧪 Testing
+
+### Using Postman
+
+1. Import `Expense_Manager_API.postman_collection.json` into Postman
+2. Set the `baseUrl` variable to your API URL
+3. Register a new user
+4. Login and the token will be automatically saved
+5. Test all endpoints
+
+### Manual Testing
+
+See `VERIFICATION_CHECKLIST.md` for comprehensive testing instructions.
+
+## 📊 Database Schema
+
+The application uses a comprehensive database schema with 20+ tables including:
+
+- **Users** - User accounts and profiles
+- **Accounts** - Financial accounts (bank, cash, credit card, etc.)
+- **Transactions** - Income, expense, and transfer records
+- **Categories** - Hierarchical transaction categories
+- **Budgets** - Budget tracking by category/account
+- **SavingsGoals**, **ScheduledTransactions**, **Debts**, **GroupExpenses**, **SharedAccounts**, **BankConnections**, **CurrencyRates**, **Notifications**, **Reports**, **AuditLogs**
+
+See `Database_Schema.sql` for complete schema definition.
+
+## 🔐 Security Features
+
+- **Password Hashing**: BCrypt with salt rounds
+- **JWT Authentication**: Secure token-based authentication
+- **Refresh Tokens**: Long-lived refresh tokens for seamless UX
+- **CORS**: Configured for frontend origin
+- **Input Validation**: FluentValidation on all requests
+- **SQL Injection Protection**: EF Core parameterized queries
+- **XSS Protection**: React's built-in escaping
+
+## 📚 Documentation
+
+- **README.md** - This file (overview and quick start)
+- **DEPLOYMENT_GUIDE.md** - Detailed deployment instructions
+- **PROJECT_SUMMARY.md** - Complete project summary and implementation details
+- **VERIFICATION_CHECKLIST.md** - Step-by-step verification guide
+- **Swagger UI** - Interactive API documentation at `/swagger`
+- **Postman Collection** - Complete API testing collection
+
+## 🚢 Deployment
+
+See `DEPLOYMENT_GUIDE.md` for detailed deployment instructions including:
+
+- Docker Compose deployment
+- Azure App Service deployment
+- Manual deployment
+- Environment configuration
+- Security checklist
+
+## 📁 Project Structure
+
+```
+expense-manager/
+├── MoneyTracker/                    # Backend ASP.NET Core API
 │   ├── MoneyTracker/
-│   │   ├── Controllers/            # API Controllers
-│   │   ├── Services/               # Business Logic Services
-│   │   ├── Core/                   # Domain Interfaces
-│   │   ├── Infrastructure/         # Repository Implementation
-│   │   ├── Data/                   # DbContext
-│   │   ├── Models/                 # Entity Models
-│   │   ├── DTOs/                   # Data Transfer Objects
-│   │   └── Program.cs              # Application Entry Point
-│   └── MoneyTracker.sln
-├── money-tracker-frontend/          # Frontend React
+│   │   ├── Core/                    # Domain layer
+│   │   ├── Application/             # Application layer
+│   │   ├── Infrastructure/          # Infrastructure layer
+│   │   ├── Controllers/             # API layer
+│   │   ├── Models/                  # EF Core entities
+│   │   └── Program.cs
+│   └── Dockerfile
+├── frontend/                        # React TypeScript SPA
 │   ├── src/
-│   │   ├── components/             # React Components
-│   │   ├── services/               # API Services
-│   │   ├── store/                  # State Management
-│   │   ├── types/                  # TypeScript Types
-│   │   └── utils/                  # Utility Functions
-│   └── package.json
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── lib/
+│   │   ├── store/
+│   │   └── types/
+│   ├── package.json
+│   └── Dockerfile
+├── Database_Schema.sql              # Database schema
+├── Database_SeedData.sql            # Seed data
+├── docker-compose.yml
+├── .github/workflows/ci-cd.yml      # CI/CD pipeline
 └── README.md
 ```
 
-## 🚀 Hướng dẫn chạy ứng dụng
+## 🤝 Contributing
 
-### 1. Chuẩn bị môi trường
+This is a demonstration project. For production use, consider:
 
-**Yêu cầu:**
-- .NET 8 SDK
-- SQL Server (LocalDB hoặc SQL Server Express)
-- Node.js 16+ và npm
-- Visual Studio 2022 hoặc VS Code
-
-### 2. Chạy Backend
-
-```bash
-# Di chuyển vào thư mục backend
-cd MoneyTracker/MoneyTracker
-
-# Restore packages
-dotnet restore
-
-# Cập nhật database (nếu cần)
-dotnet ef database update
-
-# Chạy ứng dụng
-dotnet run
-```
-
-Backend sẽ chạy tại: `https://localhost:7000`
-Swagger UI: `https://localhost:7000`
-
-### 3. Chạy Frontend
-
-```bash
-# Di chuyển vào thư mục frontend
-cd money-tracker-frontend
-
-# Cài đặt dependencies
-npm install
-
-# Tạo file environment
-echo "REACT_APP_API_URL=https://localhost:7000/api" > .env.local
-echo "REACT_APP_GOOGLE_CLIENT_ID=294978301369-6b2q7e4pdo503srrn6vuvv7dppqntuuv.apps.googleusercontent.com" >> .env.local
-
-# Chạy ứng dụng
-npm start
-```
-
-Frontend sẽ chạy tại: `http://localhost:3000`
-
-### 4. Cấu hình Database
-
-Database sẽ được tạo tự động khi chạy lần đầu. Nếu cần tạo thủ công:
-
-```sql
--- Chạy script Database_Schema.sql trong SQL Server Management Studio
--- Hoặc sử dụng Entity Framework migrations
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-```
-
-## 🔧 Cấu hình
-
-### Backend Configuration (appsettings.json)
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=NHOTUNG\\SQLEXPRESS;Initial Catalog=ExpenseManager;..."
-  },
-  "Jwt": {
-    "Key": "YourSuperSecretKeyThatIsAtLeast32CharactersLong!",
-    "Issuer": "MoneyTracker",
-    "Audience": "MoneyTrackerUsers",
-    "ExpiryMinutes": 60
-  },
-  "Authentication": {
-    "Google": {
-      "ClientId": "your-google-client-id",
-      "ClientSecret": "your-google-client-secret"
-    }
-  }
-}
-```
-
-### Frontend Configuration (.env.local)
-```
-REACT_APP_API_URL=https://localhost:7000/api
-REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id
-```
-
-## 📚 API Documentation
-
-Sau khi chạy backend, truy cập Swagger UI tại `https://localhost:7000` để xem tài liệu API đầy đủ.
-
-### Các endpoint chính:
-- `POST /api/auth/google-login` - Đăng nhập Google
-- `GET /api/users/me` - Lấy thông tin user
-- `GET /api/transactions` - Lấy danh sách giao dịch
-- `POST /api/transactions` - Tạo giao dịch mới
-- `GET /api/categories` - Lấy danh mục
-- `GET /api/budgets` - Lấy ngân sách
-- `GET /api/reports/summary` - Báo cáo tổng quan
-- `GET /api/ai/suggestions` - Gợi ý AI
-
-## 🎯 Sử dụng ứng dụng
-
-1. **Đăng nhập**: Sử dụng Google OAuth2
-2. **Dashboard**: Xem tổng quan tài chính với biểu đồ
-3. **Giao dịch**: Thêm, sửa, xóa thu nhập/chi tiêu
-4. **Danh mục**: Quản lý danh mục cá nhân
-5. **Ngân sách**: Tạo và theo dõi ngân sách
-6. **Báo cáo**: Xem báo cáo chi tiết và xuất file
-7. **AI Suggestions**: Nhận gợi ý thông minh
-
-## 🔒 Bảo mật
-
-- JWT token authentication
-- Google OAuth2 integration
-- CORS configuration
-- Input validation
-- SQL injection protection
-- XSS protection
-
-## 📱 Responsive Design
-
-Ứng dụng được thiết kế responsive, hoạt động tốt trên:
-- Desktop (1200px+)
-- Tablet (768px - 1199px)
-- Mobile (< 768px)
-
-## 🚀 Deployment
-
-### Backend
-- Deploy lên Azure App Service hoặc IIS
-- Cấu hình connection string cho production database
-- Cập nhật Google OAuth2 redirect URLs
-
-### Frontend
-- Build production: `npm run build`
-- Deploy lên Netlify, Vercel hoặc Azure Static Web Apps
-- Cấu hình environment variables
-
-## 🤝 Đóng góp
-
-1. Fork repository
-2. Tạo feature branch
-3. Commit changes
-4. Push to branch
-5. Tạo Pull Request
+1. Implementing real bank API integration (Plaid, Yodlee)
+2. Adding comprehensive unit and integration tests
+3. Implementing real email service (SendGrid, AWS SES)
+4. Adding real-time notifications (SignalR)
+5. Implementing advanced security features (2FA, rate limiting)
 
 ## 📄 License
 
-MIT License
-
-## 📞 Hỗ trợ
-
-Nếu có vấn đề, vui lòng tạo issue trên GitHub hoặc liên hệ qua email.
+This project is for demonstration purposes.
 
 ---
 
-**Chúc bạn sử dụng ứng dụng Money Tracker hiệu quả! 💰📊**
+**Built with ❤️ using ASP.NET Core 8.0 and React 18**
