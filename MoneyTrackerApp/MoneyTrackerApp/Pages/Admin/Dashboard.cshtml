@@ -1,0 +1,57 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.DashboardModel
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-start border-4 border-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalUsers">Loading...</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- More cards can be added here -->
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Links</h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="/Admin/Users" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-cog me-2"></i> Manage Users
+                    </a>
+                    <a href="/Admin/Settings" class="list-group-item list-group-item-action">
+                        <i class="fas fa-cogs me-2"></i> System Settings
+                    </a>
+                    <a href="/Admin/MasterData/Categories" class="list-group-item list-group-item-action">
+                        <i class="fas fa-list me-2"></i> Manage Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Fetch stats if API available
+        // For now just placeholder
+        document.getElementById('totalUsers').innerText = '-';
+    </script>
+}

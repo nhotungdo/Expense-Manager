@@ -7,55 +7,209 @@
     <title>@ViewData["Title"] - MoneyTrackerApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MoneyTrackerApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">MoneyTrackerApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Logo and Brand -->
+                <a class="navbar-brand" asp-area="" asp-page="/Index">
+                    <div class="brand-logo">
+                        <span class="logo-icon">💰</span>
+                        <span class="brand-name">Money<span class="brand-highlight">Tracker</span></span>
+                    </div>
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Trang chủ</a>
-                        </li>
-                    </ul>
-                    <div class="d-flex">
-                        @if (!User.Identity.IsAuthenticated)
-                        {
-                            <a class="btn btn-outline-primary me-2" asp-page="/Auth/Login">Đăng nhập</a>
-                            <a class="btn btn-primary" asp-page="/Auth/Register">Đăng ký</a>
-                        }
-                        else
-                        {
-                            <span class="navbar-text me-3">Xin chào, @User.Identity.Name</span>
-                            <a class="btn btn-outline-danger" asp-page="/Auth/Logout">Đăng xuất</a>
-                        }
-                    </div>
+
+                <!-- Navigation Content -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <!-- Main Navigation Menu -->
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Home">
+                                    <i class="nav-icon">🏠</i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="nav-icon">💳</i>
+                                    <span>Transactions</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">➕</i> Add Transaction</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📋</i> All Transactions</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📊</i> Categories</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Reports">
+                                    <i class="nav-icon">📈</i>
+                                    <span>Reports</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Groups">
+                                    <i class="nav-icon">👥</i>
+                                    <span>Groups</span>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="nav-icon">🎯</i>
+                                    <span>Planning</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💰</i> Budgets</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">🎯</i> Savings Goals</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💸</i> Debts</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📈</i> Investments</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                        <!-- Right Side Actions -->
+                        <div class="navbar-actions">
+                            <!-- Search Bar -->
+                            <div class="search-container">
+                                <input type="text" class="search-input" placeholder="Search transactions...">
+                                <i class="search-icon">🔍</i>
+                            </div>
+
+                            <!-- Quick Add Button -->
+                            <button class="btn-quick-add" title="Quick Add Transaction">
+                                <span>➕</span>
+                            </button>
+
+                            <!-- Notifications -->
+                            <div class="notification-container">
+                                <a class="notification-bell" asp-page="/Notifications">
+                                    <i class="bell-icon">🔔</i>
+                                    <span class="notification-badge">3</span>
+                                </a>
+                            </div>
+
+                            <!-- User Profile Dropdown -->
+                            <div class="dropdown user-dropdown">
+                                <a class="user-profile-btn" href="#" role="button" data-bs-toggle="dropdown">
+                                    <div class="user-avatar">
+                                        <span>@(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")</span>
+                                    </div>
+                                    <div class="user-info">
+                                        <span class="user-name">@User.Identity.Name</span>
+                                        <span class="user-role">Personal</span>
+                                    </div>
+                                    <i class="dropdown-arrow">▼</i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end user-menu">
+                                    <li class="dropdown-header">
+                                        <div class="user-menu-header">
+                                            <div class="user-avatar-large">
+                                                <span>@(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")</span>
+                                            </div>
+                                            <div>
+                                                <div class="user-menu-name">@User.Identity.Name</div>
+                                                <div class="user-menu-email">@User.Identity.Name@@example.com</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-page="/Profile/Index"><i class="dropdown-icon">👤</i> My Profile</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💼</i> My Wallets</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Settings/Index"><i class="dropdown-icon">⚙️</i> Settings</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">❓</i> Help & Support</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" asp-page="/Auth/Logout"><i class="dropdown-icon">🚪</i> Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Guest Navigation -->
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Index">
+                                    <i class="nav-icon">🏠</i>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#features">
+                                    <i class="nav-icon">✨</i>
+                                    <span>Features</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#pricing">
+                                    <i class="nav-icon">💎</i>
+                                    <span>Pricing</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#about">
+                                    <i class="nav-icon">ℹ️</i>
+                                    <span>About</span>
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <!-- Auth Buttons -->
+                        <div class="auth-buttons">
+                            <a class="btn btn-outline-light me-2" asp-page="/Auth/Login">
+                                <i class="btn-icon">🔑</i>
+                                <span>Login</span>
+                            </a>
+                            <a class="btn btn-primary-gradient" asp-page="/Auth/Register">
+                                <i class="btn-icon">🚀</i>
+                                <span>Get Started</span>
+                            </a>
+                        </div>
+                    }
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container-fluid main-content">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="app-footer">
         <div class="container">
-            &copy; 2025 - MoneyTrackerApp - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <span class="footer-logo">💰 MoneyTracker</span>
+                    <span class="footer-text">&copy; 2025 - All rights reserved</span>
+                </div>
+                <div class="footer-links">
+                    <a asp-page="/Privacy">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact Us</a>
+                    <a href="#">Help Center</a>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/header.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

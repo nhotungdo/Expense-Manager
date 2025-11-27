@@ -1,0 +1,101 @@
+@page
+@model MoneyTrackerApp.Pages.Onboarding.SetupCategoriesModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup Categories - Money Tracker</title>
+    <link rel="stylesheet" href="~/css/onboarding.css" />
+</head>
+<body class="onboarding-page">
+    <div class="onboarding-container">
+        <!-- Progress indicator -->
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 66.67%"></div>
+        </div>
+
+        <div class="onboarding-content">
+            <div class="step-header">
+                <span class="step-number">Step 3 of 4</span>
+                <h1 class="step-title">Setup Categories</h1>
+                <p class="step-description">Choose a template that fits your lifestyle</p>
+            </div>
+
+            <form id="setupCategoriesForm" class="onboarding-form">
+                <!-- Template Selection -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">📋</span>
+                        Choose a Template
+                    </label>
+                    <div class="template-grid">
+                        <div class="template-card active" data-template="Student">
+                            <div class="template-icon">🎓</div>
+                            <h3 class="template-name">Student</h3>
+                            <p class="template-desc">Perfect for students managing allowances and expenses</p>
+                        </div>
+                        <div class="template-card" data-template="Family">
+                            <div class="template-icon">👨‍👩‍👧‍👦</div>
+                            <h3 class="template-name">Family</h3>
+                            <p class="template-desc">Ideal for managing household finances</p>
+                        </div>
+                        <div class="template-card" data-template="Business">
+                            <div class="template-icon">💼</div>
+                            <h3 class="template-name">Business</h3>
+                            <p class="template-desc">For entrepreneurs and business owners</p>
+                        </div>
+                        <div class="template-card" data-template="Freelancer">
+                            <div class="template-icon">💻</div>
+                            <h3 class="template-name">Freelancer</h3>
+                            <p class="template-desc">Tailored for freelancers and contractors</p>
+                        </div>
+                        <div class="template-card" data-template="Minimal">
+                            <div class="template-icon">✨</div>
+                            <h3 class="template-name">Minimal</h3>
+                            <p class="template-desc">Simple categories for basic tracking</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedTemplate" name="template" value="Student" required>
+                </div>
+
+                <!-- Category Preview -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">👀</span>
+                        Category Preview
+                    </label>
+                    <div class="category-preview-container">
+                        <div class="preview-loading">
+                            <div class="spinner-small"></div>
+                            <p>Loading categories...</p>
+                        </div>
+                        <div class="category-preview-list hidden" id="categoryPreviewList">
+                            <!-- Categories will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error message -->
+                <div id="errorMessage" class="error-message hidden"></div>
+
+                <!-- Navigation buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="window.location.href='/Onboarding/CreateWallet'">
+                        ← Back
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Next →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/js/onboarding-setup-categories.js"></script>
+</body>
+</html>

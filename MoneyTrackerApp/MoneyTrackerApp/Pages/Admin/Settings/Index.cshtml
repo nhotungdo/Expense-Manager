@@ -1,0 +1,146 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.Settings.IndexModel
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "System Settings";
+}
+
+<h2>System Settings</h2>
+
+<div class="card mb-4">
+    <div class="card-header">
+        General Configuration
+    </div>
+    <div class="card-body">
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="maintenanceMode">
+            <label class="form-check-label" for="maintenanceMode">Maintenance Mode</label>
+            <div class="form-text">Prevents non-admin users from accessing the system.</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        All Settings
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="settingsTableBody">
+                    <!-- Loaded via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Setting Modal -->
+<div class="modal fade" id="editSettingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Setting</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editKey">
+                <div class="mb-3">
+                    <label class="form-label">Key</label>
+                    <input type="text" class="form-control" id="displayKey" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Value</label>
+                    <textarea class="form-control" id="editValue" rows="3"></textarea>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="editActive">
+                    <label class="form-check-label">Active</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveSetting()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/admin/settings');
+                const settings = await response.json();
+                renderTable(settings);
+                
+                // Check maintenance mode
+                const maint = settings.find(s => s.key === 'MaintenanceMode');
+                if (maint) {
+                    document.getElementById('maintenanceMode').checked = maint.value === 'true' && maint.isActive;
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        function renderTable(settings) {
+            const tbody = document.getElementById('settingsTableBody');
+            tbody.innerHTML = settings.map(s => `
+                <tr>
+                    <td>${s.key}</td>
+                    <td><div class="text-truncate" style="max-width: 300px;">${s.value}</div></td>
+                    <td>${s.description || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editSetting('${s.key}')">Edit</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function editSetting(key) {
+            const response = await fetch(`/api/admin/settings/${key}`);
+            const setting = await response.json();
+            
+            document.getElementById('editKey').value = setting.key;
+            document.getElementById('displayKey').value = setting.key;
+            document.getElementById('editValue').value = setting.value;
+            document.getElementById('editActive').checked = setting.isActive;
+            
+            new bootstrap.Modal(document.getElementById('editSettingModal')).show();
+        }
+
+        async function saveSetting() {
+            const key = document.getElementById('editKey').value;
+            const value = document.getElementById('editValue').value;
+            const isActive = document.getElementById('editActive').checked;
+            
+            await fetch(`/api/admin/settings/${key}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value, isActive })
+            });
+            
+            bootstrap.Modal.getInstance(document.getElementById('editSettingModal')).hide();
+            loadSettings();
+        }
+
+        document.getElementById('maintenanceMode').addEventListener('change', async (e) => {
+            await fetch('/api/admin/settings/maintenance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(e.target.checked)
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+}

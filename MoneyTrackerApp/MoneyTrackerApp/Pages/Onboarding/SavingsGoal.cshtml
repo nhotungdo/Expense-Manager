@@ -1,0 +1,130 @@
+@page
+@model MoneyTrackerApp.Pages.Onboarding.SavingsGoalModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Savings Goal - Money Tracker</title>
+    <link rel="stylesheet" href="~/css/onboarding.css" />
+</head>
+<body class="onboarding-page">
+    <div class="onboarding-container">
+        <!-- Progress indicator -->
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 83.33%"></div>
+        </div>
+
+        <div class="onboarding-content">
+            <div class="step-header">
+                <span class="step-number">Step 4 of 4 (Optional)</span>
+                <h1 class="step-title">Set a Savings Goal</h1>
+                <p class="step-description">Define your first financial goal (you can skip this step)</p>
+            </div>
+
+            <form id="savingsGoalForm" class="onboarding-form">
+                <!-- Goal Name -->
+                <div class="form-group">
+                    <label for="goalName" class="form-label">
+                        <span class="label-icon">🎯</span>
+                        Goal Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="goalName" 
+                        name="goalName" 
+                        class="form-input" 
+                        placeholder="e.g., New Laptop, Vacation, Emergency Fund"
+                        maxlength="100">
+                    <small class="form-hint">What are you saving for?</small>
+                </div>
+
+                <!-- Target Amount -->
+                <div class="form-group">
+                    <label for="targetAmount" class="form-label">
+                        <span class="label-icon">💰</span>
+                        Target Amount
+                    </label>
+                    <div class="input-with-currency">
+                        <input 
+                            type="number" 
+                            id="targetAmount" 
+                            name="targetAmount" 
+                            class="form-input" 
+                            placeholder="0.00"
+                            min="0.01"
+                            step="0.01">
+                        <span class="currency-symbol" id="currencySymbol">₫</span>
+                    </div>
+                    <small class="form-hint">How much do you need to save?</small>
+                </div>
+
+                <!-- Target Date -->
+                <div class="form-group">
+                    <label for="targetDate" class="form-label">
+                        <span class="label-icon">📅</span>
+                        Target Date
+                    </label>
+                    <input 
+                        type="date" 
+                        id="targetDate" 
+                        name="targetDate" 
+                        class="form-input">
+                    <small class="form-hint">When do you want to achieve this goal?</small>
+                </div>
+
+                <!-- Monthly Calculation -->
+                <div class="calculation-card hidden" id="calculationCard">
+                    <div class="calc-icon">📊</div>
+                    <div class="calc-content">
+                        <p class="calc-label">You need to save</p>
+                        <p class="calc-amount" id="monthlyAmount">0</p>
+                        <p class="calc-period">per month to reach your goal</p>
+                    </div>
+                </div>
+
+                <!-- Color Picker -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🎨</span>
+                        Goal Color
+                    </label>
+                    <div class="color-picker">
+                        <div class="color-option" data-color="#2196F3" style="background: #2196F3;">
+                            <span class="check-mark">✓</span>
+                        </div>
+                        <div class="color-option" data-color="#4CAF50" style="background: #4CAF50;"></div>
+                        <div class="color-option" data-color="#FF5722" style="background: #FF5722;"></div>
+                        <div class="color-option" data-color="#9C27B0" style="background: #9C27B0;"></div>
+                        <div class="color-option" data-color="#FF9800" style="background: #FF9800;"></div>
+                        <div class="color-option" data-color="#E91E63" style="background: #E91E63;"></div>
+                    </div>
+                    <input type="hidden" id="goalColor" name="goalColor" value="#2196F3">
+                </div>
+
+                <!-- Error message -->
+                <div id="errorMessage" class="error-message hidden"></div>
+
+                <!-- Navigation buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="window.location.href='/Onboarding/SetupCategories'">
+                        ← Back
+                    </button>
+                    <button type="button" class="btn-text" id="btnSkip">
+                        Skip this step
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Complete Setup →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/js/onboarding-savings-goal.js"></script>
+</body>
+</html>

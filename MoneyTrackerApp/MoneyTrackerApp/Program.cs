@@ -37,11 +37,20 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IGroupExpenseService, MoneyT
 
 // Register Report & Analytics Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IReportService, MoneyTrackerApp.Services.ReportService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTrackerApp.Services.ExportService>();
 
 // Register System Utility Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ICurrencyService, MoneyTrackerApp.Services.CurrencyService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IAiAdvisorService, MoneyTrackerApp.Services.AiAdvisorService>();
+
+// Register Onboarding Service
+// Register Onboarding Service
+builder.Services.AddScoped<MoneyTrackerApp.Services.OnboardingService>();
+
+// Register Admin Services
+builder.Services.AddScoped<MoneyTrackerApp.Services.IUserManagementService, MoneyTrackerApp.Services.UserManagementService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.ISystemSettingsService, MoneyTrackerApp.Services.SystemSettingsService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");

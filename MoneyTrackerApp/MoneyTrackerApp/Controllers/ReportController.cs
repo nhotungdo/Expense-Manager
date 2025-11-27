@@ -15,11 +15,13 @@ namespace MoneyTrackerApp.Controllers;
 public class ReportController : ControllerBase
 {
     private readonly IReportService _reportService;
+    private readonly IExportService _exportService;
     private readonly ILogger<ReportController> _logger;
 
-    public ReportController(IReportService reportService, ILogger<ReportController> logger)
+    public ReportController(IReportService reportService, IExportService exportService, ILogger<ReportController> logger)
     {
         _reportService = reportService;
+        _exportService = exportService;
         _logger = logger;
     }
 
@@ -106,28 +108,125 @@ public class ReportController : ControllerBase
     }
 
     /// <summary>
-    /// Export report to file (PDF, Excel, CSV, JSON)
+    /// Export transactions to Excel
     /// </summary>
-    [HttpPost("export")]
-    public async Task<ActionResult<string>> ExportReport([FromBody] GenerateReportDto dto)
+    [HttpGet("export/transactions/excel")]
+    public async Task<IActionResult> ExportTransactionsExcel([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? accountIds)
     {
         try
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var userId = GetUserId();
-            var filePath = await _reportService.ExportReportAsync(userId, dto);
-            return Ok(new { filePath, message = "Report exported successfully" });
-        }
-        catch (NotImplementedException ex)
-        {
-            return BadRequest(new { message = ex.Message });
+            List<long>? accIds = null;
+            if (!string.IsNullOrEmpty(accountIds))
+            {
+                accIds = accountIds.Split(',').Select(long.Parse).ToList();
+            }
+
+            var content = await _exportService.ExportTransactionsToExcelAsync(userId, startDate, endDate, accIds);
+            var fileName = $"Transactions_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+
+            return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error exporting report");
-            return StatusCode(500, new { message = "An error occurred while exporting the report" });
+            _logger.LogError(ex, "Error exporting transactions to Excel");
+            return StatusCode(500, new { message = "An error occurred while exporting" });
+        }
+    }
+
+    /// <summary>
+    /// Export transactions to PDF
+    /// </summary>
+    [HttpGet("export/transactions/pdf")]
+    public async Task<IActionResult> ExportTransactionsPdf([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? accountIds)
+    {
+        try
+        {
+            var userId = GetUserId();
+            List<long>? accIds = null;
+            if (!string.IsNullOrEmpty(accountIds))
+            {
+                accIds = accountIds.Split(',').Select(long.Parse).ToList();
+            }
+
+            var content = await _exportService.ExportTransactionsToPdfAsync(userId, startDate, endDate, accIds);
+            var fileName = $"Transactions_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+
+            return File(content, "application/pdf", fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting transactions to PDF");
+            return StatusCode(500, new { message = "An error occurred while exporting" });
+        }
+    }
+
+    /// <summary>
+    /// Export transactions to CSV
+    /// </summary>
+    [HttpGet("export/transactions/csv")]
+    public async Task<IActionResult> ExportTransactionsCsv([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? accountIds)
+    {
+        try
+        {
+            var userId = GetUserId();
+            List<long>? accIds = null;
+            if (!string.IsNullOrEmpty(accountIds))
+            {
+                accIds = accountIds.Split(',').Select(long.Parse).ToList();
+            }
+
+            var content = await _exportService.ExportTransactionsToCsvAsync(userId, startDate, endDate, accIds);
+            var fileName = $"Transactions_{DateTime.Now:yyyyMMddHHmmss}.csv";
+
+            return File(content, "text/csv", fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting transactions to CSV");
+            return StatusCode(500, new { message = "An error occurred while exporting" });
+        }
+    }
+
+    /// <summary>
+    /// Export cash flow report to Excel
+    /// </summary>
+    [HttpGet("export/cashflow/excel")]
+    public async Task<IActionResult> ExportCashFlowExcel([FromQuery] int year, [FromQuery] int month)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var content = await _exportService.ExportCashFlowReportToExcelAsync(userId, year, month);
+            var fileName = $"CashFlow_{month}_{year}.xlsx";
+
+            return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting cash flow report");
+            return StatusCode(500, new { message = "An error occurred while exporting" });
+        }
+    }
+
+    /// <summary>
+    /// Export category report to Excel
+    /// </summary>
+    [HttpGet("export/categories/excel")]
+    public async Task<IActionResult> ExportCategoriesExcel([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var content = await _exportService.ExportCategoryReportToExcelAsync(userId, startDate, endDate);
+            var fileName = $"Categories_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+
+            return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting category report");
+            return StatusCode(500, new { message = "An error occurred while exporting" });
         }
     }
 }

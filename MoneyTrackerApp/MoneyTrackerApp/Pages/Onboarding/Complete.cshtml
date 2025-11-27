@@ -1,0 +1,80 @@
+@page
+@model MoneyTrackerApp.Pages.Onboarding.CompleteModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup Complete - Money Tracker</title>
+    <link rel="stylesheet" href="~/css/onboarding.css" />
+</head>
+<body class="onboarding-page completion-page">
+    <div class="onboarding-container">
+        <!-- Progress indicator -->
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 100%"></div>
+        </div>
+
+        <div class="onboarding-content centered">
+            <!-- Success Animation -->
+            <div class="success-animation">
+                <div class="checkmark-circle">
+                    <div class="checkmark"></div>
+                </div>
+            </div>
+
+            <!-- Congratulations Message -->
+            <div class="completion-message">
+                <h1 class="completion-title">🎉 Congratulations!</h1>
+                <p class="completion-text">
+                    Your Money Tracker account is all set up and ready to go.
+                    Start managing your finances like a pro!
+                </p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="setup-summary">
+                <div class="summary-card">
+                    <div class="summary-icon">💰</div>
+                    <div class="summary-label">Wallet Created</div>
+                    <div class="summary-value" id="walletName">-</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">📋</div>
+                    <div class="summary-label">Categories</div>
+                    <div class="summary-value" id="categoryCount">-</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">🎯</div>
+                    <div class="summary-label">Goals</div>
+                    <div class="summary-value" id="goalCount">-</div>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="completion-actions">
+                <button type="button" class="btn-primary btn-large" id="btnGoToDashboard">
+                    Go to Dashboard →
+                </button>
+            </div>
+
+            <!-- Tips -->
+            <div class="quick-tips">
+                <h3 class="tips-title">💡 Quick Tips to Get Started</h3>
+                <ul class="tips-list">
+                    <li>Record your first transaction to see your balance update</li>
+                    <li>Set up budgets to control your spending</li>
+                    <li>Check the Reports page for insights</li>
+                    <li>Enable notifications to stay on track</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/onboarding-complete.js"></script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+@page
+@model MoneyTrackerApp.Pages.Profile.IndexModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Sidebar / Tabs -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="position-relative d-inline-block mb-3">
+                        <img id="profileAvatar" src="/uploads/profiles/default.png" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="User Avatar">
+                        <button class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle" onclick="document.getElementById('avatarUpload').click()">
+                            <i class="bi bi-camera">📷</i>
+                        </button>
+                        <input type="file" id="avatarUpload" hidden accept="image/*" onchange="uploadAvatar(this)">
+                    </div>
+                    <h5 class="card-title mb-1" id="profileName">Loading...</h5>
+                    <p class="text-muted small mb-3" id="profileEmail">loading...</p>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#general" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                        <i class="bi bi-person me-2">👤</i> General Information
+                    </a>
+                    <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-shield-lock me-2">🔒</i> Security
+                    </a>
+                    <a href="#sessions" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-laptop me-2">💻</i> Active Sessions
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- General Information Tab -->
+                <div class="tab-pane fade show active" id="general">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">General Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm" onsubmit="updateProfile(event)">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="fullName" name="fullName">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Gender</label>
+                                        <select class="form-select" id="gender" name="gender">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="tab-pane fade" id="security">
+                    <!-- Change Password -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">Change Password</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="passwordForm" onsubmit="changePassword(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="currentPassword" required>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="newPassword" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" id="confirmPassword" required>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-warning">Update Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Two-Factor Authentication -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Two-Factor Authentication (2FA)</h5>
+                            <span id="2faStatus" class="badge bg-secondary">Loading...</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Add an extra layer of security to your account by enabling 2FA.</p>
+                            <div id="2faActions">
+                                <button class="btn btn-outline-primary" onclick="enable2FA()">Enable 2FA</button>
+                            </div>
+                            
+                            <!-- 2FA Setup Modal -->
+                            <div id="2faSetupArea" class="d-none mt-3 p-3 border rounded bg-light">
+                                <h6>Scan QR Code</h6>
+                                <p class="small text-muted">Use your authenticator app (Google Authenticator, Authy) to scan this code.</p>
+                                <div class="text-center mb-3">
+                                    <img id="qrCodeImage" src="" alt="QR Code" class="img-fluid border p-2 bg-white">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Enter Verification Code</label>
+                                    <input type="text" class="form-control" id="verifyCode" placeholder="000000" maxlength="6">
+                                </div>
+                                <button class="btn btn-success w-100" onclick="verify2FA()">Verify & Enable</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sessions Tab -->
+                <div class="tab-pane fade" id="sessions">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Active Sessions</h5>
+                            <button class="btn btn-sm btn-outline-danger" onclick="revokeAllSessions()">Revoke All Other Sessions</button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush" id="sessionsList">
+                                <div class="text-center p-4">Loading sessions...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container for Notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load Profile Data
+        async function loadProfile() {
+            try {
+                const response = await fetch('/api/profile');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('profileName').textContent = data.fullName || data.userName;
+                    document.getElementById('profileEmail').textContent = data.email;
+                    if (data.profilePictureUrl) {
+                        document.getElementById('profileAvatar').src = data.profilePictureUrl;
+                    }
+                    
+                    // Fill form
+                    document.getElementById('fullName').value = data.fullName || '';
+                    document.getElementById('phoneNumber').value = data.phoneNumber || '';
+                    if (data.dateOfBirth) {
+                        document.getElementById('dateOfBirth').value = data.dateOfBirth.split('T')[0];
+                    }
+                    document.getElementById('gender').value = data.gender || '';
+                    document.getElementById('address').value = data.address || '';
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Update Profile
+        async function updateProfile(e) {
+            e.preventDefault();
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                gender: document.getElementById('gender').value,
+                address: document.getElementById('address').value
+            };
+
+            try {
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showToast('Profile updated successfully!', 'success');
+                    loadProfile(); // Refresh UI
+                } else {
+                    showToast('Failed to update profile.', 'danger');
+                }
+            } catch (error) {
+                showToast('Error updating profile.', 'danger');
+            }
+        }
+
+        // Upload Avatar
+        async function uploadAvatar(input) {
+            if (input.files && input.files[0]) {
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+
+                try {
+                    const response = await fetch('/api/profile/picture', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('profileAvatar').src = data.url;
+                        showToast('Profile picture updated!', 'success');
+                    } else {
+                        showToast('Failed to upload picture.', 'danger');
+                    }
+                } catch (error) {
+                    showToast('Error uploading picture.', 'danger');
+                }
+            }
+        }
+
+        // Change Password
+        async function changePassword(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showToast('New passwords do not match.', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword, newPassword, confirmNewPassword: confirmPassword })
+                });
+
+                if (response.ok) {
+                    showToast('Password changed successfully!', 'success');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    const data = await response.json();
+                    showToast(data.message || 'Failed to change password.', 'danger');
+                }
+            } catch (error) {
+                showToast('Error changing password.', 'danger');
+            }
+        }
+
+        // Load 2FA Status
+        async function load2FAStatus() {
+            try {
+                const response = await fetch('/api/security/2fa/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    const statusBadge = document.getElementById('2faStatus');
+                    const actionsDiv = document.getElementById('2faActions');
+                    
+                    if (data.enabled) {
+                        statusBadge.className = 'badge bg-success';
+                        statusBadge.textContent = 'Enabled';
+                        actionsDiv.innerHTML = '<button class="btn btn-outline-danger" onclick="disable2FA()">Disable 2FA</button>';
+                    } else {
+                        statusBadge.className = 'badge bg-secondary';
+                        statusBadge.textContent = 'Disabled';
+                        actionsDiv.innerHTML = '<button class="btn btn-outline-primary" onclick="enable2FA()">Enable 2FA</button>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading 2FA status:', error);
+            }
+        }
+
+        // Enable 2FA
+        async function enable2FA() {
+            try {
+                const response = await fetch('/api/security/2fa/enable', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ method: 'totp' })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('qrCodeImage').src = data.qrCodeUrl;
+                    document.getElementById('2faSetupArea').classList.remove('d-none');
+                    document.getElementById('2faActions').classList.add('d-none');
+                }
+            } catch (error) {
+                showToast('Error starting 2FA setup.', 'danger');
+            }
+        }
+
+        // Verify 2FA
+        async function verify2FA() {
+            const code = document.getElementById('verifyCode').value;
+            try {
+                const response = await fetch('/api/security/2fa/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+
+                if (response.ok) {
+                    showToast('2FA enabled successfully!', 'success');
+                    document.getElementById('2faSetupArea').classList.add('d-none');
+                    document.getElementById('2faActions').classList.remove('d-none');
+                    load2FAStatus();
+                } else {
+                    showToast('Invalid verification code.', 'warning');
+                }
+            } catch (error) {
+                showToast('Error verifying code.', 'danger');
+            }
+        }
+
+        // Disable 2FA
+        async function disable2FA() {
+            const password = prompt("Please enter your password to disable 2FA:");
+            if (!password) return;
+
+            try {
+                const response = await fetch('/api/security/2fa/disable', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                if (response.ok) {
+                    showToast('2FA disabled successfully.', 'success');
+                    load2FAStatus();
+                } else {
+                    showToast('Failed to disable 2FA. Check password.', 'danger');
+                }
+            } catch (error) {
+                showToast('Error disabling 2FA.', 'danger');
+            }
+        }
+
+        // Load Sessions
+        async function loadSessions() {
+            try {
+                const response = await fetch('/api/security/sessions');
+                if (response.ok) {
+                    const sessions = await response.json();
+                    const list = document.getElementById('sessionsList');
+                    list.innerHTML = '';
+
+                    if (sessions.length === 0) {
+                        list.innerHTML = '<div class="text-center p-4 text-muted">No active sessions found.</div>';
+                        return;
+                    }
+
+                    sessions.forEach(session => {
+                        const item = document.createElement('div');
+                        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        item.innerHTML = `
+                            <div>
+                                <div class="fw-bold">${session.deviceInfo}</div>
+                                <small class="text-muted">Last active: ${new Date(session.lastUsed).toLocaleString()}</small>
+                                ${session.isCurrent ? '<span class="badge bg-info ms-2">Current</span>' : ''}
+                            </div>
+                            ${!session.isCurrent ? `<button class="btn btn-sm btn-outline-danger" onclick="revokeSession('${session.id}')">Revoke</button>` : ''}
+                        `;
+                        list.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+            }
+        }
+
+        // Revoke Session
+        async function revokeSession(deviceId) {
+            if (!confirm('Are you sure you want to revoke this session?')) return;
+            try {
+                const response = await fetch(`/api/security/sessions/${deviceId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('Session revoked.', 'success');
+                    loadSessions();
+                }
+            } catch (error) {
+                showToast('Error revoking session.', 'danger');
+            }
+        }
+
+        // Revoke All Sessions
+        async function revokeAllSessions() {
+            if (!confirm('Are you sure you want to log out from all other devices?')) return;
+            try {
+                const response = await fetch('/api/security/sessions/revoke-all', { method: 'POST' });
+                if (response.ok) {
+                    showToast('All other sessions revoked.', 'success');
+                    loadSessions();
+                }
+            } catch (error) {
+                showToast('Error revoking sessions.', 'danger');
+            }
+        }
+
+        // Toast Helper
+        function showToast(message, type = 'info') {
+            const toastEl = document.getElementById('liveToast');
+            const toastBody = document.getElementById('toastMessage');
+            toastBody.textContent = message;
+            toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+            load2FAStatus();
+            loadSessions();
+        });
+    </script>
+}

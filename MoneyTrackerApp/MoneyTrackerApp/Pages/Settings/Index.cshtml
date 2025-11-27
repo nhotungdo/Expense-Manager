@@ -1,0 +1,372 @@
+@page
+@model MoneyTrackerApp.Pages.Settings.IndexModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="list-group shadow-sm sticky-top" style="top: 80px;">
+                <a href="#localization" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="bi bi-globe me-2">🌍</i> Localization
+                </a>
+                <a href="#appearance" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-palette me-2">🎨</i> Appearance
+                </a>
+                <a href="#formatting" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-calendar3 me-2">📅</i> Formatting
+                </a>
+                <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-bell me-2">🔔</i> Notifications
+                </a>
+                <a href="#danger" class="list-group-item list-group-item-action text-danger" data-bs-toggle="list">
+                    <i class="bi bi-exclamation-triangle me-2">⚠️</i> Danger Zone
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Localization -->
+                <div class="tab-pane fade show active" id="localization">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">Localization</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="localizationForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Language</label>
+                                    <select class="form-select" id="language" onchange="updateSetting('language', this.value)">
+                                        <!-- Options loaded via JS -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Default Currency</label>
+                                    <select class="form-select" id="currency" onchange="updateSetting('currency', this.value)">
+                                        <!-- Options loaded via JS -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Timezone</label>
+                                    <select class="form-select" id="timezone" onchange="updateSetting('timezone', this.value)">
+                                        <!-- Options loaded via JS -->
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance -->
+                <div class="tab-pane fade" id="appearance">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">Appearance</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'light')" id="theme-light">
+                                        <i class="bi bi-sun fs-1 text-warning"></i>
+                                        <div class="mt-2">Light Mode</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'dark')" id="theme-dark">
+                                        <i class="bi bi-moon fs-1 text-secondary"></i>
+                                        <div class="mt-2">Dark Mode</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'auto')" id="theme-auto">
+                                        <i class="bi bi-display fs-1 text-primary"></i>
+                                        <div class="mt-2">System Default</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formatting -->
+                <div class="tab-pane fade" id="formatting">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">Formatting</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="formattingForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Date Format</label>
+                                    <select class="form-select" id="dateFormat" onchange="updateSetting('dateFormat', this.value)">
+                                        <!-- Options loaded via JS -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Time Format</label>
+                                    <select class="form-select" id="timeFormat" onchange="updateSetting('timeFormat', this.value)">
+                                        <!-- Options loaded via JS -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">First Day of Week</label>
+                                    <select class="form-select" id="firstDayOfWeek" onchange="updateSetting('firstDayOfWeek', this.value)">
+                                        <option value="0">Sunday</option>
+                                        <option value="1">Monday</option>
+                                        <option value="6">Saturday</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="tab-pane fade" id="notifications">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">Notifications</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="notificationsEnabled" onchange="updateNotifications()">
+                                <label class="form-check-label fw-bold" for="notificationsEnabled">Enable Notifications</label>
+                            </div>
+                            <div class="ms-4">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" onchange="updateNotifications()">
+                                    <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                                </div>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="pushNotifications" onchange="updateNotifications()">
+                                    <label class="form-check-label" for="pushNotifications">Push Notifications</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="tab-pane fade" id="danger">
+                    <div class="card shadow-sm border-danger mb-4">
+                        <div class="card-header bg-danger text-white py-3">
+                            <h5 class="mb-0">Danger Zone</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Reset all settings to their default values. This action cannot be undone.</p>
+                            <button class="btn btn-outline-danger" onclick="resetSettings()">Reset to Defaults</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="settingsToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Settings</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentSettings = {};
+
+        async function loadOptions() {
+            try {
+                const response = await fetch('/api/settings/options');
+                const data = await response.json();
+
+                // Populate Languages
+                const langSelect = document.getElementById('language');
+                data.languages.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l.code;
+                    opt.textContent = l.name;
+                    langSelect.appendChild(opt);
+                });
+
+                // Populate Currencies
+                const currSelect = document.getElementById('currency');
+                data.currencies.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.code;
+                    opt.textContent = `${c.code} - ${c.name} (${c.symbol})`;
+                    currSelect.appendChild(opt);
+                });
+
+                // Populate Timezones
+                const tzSelect = document.getElementById('timezone');
+                data.timezones.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.id;
+                    opt.textContent = t.displayName;
+                    tzSelect.appendChild(opt);
+                });
+
+                // Populate Date Formats
+                const dfSelect = document.getElementById('dateFormat');
+                data.dateFormats.forEach(f => {
+                    const opt = document.createElement('option');
+                    opt.value = f;
+                    opt.textContent = f;
+                    dfSelect.appendChild(opt);
+                });
+
+                // Populate Time Formats
+                const tfSelect = document.getElementById('timeFormat');
+                data.timeFormats.forEach(f => {
+                    const opt = document.createElement('option');
+                    opt.value = f;
+                    opt.textContent = f;
+                    tfSelect.appendChild(opt);
+                });
+
+            } catch (error) {
+                console.error('Error loading options:', error);
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/settings');
+                if (response.ok) {
+                    currentSettings = await response.json();
+                    
+                    // Set values
+                    document.getElementById('language').value = currentSettings.language;
+                    document.getElementById('currency').value = currentSettings.defaultCurrency;
+                    document.getElementById('timezone').value = currentSettings.timezone;
+                    document.getElementById('dateFormat').value = currentSettings.dateFormat;
+                    document.getElementById('timeFormat').value = currentSettings.timeFormat;
+                    document.getElementById('firstDayOfWeek').value = currentSettings.firstDayOfWeek;
+                    
+                    document.getElementById('notificationsEnabled').checked = currentSettings.notificationsEnabled;
+                    document.getElementById('emailNotifications').checked = currentSettings.emailNotifications;
+                    document.getElementById('pushNotifications').checked = currentSettings.pushNotifications;
+
+                    // Highlight theme
+                    document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('border-primary', 'bg-light'));
+                    document.getElementById(`theme-${currentSettings.theme}`).classList.add('border-primary', 'bg-light');
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        async function updateSetting(key, value) {
+            // Optimistic update
+            currentSettings[key] = value;
+            
+            // Prepare DTO
+            const dto = { ...currentSettings };
+            // Ensure firstDayOfWeek is int
+            dto.firstDayOfWeek = parseInt(dto.firstDayOfWeek);
+
+            try {
+                let endpoint = '/api/settings';
+                let body = dto;
+
+                // Use specific endpoints for some settings if preferred, but general update is easier
+                if (key === 'language') endpoint = '/api/settings/language';
+                if (key === 'currency') endpoint = '/api/settings/currency';
+                if (key === 'theme') endpoint = '/api/settings/theme';
+                if (key === 'timezone') endpoint = '/api/settings/timezone';
+
+                if (endpoint !== '/api/settings') {
+                    body = { [key]: value };
+                }
+
+                const response = await fetch(endpoint, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (response.ok) {
+                    showToast(`${key} updated successfully!`, 'success');
+                    if (key === 'theme') {
+                        document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('border-primary', 'bg-light'));
+                        document.getElementById(`theme-${value}`).classList.add('border-primary', 'bg-light');
+                    }
+                } else {
+                    showToast(`Failed to update ${key}.`, 'danger');
+                    loadSettings(); // Revert
+                }
+            } catch (error) {
+                showToast(`Error updating ${key}.`, 'danger');
+                loadSettings(); // Revert
+            }
+        }
+
+        async function updateNotifications() {
+            const dto = {
+                notificationsEnabled: document.getElementById('notificationsEnabled').checked,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                pushNotifications: document.getElementById('pushNotifications').checked
+            };
+
+            try {
+                const response = await fetch('/api/settings/notifications', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dto)
+                });
+
+                if (response.ok) {
+                    showToast('Notification preferences updated!', 'success');
+                    currentSettings.notificationsEnabled = dto.notificationsEnabled;
+                    currentSettings.emailNotifications = dto.emailNotifications;
+                    currentSettings.pushNotifications = dto.pushNotifications;
+                } else {
+                    showToast('Failed to update notifications.', 'danger');
+                }
+            } catch (error) {
+                showToast('Error updating notifications.', 'danger');
+            }
+        }
+
+        async function resetSettings() {
+            if (!confirm('Are you sure you want to reset all settings to default?')) return;
+
+            try {
+                const response = await fetch('/api/settings/reset', { method: 'POST' });
+                if (response.ok) {
+                    showToast('Settings reset to defaults.', 'success');
+                    loadSettings();
+                } else {
+                    showToast('Failed to reset settings.', 'danger');
+                }
+            } catch (error) {
+                showToast('Error resetting settings.', 'danger');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toastEl = document.getElementById('settingsToast');
+            const toastBody = document.getElementById('toastMessage');
+            toastBody.textContent = message;
+            toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadOptions();
+            await loadSettings();
+        });
+    </script>
+    
+    <style>
+        .cursor-pointer { cursor: pointer; }
+        .theme-option:hover { background-color: #f8f9fa; }
+    </style>
+}

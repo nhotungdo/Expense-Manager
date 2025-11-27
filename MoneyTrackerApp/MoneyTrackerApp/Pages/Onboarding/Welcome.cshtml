@@ -1,0 +1,106 @@
+@page
+@model MoneyTrackerApp.Pages.Onboarding.WelcomeModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Money Tracker</title>
+    <link rel="stylesheet" href="~/css/onboarding.css" />
+</head>
+<body class="onboarding-page">
+    <div class="onboarding-container">
+        <!-- Progress indicator -->
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 16.67%"></div>
+        </div>
+
+        <!-- Slider container -->
+        <div class="slider-container">
+            <div class="slides-wrapper" id="slidesWrapper">
+                <!-- Slide 1 -->
+                <div class="slide active">
+                    <div class="slide-illustration">
+                        <div class="illustration-icon">📊</div>
+                    </div>
+                    <h2 class="slide-title">Track Your Expenses</h2>
+                    <p class="slide-description">
+                        Easily record and categorize all your income and expenses in one place. 
+                        Get a clear picture of where your money goes.
+                    </p>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="slide">
+                    <div class="slide-illustration">
+                        <div class="illustration-icon">💰</div>
+                    </div>
+                    <h2 class="slide-title">Manage Multiple Wallets</h2>
+                    <p class="slide-description">
+                        Create and manage multiple wallets for cash, bank accounts, credit cards, 
+                        and more. Track balances across all your accounts.
+                    </p>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="slide">
+                    <div class="slide-illustration">
+                        <div class="illustration-icon">📈</div>
+                    </div>
+                    <h2 class="slide-title">Visual Reports & Analytics</h2>
+                    <p class="slide-description">
+                        Get detailed insights with beautiful charts and reports. 
+                        Understand your spending patterns and make better financial decisions.
+                    </p>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="slide">
+                    <div class="slide-illustration">
+                        <div class="illustration-icon">🎯</div>
+                    </div>
+                    <h2 class="slide-title">Set Savings Goals</h2>
+                    <p class="slide-description">
+                        Define your financial goals and track your progress. 
+                        Stay motivated with visual progress indicators.
+                    </p>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="slide">
+                    <div class="slide-illustration">
+                        <div class="illustration-icon">🤖</div>
+                    </div>
+                    <h2 class="slide-title">AI-Powered Insights</h2>
+                    <p class="slide-description">
+                        Get personalized financial advice and smart suggestions 
+                        powered by artificial intelligence.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Slide indicators -->
+            <div class="slide-indicators">
+                <span class="indicator active" data-slide="0"></span>
+                <span class="indicator" data-slide="1"></span>
+                <span class="indicator" data-slide="2"></span>
+                <span class="indicator" data-slide="3"></span>
+                <span class="indicator" data-slide="4"></span>
+            </div>
+
+            <!-- Navigation buttons -->
+            <div class="slide-navigation">
+                <button type="button" class="btn-skip" id="btnSkip">Skip</button>
+                <button type="button" class="btn-next" id="btnNext">Next</button>
+                <button type="button" class="btn-start hidden" id="btnStart">Get Started</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/onboarding-welcome.js"></script>
+</body>
+</html>

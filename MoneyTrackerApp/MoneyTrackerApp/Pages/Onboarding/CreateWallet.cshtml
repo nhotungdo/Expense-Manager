@@ -1,0 +1,134 @@
+@page
+@model MoneyTrackerApp.Pages.Onboarding.CreateWalletModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Wallet - Money Tracker</title>
+    <link rel="stylesheet" href="~/css/onboarding.css" />
+</head>
+<body class="onboarding-page">
+    <div class="onboarding-container">
+        <!-- Progress indicator -->
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 50%"></div>
+        </div>
+
+        <div class="onboarding-content">
+            <div class="step-header">
+                <span class="step-number">Step 2 of 4</span>
+                <h1 class="step-title">Create Your First Wallet</h1>
+                <p class="step-description">Set up your primary wallet to start tracking</p>
+            </div>
+
+            <form id="createWalletForm" class="onboarding-form">
+                <!-- Wallet Name -->
+                <div class="form-group">
+                    <label for="walletName" class="form-label">
+                        <span class="label-icon">💼</span>
+                        Wallet Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="walletName" 
+                        name="walletName" 
+                        class="form-input" 
+                        placeholder="e.g., Cash Wallet, Main Account"
+                        value="Cash Wallet"
+                        maxlength="100"
+                        required>
+                    <small class="form-hint">Give your wallet a memorable name</small>
+                </div>
+
+                <!-- Wallet Type -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🏦</span>
+                        Wallet Type
+                    </label>
+                    <div class="wallet-type-grid">
+                        <div class="wallet-type-card active" data-type="0">
+                            <div class="type-icon">💵</div>
+                            <div class="type-name">Cash</div>
+                        </div>
+                        <div class="wallet-type-card" data-type="1">
+                            <div class="type-icon">🏦</div>
+                            <div class="type-name">Bank Account</div>
+                        </div>
+                        <div class="wallet-type-card" data-type="2">
+                            <div class="type-icon">💳</div>
+                            <div class="type-name">Credit Card</div>
+                        </div>
+                        <div class="wallet-type-card" data-type="3">
+                            <div class="type-icon">💰</div>
+                            <div class="type-name">Savings</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="walletType" name="walletType" value="0" required>
+                </div>
+
+                <!-- Initial Balance -->
+                <div class="form-group">
+                    <label for="initialBalance" class="form-label">
+                        <span class="label-icon">💵</span>
+                        Initial Balance
+                    </label>
+                    <div class="input-with-currency">
+                        <input 
+                            type="number" 
+                            id="initialBalance" 
+                            name="initialBalance" 
+                            class="form-input" 
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            value="0"
+                            required>
+                        <span class="currency-symbol" id="currencySymbol">₫</span>
+                    </div>
+                    <small class="form-hint">Enter the current balance in this wallet</small>
+                </div>
+
+                <!-- Color Picker -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🎨</span>
+                        Wallet Color
+                    </label>
+                    <div class="color-picker">
+                        <div class="color-option" data-color="#4CAF50" style="background: #4CAF50;">
+                            <span class="check-mark">✓</span>
+                        </div>
+                        <div class="color-option" data-color="#2196F3" style="background: #2196F3;"></div>
+                        <div class="color-option" data-color="#FF5722" style="background: #FF5722;"></div>
+                        <div class="color-option" data-color="#9C27B0" style="background: #9C27B0;"></div>
+                        <div class="color-option" data-color="#FF9800" style="background: #FF9800;"></div>
+                        <div class="color-option" data-color="#607D8B" style="background: #607D8B;"></div>
+                    </div>
+                    <input type="hidden" id="walletColor" name="walletColor" value="#4CAF50">
+                </div>
+
+                <!-- Error message -->
+                <div id="errorMessage" class="error-message hidden"></div>
+
+                <!-- Navigation buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="window.location.href='/Onboarding/BasicSettings'">
+                        ← Back
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Next →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/js/onboarding-create-wallet.js"></script>
+</body>
+</html>

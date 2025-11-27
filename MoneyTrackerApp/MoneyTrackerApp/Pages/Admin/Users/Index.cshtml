@@ -1,0 +1,181 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.Users.IndexModel
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "User Management";
+}
+
+<h2>User Management</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name, email, phone...">
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="loadUsers()">Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Loaded via JS -->
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul class="pagination justify-content-center" id="pagination">
+                <!-- Pagination -->
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <!-- Details loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPage = 1;
+
+        async function loadUsers(page = 1) {
+            currentPage = page;
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            let url = `/api/admin/users?pageNumber=${page}&pageSize=10`;
+            if (search) url += `&searchTerm=${encodeURIComponent(search)}`;
+            if (status) url += `&isActive=${status}`;
+
+            try {
+                const response = await fetch(url);
+                const users = await response.json();
+                renderTable(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function renderTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>
+                        <div class="fw-bold">${u.fullName}</div>
+                        <div class="small text-muted">${u.email}</div>
+                    </td>
+                    <td><span class="badge bg-info text-dark">${u.roles.join(', ')}</span></td>
+                    <td>
+                        ${u.isActive 
+                            ? '<span class="badge bg-success">Active</span>' 
+                            : '<span class="badge bg-danger">Inactive</span>'}
+                        ${u.isLocked ? '<span class="badge bg-warning text-dark">Locked</span>' : ''}
+                    </td>
+                    <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewUser(${u.id})">View</button>
+                        ${u.isLocked 
+                            ? `<button class="btn btn-sm btn-success" onclick="unlockUser(${u.id})">Unlock</button>`
+                            : `<button class="btn btn-sm btn-warning" onclick="lockUser(${u.id})">Lock</button>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewUser(id) {
+            try {
+                const response = await fetch(`/api/admin/users/${id}`);
+                const user = await response.json();
+                
+                const content = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Basic Info</h6>
+                            <p><strong>Name:</strong> ${user.fullName}</p>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <p><strong>Phone:</strong> ${user.phoneNumber || 'N/A'}</p>
+                            <p><strong>Role:</strong> ${user.roles.join(', ')}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Account Status</h6>
+                            <p><strong>Status:</strong> ${user.isActive ? 'Active' : 'Inactive'}</p>
+                            <p><strong>Last Login:</strong> ${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}</p>
+                            <p><strong>Locked:</strong> ${user.isLocked ? `Until ${new Date(user.lockoutEnd).toLocaleString()}` : 'No'}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>Actions</h6>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-warning" onclick="resetPassword(${user.id})">Reset Password</button>
+                        <button class="btn btn-info" onclick="promoteUser(${user.id})">Change Role</button>
+                    </div>
+                `;
+                
+                document.getElementById('userDetailsContent').innerHTML = content;
+                new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+            } catch (error) {
+                alert('Error loading user details');
+            }
+        }
+
+        async function lockUser(id) {
+            if (!confirm('Are you sure you want to lock this user for 24 hours?')) return;
+            await fetch(`/api/admin/users/${id}/lock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ durationMinutes: 1440 })
+            });
+            loadUsers(currentPage);
+        }
+
+        async function unlockUser(id) {
+            if (!confirm('Unlock this user?')) return;
+            await fetch(`/api/admin/users/${id}/unlock`, { method: 'POST' });
+            loadUsers(currentPage);
+        }
+        
+        async function resetPassword(id) {
+            if (!confirm('Send password reset email to this user?')) return;
+            await fetch(`/api/admin/users/${id}/reset-password`, { method: 'POST' });
+            alert('Password reset email queued.');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => loadUsers());
+    </script>
+}

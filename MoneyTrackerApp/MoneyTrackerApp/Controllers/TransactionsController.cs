@@ -1,0 +1,102 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using MoneyTrackerApp.Services;
+using MoneyTrackerApp.DTOs;
+using System.Security.Claims;
+
+namespace MoneyTrackerApp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    public class TransactionsController : ControllerBase
+    {
+        private readonly ITransactionService _transactionService;
+
+        public TransactionsController(ITransactionService transactionService)
+        {
+            _transactionService = transactionService;
+        }
+
+        private long GetUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out var userId))
+                throw new UnauthorizedAccessException("Invalid user ID");
+            return userId;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<TransactionResponseDto>>> GetTransactions([FromQuery] TransactionFilterDto filter)
+        {
+            try
+            {
+                var transactions = await _transactionService.GetUserTransactionsAsync(GetUserId(), filter);
+                return Ok(transactions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving transactions", details = ex.Message });
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TransactionResponseDto>> GetTransaction(long id)
+        {
+            try
+            {
+                var transaction = await _transactionService.GetTransactionByIdAsync(id, GetUserId());
+                if (transaction == null) return NotFound();
+                return Ok(transaction);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving transaction", details = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<TransactionResponseDto>> CreateTransaction([FromBody] CreateTransactionDto dto)
+        {
+            try
+            {
+                var transaction = await _transactionService.CreateTransactionAsync(GetUserId(), dto);
+                return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error creating transaction", details = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<TransactionResponseDto>> UpdateTransaction(long id, [FromBody] UpdateTransactionDto dto)
+        {
+            if (id != dto.Id) return BadRequest("ID mismatch");
+            try
+            {
+                var transaction = await _transactionService.UpdateTransactionAsync(GetUserId(), dto);
+                return Ok(transaction);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error updating transaction", details = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTransaction(long id)
+        {
+            try
+            {
+                var result = await _transactionService.DeleteTransactionAsync(id, GetUserId());
+                if (!result) return NotFound();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error deleting transaction", details = ex.Message });
+            }
+        }
+    }
+}
