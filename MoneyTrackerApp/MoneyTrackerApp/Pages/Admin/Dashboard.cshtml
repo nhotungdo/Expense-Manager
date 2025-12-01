@@ -2,7 +2,7 @@
 @model MoneyTrackerApp.Pages.Admin.DashboardModel
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Bảng điều khiển quản trị";
 }
 
 <div class="row">
@@ -11,8 +11,8 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalUsers">Loading...</div>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số người dùng</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalUsers">Đang tải...</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-users fa-2x text-gray-300"></i>
@@ -29,18 +29,18 @@
     <div class="col-lg-6 mb-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Quick Links</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Liên kết nhanh</h6>
             </div>
             <div class="card-body">
                 <div class="list-group">
                     <a href="/Admin/Users" class="list-group-item list-group-item-action">
-                        <i class="fas fa-user-cog me-2"></i> Manage Users
+                        <i class="fas fa-user-cog me-2"></i> Quản lý người dùng
                     </a>
                     <a href="/Admin/Settings" class="list-group-item list-group-item-action">
-                        <i class="fas fa-cogs me-2"></i> System Settings
+                        <i class="fas fa-cogs me-2"></i> Cài đặt hệ thống
                     </a>
                     <a href="/Admin/MasterData/Categories" class="list-group-item list-group-item-action">
-                        <i class="fas fa-list me-2"></i> Manage Categories
+                        <i class="fas fa-list me-2"></i> Quản lý danh mục
                     </a>
                 </div>
             </div>

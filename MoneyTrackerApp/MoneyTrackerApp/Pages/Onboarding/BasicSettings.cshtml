@@ -5,11 +5,11 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Basic Settings - Money Tracker</title>
+    <title>Cài đặt cơ bản - Money Tracker</title>
     <link rel="stylesheet" href="~/css/onboarding.css" />
 </head>
 <body class="onboarding-page">
@@ -21,9 +21,9 @@
 
         <div class="onboarding-content">
             <div class="step-header">
-                <span class="step-number">Step 1 of 4</span>
-                <h1 class="step-title">Basic Settings</h1>
-                <p class="step-description">Let's personalize your experience</p>
+                <span class="step-number">Bước 1 / 4</span>
+                <h1 class="step-title">Cài đặt cơ bản</h1>
+                <p class="step-description">Hãy cá nhân hóa trải nghiệm của bạn</p>
             </div>
 
             <form id="basicSettingsForm" class="onboarding-form">
@@ -31,36 +31,36 @@
                 <div class="form-group">
                     <label for="currency" class="form-label">
                         <span class="label-icon">💱</span>
-                        Main Currency
+                        Tiền tệ chính
                     </label>
                     <select id="currency" name="currency" class="form-select" required>
-                        <option value="VND" selected>Vietnamese Dong (₫)</option>
-                        <option value="USD">US Dollar ($)</option>
+                        <option value="VND" selected>Việt Nam Đồng (₫)</option>
+                        <option value="USD">Đô la Mỹ ($)</option>
                         <option value="EUR">Euro (€)</option>
-                        <option value="GBP">British Pound (£)</option>
-                        <option value="JPY">Japanese Yen (¥)</option>
+                        <option value="GBP">Bảng Anh (£)</option>
+                        <option value="JPY">Yên Nhật (¥)</option>
                     </select>
-                    <small class="form-hint">This will be your default currency for all transactions</small>
+                    <small class="form-hint">Đây sẽ là đơn vị tiền tệ mặc định cho tất cả các giao dịch</small>
                 </div>
 
                 <!-- Language Selection -->
                 <div class="form-group">
                     <label for="language" class="form-label">
                         <span class="label-icon">🌐</span>
-                        Language
+                        Ngôn ngữ
                     </label>
                     <select id="language" name="language" class="form-select" required>
                         <option value="vi" selected>Tiếng Việt</option>
-                        <option value="en">English</option>
+                        <option value="en">Tiếng Anh</option>
                     </select>
-                    <small class="form-hint">Choose your preferred language</small>
+                    <small class="form-hint">Chọn ngôn ngữ ưa thích của bạn</small>
                 </div>
 
                 <!-- Theme Selection -->
                 <div class="form-group">
                     <label class="form-label">
                         <span class="label-icon">🎨</span>
-                        Theme
+                        Giao diện
                     </label>
                     <div class="theme-selector">
                         <div class="theme-option" data-theme="light">
@@ -68,7 +68,7 @@
                                 <div class="preview-bar"></div>
                                 <div class="preview-content"></div>
                             </div>
-                            <span class="theme-name">Light</span>
+                            <span class="theme-name">Sáng</span>
                             <input type="radio" name="theme" value="light" checked>
                         </div>
                         <div class="theme-option" data-theme="dark">
@@ -76,7 +76,7 @@
                                 <div class="preview-bar"></div>
                                 <div class="preview-content"></div>
                             </div>
-                            <span class="theme-name">Dark</span>
+                            <span class="theme-name">Tối</span>
                             <input type="radio" name="theme" value="dark">
                         </div>
                     </div>
@@ -88,10 +88,10 @@
                 <!-- Navigation buttons -->
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="window.location.href='/Onboarding/Welcome'">
-                        ← Back
+                        ← Quay lại
                     </button>
                     <button type="submit" class="btn-primary">
-                        Next →
+                        Tiếp theo →
                     </button>
                 </div>
             </form>

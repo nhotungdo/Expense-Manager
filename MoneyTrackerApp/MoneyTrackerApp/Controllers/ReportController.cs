@@ -229,4 +229,91 @@ public class ReportController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while exporting" });
         }
     }
+    /// <summary>
+    /// Export report based on criteria
+    /// </summary>
+    [HttpPost("export")]
+    public async Task<IActionResult> ExportReport([FromBody] ExportReportRequestDto request)
+    {
+        try
+        {
+            var userId = GetUserId();
+            byte[] content = Array.Empty<byte>();
+            string fileName = "Report";
+            string contentType = "application/octet-stream";
+
+            // Determine file extension and content type
+            if (request.FileFormat == 1) // PDF
+            {
+                fileName += ".html"; // Using HTML for PDF fallback
+                contentType = "text/html";
+            }
+            else if (request.FileFormat == 2) // Excel
+            {
+                fileName += ".csv"; // Using CSV content for Excel for now
+                contentType = "application/vnd.ms-excel";
+            }
+            else if (request.FileFormat == 3) // CSV
+            {
+                fileName += ".csv";
+                contentType = "text/csv";
+            }
+            else if (request.FileFormat == 4) // JSON
+            {
+                fileName += ".json";
+                contentType = "application/json";
+            }
+            else
+            {
+                return BadRequest(new { message = "Unsupported file format." });
+            }
+
+            // Generate content based on report type
+            switch (request.ReportType)
+            {
+                case 1: // Cash Flow
+                    if (request.FileFormat == 1)
+                        content = await _exportService.ExportCashFlowReportToPdfAsync(userId, request.StartDate, request.EndDate);
+                    else if (request.FileFormat == 4)
+                        content = await _exportService.ExportCashFlowReportToJsonAsync(userId, request.StartDate, request.EndDate);
+                    else
+                        content = await _exportService.ExportCashFlowReportToExcelAsync(userId, request.StartDate, request.EndDate);
+                    
+                    fileName = $"CashFlow_{request.StartDate:yyyyMMdd}-{request.EndDate:yyyyMMdd}{Path.GetExtension(fileName)}";
+                    break;
+
+                case 3: // Category Breakdown
+                    if (request.FileFormat == 1)
+                        content = await _exportService.ExportCategoryReportToPdfAsync(userId, request.StartDate, request.EndDate);
+                    else if (request.FileFormat == 4)
+                        content = await _exportService.ExportCategoryReportToJsonAsync(userId, request.StartDate, request.EndDate);
+                    else
+                        content = await _exportService.ExportCategoryReportToExcelAsync(userId, request.StartDate, request.EndDate);
+                        
+                    fileName = $"CategoryBreakdown_{request.StartDate:yyyyMMdd}-{request.EndDate:yyyyMMdd}{Path.GetExtension(fileName)}";
+                    break;
+
+                case 4: // Monthly Trends
+                    if (request.FileFormat == 1)
+                        content = await _exportService.ExportMonthlyTrendsToPdfAsync(userId, request.StartDate.Year);
+                    else if (request.FileFormat == 4)
+                        content = await _exportService.ExportMonthlyTrendsToJsonAsync(userId, request.StartDate.Year);
+                    else
+                        content = await _exportService.ExportMonthlyTrendsToExcelAsync(userId, request.StartDate.Year);
+                        
+                    fileName = $"MonthlyTrends_{request.StartDate.Year}{Path.GetExtension(fileName)}";
+                    break;
+
+                default:
+                    return BadRequest(new { message = "Invalid report type." });
+            }
+
+            return File(content, contentType, fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting report");
+            return StatusCode(500, new { message = "An error occurred while exporting the report." });
+        }
+    }
 }

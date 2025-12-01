@@ -1,7 +1,7 @@
 @page
 @model MoneyTrackerApp.Pages.Profile.IndexModel
 @{
-    ViewData["Title"] = "My Profile";
+    ViewData["Title"] = "Hồ sơ của tôi";
 }
 
 <div class="container py-4">
@@ -17,18 +17,18 @@
                         </button>
                         <input type="file" id="avatarUpload" hidden accept="image/*" onchange="uploadAvatar(this)">
                     </div>
-                    <h5 class="card-title mb-1" id="profileName">Loading...</h5>
-                    <p class="text-muted small mb-3" id="profileEmail">loading...</p>
+                    <h5 class="card-title mb-1" id="profileName">Đang tải...</h5>
+                    <p class="text-muted small mb-3" id="profileEmail">đang tải...</p>
                 </div>
                 <div class="list-group list-group-flush">
                     <a href="#general" class="list-group-item list-group-item-action active" data-bs-toggle="list">
-                        <i class="bi bi-person me-2">👤</i> General Information
+                        <i class="bi bi-person me-2">👤</i> Thông tin chung
                     </a>
                     <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                        <i class="bi bi-shield-lock me-2">🔒</i> Security
+                        <i class="bi bi-shield-lock me-2">🔒</i> Bảo mật
                     </a>
                     <a href="#sessions" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                        <i class="bi bi-laptop me-2">💻</i> Active Sessions
+                        <i class="bi bi-laptop me-2">💻</i> Phiên hoạt động
                     </a>
                 </div>
             </div>
@@ -41,41 +41,41 @@
                 <div class="tab-pane fade show active" id="general">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">General Information</h5>
+                            <h5 class="mb-0">Thông tin chung</h5>
                         </div>
                         <div class="card-body">
                             <form id="profileForm" onsubmit="updateProfile(event)">
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Full Name</label>
+                                        <label class="form-label">Họ tên</label>
                                         <input type="text" class="form-control" id="fullName" name="fullName">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Phone Number</label>
+                                        <label class="form-label">Số điện thoại</label>
                                         <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Date of Birth</label>
+                                        <label class="form-label">Ngày sinh</label>
                                         <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Gender</label>
+                                        <label class="form-label">Giới tính</label>
                                         <select class="form-select" id="gender" name="gender">
-                                            <option value="">Select Gender</option>
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
+                                            <option value="">Chọn giới tính</option>
+                                            <option value="Male">Nam</option>
+                                            <option value="Female">Nữ</option>
+                                            <option value="Other">Khác</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Address</label>
+                                    <label class="form-label">Địa chỉ</label>
                                     <textarea class="form-control" id="address" name="address" rows="2"></textarea>
                                 </div>
                                 <div class="text-end">
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                                 </div>
                             </form>
                         </div>
@@ -87,26 +87,26 @@
                     <!-- Change Password -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Change Password</h5>
+                            <h5 class="mb-0">Đổi mật khẩu</h5>
                         </div>
                         <div class="card-body">
                             <form id="passwordForm" onsubmit="changePassword(event)">
                                 <div class="mb-3">
-                                    <label class="form-label">Current Password</label>
+                                    <label class="form-label">Mật khẩu hiện tại</label>
                                     <input type="password" class="form-control" id="currentPassword" required>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">New Password</label>
+                                        <label class="form-label">Mật khẩu mới</label>
                                         <input type="password" class="form-control" id="newPassword" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Confirm New Password</label>
+                                        <label class="form-label">Xác nhận mật khẩu mới</label>
                                         <input type="password" class="form-control" id="confirmPassword" required>
                                     </div>
                                 </div>
                                 <div class="text-end">
-                                    <button type="submit" class="btn btn-warning">Update Password</button>
+                                    <button type="submit" class="btn btn-warning">Cập nhật mật khẩu</button>
                                 </div>
                             </form>
                         </div>
@@ -115,27 +115,27 @@
                     <!-- Two-Factor Authentication -->
                     <div class="card shadow-sm">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Two-Factor Authentication (2FA)</h5>
-                            <span id="2faStatus" class="badge bg-secondary">Loading...</span>
+                            <h5 class="mb-0">Xác thực hai yếu tố (2FA)</h5>
+                            <span id="2faStatus" class="badge bg-secondary">Đang tải...</span>
                         </div>
                         <div class="card-body">
-                            <p class="text-muted">Add an extra layer of security to your account by enabling 2FA.</p>
+                            <p class="text-muted">Thêm một lớp bảo mật cho tài khoản của bạn bằng cách bật 2FA.</p>
                             <div id="2faActions">
-                                <button class="btn btn-outline-primary" onclick="enable2FA()">Enable 2FA</button>
+                                <button class="btn btn-outline-primary" onclick="enable2FA()">Bật 2FA</button>
                             </div>
                             
                             <!-- 2FA Setup Modal -->
                             <div id="2faSetupArea" class="d-none mt-3 p-3 border rounded bg-light">
-                                <h6>Scan QR Code</h6>
-                                <p class="small text-muted">Use your authenticator app (Google Authenticator, Authy) to scan this code.</p>
+                                <h6>Quét mã QR</h6>
+                                <p class="small text-muted">Sử dụng ứng dụng xác thực (Google Authenticator, Authy) để quét mã này.</p>
                                 <div class="text-center mb-3">
                                     <img id="qrCodeImage" src="" alt="QR Code" class="img-fluid border p-2 bg-white">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Enter Verification Code</label>
+                                    <label class="form-label">Nhập mã xác thực</label>
                                     <input type="text" class="form-control" id="verifyCode" placeholder="000000" maxlength="6">
                                 </div>
-                                <button class="btn btn-success w-100" onclick="verify2FA()">Verify & Enable</button>
+                                <button class="btn btn-success w-100" onclick="verify2FA()">Xác thực & Bật</button>
                             </div>
                         </div>
                     </div>
@@ -145,12 +145,12 @@
                 <div class="tab-pane fade" id="sessions">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Active Sessions</h5>
-                            <button class="btn btn-sm btn-outline-danger" onclick="revokeAllSessions()">Revoke All Other Sessions</button>
+                            <h5 class="mb-0">Phiên hoạt động</h5>
+                            <button class="btn btn-sm btn-outline-danger" onclick="revokeAllSessions()">Thu hồi tất cả các phiên khác</button>
                         </div>
                         <div class="card-body p-0">
                             <div class="list-group list-group-flush" id="sessionsList">
-                                <div class="text-center p-4">Loading sessions...</div>
+                                <div class="text-center p-4">Đang tải phiên...</div>
                             </div>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-            <strong class="me-auto">Notification</strong>
+            <strong class="me-auto">Thông báo</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body" id="toastMessage"></div>
@@ -218,13 +218,13 @@
                 });
 
                 if (response.ok) {
-                    showToast('Profile updated successfully!', 'success');
+                    showToast('Cập nhật hồ sơ thành công!', 'success');
                     loadProfile(); // Refresh UI
                 } else {
-                    showToast('Failed to update profile.', 'danger');
+                    showToast('Không thể cập nhật hồ sơ.', 'danger');
                 }
             } catch (error) {
-                showToast('Error updating profile.', 'danger');
+                showToast('Lỗi cập nhật hồ sơ.', 'danger');
             }
         }
 
@@ -243,12 +243,12 @@
                     if (response.ok) {
                         const data = await response.json();
                         document.getElementById('profileAvatar').src = data.url;
-                        showToast('Profile picture updated!', 'success');
+                        showToast('Đã cập nhật ảnh đại diện!', 'success');
                     } else {
-                        showToast('Failed to upload picture.', 'danger');
+                        showToast('Không thể tải lên ảnh.', 'danger');
                     }
                 } catch (error) {
-                    showToast('Error uploading picture.', 'danger');
+                    showToast('Lỗi tải lên ảnh.', 'danger');
                 }
             }
         }
@@ -261,7 +261,7 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
 
             if (newPassword !== confirmPassword) {
-                showToast('New passwords do not match.', 'warning');
+                showToast('Mật khẩu mới không khớp.', 'warning');
                 return;
             }
 
@@ -273,14 +273,14 @@
                 });
 
                 if (response.ok) {
-                    showToast('Password changed successfully!', 'success');
+                    showToast('Đổi mật khẩu thành công!', 'success');
                     document.getElementById('passwordForm').reset();
                 } else {
                     const data = await response.json();
-                    showToast(data.message || 'Failed to change password.', 'danger');
+                    showToast(data.message || 'Không thể đổi mật khẩu.', 'danger');
                 }
             } catch (error) {
-                showToast('Error changing password.', 'danger');
+                showToast('Lỗi đổi mật khẩu.', 'danger');
             }
         }
 
@@ -295,12 +295,12 @@
                     
                     if (data.enabled) {
                         statusBadge.className = 'badge bg-success';
-                        statusBadge.textContent = 'Enabled';
-                        actionsDiv.innerHTML = '<button class="btn btn-outline-danger" onclick="disable2FA()">Disable 2FA</button>';
+                        statusBadge.textContent = 'Đã bật';
+                        actionsDiv.innerHTML = '<button class="btn btn-outline-danger" onclick="disable2FA()">Tắt 2FA</button>';
                     } else {
                         statusBadge.className = 'badge bg-secondary';
-                        statusBadge.textContent = 'Disabled';
-                        actionsDiv.innerHTML = '<button class="btn btn-outline-primary" onclick="enable2FA()">Enable 2FA</button>';
+                        statusBadge.textContent = 'Đã tắt';
+                        actionsDiv.innerHTML = '<button class="btn btn-outline-primary" onclick="enable2FA()">Bật 2FA</button>';
                     }
                 }
             } catch (error) {
@@ -324,7 +324,7 @@
                     document.getElementById('2faActions').classList.add('d-none');
                 }
             } catch (error) {
-                showToast('Error starting 2FA setup.', 'danger');
+                showToast('Lỗi bắt đầu thiết lập 2FA.', 'danger');
             }
         }
 
@@ -339,21 +339,21 @@
                 });
 
                 if (response.ok) {
-                    showToast('2FA enabled successfully!', 'success');
+                    showToast('Đã bật 2FA thành công!', 'success');
                     document.getElementById('2faSetupArea').classList.add('d-none');
                     document.getElementById('2faActions').classList.remove('d-none');
                     load2FAStatus();
                 } else {
-                    showToast('Invalid verification code.', 'warning');
+                    showToast('Mã xác thực không hợp lệ.', 'warning');
                 }
             } catch (error) {
-                showToast('Error verifying code.', 'danger');
+                showToast('Lỗi xác thực mã.', 'danger');
             }
         }
 
         // Disable 2FA
         async function disable2FA() {
-            const password = prompt("Please enter your password to disable 2FA:");
+            const password = prompt("Vui lòng nhập mật khẩu để tắt 2FA:");
             if (!password) return;
 
             try {
@@ -364,13 +364,13 @@
                 });
 
                 if (response.ok) {
-                    showToast('2FA disabled successfully.', 'success');
+                    showToast('Đã tắt 2FA thành công.', 'success');
                     load2FAStatus();
                 } else {
-                    showToast('Failed to disable 2FA. Check password.', 'danger');
+                    showToast('Không thể tắt 2FA. Kiểm tra lại mật khẩu.', 'danger');
                 }
             } catch (error) {
-                showToast('Error disabling 2FA.', 'danger');
+                showToast('Lỗi tắt 2FA.', 'danger');
             }
         }
 
@@ -384,7 +384,7 @@
                     list.innerHTML = '';
 
                     if (sessions.length === 0) {
-                        list.innerHTML = '<div class="text-center p-4 text-muted">No active sessions found.</div>';
+                        list.innerHTML = '<div class="text-center p-4 text-muted">Không tìm thấy phiên hoạt động nào.</div>';
                         return;
                     }
 
@@ -394,10 +394,10 @@
                         item.innerHTML = `
                             <div>
                                 <div class="fw-bold">${session.deviceInfo}</div>
-                                <small class="text-muted">Last active: ${new Date(session.lastUsed).toLocaleString()}</small>
-                                ${session.isCurrent ? '<span class="badge bg-info ms-2">Current</span>' : ''}
+                                <small class="text-muted">Hoạt động lần cuối: ${new Date(session.lastUsed).toLocaleString('vi-VN')}</small>
+                                ${session.isCurrent ? '<span class="badge bg-info ms-2">Hiện tại</span>' : ''}
                             </div>
-                            ${!session.isCurrent ? `<button class="btn btn-sm btn-outline-danger" onclick="revokeSession('${session.id}')">Revoke</button>` : ''}
+                            ${!session.isCurrent ? `<button class="btn btn-sm btn-outline-danger" onclick="revokeSession('${session.id}')">Thu hồi</button>` : ''}
                         `;
                         list.appendChild(item);
                     });
@@ -409,29 +409,29 @@
 
         // Revoke Session
         async function revokeSession(deviceId) {
-            if (!confirm('Are you sure you want to revoke this session?')) return;
+            if (!confirm('Bạn có chắc chắn muốn thu hồi phiên này không?')) return;
             try {
                 const response = await fetch(`/api/security/sessions/${deviceId}`, { method: 'DELETE' });
                 if (response.ok) {
-                    showToast('Session revoked.', 'success');
+                    showToast('Đã thu hồi phiên.', 'success');
                     loadSessions();
                 }
             } catch (error) {
-                showToast('Error revoking session.', 'danger');
+                showToast('Lỗi thu hồi phiên.', 'danger');
             }
         }
 
         // Revoke All Sessions
         async function revokeAllSessions() {
-            if (!confirm('Are you sure you want to log out from all other devices?')) return;
+            if (!confirm('Bạn có chắc chắn muốn đăng xuất khỏi tất cả các thiết bị khác không?')) return;
             try {
                 const response = await fetch('/api/security/sessions/revoke-all', { method: 'POST' });
                 if (response.ok) {
-                    showToast('All other sessions revoked.', 'success');
+                    showToast('Đã thu hồi tất cả các phiên khác.', 'success');
                     loadSessions();
                 }
             } catch (error) {
-                showToast('Error revoking sessions.', 'danger');
+                showToast('Lỗi thu hồi các phiên.', 'danger');
             }
         }
 

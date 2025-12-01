@@ -25,6 +25,14 @@
 
         // Smooth scroll for anchor links
         initializeSmoothScroll();
+
+        initializeThemeToggle();
+        initializeLanguageSelector();
+        initializeCart();
+        initializeFilters();
+        initializeSummary();
+        initializeRealtimeSearch();
+        initializeNotificationsPanel();
     }
 
     // Highlight active navigation link
@@ -227,7 +235,7 @@
         // }
 
         lastScroll = currentScroll;
-    });
+    }, { passive: true });
 
     // Dropdown hover effect (desktop only)
     if (window.innerWidth > 991) {
@@ -323,3 +331,201 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Theme toggle
+function initializeThemeToggle() {
+    const btns = document.querySelectorAll('.theme-toggle');
+    const stored = localStorage.getItem('mt-theme');
+    if (stored) {
+        document.documentElement.setAttribute('data-theme', stored);
+        updateThemeToggleIcon(stored);
+    }
+
+    btns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('mt-theme', next);
+            updateThemeToggleIcon(next);
+        });
+    });
+}
+
+function initializeRealtimeSearch() {
+    const input = document.querySelector('.search-input');
+    const results = document.querySelector('.search-results');
+    if (!input || !results) return;
+    let timer = null;
+    input.addEventListener('input', function () {
+        const q = this.value.trim();
+        clearTimeout(timer);
+        if (!q) {
+            results.innerHTML = '';
+            results.hidden = true;
+            return;
+        }
+        timer = setTimeout(async () => {
+            const items = await querySearch(q);
+            renderSearchResults(results, items);
+        }, 250);
+    });
+}
+
+async function querySearch(q) {
+    try {
+        const r = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        if (!r.ok) throw new Error('no');
+        const data = await r.json();
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function renderSearchResults(container, items) {
+    if (!items.length) {
+        container.innerHTML = `<div class="search-empty" role="option">Press Enter to search</div>`;
+        container.hidden = false;
+        return;
+    }
+    const html = items.slice(0, 8).map(it => {
+        const t = it.type || 'item';
+        const n = it.name || it.title || '';
+        const u = it.url || '#';
+        return `<a class="search-result" role="option" href="${u}"><span class="search-type">${t}</span><span class="search-name">${n}</span></a>`;
+    }).join('');
+    container.innerHTML = html;
+    container.hidden = false;
+}
+
+function initializeFilters() {
+    const state = loadFilters();
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const g = btn.getAttribute('data-filter-group');
+        const v = btn.getAttribute('data-filter');
+        if (state[g] && state[g] === v) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+            const s = loadFilters();
+            s[g] = v;
+            saveFilters(s);
+            document.querySelectorAll(`.filter-btn[data-filter-group="${g}"]`).forEach(b => b.classList.toggle('active', b === btn));
+        });
+    });
+    const walletSelect = document.querySelector('.wallet-select');
+    if (walletSelect) {
+        walletSelect.value = state.wallet || '';
+        walletSelect.addEventListener('change', () => {
+            const s = loadFilters();
+            s.wallet = walletSelect.value;
+            saveFilters(s);
+        });
+    }
+}
+
+function loadFilters() {
+    try { return JSON.parse(localStorage.getItem('mt-filters') || '{}'); } catch { return {}; }
+}
+function saveFilters(s) {
+    localStorage.setItem('mt-filters', JSON.stringify(s));
+}
+
+function initializeSummary() {
+    const el = document.getElementById('financial-summary');
+    if (!el) return;
+    fetch('/api/Report/dashboard').then(r => r.json()).then(d => {
+        if (!d) return;
+        const balance = formatCurrency(d.currentBalance || 0, 'VND');
+        const income = formatCurrency(d.monthlyIncome || 0, 'VND');
+        const expense = formatCurrency(d.monthlyExpense || 0, 'VND');
+        const trend = (d.monthlyIncome || 0) - (d.monthlyExpense || 0);
+        const trendClass = trend >= 0 ? 'positive' : 'negative';
+        el.innerHTML = `<div class="summary-item"><span class="label">Total</span><span class="value">${balance}</span></div><div class="summary-item"><span class="label">Income</span><span class="value">${income}</span></div><div class="summary-item"><span class="label">Expense</span><span class="value">${expense}</span></div><div class="summary-item ${trendClass}"><span class="label">Net</span><span class="value">${formatCurrency(trend, 'VND')}</span></div>`;
+    }).catch(() => { });
+}
+
+function formatCurrency(n, currency) {
+    try { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency }).format(n); } catch { return String(n); }
+}
+
+function initializeNotificationsPanel() {
+    const panel = document.querySelector('.notification-panel');
+    const bell = document.querySelector('.notification-bell');
+    const badge = document.querySelector('.notification-badge');
+    if (!panel || !bell) return;
+    bell.addEventListener('click', function (e) {
+        e.preventDefault();
+        panel.hidden = !panel.hidden;
+    });
+
+    // Mock notification data if API fails
+    const mockNotifications = [
+        { type: 'warning', title: 'Overspending Alert', description: 'You have exceeded your dining budget.' },
+        { type: 'info', title: 'Transaction Reminder', description: 'Rent payment is due tomorrow.' }
+    ];
+
+    fetch('/api/Notification').then(r => r.json()).then(list => {
+        renderNotifications(list);
+    }).catch(() => {
+        // Fallback to mock data for demonstration
+        renderNotifications(mockNotifications);
+    });
+
+    function renderNotifications(list) {
+        const items = Array.isArray(list) ? list : [];
+        if (badge) {
+            badge.textContent = items.length > 99 ? '99+' : String(items.length);
+            badge.style.display = items.length ? 'block' : 'none';
+        }
+        panel.innerHTML = items.length ? items.slice(0, 10).map(n => `<div class="notification-item ${n.type || ''}"><div class="title fw-bold">${n.title || ''}</div><div class="desc small">${n.description || ''}</div></div>`).join('') : '<div class="p-2 text-muted">No notifications</div>';
+    }
+}
+
+// Language selector
+function initializeLanguageSelector() {
+    const options = document.querySelectorAll('.lang-option');
+    const stored = localStorage.getItem('mt-lang');
+    if (stored) {
+        document.documentElement.lang = stored;
+        updateLanguageDisplay(stored);
+    }
+    options.forEach(opt => {
+        opt.addEventListener('click', function (e) {
+            e.preventDefault();
+            const lang = this.getAttribute('data-lang') || 'vi';
+            document.documentElement.lang = lang;
+            localStorage.setItem('mt-lang', lang);
+            updateLanguageDisplay(lang);
+        });
+    });
+}
+
+function updateLanguageDisplay(lang) {
+    const els = document.querySelectorAll('.current-language');
+    els.forEach(el => {
+        el.textContent = lang === 'en' ? 'EN' : 'VN';
+    });
+}
+
+// Cart
+function initializeCart() {
+    const badge = document.querySelector('.item-count-badge');
+    const btn = document.querySelector('.cart-button');
+    const count = parseInt(localStorage.getItem('mt-cart-count') || '0', 10);
+    updateCartCount(count);
+    if (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = '/Cart';
+            window.location.href = target;
+        });
+    }
+}
+
+function updateCartCount(count) {
+    const badge = document.querySelector('.item-count-badge');
+    if (!badge) return;
+    const c = Number.isFinite(count) ? count : 0;
+    badge.textContent = c > 99 ? '99+' : String(c);
+    badge.style.display = c > 0 ? 'block' : 'none';
+}

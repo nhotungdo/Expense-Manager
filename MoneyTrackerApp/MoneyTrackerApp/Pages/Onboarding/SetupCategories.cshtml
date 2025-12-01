@@ -5,11 +5,11 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setup Categories - Money Tracker</title>
+    <title>Thiết lập danh mục - Money Tracker</title>
     <link rel="stylesheet" href="~/css/onboarding.css" />
 </head>
 <body class="onboarding-page">
@@ -21,9 +21,9 @@
 
         <div class="onboarding-content">
             <div class="step-header">
-                <span class="step-number">Step 3 of 4</span>
-                <h1 class="step-title">Setup Categories</h1>
-                <p class="step-description">Choose a template that fits your lifestyle</p>
+                <span class="step-number">Bước 3 / 4</span>
+                <h1 class="step-title">Thiết lập danh mục</h1>
+                <p class="step-description">Chọn mẫu phù hợp với phong cách sống của bạn</p>
             </div>
 
             <form id="setupCategoriesForm" class="onboarding-form">
@@ -31,33 +31,33 @@
                 <div class="form-group">
                     <label class="form-label">
                         <span class="label-icon">📋</span>
-                        Choose a Template
+                        Chọn mẫu
                     </label>
                     <div class="template-grid">
                         <div class="template-card active" data-template="Student">
                             <div class="template-icon">🎓</div>
-                            <h3 class="template-name">Student</h3>
-                            <p class="template-desc">Perfect for students managing allowances and expenses</p>
+                            <h3 class="template-name">Sinh viên</h3>
+                            <p class="template-desc">Phù hợp cho sinh viên quản lý tiền tiêu vặt và chi phí</p>
                         </div>
                         <div class="template-card" data-template="Family">
                             <div class="template-icon">👨‍👩‍👧‍👦</div>
-                            <h3 class="template-name">Family</h3>
-                            <p class="template-desc">Ideal for managing household finances</p>
+                            <h3 class="template-name">Gia đình</h3>
+                            <p class="template-desc">Lý tưởng để quản lý tài chính gia đình</p>
                         </div>
                         <div class="template-card" data-template="Business">
                             <div class="template-icon">💼</div>
-                            <h3 class="template-name">Business</h3>
-                            <p class="template-desc">For entrepreneurs and business owners</p>
+                            <h3 class="template-name">Doanh nghiệp</h3>
+                            <p class="template-desc">Dành cho doanh nhân và chủ doanh nghiệp</p>
                         </div>
                         <div class="template-card" data-template="Freelancer">
                             <div class="template-icon">💻</div>
-                            <h3 class="template-name">Freelancer</h3>
-                            <p class="template-desc">Tailored for freelancers and contractors</p>
+                            <h3 class="template-name">Người làm tự do</h3>
+                            <p class="template-desc">Thiết kế riêng cho người làm tự do và nhà thầu</p>
                         </div>
                         <div class="template-card" data-template="Minimal">
                             <div class="template-icon">✨</div>
-                            <h3 class="template-name">Minimal</h3>
-                            <p class="template-desc">Simple categories for basic tracking</p>
+                            <h3 class="template-name">Tối giản</h3>
+                            <p class="template-desc">Danh mục đơn giản để theo dõi cơ bản</p>
                         </div>
                     </div>
                     <input type="hidden" id="selectedTemplate" name="template" value="Student" required>
@@ -67,12 +67,12 @@
                 <div class="form-group">
                     <label class="form-label">
                         <span class="label-icon">👀</span>
-                        Category Preview
+                        Xem trước danh mục
                     </label>
                     <div class="category-preview-container">
                         <div class="preview-loading">
                             <div class="spinner-small"></div>
-                            <p>Loading categories...</p>
+                            <p>Đang tải danh mục...</p>
                         </div>
                         <div class="category-preview-list hidden" id="categoryPreviewList">
                             <!-- Categories will be loaded here -->
@@ -86,10 +86,10 @@
                 <!-- Navigation buttons -->
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="window.location.href='/Onboarding/CreateWallet'">
-                        ← Back
+                        ← Quay lại
                     </button>
                     <button type="submit" class="btn-primary">
-                        Next →
+                        Tiếp theo →
                     </button>
                 </div>
             </form>

@@ -1,7 +1,7 @@
 @page
 @model MoneyTrackerApp.Pages.Settings.IndexModel
 @{
-    ViewData["Title"] = "Settings";
+    ViewData["Title"] = "Cài đặt";
 }
 
 <div class="container py-4">
@@ -9,19 +9,19 @@
         <div class="col-md-3 mb-4">
             <div class="list-group shadow-sm sticky-top" style="top: 80px;">
                 <a href="#localization" class="list-group-item list-group-item-action active" data-bs-toggle="list">
-                    <i class="bi bi-globe me-2">🌍</i> Localization
+                    <i class="bi bi-globe me-2">🌍</i> Bản địa hóa
                 </a>
                 <a href="#appearance" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="bi bi-palette me-2">🎨</i> Appearance
+                    <i class="bi bi-palette me-2">🎨</i> Giao diện
                 </a>
                 <a href="#formatting" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="bi bi-calendar3 me-2">📅</i> Formatting
+                    <i class="bi bi-calendar3 me-2">📅</i> Định dạng
                 </a>
                 <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="bi bi-bell me-2">🔔</i> Notifications
+                    <i class="bi bi-bell me-2">🔔</i> Thông báo
                 </a>
                 <a href="#danger" class="list-group-item list-group-item-action text-danger" data-bs-toggle="list">
-                    <i class="bi bi-exclamation-triangle me-2">⚠️</i> Danger Zone
+                    <i class="bi bi-exclamation-triangle me-2">⚠️</i> Vùng nguy hiểm
                 </a>
             </div>
         </div>
@@ -32,24 +32,24 @@
                 <div class="tab-pane fade show active" id="localization">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Localization</h5>
+                            <h5 class="mb-0">Bản địa hóa</h5>
                         </div>
                         <div class="card-body">
                             <form id="localizationForm">
                                 <div class="mb-3">
-                                    <label class="form-label">Language</label>
+                                    <label class="form-label">Ngôn ngữ</label>
                                     <select class="form-select" id="language" onchange="updateSetting('language', this.value)">
                                         <!-- Options loaded via JS -->
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Default Currency</label>
+                                    <label class="form-label">Tiền tệ mặc định</label>
                                     <select class="form-select" id="currency" onchange="updateSetting('currency', this.value)">
                                         <!-- Options loaded via JS -->
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Timezone</label>
+                                    <label class="form-label">Múi giờ</label>
                                     <select class="form-select" id="timezone" onchange="updateSetting('timezone', this.value)">
                                         <!-- Options loaded via JS -->
                                     </select>
@@ -63,26 +63,26 @@
                 <div class="tab-pane fade" id="appearance">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Appearance</h5>
+                            <h5 class="mb-0">Giao diện</h5>
                         </div>
                         <div class="card-body">
                             <div class="row text-center">
                                 <div class="col-md-4 mb-3">
                                     <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'light')" id="theme-light">
                                         <i class="bi bi-sun fs-1 text-warning"></i>
-                                        <div class="mt-2">Light Mode</div>
+                                        <div class="mt-2">Chế độ sáng</div>
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'dark')" id="theme-dark">
                                         <i class="bi bi-moon fs-1 text-secondary"></i>
-                                        <div class="mt-2">Dark Mode</div>
+                                        <div class="mt-2">Chế độ tối</div>
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'auto')" id="theme-auto">
                                         <i class="bi bi-display fs-1 text-primary"></i>
-                                        <div class="mt-2">System Default</div>
+                                        <div class="mt-2">Mặc định hệ thống</div>
                                     </div>
                                 </div>
                             </div>
@@ -94,28 +94,28 @@
                 <div class="tab-pane fade" id="formatting">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Formatting</h5>
+                            <h5 class="mb-0">Định dạng</h5>
                         </div>
                         <div class="card-body">
                             <form id="formattingForm">
                                 <div class="mb-3">
-                                    <label class="form-label">Date Format</label>
+                                    <label class="form-label">Định dạng ngày</label>
                                     <select class="form-select" id="dateFormat" onchange="updateSetting('dateFormat', this.value)">
                                         <!-- Options loaded via JS -->
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Time Format</label>
+                                    <label class="form-label">Định dạng giờ</label>
                                     <select class="form-select" id="timeFormat" onchange="updateSetting('timeFormat', this.value)">
                                         <!-- Options loaded via JS -->
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">First Day of Week</label>
+                                    <label class="form-label">Ngày đầu tuần</label>
                                     <select class="form-select" id="firstDayOfWeek" onchange="updateSetting('firstDayOfWeek', this.value)">
-                                        <option value="0">Sunday</option>
-                                        <option value="1">Monday</option>
-                                        <option value="6">Saturday</option>
+                                        <option value="0">Chủ nhật</option>
+                                        <option value="1">Thứ hai</option>
+                                        <option value="6">Thứ bảy</option>
                                     </select>
                                 </div>
                             </form>
@@ -127,21 +127,21 @@
                 <div class="tab-pane fade" id="notifications">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Notifications</h5>
+                            <h5 class="mb-0">Thông báo</h5>
                         </div>
                         <div class="card-body">
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="notificationsEnabled" onchange="updateNotifications()">
-                                <label class="form-check-label fw-bold" for="notificationsEnabled">Enable Notifications</label>
+                                <label class="form-check-label fw-bold" for="notificationsEnabled">Bật thông báo</label>
                             </div>
                             <div class="ms-4">
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" id="emailNotifications" onchange="updateNotifications()">
-                                    <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                                    <label class="form-check-label" for="emailNotifications">Thông báo qua Email</label>
                                 </div>
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" id="pushNotifications" onchange="updateNotifications()">
-                                    <label class="form-check-label" for="pushNotifications">Push Notifications</label>
+                                    <label class="form-check-label" for="pushNotifications">Thông báo đẩy</label>
                                 </div>
                             </div>
                         </div>
@@ -152,11 +152,11 @@
                 <div class="tab-pane fade" id="danger">
                     <div class="card shadow-sm border-danger mb-4">
                         <div class="card-header bg-danger text-white py-3">
-                            <h5 class="mb-0">Danger Zone</h5>
+                            <h5 class="mb-0">Vùng nguy hiểm</h5>
                         </div>
                         <div class="card-body">
-                            <p>Reset all settings to their default values. This action cannot be undone.</p>
-                            <button class="btn btn-outline-danger" onclick="resetSettings()">Reset to Defaults</button>
+                            <p>Đặt lại tất cả cài đặt về mặc định. Hành động này không thể hoàn tác.</p>
+                            <button class="btn btn-outline-danger" onclick="resetSettings()">Đặt lại về mặc định</button>
                         </div>
                     </div>
                 </div>
@@ -169,7 +169,7 @@
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="settingsToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-            <strong class="me-auto">Settings</strong>
+            <strong class="me-auto">Cài đặt</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body" id="toastMessage"></div>
@@ -292,17 +292,17 @@
                 });
 
                 if (response.ok) {
-                    showToast(`${key} updated successfully!`, 'success');
+                    showToast(`${key} cập nhật thành công!`, 'success');
                     if (key === 'theme') {
                         document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('border-primary', 'bg-light'));
                         document.getElementById(`theme-${value}`).classList.add('border-primary', 'bg-light');
                     }
                 } else {
-                    showToast(`Failed to update ${key}.`, 'danger');
+                    showToast(`Không thể cập nhật ${key}.`, 'danger');
                     loadSettings(); // Revert
                 }
             } catch (error) {
-                showToast(`Error updating ${key}.`, 'danger');
+                showToast(`Lỗi cập nhật ${key}.`, 'danger');
                 loadSettings(); // Revert
             }
         }
@@ -322,31 +322,31 @@
                 });
 
                 if (response.ok) {
-                    showToast('Notification preferences updated!', 'success');
+                    showToast('Tùy chọn thông báo đã được cập nhật!', 'success');
                     currentSettings.notificationsEnabled = dto.notificationsEnabled;
                     currentSettings.emailNotifications = dto.emailNotifications;
                     currentSettings.pushNotifications = dto.pushNotifications;
                 } else {
-                    showToast('Failed to update notifications.', 'danger');
+                    showToast('Không thể cập nhật thông báo.', 'danger');
                 }
             } catch (error) {
-                showToast('Error updating notifications.', 'danger');
+                showToast('Lỗi cập nhật thông báo.', 'danger');
             }
         }
 
         async function resetSettings() {
-            if (!confirm('Are you sure you want to reset all settings to default?')) return;
+            if (!confirm('Bạn có chắc chắn muốn đặt lại tất cả cài đặt về mặc định không?')) return;
 
             try {
                 const response = await fetch('/api/settings/reset', { method: 'POST' });
                 if (response.ok) {
-                    showToast('Settings reset to defaults.', 'success');
+                    showToast('Cài đặt đã được đặt lại về mặc định.', 'success');
                     loadSettings();
                 } else {
-                    showToast('Failed to reset settings.', 'danger');
+                    showToast('Không thể đặt lại cài đặt.', 'danger');
                 }
             } catch (error) {
-                showToast('Error resetting settings.', 'danger');
+                showToast('Lỗi đặt lại cài đặt.', 'danger');
             }
         }
 

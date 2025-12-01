@@ -5,11 +5,11 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Wallet - Money Tracker</title>
+    <title>Tạo ví - Money Tracker</title>
     <link rel="stylesheet" href="~/css/onboarding.css" />
 </head>
 <body class="onboarding-page">
@@ -21,9 +21,9 @@
 
         <div class="onboarding-content">
             <div class="step-header">
-                <span class="step-number">Step 2 of 4</span>
-                <h1 class="step-title">Create Your First Wallet</h1>
-                <p class="step-description">Set up your primary wallet to start tracking</p>
+                <span class="step-number">Bước 2 / 4</span>
+                <h1 class="step-title">Tạo ví đầu tiên của bạn</h1>
+                <p class="step-description">Thiết lập ví chính của bạn để bắt đầu theo dõi</p>
             </div>
 
             <form id="createWalletForm" class="onboarding-form">
@@ -31,42 +31,42 @@
                 <div class="form-group">
                     <label for="walletName" class="form-label">
                         <span class="label-icon">💼</span>
-                        Wallet Name
+                        Tên ví
                     </label>
                     <input 
                         type="text" 
                         id="walletName" 
                         name="walletName" 
                         class="form-input" 
-                        placeholder="e.g., Cash Wallet, Main Account"
-                        value="Cash Wallet"
+                        placeholder="ví dụ: Ví tiền mặt, Tài khoản chính"
+                        value="Ví tiền mặt"
                         maxlength="100"
                         required>
-                    <small class="form-hint">Give your wallet a memorable name</small>
+                    <small class="form-hint">Đặt tên dễ nhớ cho ví của bạn</small>
                 </div>
 
                 <!-- Wallet Type -->
                 <div class="form-group">
                     <label class="form-label">
                         <span class="label-icon">🏦</span>
-                        Wallet Type
+                        Loại ví
                     </label>
                     <div class="wallet-type-grid">
                         <div class="wallet-type-card active" data-type="0">
                             <div class="type-icon">💵</div>
-                            <div class="type-name">Cash</div>
+                            <div class="type-name">Tiền mặt</div>
                         </div>
                         <div class="wallet-type-card" data-type="1">
                             <div class="type-icon">🏦</div>
-                            <div class="type-name">Bank Account</div>
+                            <div class="type-name">Tài khoản ngân hàng</div>
                         </div>
                         <div class="wallet-type-card" data-type="2">
                             <div class="type-icon">💳</div>
-                            <div class="type-name">Credit Card</div>
+                            <div class="type-name">Thẻ tín dụng</div>
                         </div>
                         <div class="wallet-type-card" data-type="3">
                             <div class="type-icon">💰</div>
-                            <div class="type-name">Savings</div>
+                            <div class="type-name">Tiết kiệm</div>
                         </div>
                     </div>
                     <input type="hidden" id="walletType" name="walletType" value="0" required>
@@ -76,7 +76,7 @@
                 <div class="form-group">
                     <label for="initialBalance" class="form-label">
                         <span class="label-icon">💵</span>
-                        Initial Balance
+                        Số dư ban đầu
                     </label>
                     <div class="input-with-currency">
                         <input 
@@ -91,14 +91,14 @@
                             required>
                         <span class="currency-symbol" id="currencySymbol">₫</span>
                     </div>
-                    <small class="form-hint">Enter the current balance in this wallet</small>
+                    <small class="form-hint">Nhập số dư hiện tại trong ví này</small>
                 </div>
 
                 <!-- Color Picker -->
                 <div class="form-group">
                     <label class="form-label">
                         <span class="label-icon">🎨</span>
-                        Wallet Color
+                        Màu ví
                     </label>
                     <div class="color-picker">
                         <div class="color-option" data-color="#4CAF50" style="background: #4CAF50;">
@@ -119,10 +119,10 @@
                 <!-- Navigation buttons -->
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="window.location.href='/Onboarding/BasicSettings'">
-                        ← Back
+                        ← Quay lại
                     </button>
                     <button type="submit" class="btn-primary">
-                        Next →
+                        Tiếp theo →
                     </button>
                 </div>
             </form>

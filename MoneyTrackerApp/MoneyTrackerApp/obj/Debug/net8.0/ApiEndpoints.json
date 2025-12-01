@@ -2078,6 +2078,22 @@
   },
   {
     "ContainingType": "MoneyTrackerApp.Controllers.ReportController",
+    "Method": "ExportReport",
+    "RelativePath": "api/Report/export",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "MoneyTrackerApp.DTOs.ExportReportRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.ReportController",
     "Method": "ExportCashFlowExcel",
     "RelativePath": "api/Report/export/cashflow/excel",
     "HttpMethod": "GET",

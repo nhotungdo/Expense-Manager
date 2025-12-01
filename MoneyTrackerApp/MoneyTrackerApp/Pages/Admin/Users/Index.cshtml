@@ -2,26 +2,26 @@
 @model MoneyTrackerApp.Pages.Admin.Users.IndexModel
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "User Management";
+    ViewData["Title"] = "Quản lý người dùng";
 }
 
-<h2>User Management</h2>
+<h2>Quản lý người dùng</h2>
 
 <div class="card mb-4">
     <div class="card-body">
         <div class="row">
             <div class="col-md-4">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search by name, email, phone...">
+                <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo tên, email, số điện thoại...">
             </div>
             <div class="col-md-3">
                 <select id="statusFilter" class="form-select">
-                    <option value="">All Status</option>
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Không hoạt động</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-primary w-100" onclick="loadUsers()">Search</button>
+                <button class="btn btn-primary w-100" onclick="loadUsers()">Tìm kiếm</button>
             </div>
         </div>
     </div>
@@ -34,11 +34,11 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>User</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Joined</th>
-                        <th>Actions</th>
+                        <th>Người dùng</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tham gia</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="userTableBody">
@@ -59,7 +59,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">User Details</h5>
+                <h5 class="modal-title">Chi tiết người dùng</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="userDetailsContent">
@@ -103,16 +103,16 @@
                     <td><span class="badge bg-info text-dark">${u.roles.join(', ')}</span></td>
                     <td>
                         ${u.isActive 
-                            ? '<span class="badge bg-success">Active</span>' 
-                            : '<span class="badge bg-danger">Inactive</span>'}
-                        ${u.isLocked ? '<span class="badge bg-warning text-dark">Locked</span>' : ''}
+                            ? '<span class="badge bg-success">Hoạt động</span>' 
+                            : '<span class="badge bg-danger">Không hoạt động</span>'}
+                        ${u.isLocked ? '<span class="badge bg-warning text-dark">Bị khóa</span>' : ''}
                     </td>
-                    <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td>${new Date(u.createdAt).toLocaleDateString('vi-VN')}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary" onclick="viewUser(${u.id})">View</button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewUser(${u.id})">Xem</button>
                         ${u.isLocked 
-                            ? `<button class="btn btn-sm btn-success" onclick="unlockUser(${u.id})">Unlock</button>`
-                            : `<button class="btn btn-sm btn-warning" onclick="lockUser(${u.id})">Lock</button>`}
+                            ? `<button class="btn btn-sm btn-success" onclick="unlockUser(${u.id})">Mở khóa</button>`
+                            : `<button class="btn btn-sm btn-warning" onclick="lockUser(${u.id})">Khóa</button>`}
                     </td>
                 </tr>
             `).join('');
@@ -126,36 +126,36 @@
                 const content = `
                     <div class="row">
                         <div class="col-md-6">
-                            <h6>Basic Info</h6>
-                            <p><strong>Name:</strong> ${user.fullName}</p>
+                            <h6>Thông tin cơ bản</h6>
+                            <p><strong>Tên:</strong> ${user.fullName}</p>
                             <p><strong>Email:</strong> ${user.email}</p>
-                            <p><strong>Phone:</strong> ${user.phoneNumber || 'N/A'}</p>
-                            <p><strong>Role:</strong> ${user.roles.join(', ')}</p>
+                            <p><strong>Số điện thoại:</strong> ${user.phoneNumber || 'N/A'}</p>
+                            <p><strong>Vai trò:</strong> ${user.roles.join(', ')}</p>
                         </div>
                         <div class="col-md-6">
-                            <h6>Account Status</h6>
-                            <p><strong>Status:</strong> ${user.isActive ? 'Active' : 'Inactive'}</p>
-                            <p><strong>Last Login:</strong> ${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}</p>
-                            <p><strong>Locked:</strong> ${user.isLocked ? `Until ${new Date(user.lockoutEnd).toLocaleString()}` : 'No'}</p>
+                            <h6>Trạng thái tài khoản</h6>
+                            <p><strong>Trạng thái:</strong> ${user.isActive ? 'Hoạt động' : 'Không hoạt động'}</p>
+                            <p><strong>Đăng nhập lần cuối:</strong> ${user.lastLogin ? new Date(user.lastLogin).toLocaleString('vi-VN') : 'Chưa bao giờ'}</p>
+                            <p><strong>Bị khóa:</strong> ${user.isLocked ? `Đến ${new Date(user.lockoutEnd).toLocaleString('vi-VN')}` : 'Không'}</p>
                         </div>
                     </div>
                     <hr>
-                    <h6>Actions</h6>
+                    <h6>Hành động</h6>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-warning" onclick="resetPassword(${user.id})">Reset Password</button>
-                        <button class="btn btn-info" onclick="promoteUser(${user.id})">Change Role</button>
+                        <button class="btn btn-warning" onclick="resetPassword(${user.id})">Đặt lại mật khẩu</button>
+                        <button class="btn btn-info" onclick="promoteUser(${user.id})">Đổi vai trò</button>
                     </div>
                 `;
                 
                 document.getElementById('userDetailsContent').innerHTML = content;
                 new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
             } catch (error) {
-                alert('Error loading user details');
+                alert('Lỗi tải chi tiết người dùng');
             }
         }
 
         async function lockUser(id) {
-            if (!confirm('Are you sure you want to lock this user for 24 hours?')) return;
+            if (!confirm('Bạn có chắc chắn muốn khóa người dùng này trong 24 giờ không?')) return;
             await fetch(`/api/admin/users/${id}/lock`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -165,15 +165,15 @@
         }
 
         async function unlockUser(id) {
-            if (!confirm('Unlock this user?')) return;
+            if (!confirm('Mở khóa người dùng này?')) return;
             await fetch(`/api/admin/users/${id}/unlock`, { method: 'POST' });
             loadUsers(currentPage);
         }
         
         async function resetPassword(id) {
-            if (!confirm('Send password reset email to this user?')) return;
+            if (!confirm('Gửi email đặt lại mật khẩu cho người dùng này?')) return;
             await fetch(`/api/admin/users/${id}/reset-password`, { method: 'POST' });
-            alert('Password reset email queued.');
+            alert('Email đặt lại mật khẩu đã được thêm vào hàng đợi.');
         }
 
         document.addEventListener('DOMContentLoaded', () => loadUsers());

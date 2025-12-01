@@ -39,43 +39,43 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-page="/Home">
                                     <i class="nav-icon">🏠</i>
-                                    <span>Dashboard</span>
+                                    <span>Tổng quan</span>
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="nav-icon">💳</i>
-                                    <span>Transactions</span>
+                                    <span>Giao dịch</span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">➕</i> Add Transaction</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📋</i> All Transactions</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">➕</i> Thêm giao dịch</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📋</i> Tất cả giao dịch</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📊</i> Categories</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📊</i> Danh mục</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-page="/Reports">
                                     <i class="nav-icon">📈</i>
-                                    <span>Reports</span>
+                                    <span>Báo cáo</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-page="/Groups">
                                     <i class="nav-icon">👥</i>
-                                    <span>Groups</span>
+                                    <span>Nhóm</span>
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="nav-icon">🎯</i>
-                                    <span>Planning</span>
+                                    <span>Kế hoạch</span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💰</i> Budgets</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">🎯</i> Savings Goals</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💸</i> Debts</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📈</i> Investments</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💰</i> Ngân sách</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">🎯</i> Mục tiêu tiết kiệm</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💸</i> Khoản nợ</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">📈</i> Đầu tư</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -84,12 +84,12 @@
                         <div class="navbar-actions">
                             <!-- Search Bar -->
                             <div class="search-container">
-                                <input type="text" class="search-input" placeholder="Search transactions...">
+                                <input type="text" class="search-input" placeholder="Tìm kiếm giao dịch...">
                                 <i class="search-icon">🔍</i>
                             </div>
 
                             <!-- Quick Add Button -->
-                            <button class="btn-quick-add" title="Quick Add Transaction">
+                            <button class="btn-quick-add" title="Thêm nhanh giao dịch">
                                 <span>➕</span>
                             </button>
 
@@ -109,7 +109,7 @@
                                     </div>
                                     <div class="user-info">
                                         <span class="user-name">@User.Identity.Name</span>
-                                        <span class="user-role">Personal</span>
+                                        <span class="user-role">Cá nhân</span>
                                     </div>
                                     <i class="dropdown-arrow">▼</i>
                                 </a>
@@ -126,12 +126,12 @@
                                         </div>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" asp-page="/Profile/Index"><i class="dropdown-icon">👤</i> My Profile</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💼</i> My Wallets</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Settings/Index"><i class="dropdown-icon">⚙️</i> Settings</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">❓</i> Help & Support</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Profile/Index"><i class="dropdown-icon">👤</i> Hồ sơ của tôi</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💼</i> Ví của tôi</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Settings/Index"><i class="dropdown-icon">⚙️</i> Cài đặt</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">❓</i> Trợ giúp & Hỗ trợ</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" asp-page="/Auth/Logout"><i class="dropdown-icon">🚪</i> Logout</a></li>
+                                    <li><a class="dropdown-item text-danger" asp-page="/Auth/Logout"><i class="dropdown-icon">🚪</i> Đăng xuất</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -143,25 +143,25 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-page="/Index">
                                     <i class="nav-icon">🏠</i>
-                                    <span>Home</span>
+                                    <span>Trang chủ</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#features">
                                     <i class="nav-icon">✨</i>
-                                    <span>Features</span>
+                                    <span>Tính năng</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#pricing">
                                     <i class="nav-icon">💎</i>
-                                    <span>Pricing</span>
+                                    <span>Bảng giá</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#about">
                                     <i class="nav-icon">ℹ️</i>
-                                    <span>About</span>
+                                    <span>Giới thiệu</span>
                                 </a>
                             </li>
                         </ul>
@@ -170,11 +170,11 @@
                         <div class="auth-buttons">
                             <a class="btn btn-outline-light me-2" asp-page="/Auth/Login">
                                 <i class="btn-icon">🔑</i>
-                                <span>Login</span>
+                                <span>Đăng nhập</span>
                             </a>
                             <a class="btn btn-primary-gradient" asp-page="/Auth/Register">
                                 <i class="btn-icon">🚀</i>
-                                <span>Get Started</span>
+                                <span>Bắt đầu ngay</span>
                             </a>
                         </div>
                     }
@@ -194,13 +194,13 @@
             <div class="footer-content">
                 <div class="footer-left">
                     <span class="footer-logo">💰 MoneyTracker</span>
-                    <span class="footer-text">&copy; 2025 - All rights reserved</span>
+                    <span class="footer-text">&copy; 2025 - Đã đăng ký bản quyền</span>
                 </div>
                 <div class="footer-links">
-                    <a asp-page="/Privacy">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Contact Us</a>
-                    <a href="#">Help Center</a>
+                    <a asp-page="/Privacy">Chính sách bảo mật</a>
+                    <a href="#">Điều khoản dịch vụ</a>
+                    <a href="#">Liên hệ</a>
+                    <a href="#">Trung tâm trợ giúp</a>
                 </div>
             </div>
         </div>

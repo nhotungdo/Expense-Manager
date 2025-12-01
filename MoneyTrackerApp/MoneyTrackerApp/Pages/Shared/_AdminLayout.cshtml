@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Admin Panel</title>
+    <title>@ViewData["Title"] - Bảng quản trị</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -32,27 +32,27 @@
     <div class="d-flex">
         <div class="admin-sidebar col-md-2 d-none d-md-block">
             <div class="p-3">
-                <h4>Admin Panel</h4>
+                <h4>Bảng quản trị</h4>
             </div>
             <nav>
                 <a href="/Admin/Dashboard" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Dashboard") == true ? "active" : "")">
-                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    <i class="fas fa-tachometer-alt me-2"></i> Bảng điều khiển
                 </a>
                 <a href="/Admin/Users" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Users") == true ? "active" : "")">
-                    <i class="fas fa-users me-2"></i> User Management
+                    <i class="fas fa-users me-2"></i> Quản lý người dùng
                 </a>
                 <a href="/Admin/Settings" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
-                    <i class="fas fa-cogs me-2"></i> System Settings
+                    <i class="fas fa-cogs me-2"></i> Cài đặt hệ thống
                 </a>
                 <a href="/Admin/MasterData/Categories" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("MasterData") == true ? "active" : "")">
-                    <i class="fas fa-database me-2"></i> Master Data
+                    <i class="fas fa-database me-2"></i> Dữ liệu chính
                 </a>
                 <a href="/Admin/Monitoring/AuditLogs" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring") == true ? "active" : "")">
-                    <i class="fas fa-history me-2"></i> Audit Logs
+                    <i class="fas fa-history me-2"></i> Nhật ký kiểm toán
                 </a>
                 <hr />
                 <a href="/Home">
-                    <i class="fas fa-arrow-left me-2"></i> Back to App
+                    <i class="fas fa-arrow-left me-2"></i> Quay lại ứng dụng
                 </a>
             </nav>
         </div>
@@ -65,7 +65,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <span class="nav-link">Admin User</span>
+                                <span class="nav-link">Người dùng quản trị</span>
                             </li>
                         </ul>
                     </div>

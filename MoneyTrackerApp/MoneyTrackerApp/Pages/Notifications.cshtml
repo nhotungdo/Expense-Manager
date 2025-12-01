@@ -1,33 +1,33 @@
 @page
 @model MoneyTrackerApp.Pages.NotificationsModel
 @{
-    ViewData["Title"] = "Notifications";
+    ViewData["Title"] = "Thông báo";
 }
 
 <div class="notifications-container">
     <div class="page-header">
         <h1>
             <i class="fas fa-bell"></i>
-            Notifications
+            Thông báo
             <span id="unreadBadge" class="badge">0</span>
         </h1>
         <button class="btn btn-secondary" onclick="markAllAsRead()">
-            <i class="fas fa-check-double"></i> Mark All as Read
+            <i class="fas fa-check-double"></i> Đánh dấu tất cả là đã đọc
         </button>
     </div>
 
     <div class="notifications-filter">
         <button class="filter-btn active" onclick="filterNotifications('all')">
-            All Notifications
+            Tất cả thông báo
         </button>
         <button class="filter-btn" onclick="filterNotifications('unread')">
-            Unread Only
+            Chỉ chưa đọc
         </button>
     </div>
 
     <div id="notificationsList" class="notifications-list">
         <div class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+            <i class="fas fa-spinner fa-spin"></i> Đang tải thông báo...
         </div>
     </div>
 </div>
@@ -292,7 +292,7 @@
             displayNotifications(notifications);
         } catch (error) {
             console.error('Error loading notifications:', error);
-            document.getElementById('notificationsList').innerHTML = '<p class="error-message">Failed to load notifications</p>';
+            document.getElementById('notificationsList').innerHTML = '<p class="error-message">Không thể tải thông báo</p>';
         }
     }
 
@@ -326,7 +326,7 @@
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-bell-slash"></i>
-                    <p>No notifications yet</p>
+                    <p>Chưa có thông báo nào</p>
                 </div>
             `;
             return;
@@ -415,10 +415,10 @@
             // Reload notifications
             loadNotifications(currentFilter === 'unread');
             loadUnreadCount();
-            alert('All notifications marked as read');
+            alert('Đã đánh dấu tất cả thông báo là đã đọc');
         } catch (error) {
             console.error('Error marking all notifications as read:', error);
-            alert('Failed to mark all notifications as read');
+            alert('Không thể đánh dấu tất cả thông báo là đã đọc');
         }
     }
 
@@ -448,11 +448,20 @@
         for (const [unit, secondsInUnit] of Object.entries(intervals)) {
             const interval = Math.floor(seconds / secondsInUnit);
             if (interval >= 1) {
-                return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
+                // Vietnamese translation for time units
+                const unitVi = {
+                    year: 'năm',
+                    month: 'tháng',
+                    week: 'tuần',
+                    day: 'ngày',
+                    hour: 'giờ',
+                    minute: 'phút'
+                }[unit];
+                return `${interval} ${unitVi} trước`;
             }
         }
         
-        return 'Just now';
+        return 'Vừa xong';
     }
 
     // Utility functions

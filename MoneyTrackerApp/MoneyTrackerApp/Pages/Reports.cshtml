@@ -1,31 +1,31 @@
 @page
 @model MoneyTrackerApp.Pages.ReportsModel
 @{
-    ViewData["Title"] = "Reports & Analytics";
+    ViewData["Title"] = "Báo cáo & Phân tích";
 }
 
 <div class="reports-container">
     <div class="page-header">
         <h1>
             <i class="fas fa-chart-line"></i>
-            Reports & Analytics
+            Báo cáo & Phân tích
         </h1>
         <button class="btn btn-primary" onclick="showExportModal()">
-            <i class="fas fa-download"></i> Export Report
+            <i class="fas fa-download"></i> Xuất báo cáo
         </button>
     </div>
 
     <!-- Dashboard Overview -->
     <div class="dashboard-section">
-        <h2>Dashboard Overview</h2>
+        <h2>Tổng quan</h2>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <i class="fas fa-wallet"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-label">Current Balance</div>
-                    <div class="stat-value" id="currentBalance">Loading...</div>
+                    <div class="stat-label">Số dư hiện tại</div>
+                    <div class="stat-value" id="currentBalance">Đang tải...</div>
                 </div>
             </div>
 
@@ -34,8 +34,8 @@
                     <i class="fas fa-arrow-up"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-label">Monthly Income</div>
-                    <div class="stat-value" id="monthlyIncome">Loading...</div>
+                    <div class="stat-label">Thu nhập tháng</div>
+                    <div class="stat-value" id="monthlyIncome">Đang tải...</div>
                 </div>
             </div>
 
@@ -44,8 +44,8 @@
                     <i class="fas fa-arrow-down"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-label">Monthly Expense</div>
-                    <div class="stat-value" id="monthlyExpense">Loading...</div>
+                    <div class="stat-label">Chi tiêu tháng</div>
+                    <div class="stat-value" id="monthlyExpense">Đang tải...</div>
                 </div>
             </div>
 
@@ -54,8 +54,8 @@
                     <i class="fas fa-piggy-bank"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-label">Monthly Savings</div>
-                    <div class="stat-value" id="monthlySavings">Loading...</div>
+                    <div class="stat-label">Tiết kiệm tháng</div>
+                    <div class="stat-value" id="monthlySavings">Đang tải...</div>
                     <div class="stat-subtitle" id="savingsRate"></div>
                 </div>
             </div>
@@ -66,14 +66,14 @@
     <div class="charts-section">
         <div class="chart-container">
             <div class="chart-header">
-                <h3>Cash Flow (Last 7 Days)</h3>
+                <h3>Dòng tiền (7 ngày qua)</h3>
             </div>
             <canvas id="cashFlowChart"></canvas>
         </div>
 
         <div class="chart-container">
             <div class="chart-header">
-                <h3>Expense Breakdown</h3>
+                <h3>Phân tích chi tiêu</h3>
             </div>
             <canvas id="expensePieChart"></canvas>
         </div>
@@ -82,29 +82,29 @@
     <!-- Reports Section -->
     <div class="reports-section">
         <div class="tabs">
-            <button class="tab active" onclick="switchReportTab('cashflow')">Cash Flow</button>
-            <button class="tab" onclick="switchReportTab('trends')">Monthly Trends</button>
-            <button class="tab" onclick="switchReportTab('categories')">Category Breakdown</button>
-            <button class="tab" onclick="switchReportTab('ai')">AI Insights</button>
+            <button class="tab active" onclick="switchReportTab('cashflow')">Dòng tiền</button>
+            <button class="tab" onclick="switchReportTab('trends')">Xu hướng tháng</button>
+            <button class="tab" onclick="switchReportTab('categories')">Phân tích danh mục</button>
+            <button class="tab" onclick="switchReportTab('ai')">Thông tin chi tiết AI</button>
         </div>
 
         <!-- Cash Flow Report -->
         <div id="cashflowTab" class="tab-content active">
             <div class="report-filters">
                 <div class="filter-group">
-                    <label>Start Date:</label>
+                    <label>Ngày bắt đầu:</label>
                     <input type="date" id="cashflowStartDate" class="form-control" />
                 </div>
                 <div class="filter-group">
-                    <label>End Date:</label>
+                    <label>Ngày kết thúc:</label>
                     <input type="date" id="cashflowEndDate" class="form-control" />
                 </div>
                 <button class="btn btn-primary" onclick="loadCashFlowReport()">
-                    <i class="fas fa-search"></i> Generate
+                    <i class="fas fa-search"></i> Tạo báo cáo
                 </button>
             </div>
             <div id="cashflowReport" class="report-content">
-                <p class="info-message">Select date range and click Generate to view cash flow report</p>
+                <p class="info-message">Chọn khoảng thời gian và nhấp Tạo báo cáo để xem báo cáo dòng tiền</p>
             </div>
         </div>
 
@@ -112,7 +112,7 @@
         <div id="trendsTab" class="tab-content">
             <div class="report-filters">
                 <div class="filter-group">
-                    <label>Year:</label>
+                    <label>Năm:</label>
                     <select id="trendsYear" class="form-control">
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
@@ -120,11 +120,11 @@
                     </select>
                 </div>
                 <button class="btn btn-primary" onclick="loadMonthlyTrends()">
-                    <i class="fas fa-search"></i> Generate
+                    <i class="fas fa-search"></i> Tạo báo cáo
                 </button>
             </div>
             <div id="trendsReport" class="report-content">
-                <p class="info-message">Select year and click Generate to view monthly trends</p>
+                <p class="info-message">Chọn năm và nhấp Tạo báo cáo để xem xu hướng tháng</p>
             </div>
         </div>
 
@@ -132,19 +132,19 @@
         <div id="categoriesTab" class="tab-content">
             <div class="report-filters">
                 <div class="filter-group">
-                    <label>Start Date:</label>
+                    <label>Ngày bắt đầu:</label>
                     <input type="date" id="categoryStartDate" class="form-control" />
                 </div>
                 <div class="filter-group">
-                    <label>End Date:</label>
+                    <label>Ngày kết thúc:</label>
                     <input type="date" id="categoryEndDate" class="form-control" />
                 </div>
                 <button class="btn btn-primary" onclick="loadCategoryBreakdown()">
-                    <i class="fas fa-search"></i> Generate
+                    <i class="fas fa-search"></i> Tạo báo cáo
                 </button>
             </div>
             <div id="categoriesReport" class="report-content">
-                <p class="info-message">Select date range and click Generate to view category breakdown</p>
+                <p class="info-message">Chọn khoảng thời gian và nhấp Tạo báo cáo để xem phân tích danh mục</p>
             </div>
         </div>
 
@@ -152,13 +152,13 @@
         <div id="aiTab" class="tab-content">
             <div class="ai-section">
                 <div class="ai-header">
-                    <h3><i class="fas fa-robot"></i> AI Financial Advisor</h3>
+                    <h3><i class="fas fa-robot"></i> Cố vấn tài chính AI</h3>
                     <button class="btn btn-primary" onclick="generateAiSuggestions()">
-                        <i class="fas fa-sync"></i> Generate New Insights
+                        <i class="fas fa-sync"></i> Tạo thông tin chi tiết mới
                     </button>
                 </div>
                 <div id="aiSuggestions" class="ai-suggestions">
-                    <p class="info-message">Loading AI insights...</p>
+                    <p class="info-message">Đang tải thông tin chi tiết AI...</p>
                 </div>
             </div>
         </div>
@@ -168,30 +168,30 @@
     <div id="exportModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeExportModal()">&times;</span>
-            <h2>Export Report</h2>
+            <h2>Xuất báo cáo</h2>
             <form id="exportForm">
                 <div class="form-group">
-                    <label>Report Type *</label>
+                    <label>Loại báo cáo *</label>
                     <select id="exportReportType" class="form-control" required>
-                        <option value="1">Cash Flow Report</option>
-                        <option value="3">Category Breakdown</option>
-                        <option value="4">Monthly Trends</option>
+                        <option value="1">Báo cáo dòng tiền</option>
+                        <option value="3">Phân tích danh mục</option>
+                        <option value="4">Xu hướng tháng</option>
                     </select>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Start Date *</label>
+                        <label>Ngày bắt đầu *</label>
                         <input type="date" id="exportStartDate" class="form-control" required />
                     </div>
                     <div class="form-group">
-                        <label>End Date *</label>
+                        <label>Ngày kết thúc *</label>
                         <input type="date" id="exportEndDate" class="form-control" required />
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>File Format *</label>
+                    <label>Định dạng tệp *</label>
                     <select id="exportFileFormat" class="form-control" required>
                         <option value="1">PDF</option>
                         <option value="2">Excel (XLSX)</option>
@@ -201,9 +201,9 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeExportModal()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeExportModal()">Hủy</button>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-download"></i> Export
+                        <i class="fas fa-download"></i> Xuất
                     </button>
                 </div>
             </form>
@@ -695,7 +695,7 @@
         document.getElementById('monthlyIncome').textContent = formatCurrency(data.monthlyIncome) + ' VND';
         document.getElementById('monthlyExpense').textContent = formatCurrency(data.monthlyExpense) + ' VND';
         document.getElementById('monthlySavings').textContent = formatCurrency(data.monthlySavings) + ' VND';
-        document.getElementById('savingsRate').textContent = `${data.savingsRate.toFixed(1)}% savings rate`;
+        document.getElementById('savingsRate').textContent = `${data.savingsRate.toFixed(1)}% tỷ lệ tiết kiệm`;
 
         // Create cash flow chart
         if (cashFlowChart) cashFlowChart.destroy();
@@ -706,14 +706,14 @@
                 labels: data.cashFlowChart.labels,
                 datasets: [
                     {
-                        label: 'Income',
+                        label: 'Thu nhập',
                         data: data.cashFlowChart.incomeData,
                         borderColor: '#4CAF50',
                         backgroundColor: 'rgba(76, 175, 80, 0.1)',
                         tension: 0.4
                     },
                     {
-                        label: 'Expense',
+                        label: 'Chi tiêu',
                         data: data.cashFlowChart.expenseData,
                         borderColor: '#f44336',
                         backgroundColor: 'rgba(244, 67, 54, 0.1)',
@@ -761,7 +761,7 @@
         const endDate = document.getElementById('cashflowEndDate').value;
 
         if (!startDate || !endDate) {
-            alert('Please select both start and end dates');
+            alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc');
             return;
         }
 
@@ -778,7 +778,7 @@
             displayCashFlowReport(data);
         } catch (error) {
             console.error('Error loading cash flow report:', error);
-            document.getElementById('cashflowReport').innerHTML = '<p class="error-message">Failed to load report</p>';
+            document.getElementById('cashflowReport').innerHTML = '<p class="error-message">Không thể tải báo cáo</p>';
         }
     }
 
@@ -788,22 +788,22 @@
         container.innerHTML = `
             <div class="report-summary">
                 <div class="summary-card">
-                    <div class="summary-label">Total Income</div>
+                    <div class="summary-label">Tổng thu nhập</div>
                     <div class="summary-value" style="color: #4CAF50;">${formatCurrency(data.totalIncome)}</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-label">Total Expense</div>
+                    <div class="summary-label">Tổng chi tiêu</div>
                     <div class="summary-value" style="color: #f44336;">${formatCurrency(data.totalExpense)}</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-label">Net Cash Flow</div>
+                    <div class="summary-label">Dòng tiền ròng</div>
                     <div class="summary-value" style="color: ${data.netCashFlow >= 0 ? '#4CAF50' : '#f44336'};">
                         ${formatCurrency(data.netCashFlow)}
                     </div>
                 </div>
             </div>
 
-            <h4>Income Breakdown</h4>
+            <h4>Phân tích thu nhập</h4>
             <ul class="category-list">
                 ${data.incomeItems.map(item => `
                     <li class="category-item">
@@ -818,7 +818,7 @@
                 `).join('')}
             </ul>
 
-            <h4 style="margin-top: 30px;">Expense Breakdown</h4>
+            <h4 style="margin-top: 30px;">Phân tích chi tiêu</h4>
             <ul class="category-list">
                 ${data.expenseItems.map(item => `
                     <li class="category-item">
@@ -851,7 +851,7 @@
             displayMonthlyTrends(data);
         } catch (error) {
             console.error('Error loading monthly trends:', error);
-            document.getElementById('trendsReport').innerHTML = '<p class="error-message">Failed to load report</p>';
+            document.getElementById('trendsReport').innerHTML = '<p class="error-message">Không thể tải báo cáo</p>';
         }
     }
 
@@ -864,15 +864,15 @@
         container.innerHTML = `
             <div class="report-summary">
                 <div class="summary-card">
-                    <div class="summary-label">Average Income</div>
+                    <div class="summary-label">Thu nhập trung bình</div>
                     <div class="summary-value">${formatCurrency(data.averageIncome)}</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-label">Average Expense</div>
+                    <div class="summary-label">Chi tiêu trung bình</div>
                     <div class="summary-value">${formatCurrency(data.averageExpense)}</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-label">Trend</div>
+                    <div class="summary-label">Xu hướng</div>
                     <div class="summary-value">
                         <span class="trend-indicator ${trendClass}">
                             ${data.trend}
@@ -894,12 +894,12 @@
                 labels: data.monthlyData.map(m => m.monthName),
                 datasets: [
                     {
-                        label: 'Income',
+                        label: 'Thu nhập',
                         data: data.monthlyData.map(m => m.income),
                         backgroundColor: 'rgba(76, 175, 80, 0.7)'
                     },
                     {
-                        label: 'Expense',
+                        label: 'Chi tiêu',
                         data: data.monthlyData.map(m => m.expense),
                         backgroundColor: 'rgba(244, 67, 54, 0.7)'
                     }
@@ -922,7 +922,7 @@
         const endDate = document.getElementById('categoryEndDate').value;
 
         if (!startDate || !endDate) {
-            alert('Please select both start and end dates');
+            alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc');
             return;
         }
 
@@ -939,7 +939,7 @@
             displayCategoryBreakdown(data);
         } catch (error) {
             console.error('Error loading category breakdown:', error);
-            document.getElementById('categoriesReport').innerHTML = '<p class="error-message">Failed to load report</p>';
+            document.getElementById('categoriesReport').innerHTML = '<p class="error-message">Không thể tải báo cáo</p>';
         }
     }
 
@@ -949,16 +949,16 @@
         container.innerHTML = `
             <div class="report-summary">
                 <div class="summary-card">
-                    <div class="summary-label">Total Income</div>
+                    <div class="summary-label">Tổng thu nhập</div>
                     <div class="summary-value" style="color: #4CAF50;">${formatCurrency(data.totalIncome)}</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-label">Total Expense</div>
+                    <div class="summary-label">Tổng chi tiêu</div>
                     <div class="summary-value" style="color: #f44336;">${formatCurrency(data.totalExpense)}</div>
                 </div>
             </div>
 
-            <h4>Income Categories</h4>
+            <h4>Danh mục thu nhập</h4>
             <ul class="category-list">
                 ${data.incomeCategories.map(cat => `
                     <li class="category-item">
@@ -967,7 +967,7 @@
                         </div>
                         <div class="category-info">
                             <div class="category-name">${escapeHtml(cat.categoryName)}</div>
-                            <div class="category-count">${cat.transactionCount} transactions</div>
+                            <div class="category-count">${cat.transactionCount} giao dịch</div>
                         </div>
                         <div class="category-amount">
                             <div class="category-value">${formatCurrency(cat.amount)}</div>
@@ -977,7 +977,7 @@
                 `).join('')}
             </ul>
 
-            <h4 style="margin-top: 30px;">Expense Categories</h4>
+            <h4 style="margin-top: 30px;">Danh mục chi tiêu</h4>
             <ul class="category-list">
                 ${data.expenseCategories.map(cat => `
                     <li class="category-item">
@@ -986,7 +986,7 @@
                         </div>
                         <div class="category-info">
                             <div class="category-name">${escapeHtml(cat.categoryName)}</div>
-                            <div class="category-count">${cat.transactionCount} transactions</div>
+                            <div class="category-count">${cat.transactionCount} giao dịch</div>
                         </div>
                         <div class="category-amount">
                             <div class="category-value">${formatCurrency(cat.amount)}</div>
@@ -1012,7 +1012,7 @@
             displayAiSuggestions(suggestions);
         } catch (error) {
             console.error('Error loading AI suggestions:', error);
-            document.getElementById('aiSuggestions').innerHTML = '<p class="error-message">Failed to load AI insights</p>';
+            document.getElementById('aiSuggestions').innerHTML = '<p class="error-message">Không thể tải thông tin chi tiết AI</p>';
         }
     }
 
@@ -1020,7 +1020,7 @@
         const container = document.getElementById('aiSuggestions');
         
         if (suggestions.length === 0) {
-            container.innerHTML = '<p class="info-message">No AI insights available yet. Click "Generate New Insights" to analyze your spending patterns.</p>';
+            container.innerHTML = '<p class="info-message">Chưa có thông tin chi tiết AI. Nhấp "Tạo thông tin chi tiết mới" để phân tích thói quen chi tiêu của bạn.</p>';
             return;
         }
 
@@ -1044,11 +1044,11 @@
 
             if (!response.ok) throw new Error('Failed to generate AI suggestions');
 
-            alert('AI insights generated successfully!');
+            alert('Đã tạo thông tin chi tiết AI thành công!');
             loadAiSuggestions();
         } catch (error) {
             console.error('Error generating AI suggestions:', error);
-            alert('Failed to generate AI insights');
+            alert('Không thể tạo thông tin chi tiết AI');
         }
     }
 
@@ -1090,14 +1090,43 @@
                 body: JSON.stringify(data)
             });
 
-            if (!response.ok) throw new Error('Failed to export report');
+            if (!response.ok) {
+                let errorMessage = 'Không thể xuất báo cáo';
+                try {
+                    const error = await response.json();
+                    errorMessage = error.message || errorMessage;
+                } catch (e) {
+                    // Ignore JSON parse error if response is not JSON
+                }
+                throw new Error(errorMessage);
+            }
 
-            const result = await response.json();
-            alert('Report exported successfully! File path: ' + result.filePath);
+            // Handle file download
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Try to get filename from Content-Disposition header
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let fileName = 'report.csv';
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                if (filenameMatch && filenameMatch[1]) {
+                    fileName = filenameMatch[1].replace(/['"]/g, '');
+                }
+            }
+            
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
             closeExportModal();
         } catch (error) {
             console.error('Error exporting report:', error);
-            alert('Failed to export report');
+            alert(error.message || 'Không thể xuất báo cáo');
         }
     });
 

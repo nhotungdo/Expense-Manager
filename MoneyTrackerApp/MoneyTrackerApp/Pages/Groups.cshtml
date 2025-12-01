@@ -1,24 +1,24 @@
 @page
 @model MoneyTrackerApp.Pages.GroupsModel
 @{
-    ViewData["Title"] = "Group Expenses & Split Bills";
+    ViewData["Title"] = "Chi tiêu nhóm & Chia hóa đơn";
 }
 
 <div class="groups-container">
     <div class="page-header">
         <h1>
             <i class="fas fa-users"></i>
-            Group Expenses & Split Bills
+            Chi tiêu nhóm & Chia hóa đơn
         </h1>
         <button class="btn btn-primary" onclick="showCreateGroupModal()">
-            <i class="fas fa-plus"></i> Create New Group
+            <i class="fas fa-plus"></i> Tạo nhóm mới
         </button>
     </div>
 
     <!-- Groups List -->
     <div id="groupsList" class="groups-grid">
         <div class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i> Loading groups...
+            <i class="fas fa-spinner fa-spin"></i> Đang tải nhóm...
         </div>
     </div>
 
@@ -36,37 +36,37 @@
     <div id="createGroupModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeCreateGroupModal()">&times;</span>
-            <h2 id="groupModalTitle">Create New Group</h2>
+            <h2 id="groupModalTitle">Tạo nhóm mới</h2>
             <form id="groupForm">
                 <input type="hidden" id="groupId" />
                 
                 <div class="form-group">
-                    <label for="groupName">Group Name *</label>
+                    <label for="groupName">Tên nhóm *</label>
                     <input type="text" id="groupName" class="form-control" required maxlength="100" />
                 </div>
 
                 <div class="form-group">
-                    <label for="groupDescription">Description</label>
+                    <label for="groupDescription">Mô tả</label>
                     <textarea id="groupDescription" class="form-control" rows="3" maxlength="500"></textarea>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="groupIcon">Icon</label>
+                        <label for="groupIcon">Biểu tượng</label>
                         <select id="groupIcon" class="form-control">
-                            <option value="🏠">🏠 Home</option>
-                            <option value="✈️">✈️ Travel</option>
-                            <option value="🍕">🍕 Food</option>
-                            <option value="🎉">🎉 Party</option>
-                            <option value="🏖️">🏖️ Vacation</option>
-                            <option value="💼">💼 Business</option>
-                            <option value="🎓">🎓 Education</option>
-                            <option value="⚽">⚽ Sports</option>
+                            <option value="🏠">🏠 Nhà</option>
+                            <option value="✈️">✈️ Du lịch</option>
+                            <option value="🍕">🍕 Ăn uống</option>
+                            <option value="🎉">🎉 Tiệc tùng</option>
+                            <option value="🏖️">🏖️ Nghỉ mát</option>
+                            <option value="💼">💼 Công việc</option>
+                            <option value="🎓">🎓 Giáo dục</option>
+                            <option value="⚽">⚽ Thể thao</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="groupColor">Color</label>
+                        <label for="groupColor">Màu sắc</label>
                         <input type="color" id="groupColor" class="form-control" value="#4CAF50" />
                     </div>
                 </div>
@@ -74,13 +74,13 @@
                 <div class="form-group">
                     <label>
                         <input type="checkbox" id="groupIsPublic" checked />
-                        Public Group
+                        Nhóm công khai
                     </label>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeCreateGroupModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Group</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateGroupModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu nhóm</button>
                 </div>
             </form>
         </div>
@@ -90,23 +90,23 @@
     <div id="addTransactionModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAddTransactionModal()">&times;</span>
-            <h2>Add Group Expense</h2>
+            <h2>Thêm chi tiêu nhóm</h2>
             <form id="transactionForm">
                 <input type="hidden" id="transactionGroupId" />
                 
                 <div class="form-group">
-                    <label for="transactionDescription">Description *</label>
+                    <label for="transactionDescription">Mô tả *</label>
                     <input type="text" id="transactionDescription" class="form-control" required maxlength="500" />
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="transactionAmount">Amount *</label>
+                        <label for="transactionAmount">Số tiền *</label>
                         <input type="number" id="transactionAmount" class="form-control" required min="0.01" step="0.01" />
                     </div>
 
                     <div class="form-group">
-                        <label for="transactionCurrency">Currency</label>
+                        <label for="transactionCurrency">Đơn vị tiền tệ</label>
                         <select id="transactionCurrency" class="form-control">
                             <option value="VND">VND</option>
                             <option value="USD">USD</option>
@@ -117,21 +117,21 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="transactionDate">Date</label>
+                        <label for="transactionDate">Ngày</label>
                         <input type="date" id="transactionDate" class="form-control" />
                     </div>
 
                     <div class="form-group">
-                        <label for="transactionCategory">Category</label>
+                        <label for="transactionCategory">Danh mục</label>
                         <input type="text" id="transactionCategory" class="form-control" maxlength="100" />
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="splitMethod">Split Method *</label>
+                    <label for="splitMethod">Phương thức chia *</label>
                     <select id="splitMethod" class="form-control">
-                        <option value="1">Split Equally</option>
-                        <option value="2">Custom Amounts</option>
+                        <option value="1">Chia đều</option>
+                        <option value="2">Số tiền tùy chỉnh</option>
                     </select>
                 </div>
 
@@ -140,8 +140,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeAddTransactionModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Expense</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddTransactionModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm chi tiêu</button>
                 </div>
             </form>
         </div>
@@ -522,7 +522,7 @@
             displayGroups(groups);
         } catch (error) {
             console.error('Error loading groups:', error);
-            document.getElementById('groupsList').innerHTML = '<p class="error-message">Failed to load groups. Please try again.</p>';
+            document.getElementById('groupsList').innerHTML = '<p class="error-message">Không thể tải nhóm. Vui lòng thử lại.</p>';
         }
     }
 
@@ -530,7 +530,7 @@
         const container = document.getElementById('groupsList');
         
         if (groups.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #666;">No groups yet. Create your first group to start splitting expenses!</p>';
+            container.innerHTML = '<p style="text-align: center; color: #666;">Chưa có nhóm nào. Tạo nhóm đầu tiên để bắt đầu chia sẻ chi tiêu!</p>';
             return;
         }
 
@@ -540,16 +540,16 @@
                     <div class="group-icon">${group.icon || '👥'}</div>
                     <div class="group-info">
                         <h3>${escapeHtml(group.name)}</h3>
-                        <p>${escapeHtml(group.description || 'No description')}</p>
+                        <p>${escapeHtml(group.description || 'Không có mô tả')}</p>
                     </div>
                 </div>
                 <div class="group-stats">
                     <div class="stat-item">
-                        <div class="stat-label">Members</div>
+                        <div class="stat-label">Thành viên</div>
                         <div class="stat-value">${group.memberCount}</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">Total Expenses</div>
+                        <div class="stat-label">Tổng chi tiêu</div>
                         <div class="stat-value">${formatCurrency(group.totalExpenses)}</div>
                     </div>
                 </div>
@@ -574,7 +574,7 @@
             document.getElementById('groupDetailsModal').style.display = 'block';
         } catch (error) {
             console.error('Error loading group details:', error);
-            alert('Failed to load group details');
+            alert('Không thể tải chi tiết nhóm');
         }
     }
 
@@ -591,22 +591,22 @@
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="showAddTransactionModal(${group.id})">
-                        <i class="fas fa-plus"></i> Add Expense
+                        <i class="fas fa-plus"></i> Thêm chi tiêu
                     </button>
                 </div>
 
                 <div class="tabs">
-                    <button class="tab active" onclick="switchTab('transactions')">Transactions</button>
-                    <button class="tab" onclick="switchTab('balances')">Balances</button>
-                    <button class="tab" onclick="switchTab('members')">Members</button>
+                    <button class="tab active" onclick="switchTab('transactions')">Giao dịch</button>
+                    <button class="tab" onclick="switchTab('balances')">Số dư</button>
+                    <button class="tab" onclick="switchTab('members')">Thành viên</button>
                 </div>
 
                 <div id="transactionsTab" class="tab-content active">
-                    <div id="transactionsList">Loading...</div>
+                    <div id="transactionsList">Đang tải...</div>
                 </div>
 
                 <div id="balancesTab" class="tab-content">
-                    <div id="balancesList">Loading...</div>
+                    <div id="balancesList">Đang tải...</div>
                 </div>
 
                 <div id="membersTab" class="tab-content">
@@ -614,7 +614,7 @@
                         ${group.members.map(member => `
                             <div class="balance-item">
                                 <span>${escapeHtml(member.userName)} (${member.role})</span>
-                                <span style="color: #666; font-size: 13px;">Joined ${new Date(member.joinedAt).toLocaleDateString()}</span>
+                                <span style="color: #666; font-size: 13px;">Đã tham gia ${new Date(member.joinedAt).toLocaleDateString()}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -640,7 +640,7 @@
             displayTransactions(transactions);
         } catch (error) {
             console.error('Error loading transactions:', error);
-            document.getElementById('transactionsList').innerHTML = '<p class="error-message">Failed to load transactions</p>';
+            document.getElementById('transactionsList').innerHTML = '<p class="error-message">Không thể tải giao dịch</p>';
         }
     }
 
@@ -648,7 +648,7 @@
         const container = document.getElementById('transactionsList');
         
         if (transactions.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #666;">No transactions yet</p>';
+            container.innerHTML = '<p style="text-align: center; color: #666;">Chưa có giao dịch nào</p>';
             return;
         }
 
@@ -658,7 +658,7 @@
                     <li class="transaction-item">
                         <div class="transaction-info">
                             <h4>${escapeHtml(tx.description)}</h4>
-                            <p>Paid by ${escapeHtml(tx.paidByUserName)} • ${new Date(tx.transactionDate).toLocaleDateString()}</p>
+                            <p>Trả bởi ${escapeHtml(tx.paidByUserName)} • ${new Date(tx.transactionDate).toLocaleDateString()}</p>
                         </div>
                         <div class="transaction-amount">${formatCurrency(tx.amount)} ${tx.currency}</div>
                     </li>
@@ -681,7 +681,7 @@
             displayBalances(data);
         } catch (error) {
             console.error('Error loading balances:', error);
-            document.getElementById('balancesList').innerHTML = '<p class="error-message">Failed to load balances</p>';
+            document.getElementById('balancesList').innerHTML = '<p class="error-message">Không thể tải số dư</p>';
         }
     }
 
@@ -690,7 +690,7 @@
         
         container.innerHTML = `
             <div class="balance-summary">
-                <h3 style="margin-top: 0;">Member Balances</h3>
+                <h3 style="margin-top: 0;">Số dư thành viên</h3>
                 ${data.memberBalances.map(balance => `
                     <div class="balance-item">
                         <span>${escapeHtml(balance.userName)}</span>
@@ -702,19 +702,19 @@
             </div>
 
             ${data.settlements.length > 0 ? `
-                <h3>Suggested Settlements</h3>
+                <h3>Đề xuất thanh toán</h3>
                 <ul class="settlement-list">
                     ${data.settlements.map(settlement => `
                         <li class="settlement-item">
                             <p>
-                                <strong>${escapeHtml(settlement.fromUserName)}</strong> should pay 
-                                <span class="settlement-amount">${formatCurrency(settlement.amount)}</span> to 
+                                <strong>${escapeHtml(settlement.fromUserName)}</strong> nên trả 
+                                <span class="settlement-amount">${formatCurrency(settlement.amount)}</span> cho 
                                 <strong>${escapeHtml(settlement.toUserName)}</strong>
                             </p>
                         </li>
                     `).join('')}
                 </ul>
-            ` : '<p style="text-align: center; color: #666;">All settled up! 🎉</p>'}
+            ` : '<p style="text-align: center; color: #666;">Đã thanh toán xong! 🎉</p>'}
         `;
     }
 
@@ -731,7 +731,7 @@
     }
 
     function showCreateGroupModal() {
-        document.getElementById('groupModalTitle').textContent = 'Create New Group';
+        document.getElementById('groupModalTitle').textContent = 'Tạo nhóm mới';
         document.getElementById('groupForm').reset();
         document.getElementById('groupId').value = '';
         document.getElementById('createGroupModal').style.display = 'block';
@@ -791,10 +791,10 @@
 
             closeCreateGroupModal();
             loadGroups();
-            alert('Group saved successfully!');
+            alert('Đã lưu nhóm thành công!');
         } catch (error) {
             console.error('Error saving group:', error);
-            alert('Failed to save group');
+            alert('Không thể lưu nhóm');
         }
     });
 
@@ -827,10 +827,10 @@
             if (currentGroupId) {
                 showGroupDetails(currentGroupId);
             }
-            alert('Transaction added successfully!');
+            alert('Đã thêm giao dịch thành công!');
         } catch (error) {
             console.error('Error adding transaction:', error);
-            alert('Failed to add transaction');
+            alert('Không thể thêm giao dịch');
         }
     });
 

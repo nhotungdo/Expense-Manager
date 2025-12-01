@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MoneyTrackerApp.Pages
+namespace MoneyTrackerApp.Pages.Transactions
 {
-    public class TransactionsModel : PageModel
+    public class IndexModel : PageModel
     {
         public void OnGet()
         {
