@@ -1265,6 +1265,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "MoneyTrackerApp.Controllers.CategoriesController",
+    "Method": "GetUserCategories",
+    "RelativePath": "api/Categories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "type",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "MoneyTrackerApp.Controllers.CurrencyController",
     "Method": "ConvertCurrency",
     "RelativePath": "api/Currency/convert",
@@ -1738,6 +1754,38 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.OcrController",
+    "Method": "Process",
+    "RelativePath": "api/Ocr/process",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MoneyTrackerApp.DTOs.OcrReceiptDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.OcrController",
+    "Method": "Upload",
+    "RelativePath": "api/Ocr/upload",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "MoneyTrackerApp.Controllers.OnboardingController",

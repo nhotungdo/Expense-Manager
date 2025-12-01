@@ -10,7 +10,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0 text-gray-800 fw-bold">Dashboard</h1>
-            <p class="text-muted mb-0">Welcome back, <span id="userName" class="fw-bold">User</span>! Here's your financial overview.</p>
+            <p class="text-muted mb-0">Welcome back, <span id="userName" class="fw-bold">User</span>! Here's your
+                financial overview.</p>
         </div>
         <div class="d-flex gap-2">
             <button class="btn btn-outline-primary" onclick="loadDashboardData()">
@@ -49,7 +50,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Income (Monthly)</div>
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Income (Monthly)
+                            </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="monthlyIncome">Loading...</div>
                         </div>
                         <div class="col-auto">
@@ -68,7 +70,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Expense (Monthly)</div>
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Expense (Monthly)
+                            </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="monthlyExpense">Loading...</div>
                         </div>
                         <div class="col-auto">
@@ -106,7 +109,8 @@
         <!-- Cash Flow Chart -->
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4 h-100">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
                     <h6 class="m-0 font-weight-bold text-primary">Cash Flow Overview (Last 7 Days)</h6>
                 </div>
                 <div class="card-body">
@@ -120,7 +124,8 @@
         <!-- Expense Breakdown Pie Chart -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4 h-100">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
                     <h6 class="m-0 font-weight-bold text-primary">Top Expenses</h6>
                 </div>
                 <div class="card-body">
@@ -179,7 +184,66 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Transaction form will be implemented here.</p>
+                <form id="addTransactionForm">
+                    <div class="mb-3">
+                                        <label for="accountSelect" class="form-label">Account</label>
+                                        <select id="accountSelect" class="form-select" required>
+                                            <option value="">Loading accounts...</option>
+                                        </select>
+                                        <div class="invalid-feedback" id="accountError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transactionType" class="form-label">Type</label>
+                        <select id="transactionType" class="form-select">
+                            <option value="2">Expense</option>
+                            <option value="1">Income</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select id="parentCategorySelect" class="form-select">
+                            <option value="">Loading categories...</option>
+                        </select>
+                        <select id="childCategorySelect" class="form-select mt-2 d-none">
+                            <option value="">Select subcategory...</option>
+                        </select>
+                        <div class="invalid-feedback" id="categoryError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amountInput" class="form-label">Amount</label>
+                        <input id="amountInput" type="number" step="0.01" class="form-control" required />
+                        <div class="invalid-feedback" id="amountError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="currencyInput" class="form-label">Currency</label>
+                        <input id="currencyInput" type="text" class="form-control" value="VND" maxlength="3" required />
+                        <div class="invalid-feedback" id="currencyError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateInput" class="form-label">Date</label>
+                        <input id="dateInput" type="date" class="form-control" required />
+                        <div class="invalid-feedback" id="dateError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="noteInput" class="form-label">Note</label>
+                        <input id="noteInput" type="text" class="form-control" maxlength="512" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="receiptFileInput" class="form-label">Attach Receipt (optional)</label>
+                        <input id="receiptFileInput" type="file" accept="image/*" class="form-control" />
+                        <img id="receiptPreview" src="#" class="img-fluid mt-2 d-none" style="max-height:200px;" />
+                        <div class="d-flex align-items-center mt-2">
+                            <div id="receiptScanStatus" class="small text-muted"></div>
+                            <div id="receiptSpinner" class="spinner-border spinner-border-sm text-primary ms-2 d-none" role="status"><span class="visually-hidden">Loading...</span></div>
+                        </div>
+                        <input type="hidden" id="attachmentUrl" />
+                        <input type="hidden" id="ocrText" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="submitAddTransaction" class="btn btn-primary">Save Transaction</button>
             </div>
         </div>
     </div>
@@ -195,33 +259,42 @@
         justify-content: center;
         font-size: 1.5rem;
     }
+
     .card {
         border: none;
         border-radius: 0.75rem;
     }
+
     .shadow {
-        box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15)!important;
+        box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
     }
+
     .text-gray-800 {
-        color: #5a5c69!important;
+        color: #5a5c69 !important;
     }
+
     .text-gray-300 {
-        color: #dddfeb!important;
+        color: #dddfeb !important;
     }
+
     .border-left-primary {
-        border-left: .25rem solid #4e73df!important;
+        border-left: .25rem solid #4e73df !important;
     }
+
     .border-left-success {
-        border-left: .25rem solid #1cc88a!important;
+        border-left: .25rem solid #1cc88a !important;
     }
+
     .border-left-info {
-        border-left: .25rem solid #36b9cc!important;
+        border-left: .25rem solid #36b9cc !important;
     }
+
     .border-left-warning {
-        border-left: .25rem solid #f6c23e!important;
+        border-left: .25rem solid #f6c23e !important;
     }
+
     .border-left-danger {
-        border-left: .25rem solid #e74a3b!important;
+        border-left: .25rem solid #e74a3b !important;
     }
 </style>
 
@@ -246,7 +319,7 @@
                 renderExpensePieChart(data.expensePieChart);
                 renderRecentTransactions(data.recentTransactions);
                 renderBudgetAlerts(data.budgetAlerts);
-                
+
                 // Set user name if available (from layout or token)
                 // document.getElementById('userName').textContent = ...; 
             } catch (error) {
@@ -263,7 +336,7 @@
 
         function renderCashFlowChart(chartData) {
             const ctx = document.getElementById('cashFlowChart').getContext('2d');
-            
+
             if (cashFlowChartInstance) cashFlowChartInstance.destroy();
 
             cashFlowChartInstance = new Chart(ctx, {
@@ -303,7 +376,7 @@
 
         function renderExpensePieChart(chartData) {
             const ctx = document.getElementById('expensePieChart').getContext('2d');
-            
+
             if (expensePieChartInstance) expensePieChartInstance.destroy();
 
             if (!chartData || chartData.length === 0) {
@@ -331,10 +404,10 @@
 
             // Custom Legend
             const legendHtml = chartData.map(d => `
-                <span class="mr-2">
-                    <i class="fas fa-circle" style="color: ${d.color || '#4e73df'}"></i> ${d.label}
-                </span>
-            `).join(' ');
+                        <span class="mr-2">
+                            <i class="fas fa-circle" style="color: ${d.color || '#4e73df'}"></i> ${d.label}
+                        </span>
+                    `).join(' ');
             document.getElementById('expenseLegend').innerHTML = legendHtml;
         }
 
@@ -346,21 +419,21 @@
             }
 
             container.innerHTML = transactions.map(t => `
-                <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-circle bg-light text-primary me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
-                            ${t.categoryIcon || '📄'}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-circle bg-light text-primary me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                    ${t.categoryIcon || '📄'}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">${t.description}</div>
+                                    <div class="small text-muted">${new Date(t.date).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <div class="fw-bold ${t.type === 'Income' ? 'text-success' : 'text-danger'}">
+                                ${t.type === 'Income' ? '+' : '-'} ${formatCurrency(t.amount)}
+                            </div>
                         </div>
-                        <div>
-                            <div class="fw-bold text-dark">${t.description}</div>
-                            <div class="small text-muted">${new Date(t.date).toLocaleDateString()}</div>
-                        </div>
-                    </div>
-                    <div class="fw-bold ${t.type === 'Income' ? 'text-success' : 'text-danger'}">
-                        ${t.type === 'Income' ? '+' : '-'} ${formatCurrency(t.amount)}
-                    </div>
-                </div>
-            `).join('');
+                    `).join('');
         }
 
         function renderBudgetAlerts(alerts) {
@@ -371,19 +444,19 @@
             }
 
             container.innerHTML = alerts.map(a => `
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="small font-weight-bold">${a.categoryName}</span>
-                        <span class="small font-weight-bold ${a.percentage > 100 ? 'text-danger' : ''}">${Math.round(a.percentage)}%</span>
-                    </div>
-                    <div class="progress" style="height: 10px;">
-                        <div class="progress-bar ${a.percentage > 100 ? 'bg-danger' : (a.percentage > 80 ? 'bg-warning' : 'bg-success')}" 
-                             role="progressbar" 
-                             style="width: ${Math.min(a.percentage, 100)}%"></div>
-                    </div>
-                    <div class="small text-muted mt-1">${a.message}</div>
-                </div>
-            `).join('');
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="small font-weight-bold">${a.categoryName}</span>
+                                <span class="small font-weight-bold ${a.percentage > 100 ? 'text-danger' : ''}">${Math.round(a.percentage)}%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar ${a.percentage > 100 ? 'bg-danger' : (a.percentage > 80 ? 'bg-warning' : 'bg-success')}" 
+                                     role="progressbar" 
+                                     style="width: ${Math.min(a.percentage, 100)}%"></div>
+                            </div>
+                            <div class="small text-muted mt-1">${a.message}</div>
+                        </div>
+                    `).join('');
         }
 
         function formatCurrency(amount) {
@@ -391,10 +464,339 @@
         }
 
         function openAddTransactionModal() {
-            var modal = new bootstrap.Modal(document.getElementById('addTransactionModal'));
+            var modalEl = document.getElementById('addTransactionModal');
+            var modal = new bootstrap.Modal(modalEl);
+            // Load accounts into the form each time modal opens
+            loadAccountSummaries().catch(err => console.warn('Failed to load accounts', err));
+            // load parent categories and reset child select
+            loadParentCategories().catch(err => console.warn('Failed to load categories', err));
+            const childSel = document.getElementById('childCategorySelect');
+            if (childSel) { childSel.classList.add('d-none'); childSel.innerHTML = '<option value="">Select subcategory...</option>'; }
             modal.show();
         }
 
+        async function loadAccountSummaries() {
+            const select = document.getElementById('accountSelect');
+            if (!select) return;
+            select.innerHTML = '<option value="">Loading accounts...</option>';
+
+            try {
+                const res = await fetch('/api/Accounts/summaries');
+                if (!res.ok) {
+                    select.innerHTML = '<option value="">Unable to load accounts</option>';
+                    return;
+                }
+                const accounts = await res.json();
+                if (!accounts || accounts.length === 0) {
+                    select.innerHTML = '<option value="">No accounts available</option>';
+                    return;
+                }
+                select.innerHTML = accounts.map(a => `<option value="${a.id}">${a.name} (${a.currency}) - ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: a.currency }).format(a.currentBalance)}</option>`).join('');
+            } catch (err) {
+                console.error('Error loading accounts', err);
+                select.innerHTML = '<option value="">Error loading accounts</option>';
+            }
+        }
+
+        async function submitAddTransaction() {
+            const accountId = parseInt(document.getElementById('accountSelect').value);
+            const transactionType = parseInt(document.getElementById('transactionType').value);
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const currency = (document.getElementById('currencyInput').value || 'VND').toUpperCase();
+            const transactionDate = document.getElementById('dateInput').value;
+            const note = document.getElementById('noteInput').value || null;
+            // client-side validation (inline)
+            if (!validateAddTransactionForm()) return;
+
+            const dto = {
+                accountId: accountId,
+                categoryId: (function () {
+                    const child = document.getElementById('childCategorySelect');
+                    if (child && !child.classList.contains('d-none') && child.value) return parseInt(child.value);
+                    const parent = document.getElementById('parentCategorySelect');
+                    return parent && parent.value ? parseInt(parent.value) : null;
+                })(),
+                transactionType: transactionType,
+                amount: amount,
+                currency: currency,
+                note: note,
+                transactionDate: transactionDate,
+                attachmentUrl: document.getElementById('attachmentUrl')?.value || null,
+                ocrText: document.getElementById('ocrText')?.value || null
+            };
+
+            try {
+                const res = await fetch('/api/Transactions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dto)
+                });
+
+                if (res.status === 401) {
+                    window.location.href = '/Auth/Login';
+                    return;
+                }
+
+                if (!res.ok) {
+                    const body = await res.json().catch(() => ({}));
+                    alert('Failed to create transaction: ' + (body?.message || res.statusText));
+                    return;
+                }
+
+                // Success: close modal and refresh dashboard
+                const modalEl = document.getElementById('addTransactionModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                await loadDashboardData();
+            } catch (err) {
+                console.error('Error creating transaction', err);
+                alert('Error creating transaction');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', loadDashboardData);
+
+        // Wire up add-transaction submit button
+        document.addEventListener('DOMContentLoaded', function () {
+            const submitBtn = document.getElementById('submitAddTransaction');
+            if (submitBtn) submitBtn.addEventListener('click', submitAddTransaction);
+        });
+
+        // Load parent categories and wire child population
+        let __allCategoriesCache = null;
+        async function loadParentCategories(type = null) {
+            const parent = document.getElementById('parentCategorySelect');
+            const child = document.getElementById('childCategorySelect');
+            if (!parent) return;
+            parent.innerHTML = '<option value="">Loading categories...</option>';
+            try {
+                const url = '/api/Categories' + (type ? `?type=${type}` : '');
+                const res = await fetch(url);
+                if (!res.ok) {
+                    parent.innerHTML = '<option value="">Unable to load categories</option>';
+                    return;
+                }
+                const cats = await res.json();
+                __allCategoriesCache = cats || [];
+
+                const parents = (__allCategoriesCache || []).filter(c => !c.parentCategoryId);
+                if (!parents || parents.length === 0) {
+                    parent.innerHTML = '<option value="">No categories</option>';
+                } else {
+                    parent.innerHTML = [`<option value="">(No category)</option>`].concat(
+                        parents.map(p => `<option value="${p.id}">${p.name}</option>`)
+                    ).join('');
+                }
+
+                // attach change handler
+                parent.removeEventListener('change', _parentChangeHandler);
+                parent.addEventListener('change', _parentChangeHandler);
+                // reset child
+                if (child) { child.classList.add('d-none'); child.innerHTML = '<option value="">Select subcategory...</option>'; }
+            } catch (err) {
+                console.error('Error loading parent categories', err);
+                parent.innerHTML = '<option value="">Error loading categories</option>';
+            }
+        }
+
+        function _parentChangeHandler(e) {
+            const parentId = e.target.value;
+            if (!parentId) {
+                const child = document.getElementById('childCategorySelect');
+                if (child) { child.classList.add('d-none'); child.innerHTML = '<option value="">Select subcategory...</option>'; }
+                return;
+            }
+            loadChildCategories(parseInt(parentId));
+        }
+
+        async function loadChildCategories(parentId) {
+            const child = document.getElementById('childCategorySelect');
+            if (!child) return;
+            child.innerHTML = '<option value="">Loading...</option>';
+            try {
+                let subs = [];
+                if (__allCategoriesCache) {
+                    subs = __allCategoriesCache.filter(c => c.parentCategoryId === parentId);
+                } else {
+                    // fallback call: request subcategories from API
+                    const res = await fetch(`/api/Categories?parentId=${parentId}`);
+                    if (res.ok) subs = await res.json();
+                }
+
+                if (!subs || subs.length === 0) {
+                    child.classList.add('d-none');
+                    child.innerHTML = '<option value="">No subcategories</option>';
+                    return;
+                }
+
+                child.classList.remove('d-none');
+                child.innerHTML = [`<option value="">(No subcategory)</option>`].concat(
+                    subs.map(s => `<option value="${s.id}">${s.name}</option>`)
+                ).join('');
+            } catch (err) {
+                console.error('Error loading child categories', err);
+                child.classList.add('d-none');
+                child.innerHTML = '<option value="">Error loading subcategories</option>';
+            }
+        }
+
+        // Validation: inline bootstrap feedback
+        function clearValidationStates() {
+            ['accountSelect','amountInput','currencyInput','dateInput','parentCategorySelect','childCategorySelect'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('is-invalid');
+            });
+            ['accountError','amountError','currencyError','dateError','categoryError'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+        }
+
+        function validateAddTransactionForm() {
+            clearValidationStates();
+            let ok = true;
+            const account = document.getElementById('accountSelect');
+            const amountEl = document.getElementById('amountInput');
+            const currencyEl = document.getElementById('currencyInput');
+            const dateEl = document.getElementById('dateInput');
+            const parent = document.getElementById('parentCategorySelect');
+            const child = document.getElementById('childCategorySelect');
+
+            if (!account || !account.value) {
+                ok = false;
+                account.classList.add('is-invalid');
+                document.getElementById('accountError').textContent = 'Please choose an account.';
+            }
+
+            const amount = parseFloat(amountEl?.value || '0');
+            if (!amountEl || isNaN(amount) || amount <= 0) {
+                ok = false;
+                amountEl.classList.add('is-invalid');
+                document.getElementById('amountError').textContent = 'Enter a valid amount greater than 0.';
+            }
+
+            const currency = (currencyEl?.value || '').trim();
+            if (!currency || currency.length !== 3) {
+                ok = false;
+                currencyEl.classList.add('is-invalid');
+                document.getElementById('currencyError').textContent = 'Currency code must be 3 characters.';
+            }
+
+            if (!dateEl || !dateEl.value) {
+                ok = false;
+                dateEl.classList.add('is-invalid');
+                document.getElementById('dateError').textContent = 'Please select a date.';
+            }
+
+            // optional: require category? skip but mark if invalid format
+            // Choose category: prefer child if visible
+            const chosenCat = (child && !child.classList.contains('d-none') && child.value) ? child.value : (parent && parent.value ? parent.value : '');
+            if (chosenCat === '') {
+                // no category selected is allowed; do not mark invalid by default
+            }
+
+            return ok;
+        }
+
+        // Receipt handling: preview, upload, OCR scan
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.getElementById('receiptFileInput');
+            if (fileInput) fileInput.addEventListener('change', handleReceiptFileSelect);
+        });
+
+        function showReceiptPreviewDataUrl(dataUrl) {
+            const img = document.getElementById('receiptPreview');
+            if (!img) return;
+            img.src = dataUrl;
+            img.classList.remove('d-none');
+        }
+
+        function setProcessing(isProcessing) {
+            const submitBtn = document.getElementById('submitAddTransaction');
+            const fileInput = document.getElementById('receiptFileInput');
+            const spinner = document.getElementById('receiptSpinner');
+            if (submitBtn) submitBtn.disabled = !!isProcessing;
+            if (fileInput) fileInput.disabled = !!isProcessing;
+            if (spinner) spinner.classList.toggle('d-none', !isProcessing);
+        }
+
+        function setReceiptStatus(text, isError = false) {
+            const el = document.getElementById('receiptScanStatus');
+            if (!el) return;
+            el.textContent = text;
+            el.classList.toggle('text-danger', isError);
+        }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleReceiptFileSelect(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            setProcessing(true);
+            try {
+                setReceiptStatus('Preparing receipt...');
+                const dataUrl = await fileToDataUrl(file);
+                showReceiptPreviewDataUrl(dataUrl);
+
+                // Extract base64 (strip data:*/*;base64, prefix)
+                const base64 = (dataUrl + '').split(',')[1] || '';
+
+                // 1) Call OCR process endpoint
+                setReceiptStatus('Scanning receipt (OCR)...');
+                const ocrRes = await fetch('/api/ocr/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageBase64: base64 })
+                });
+                if (!ocrRes.ok) {
+                    setReceiptStatus('OCR failed: ' + ocrRes.statusText, true);
+                } else {
+                    const ocr = await ocrRes.json();
+                    // Pre-fill fields if OCR extracted values
+                    if (ocr) {
+                        if (ocr.amount) document.getElementById('amountInput').value = ocr.amount;
+                        if (ocr.date) {
+                            // Convert to yyyy-MM-dd
+                            const d = new Date(ocr.date);
+                            if (!isNaN(d)) {
+                                const yyyy = d.getFullYear();
+                                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                const dd = String(d.getDate()).padStart(2, '0');
+                                document.getElementById('dateInput').value = `${yyyy}-${mm}-${dd}`;
+                            }
+                        }
+                        if (ocr.merchantName) document.getElementById('noteInput').value = ocr.merchantName;
+                        if (ocr.rawText) document.getElementById('ocrText').value = ocr.rawText;
+                    }
+                    setReceiptStatus('OCR scan completed. Uploading receipt...');
+
+                    // 2) Upload the receipt file to server so we can attach URL
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    const upRes = await fetch('/api/ocr/upload', { method: 'POST', body: fd });
+                    if (!upRes.ok) {
+                        setReceiptStatus('Upload failed: ' + upRes.statusText, true);
+                        document.getElementById('attachmentUrl').value = '';
+                    } else {
+                        const up = await upRes.json();
+                        const url = up?.url || up?.attachmentUrl || null;
+                        document.getElementById('attachmentUrl').value = url || '';
+                        setReceiptStatus(url ? 'Receipt uploaded' : 'Uploaded but no URL returned');
+                    }
+                }
+            } catch (err) {
+                console.error('Receipt handling error', err);
+                setReceiptStatus('Error processing receipt', true);
+            } finally {
+                setProcessing(false);
+            }
+        }
     </script>
 }

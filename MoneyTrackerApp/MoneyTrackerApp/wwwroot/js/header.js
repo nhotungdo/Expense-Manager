@@ -72,13 +72,30 @@
 
     function performSearch(query) {
         if (!query.trim()) return;
-
         console.log('Searching for:', query);
-        // TODO: Implement actual search functionality
-        // window.location.href = `/Search?q=${encodeURIComponent(query)}`;
 
-        // Show search results or redirect
-        alert(`Search functionality coming soon!\nSearching for: ${query}`);
+        // Prefer a transactions search page if present, otherwise fall back to reports
+        // Try common candidate paths used in the app
+        const candidates = [
+            '/Transactions',
+            '/transactions',
+            '/Reports',
+            '/Reports?search=',
+            '/Home'
+        ];
+
+        // Build a target URL with query parameter
+        const encoded = encodeURIComponent(query);
+
+        // If the site exposes a Reports page link, prefer it
+        const reportsLink = document.querySelector('a[asp-page="/Reports"], a[href="/Reports"], a[href="/reports"]');
+        let target = `/Transactions?search=${encoded}`;
+        if (reportsLink) {
+            target = `/Reports?search=${encoded}`;
+        }
+
+        // Navigate to search target
+        window.location.href = target;
     }
 
     // Quick Add Button
@@ -87,9 +104,26 @@
         if (!quickAddBtn) return;
 
         quickAddBtn.addEventListener('click', function () {
-            // TODO: Open quick add transaction modal
             console.log('Quick add clicked');
-            alert('Quick Add Transaction modal coming soon!');
+
+            // If there's a bootstrap modal with id 'addTransactionModal' on the page, open it
+            try {
+                const modalEl = document.getElementById('addTransactionModal');
+                if (modalEl) {
+                    // Bootstrap 5 modal
+                    if (window.bootstrap && typeof window.bootstrap.Modal === 'function') {
+                        const m = new window.bootstrap.Modal(modalEl);
+                        m.show();
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Error opening modal', e);
+            }
+
+            // Otherwise, navigate to a transaction creation page
+            const createPath = '/Transactions/Create';
+            window.location.href = createPath;
         });
     }
 
