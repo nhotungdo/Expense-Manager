@@ -160,22 +160,24 @@
                 savingsGoal: savingsGoal
             };
 
-            const accessToken = getCookie('AccessToken');
-            if (!accessToken) {
-                throw new Error('Not authenticated');
-            }
-
             const response = await fetch('/api/onboarding/complete', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(completeData)
             });
 
             if (!response.ok) {
-                throw new Error('Failed to complete onboarding');
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Server error:', errorData);
+                throw new Error(errorData.message || 'Failed to complete onboarding');
+            }
+
+            const result = await response.json();
+            if (result.accessToken) {
+                localStorage.setItem('accessToken', result.accessToken);
+                if (result.refreshToken) localStorage.setItem('refreshToken', result.refreshToken);
             }
 
             // Clear session storage
@@ -188,7 +190,7 @@
             window.location.href = '/Onboarding/Complete';
         } catch (error) {
             console.error('Error completing onboarding:', error);
-            showError('Failed to complete setup. Please try again.');
+            showError(error.message || 'Failed to complete setup. Please try again.');
         }
     }
 

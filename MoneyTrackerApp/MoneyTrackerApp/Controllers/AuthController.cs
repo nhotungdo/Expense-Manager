@@ -43,6 +43,7 @@ namespace MoneyTrackerApp.Controllers
         {
             public string AccessToken { get; set; } = string.Empty;
             public string RefreshToken { get; set; } = string.Empty;
+            public bool OnboardingCompleted { get; set; }
         }
 
         [HttpGet("google/start")]
@@ -123,33 +124,67 @@ namespace MoneyTrackerApp.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<TokenResponse>> Register([FromBody] RegisterRequest req)
         {
+            // 1. Basic Validation
+            if (string.IsNullOrWhiteSpace(req.Email) || !req.Email.Contains("@"))
+                return BadRequest(new { message = "Email không hợp lệ" });
+
+            if (string.IsNullOrWhiteSpace(req.Password) || req.Password.Length < 6)
+                return BadRequest(new { message = "Mật khẩu phải có ít nhất 6 ký tự" });
+
+            if (string.IsNullOrWhiteSpace(req.FullName))
+                return BadRequest(new { message = "Vui lòng nhập họ tên" });
+
+            // 2. Check existence
             var existing = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
             if (existing != null) return BadRequest(new { message = "Email đã tồn tại" });
 
+            // 3. Create User
             var user = new User
             {
                 Email = req.Email,
                 UserName = req.Email,
                 NormalizedEmail = req.Email.ToUpperInvariant(),
                 NormalizedUserName = req.Email.ToUpperInvariant(),
-                FullName = req.FullName,
+                FullName = req.FullName.Trim(),
                 EmailConfirmed = true,
                 Enabled = true,
                 Role = "User",
                 Language = "vi",
                 DefaultCurrency = "VND",
                 Timezone = "Asia/Ho_Chi_Minh",
-                Theme = "light"
+                Theme = "light",
+                // Fix: GoogleId is required and unique in DB. 
+                // We generate a unique placeholder for local accounts.
+                GoogleId = $"local_{Guid.NewGuid()}" 
             };
 
-            // Bcrypt hashing
+            // 4. Hash Password
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
 
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
+            try 
+            {
+                _db.Users.Add(user);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Return JSON error so frontend can display it instead of "Lỗi kết nối"
+                return StatusCode(500, new { message = "Lỗi lưu dữ liệu: " + ex.Message });
+            }
 
+            // 5. Issue Tokens
             var pair = await _jwtService.IssueAsync(user);
-            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh };
+            
+            // 6. Set Cookie (Important for auto-login consistency)
+            Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(60)
+            });
+
+            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh, OnboardingCompleted = user.OnboardingCompleted };
             return Ok(tokens);
         }
 
@@ -173,7 +208,7 @@ namespace MoneyTrackerApp.Controllers
                 Expires = DateTime.UtcNow.AddMinutes(60)
             });
 
-            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh };
+            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh, OnboardingCompleted = user.OnboardingCompleted };
             return Ok(tokens);
         }
 
@@ -203,7 +238,7 @@ namespace MoneyTrackerApp.Controllers
             if (user == null) return Unauthorized();
 
             var pair = await _jwtService.IssueAsync(user);
-            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh };
+            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh, OnboardingCompleted = user.OnboardingCompleted };
             return Ok(tokens);
         }
 

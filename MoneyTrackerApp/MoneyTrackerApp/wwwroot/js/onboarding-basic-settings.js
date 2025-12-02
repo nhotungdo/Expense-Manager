@@ -55,20 +55,16 @@
 
         // Update onboarding step
         try {
-            const accessToken = getCookie('AccessToken');
-            if (accessToken) {
-                await fetch('/api/onboarding/step', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({
-                        step: 3, // CreateWallet
-                        stepData: JSON.stringify(formData)
-                    })
-                });
-            }
+            await fetch('/api/onboarding/step', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    step: 3, // CreateWallet
+                    stepData: JSON.stringify(formData)
+                })
+            });
 
             // Navigate to next page
             window.location.href = '/Onboarding/CreateWallet';

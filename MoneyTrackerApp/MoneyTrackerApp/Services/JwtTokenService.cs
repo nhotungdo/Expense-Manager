@@ -30,7 +30,8 @@ namespace MoneyTrackerApp.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("OnboardingCompleted", user.OnboardingCompleted.ToString())
             };
 
             var keyBytes = Encoding.UTF8.GetBytes(key);

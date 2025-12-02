@@ -61,8 +61,9 @@ namespace MoneyTrackerApp.Pages.Auth
                     Expires = DateTime.UtcNow.AddMinutes(60)
                 });
 
-                // Redirect to home with tokens (for client-side storage if needed)
-                var redirectUrl = $"/Auth/Login?accessToken={Uri.EscapeDataString(accessToken)}&refreshToken={Uri.EscapeDataString(refreshToken)}";
+                // Redirect based on onboarding status
+                var baseUrl = user.OnboardingCompleted ? "/Index" : "/Onboarding/Welcome";
+                var redirectUrl = $"{baseUrl}?accessToken={Uri.EscapeDataString(accessToken)}&refreshToken={Uri.EscapeDataString(refreshToken)}";
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)

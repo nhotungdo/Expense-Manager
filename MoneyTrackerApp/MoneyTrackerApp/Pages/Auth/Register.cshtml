@@ -1,63 +1,420 @@
 @page
 @model MoneyTrackerApp.Pages.Auth.RegisterModel
 @{
-    Layout = "/Pages/Shared/_Layout.cshtml";
+  Layout = null;
 }
-<section class="auth-container">
-    <div class="card">
-        <h1>Đăng ký</h1>
-        <form id="register-form">
-            <div class="field">
-                <label>Họ tên</label>
-                <input type="text" name="fullName" placeholder="Nguyễn Văn A" />
-            </div>
-            <div class="field">
-                <label>Email</label>
-                <input type="email" name="email" placeholder="you@example.com" required />
-            </div>
-            <div class="field">
-                <label>Mật khẩu</label>
-                <input type="password" name="password" placeholder="••••••••" required />
-            </div>
-            <button type="submit" class="btn">Tạo tài khoản</button>
-        </form>
-        <div id="result" class="result" hidden></div>
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký - MoneyTrackerApp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #22c55e;
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      --text-color: #ffffff;
+      --input-bg: rgba(255, 255, 255, 0.1);
+      --input-border: rgba(255, 255, 255, 0.3);
+      --input-focus: rgba(255, 255, 255, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(45deg, #11998e, #38ef7d, #0f2027);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    @@keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Decorative Blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    .blob-1 {
+      top: -10%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: #7F00FF;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .blob-2 {
+      bottom: -10%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: #00C9FF;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+
+    .blob-3 {
+      top: 20%;
+      right: 20%;
+      width: 300px;
+      height: 300px;
+      background: #92FE9D;
+      animation: float 12s ease-in-out infinite 2s;
+    }
+
+    @@keyframes float {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(20px, 40px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .register-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 24px;
+      padding: 48px;
+      width: 100%;
+      max-width: 500px;
+      color: var(--text-color);
+      transition: transform 0.3s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .register-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .register-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(to right, #fff, #e0e0e0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .register-header p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 15px;
+      font-weight: 300;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      margin-left: 4px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 18px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px 14px 48px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      color: white;
+      font-size: 15px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    input:focus {
+      outline: none;
+      background: var(--input-focus);
+      border-color: rgba(255, 255, 255, 0.6);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+      background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .register-footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .register-footer p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+
+    .register-footer a {
+      color: #4ade80;
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 4px;
+      transition: color 0.3s;
+    }
+
+    .register-footer a:hover {
+      color: #22c55e;
+      text-decoration: underline;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-size: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    .result.success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      display: block;
+    }
+
+    .result.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      display: block;
+    }
+  </style>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- Decorative Background Elements -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="register-container">
+    <div class="glass-card">
+      <div class="register-header">
+        <h1>Tạo tài khoản mới</h1>
+        <p>Bắt đầu hành trình quản lý tài chính của bạn</p>
+      </div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label for="fullName">Họ tên</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" id="fullName" name="fullName" placeholder="Nguyễn Văn A" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" name="email" placeholder="name@example.com" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mật khẩu</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="••••••••" required minlength="6" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Xác nhận mật khẩu</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          Tạo tài khoản
+        </button>
+      </form>
+
+      <div id="result" class="result"></div>
+
+      <div class="register-footer">
+        <p>Đã có tài khoản? <a href="/Auth/Login">Đăng nhập ngay</a></p>
+      </div>
     </div>
-    <style>
-        .auth-container{min-height:70vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#22c55e, #0ea5e9 70%);padding:32px}
-        .card{width:100%;max-width:480px;background:#fff;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,.15);padding:28px}
-        h1{margin:0 0 16px 0;font-size:24px}
-        .field{margin-bottom:12px}
-        label{display:block;font-size:13px;color:#555;margin-bottom:6px}
-        input{width:100%;padding:12px;border-radius:10px;border:1px solid #e5e7eb;outline:none}
-        input:focus{border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
-        .btn{width:100%;padding:12px;border:none;border-radius:10px;background:#22c55e;color:#fff;font-weight:600;margin-top:8px;cursor:pointer}
-        .btn:hover{background:#16a34a}
-        .result{margin-top:12px;font-size:12px;word-break:break-all}
-    </style>
-</section>
-<script>
-const form = document.getElementById('register-form');
-const result = document.getElementById('result');
-form.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const fullName = form.fullName.value.trim();
-  const email = form.email.value.trim();
-  const password = form.password.value;
-  const res = await fetch('/api/auth/register',{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ fullName, email, password })
-  });
-  const data = await res.json().catch(()=>({message:'Lỗi'}));
-  result.hidden = false;
-  if(res.ok){
-    localStorage.setItem('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
-    result.textContent = 'Đăng ký thành công';
-    result.style.color = '#16a34a';
-  }else{
-    result.textContent = data.message || 'Đăng ký thất bại';
-    result.style.color = '#dc2626';
-  }
-});
-</script>
+  </div>
+
+  <script>
+    const form = document.getElementById('register-form');
+    const result = document.getElementById('result');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fullName = form.fullName.value.trim();
+      const email = form.email.value.trim();
+      const password = form.password.value;
+      const confirmPassword = form.confirmPassword.value;
+
+      // Client-side validation
+      result.style.display = 'none';
+      result.className = 'result';
+
+      if (password.length < 6) {
+        result.textContent = 'Mật khẩu phải có ít nhất 6 ký tự';
+        result.className = 'result error';
+        result.style.display = 'block';
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        result.textContent = 'Mật khẩu xác nhận không khớp';
+        result.className = 'result error';
+        result.style.display = 'block';
+        return;
+      }
+
+      // Disable button
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang xử lý...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fullName,
+            email,
+            password
+          })
+        });
+
+        const data = await res.json().catch(() => ({
+          message: 'Lỗi kết nối'
+        }));
+
+        if (res.ok) {
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
+          
+          result.textContent = 'Đăng ký thành công! Đang chuyển hướng...';
+          result.className = 'result success';
+          result.style.display = 'block';
+          
+          setTimeout(() => {
+             window.location.href = '/home';
+          }, 1500);
+        } else {
+          result.textContent = data.message || 'Đăng ký thất bại';
+          result.className = 'result error';
+          result.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Tạo tài khoản';
+        }
+      } catch (error) {
+        console.error(error);
+        result.textContent = 'Lỗi hệ thống. Vui lòng thử lại.';
+        result.className = 'result error';
+        result.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Tạo tài khoản';
+      }
+    });
+  </script>
+</body>
+
+</html>

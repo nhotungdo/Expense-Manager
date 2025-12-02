@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "C8q4//MqWy5/yq0BjZAJoRC8iWAjKXVfhsuArB09pwY=",
+  "Hash": "4OeREM6KOcGzlIOvi8djUrFRouOiKpHzpyNk5CIIPdU=",
   "Source": "MoneyTrackerApp",
   "BasePath": "_content/MoneyTrackerApp",
   "Mode": "Default",
@@ -1364,6 +1364,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\9c67f94508e942a9ad21604251caa3f8.jpg",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "uploads/9c67f94508e942a9ad21604251caa3f8.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\9c67f94508e942a9ad21604251caa3f8.jpg"
     }
   ]
 }

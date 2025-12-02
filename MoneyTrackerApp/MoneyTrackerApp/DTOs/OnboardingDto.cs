@@ -89,7 +89,7 @@ public class OnboardingSavingsGoalDto
     [Range(0.01, double.MaxValue, ErrorMessage = "Target amount must be greater than 0")]
     public decimal? TargetAmount { get; set; }
 
-    public DateOnly? TargetDate { get; set; }
+    public DateTime? TargetDate { get; set; }
 
     public string? Icon { get; set; }
     public string? Color { get; set; }

@@ -119,6 +119,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<MoneyTrackerApp.Middleware.OnboardingMiddleware>();
+
 app.MapRazorPages();
 app.MapControllers();
 

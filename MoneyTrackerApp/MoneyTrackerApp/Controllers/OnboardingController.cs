@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoneyTrackerApp.DTOs;
 using MoneyTrackerApp.Services;
+using MoneyTrackerApp.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -16,13 +18,19 @@ public class OnboardingController : ControllerBase
 {
     private readonly OnboardingService _onboardingService;
     private readonly ILogger<OnboardingController> _logger;
+    private readonly MoneyTrackerApp.Services.JwtTokenService _jwtService;
+    private readonly ExpenseManagerContext _context;
 
     public OnboardingController(
         OnboardingService onboardingService,
-        ILogger<OnboardingController> logger)
+        ILogger<OnboardingController> logger,
+        MoneyTrackerApp.Services.JwtTokenService jwtService,
+        ExpenseManagerContext context)
     {
         _onboardingService = onboardingService;
         _logger = logger;
+        _jwtService = jwtService;
+        _context = context;
     }
 
     /// <summary>
@@ -128,11 +136,28 @@ public class OnboardingController : ControllerBase
                 return Unauthorized(new { message = "User not authenticated" });
             }
 
-            var success = await _onboardingService.CompleteOnboardingAsync(userId, dto);
+            var (success, message) = await _onboardingService.CompleteOnboardingAsync(userId, dto);
             
             if (!success)
             {
-                return BadRequest(new { message = "Failed to complete onboarding" });
+                return BadRequest(new { message = $"Failed to complete onboarding: {message}" });
+            }
+
+            // Issue new tokens with OnboardingCompleted = true
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                var pair = await _jwtService.IssueAsync(user);
+                
+                Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMinutes(60)
+                });
+
+                return Ok(new { message = "Onboarding completed successfully", accessToken = pair.access, refreshToken = pair.refresh });
             }
 
             return Ok(new { message = "Onboarding completed successfully" });
@@ -177,7 +202,7 @@ public class OnboardingController : ControllerBase
 
             var monthlyAmount = _onboardingService.CalculateMonthlySavings(
                 dto.TargetAmount.Value, 
-                dto.TargetDate.Value);
+                DateOnly.FromDateTime(dto.TargetDate.Value));
 
             return Ok(new { monthlyAmount });
         }

@@ -140,7 +140,7 @@ public class OnboardingService
     /// <summary>
     /// Complete onboarding and create initial data
     /// </summary>
-    public async Task<bool> CompleteOnboardingAsync(long userId, CompleteOnboardingDto dto)
+    public async Task<(bool Success, string Message)> CompleteOnboardingAsync(long userId, CompleteOnboardingDto dto)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -149,7 +149,7 @@ public class OnboardingService
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
             {
-                return false;
+                return (false, "User not found");
             }
 
             // Update user settings
@@ -186,7 +186,7 @@ public class OnboardingService
                 var initialTransaction = new Transaction
                 {
                     UserId = userId,
-                    AccountId = account.Id,
+                    Account = account,
                     TransactionType = (int)TransactionType.Income,
                     Amount = dto.Wallet.InitialBalance,
                     Currency = dto.Profile.Currency,
@@ -234,7 +234,7 @@ public class OnboardingService
                     Name = dto.SavingsGoal.Name,
                     TargetAmount = dto.SavingsGoal.TargetAmount ?? 0,
                     CurrentAmount = 0,
-                    TargetDate = dto.SavingsGoal.TargetDate,
+                    TargetDate = dto.SavingsGoal.TargetDate.HasValue ? DateOnly.FromDateTime(dto.SavingsGoal.TargetDate.Value) : null,
                     Icon = dto.SavingsGoal.Icon ?? "🎯",
                     Color = dto.SavingsGoal.Color ?? "#2196F3",
                     Status = 0, // Active
@@ -261,13 +261,13 @@ public class OnboardingService
             await transaction.CommitAsync();
 
             _logger.LogInformation($"Completed onboarding for user {userId}");
-            return true;
+            return (true, "Success");
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
             _logger.LogError($"Error completing onboarding for user {userId}: {ex.Message}");
-            return false;
+            return (false, ex.Message); // Return actual error message
         }
     }
 
