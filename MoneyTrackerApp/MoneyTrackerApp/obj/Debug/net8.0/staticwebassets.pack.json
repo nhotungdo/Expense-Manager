@@ -53,6 +53,10 @@
       "PackagePath": "staticwebassets\\js\\site.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\subscription-utils.js",
+      "PackagePath": "staticwebassets\\js\\subscription-utils.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\lib\\bootstrap\\LICENSE",
       "PackagePath": "staticwebassets\\lib\\bootstrap"
     },

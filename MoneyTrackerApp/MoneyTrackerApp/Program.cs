@@ -52,6 +52,9 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.OnboardingService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IUserManagementService, MoneyTrackerApp.Services.UserManagementService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ISystemSettingsService, MoneyTrackerApp.Services.SystemSettingsService>();
 
+// Register Subscription Service
+builder.Services.AddScoped<MoneyTrackerApp.Services.ISubscriptionService, MoneyTrackerApp.Services.SubscriptionService>();
+
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");
 var jwtAudience = jwtSection.GetValue<string>("Audience");

@@ -126,6 +126,7 @@ public class DashboardOverviewDto
     public List<CategoryPieChartDto> ExpensePieChart { get; set; } = new();
     public List<RecentTransactionDto> RecentTransactions { get; set; } = new();
     public List<BudgetAlertDto> BudgetAlerts { get; set; } = new();
+    public List<SavingsGoalResponseDto> SavingsGoals { get; set; } = new();
 }
 
 /// <summary>

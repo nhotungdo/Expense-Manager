@@ -1,0 +1,135 @@
+@page
+@model MoneyTrackerApp.Pages.Subscription.FailedModel
+@{
+    ViewData["Title"] = "Thanh toán thất bại";
+}
+
+<div class="result-page failed">
+    <div class="container">
+        <div class="result-card">
+            <div class="icon-container">
+                <svg class="error-icon" viewBox="0 0 52 52">
+                    <circle class="error-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="error-cross" fill="none" d="M16 16 36 36 M36 16 16 36"/>
+                </svg>
+            </div>
+            <h1>Thanh toán thất bại</h1>
+            <p>Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.</p>
+            <div class="actions">
+                <a href="/Subscription" class="btn btn-primary">Thử lại</a>
+                <a href="/Dashboard" class="btn btn-outline">Về trang chủ</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .result-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    .result-page.failed {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    }
+
+    .container {
+        max-width: 600px;
+        width: 100%;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 20px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .icon-container {
+        margin-bottom: 30px;
+    }
+
+    .error-icon {
+        width: 100px;
+        height: 100px;
+    }
+
+    .error-circle {
+        stroke: #f56565;
+        stroke-width: 2;
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    .error-cross {
+        stroke: #f56565;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-dasharray: 54;
+        stroke-dashoffset: 54;
+        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+
+    @@keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 15px;
+    }
+
+    p {
+        font-size: 18px;
+        color: #718096;
+        margin-bottom: 40px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(245, 101, 101, 0.3);
+    }
+
+    .btn-outline {
+        background: white;
+        border: 2px solid #f56565;
+        color: #f56565;
+    }
+
+    .btn-outline:hover {
+        background: #f56565;
+        color: white;
+    }
+</style>

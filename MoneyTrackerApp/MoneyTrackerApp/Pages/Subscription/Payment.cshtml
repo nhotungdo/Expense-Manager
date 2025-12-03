@@ -1,0 +1,790 @@
+@page
+@model MoneyTrackerApp.Pages.Subscription.PaymentModel
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+<div class="payment-page">
+    <div class="container">
+        <div class="payment-container">
+            <!-- Package Info -->
+            <div class="package-info" id="package-info">
+                <h2>Thông tin gói dịch vụ</h2>
+                <div id="package-details" class="loading">Đang tải...</div>
+            </div>
+
+            <!-- Payment QR -->
+            <div class="payment-qr">
+                <h2>Quét mã QR để thanh toán</h2>
+                <div id="qr-container">
+                    <div class="qr-placeholder">
+                        <div class="spinner"></div>
+                        <p>Đang tạo mã QR...</p>
+                    </div>
+                </div>
+                <div id="payment-info" class="payment-info" style="display: none;">
+                    <div class="info-item">
+                        <span class="label">Số tiền:</span>
+                        <span class="value" id="amount"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Mã giao dịch:</span>
+                        <span class="value" id="transaction-id"></span>
+                    </div>
+                </div>
+                <div class="payment-actions">
+                    <button id="pay-now-btn" class="btn btn-primary" style="display: none;">
+                        Thanh toán ngay
+                    </button>
+                    <button class="btn btn-outline" onclick="window.location.href='/Subscription'">
+                        Quay lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .payment-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .package-info,
+    .payment-qr {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #1a202c;
+    }
+
+    .loading {
+        text-align: center;
+        color: #718096;
+        padding: 20px;
+    }
+
+    .package-detail {
+        margin-bottom: 15px;
+    }
+
+    .package-detail .label {
+        font-weight: 600;
+        color: #4a5568;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .package-detail .value {
+        font-size: 18px;
+        color: #1a202c;
+    }
+
+    .package-features {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+
+    .package-features li {
+        padding: 10px 0;
+        color: #4a5568;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .package-features li:before {
+        content: "✓";
+        color: #48bb78;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .total-amount {
+        margin-top: 20px;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        color: white;
+    }
+
+    .total-amount .label {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    .total-amount .value {
+        font-size: 32px;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+
+    #qr-container {
+        text-align: center;
+        margin: 30px 0;
+    }
+
+    .qr-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e2e8f0;
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    #qr-code {
+        max-width: 300px;
+        height: auto;
+        border: 5px solid #667eea;
+        border-radius: 10px;
+        padding: 10px;
+        background: white;
+    }
+
+    .payment-info {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-item .label {
+        color: #718096;
+        font-weight: 500;
+    }
+
+    .info-item .value {
+        color: #1a202c;
+        font-weight: 600;
+    }
+
+    .payment-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-outline {
+        background: white;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    @@media (max-width: 768px) {
+        .payment-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p id="loading-message">Đang xử lý...</p>
+    </div>
+</div>
+
+<style>
+    /* Toast Notification Styles */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+        z-index: 10000;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast.success {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .toast.error {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    }
+
+    .toast.warning {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    }
+
+    .toast.info {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    }
+
+    /* Loading Overlay Styles */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        backdrop-filter: blur(4px);
+    }
+
+    .loading-spinner {
+        text-align: center;
+        color: white;
+    }
+
+    .loading-spinner .spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    .loading-spinner p {
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .error-container {
+        text-align: center;
+        padding: 40px;
+        background: #fff5f5;
+        border-radius: 10px;
+        border: 2px solid #fc8181;
+    }
+
+    .error-container h3 {
+        color: #e53e3e;
+        margin-bottom: 15px;
+    }
+
+    .error-container p {
+        color: #742a2a;
+        margin-bottom: 20px;
+    }
+
+    .retry-btn {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .retry-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .payment-status {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .payment-status.pending {
+        background: #fef5e7;
+        color: #d68910;
+    }
+
+    .payment-status.processing {
+        background: #ebf8ff;
+        color: #2c5282;
+    }
+</style>
+
+<script>
+    const packageId = @Model.PackageId;
+    let paymentUrl = '';
+    let paymentData = null;
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Check authentication first
+        const isAuthenticated = await checkAuthentication();
+        if (!isAuthenticated) {
+            showToast('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+            setTimeout(() => {
+                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `/Auth/Login?returnUrl=${returnUrl}`;
+            }, 2000);
+            return;
+        }
+
+        // Load package details and create subscription
+        await initializePayment();
+    });
+
+    /**
+     * Check if user is authenticated
+     */
+    async function checkAuthentication() {
+        try {
+            const response = await fetch('/api/Subscription/my-subscription', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            return response.status !== 401;
+        } catch (error) {
+            console.error('Auth check failed:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Initialize payment flow
+     */
+    async function initializePayment() {
+        showLoadingOverlay(true, 'Đang tải thông tin gói dịch vụ...');
+
+        try {
+            // Load package details
+            await loadPackageDetails();
+            
+            // Create subscription and get payment info
+            showLoadingOverlay(true, 'Đang tạo đơn hàng...');
+            await createSubscription();
+            
+            showLoadingOverlay(false);
+            showToast('Đã tạo đơn hàng thành công. Vui lòng quét mã QR để thanh toán.', 'success');
+        } catch (error) {
+            showLoadingOverlay(false);
+            handleInitializationError(error);
+        }
+    }
+
+    /**
+     * Load package details from API
+     */
+    async function loadPackageDetails() {
+        try {
+            // Try to get from session storage first
+            const cachedPackage = sessionStorage.getItem('selectedPackage');
+            if (cachedPackage) {
+                const pkg = JSON.parse(cachedPackage);
+                if (pkg.id === packageId) {
+                    displayPackageInfo(pkg);
+                }
+            }
+
+            // Fetch from API
+            const response = await fetch(`/api/Subscription/packages/${packageId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('Không tìm thấy gói dịch vụ');
+                }
+                throw new Error(`Lỗi tải gói dịch vụ: ${response.status}`);
+            }
+
+            const pkg = await response.json();
+            displayPackageInfo(pkg);
+            
+            // Update session storage
+            sessionStorage.setItem('selectedPackage', JSON.stringify(pkg));
+        } catch (error) {
+            console.error('Error loading package:', error);
+            throw new Error(`Không thể tải thông tin gói dịch vụ: ${error.message}`);
+        }
+    }
+
+    /**
+     * Display package information
+     */
+    function displayPackageInfo(pkg) {
+        document.getElementById('package-details').innerHTML = `
+            <div class="package-detail">
+                <span class="label">Tên gói:</span>
+                <span class="value">${escapeHtml(pkg.name)}</span>
+            </div>
+            <div class="package-detail">
+                <span class="label">Mô tả:</span>
+                <span class="value">${escapeHtml(pkg.description || 'Không có mô tả')}</span>
+            </div>
+            <div class="package-detail">
+                <span class="label">Chu kỳ thanh toán:</span>
+                <span class="value">${escapeHtml(pkg.billingCycleName)}</span>
+            </div>
+            <ul class="package-features">
+                ${pkg.features.map(feature => `<li>${escapeHtml(feature)}</li>`).join('')}
+                ${pkg.maxTransactions > 0 ? `<li>Tối đa ${pkg.maxTransactions.toLocaleString('vi-VN')} giao dịch</li>` : ''}
+                ${pkg.maxAccounts > 0 ? `<li>Tối đa ${pkg.maxAccounts} tài khoản</li>` : ''}
+                ${pkg.hasAdvancedReports ? '<li>Báo cáo nâng cao</li>' : ''}
+                ${pkg.hasAiAdvisor ? '<li>Tư vấn AI</li>' : ''}
+                ${pkg.hasGroupExpense ? '<li>Chi tiêu nhóm</li>' : ''}
+                ${pkg.hasPrioritySupport ? '<li>Hỗ trợ ưu tiên</li>' : ''}
+            </ul>
+            <div class="total-amount">
+                <div class="label">Tổng thanh toán</div>
+                <div class="value">${pkg.price.toLocaleString('vi-VN')}₫</div>
+            </div>
+        `;
+    }
+
+    /**
+     * Create subscription and get payment details
+     */
+    async function createSubscription() {
+        try {
+            const response = await fetch('/api/Subscription/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    packageId: packageId,
+                    autoRenew: true,
+                    returnUrl: window.location.origin + '/Subscription/PaymentCallback'
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Lỗi tạo đơn hàng: ${response.status}`);
+            }
+
+            paymentData = await response.json();
+            
+            // Validate payment data
+            if (!paymentData.paymentUrl || !paymentData.qrCodeUrl) {
+                throw new Error('Dữ liệu thanh toán không hợp lệ');
+            }
+
+            // Check payment gateway connectivity
+            await checkPaymentGatewayConnectivity(paymentData.qrCodeUrl);
+            
+            displayQRCode(paymentData);
+            
+            // Store payment info in session
+            sessionStorage.setItem('currentPayment', JSON.stringify({
+                paymentId: paymentData.paymentId,
+                amount: paymentData.amount,
+                timestamp: new Date().toISOString()
+            }));
+
+        } catch (error) {
+            console.error('Error creating subscription:', error);
+            
+            // Retry logic
+            if (retryCount < MAX_RETRIES) {
+                retryCount++;
+                showToast(`Lỗi tạo đơn hàng. Đang thử lại (${retryCount}/${MAX_RETRIES})...`, 'warning');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return await createSubscription();
+            }
+            
+            throw new Error(`Không thể tạo đơn hàng sau ${MAX_RETRIES} lần thử: ${error.message}`);
+        }
+    }
+
+    /**
+     * Check payment gateway connectivity
+     */
+    async function checkPaymentGatewayConnectivity(qrCodeUrl) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(qrCodeUrl, {
+                method: 'HEAD',
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error('Payment gateway không phản hồi');
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.warn('Payment gateway connectivity check timeout');
+                showToast('Cảnh báo: Kết nối đến cổng thanh toán chậm', 'warning');
+            } else {
+                console.warn('Payment gateway connectivity check failed:', error);
+            }
+        }
+    }
+
+    /**
+     * Display QR code and payment information
+     */
+    function displayQRCode(paymentData) {
+        paymentUrl = paymentData.paymentUrl;
+        
+        document.getElementById('qr-container').innerHTML = `
+            <img id="qr-code" 
+                 src="${escapeHtml(paymentData.qrCodeUrl)}" 
+                 alt="QR Code"
+                 onerror="handleQRCodeError()" />
+            <div class="payment-status pending">
+                <span>⏳ Chờ thanh toán</span>
+            </div>
+        `;
+
+        document.getElementById('payment-info').style.display = 'block';
+        document.getElementById('amount').textContent = paymentData.amount.toLocaleString('vi-VN') + '₫';
+        document.getElementById('transaction-id').textContent = paymentData.paymentId;
+
+        const payNowBtn = document.getElementById('pay-now-btn');
+        payNowBtn.style.display = 'block';
+        payNowBtn.onclick = function() {
+            openPaymentGateway();
+        };
+    }
+
+    /**
+     * Open payment gateway in new window
+     */
+    function openPaymentGateway() {
+        if (!paymentUrl) {
+            showToast('Lỗi: URL thanh toán không hợp lệ', 'error');
+            return;
+        }
+
+        try {
+            const paymentWindow = window.open(paymentUrl, '_blank', 'width=800,height=600');
+            
+            if (!paymentWindow) {
+                showToast('Vui lòng cho phép popup để mở trang thanh toán', 'warning');
+                // Fallback: redirect in same window
+                setTimeout(() => {
+                    if (confirm('Không thể mở cửa sổ mới. Chuyển đến trang thanh toán?')) {
+                        window.location.href = paymentUrl;
+                    }
+                }, 1000);
+            } else {
+                showToast('Đã mở trang thanh toán. Vui lòng hoàn tất giao dịch.', 'info');
+                
+                // Monitor payment window
+                const checkWindow = setInterval(() => {
+                    if (paymentWindow.closed) {
+                        clearInterval(checkWindow);
+                        showToast('Cửa sổ thanh toán đã đóng. Vui lòng kiểm tra trạng thái giao dịch.', 'info');
+                    }
+                }, 1000);
+            }
+        } catch (error) {
+            console.error('Error opening payment gateway:', error);
+            showToast('Lỗi mở trang thanh toán', 'error');
+        }
+    }
+
+    /**
+     * Handle QR code loading error
+     */
+    function handleQRCodeError() {
+        document.getElementById('qr-container').innerHTML = `
+            <div class="error-container">
+                <h3>⚠️ Không thể tải mã QR</h3>
+                <p>Vui lòng thử lại hoặc sử dụng nút "Thanh toán ngay" bên dưới</p>
+                <button class="retry-btn" onclick="initializePayment()">🔄 Thử lại</button>
+            </div>
+        `;
+        showToast('Không thể tải mã QR. Vui lòng thử lại.', 'error');
+    }
+
+    /**
+     * Handle initialization errors
+     */
+    function handleInitializationError(error) {
+        const container = document.getElementById('qr-container');
+        container.innerHTML = `
+            <div class="error-container">
+                <h3>❌ Lỗi khởi tạo thanh toán</h3>
+                <p>${escapeHtml(error.message)}</p>
+                <button class="retry-btn" onclick="retryInitialization()">🔄 Thử lại</button>
+                <button class="retry-btn" onclick="window.location.href='/Subscription'" 
+                        style="background: #718096; margin-left: 10px;">
+                    ← Quay lại
+                </button>
+            </div>
+        `;
+        showToast(error.message, 'error');
+    }
+
+    /**
+     * Retry initialization
+     */
+    async function retryInitialization() {
+        retryCount = 0;
+        await initializePayment();
+    }
+
+    /**
+     * Show/hide loading overlay
+     */
+    function showLoadingOverlay(show, message = 'Đang xử lý...') {
+        const overlay = document.getElementById('loading-overlay');
+        const messageEl = document.getElementById('loading-message');
+        
+        if (overlay) {
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+        
+        if (messageEl && message) {
+            messageEl.textContent = message;
+        }
+    }
+
+    /**
+     * Show toast notification
+     */
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    /**
+     * Handle page visibility change (detect when user returns to tab)
+     */
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && paymentData) {
+            // User returned to tab - could check payment status here
+            console.log('User returned to payment page');
+        }
+    });
+
+    /**
+     * Clean up on page unload
+     */
+    window.addEventListener('beforeunload', function() {
+        // Keep session storage for potential return
+        console.log('Payment page unloading');
+    });
+
+    /**
+     * Global error handlers
+     */
+    window.addEventListener('error', function(event) {
+        console.error('Global error:', event.error);
+        showToast('Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+    });
+
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+        showToast('Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+    });
+</script>

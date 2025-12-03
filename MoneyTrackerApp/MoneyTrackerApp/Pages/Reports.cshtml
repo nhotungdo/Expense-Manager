@@ -4,6 +4,11 @@
     ViewData["Title"] = "Báo cáo & Phân tích";
 }
 
+<!-- External Libraries -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <div class="reports-container">
     <div class="page-header">
         <h1>
@@ -19,7 +24,7 @@
     <div class="dashboard-section">
         <h2>Tổng quan</h2>
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card" data-aos="zoom-in" data-aos-delay="0">
                 <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <i class="fas fa-wallet"></i>
                 </div>
@@ -29,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card" data-aos="zoom-in" data-aos-delay="100">
                 <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                     <i class="fas fa-arrow-up"></i>
                 </div>
@@ -39,7 +44,7 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
                 <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                     <i class="fas fa-arrow-down"></i>
                 </div>
@@ -49,7 +54,7 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card" data-aos="zoom-in" data-aos-delay="300">
                 <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
                     <i class="fas fa-piggy-bank"></i>
                 </div>
@@ -64,18 +69,40 @@
 
     <!-- Charts Section -->
     <div class="charts-section">
-        <div class="chart-container">
+        <div class="chart-container" data-aos="fade-up" data-aos-delay="100">
             <div class="chart-header">
-                <h3>Dòng tiền (7 ngày qua)</h3>
+                <h3>Phân tích thu chi</h3>
             </div>
-            <canvas id="cashFlowChart"></canvas>
+            <div id="cashFlowChart"></div>
         </div>
 
-        <div class="chart-container">
+        <div class="chart-container budget-card" data-aos="fade-up" data-aos-delay="200">
             <div class="chart-header">
-                <h3>Phân tích chi tiêu</h3>
+                <h3>Ngân sách</h3>
             </div>
-            <canvas id="expensePieChart"></canvas>
+            <div class="chart-wrapper">
+                <div id="budgetChart"></div>
+            </div>
+            <div class="budget-summary" id="budgetSummary">
+                <div class="budget-item">
+                    <span class="label">Đã chi</span>
+                    <span class="value" id="totalSpent">0</span>
+                </div>
+                <div class="budget-item">
+                    <span class="label">Giới hạn</span>
+                    <span class="value" id="totalLimit">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reports-section">
+        <div class="chart-container transactions-card" data-aos="fade-left" data-aos-delay="300">
+            <div class="card-header">
+                <h3>Giao dịch gần đây</h3>
+                <a href="/Transactions" class="view-all">Xem tất cả</a>
+            </div>
+            <div class="transaction-list" id="recentTransactions"></div>
         </div>
     </div>
 
@@ -648,21 +675,50 @@
         background: #d1ecf1;
         color: #0c5460;
     }
+
+    /* Transactions List */
+    .transactions-card .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .view-all { font-size: 13px; color: #00D9F5; text-decoration: none; font-weight: 600; }
+    .transaction-list { display: flex; flex-direction: column; gap: 12px; }
+    .transaction-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid #eee; border-radius: 12px; background: #fff; }
+    .t-icon { width: 36px; height: 36px; border-radius: 10px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .t-info { flex: 1; margin-left: 12px; }
+    .t-desc { font-size: 14px; font-weight: 600; color: #1A1A1A; margin-bottom: 2px; }
+    .t-date { font-size: 11px; color: #8E8E93; }
+    .t-amount { font-weight: 700; font-size: 14px; }
+    .text-success { color: #00E396 !important; }
+    .text-danger { color: #FF4560 !important; }
+
+    /* Budget over-limit flash */
+    .flash-warning { animation: flash 1s infinite; }
+    @@keyframes flash { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* Tooltip subtle zoom */
+    .apexcharts-tooltip { transition: transform 0.2s ease, opacity 0.2s ease; }
+    .apexcharts-tooltip.active { transform: scale(1.05); }
 </style>
 
 <script>
-    let cashFlowChart = null;
-    let expensePieChart = null;
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true
+    });
 
     // Load dashboard on page load
     document.addEventListener('DOMContentLoaded', function() {
         loadDashboard();
         loadAiSuggestions();
-        
+
         // Set default dates
         const today = new Date();
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-        
+
         document.getElementById('cashflowStartDate').valueAsDate = firstDay;
         document.getElementById('cashflowEndDate').valueAsDate = today;
         document.getElementById('categoryStartDate').valueAsDate = firstDay;
@@ -690,70 +746,144 @@
     }
 
     function displayDashboard(data) {
-        // Update stats
-        document.getElementById('currentBalance').textContent = formatCurrency(data.currentBalance) + ' VND';
-        document.getElementById('monthlyIncome').textContent = formatCurrency(data.monthlyIncome) + ' VND';
-        document.getElementById('monthlyExpense').textContent = formatCurrency(data.monthlyExpense) + ' VND';
-        document.getElementById('monthlySavings').textContent = formatCurrency(data.monthlySavings) + ' VND';
+        animateValue('currentBalance', 0, data.currentBalance, 1500);
+        animateValue('monthlyIncome', 0, data.monthlyIncome, 1200);
+        animateValue('monthlyExpense', 0, data.monthlyExpense, 1200);
+        animateValue('monthlySavings', 0, data.monthlySavings, 1200);
         document.getElementById('savingsRate').textContent = `${data.savingsRate.toFixed(1)}% tỷ lệ tiết kiệm`;
 
-        // Create cash flow chart
-        if (cashFlowChart) cashFlowChart.destroy();
-        const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
-        cashFlowChart = new Chart(cashFlowCtx, {
-            type: 'line',
-            data: {
-                labels: data.cashFlowChart.labels,
-                datasets: [
-                    {
-                        label: 'Thu nhập',
-                        data: data.cashFlowChart.incomeData,
-                        borderColor: '#4CAF50',
-                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Chi tiêu',
-                        data: data.cashFlowChart.expenseData,
-                        borderColor: '#f44336',
-                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
+        renderMainChart(data.cashFlowChart);
+        renderBudgetChart(data.budgetAlerts);
+        renderTransactions(data.recentTransactions);
+    }
 
-        // Create expense pie chart
-        if (expensePieChart) expensePieChart.destroy();
-        const pieCtx = document.getElementById('expensePieChart').getContext('2d');
-        expensePieChart = new Chart(pieCtx, {
-            type: 'doughnut',
-            data: {
-                labels: data.expensePieChart.map(item => item.label),
-                datasets: [{
-                    data: data.expensePieChart.map(item => item.value),
-                    backgroundColor: data.expensePieChart.map(item => item.color)
-                }]
+    function animateValue(id, start, end, duration) {
+        const el = document.getElementById(id);
+        let startTs = null;
+        const step = (ts) => {
+            if (!startTs) startTs = ts;
+            const progress = Math.min((ts - startTs) / duration, 1);
+            const value = Math.floor(progress * (end - start) + start);
+            el.innerHTML = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+            if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    }
+
+    function renderMainChart(chartData) {
+        const options = {
+            series: [
+                { name: 'Thu nhập', data: chartData.incomeData },
+                { name: 'Chi tiêu', data: chartData.expenseData }
+            ],
+            chart: {
+                type: 'area',
+                height: 300,
+                toolbar: { show: false },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    animateGradually: { enabled: true, delay: 150 },
+                    dynamicAnimation: { enabled: true, speed: 350 }
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
+            colors: ['#00D9F5', '#FF60A8'],
+            dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 3 },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.2,
+                    stops: [0, 90, 100],
+                    gradientToColors: ['#007CF0', '#8A2BE2']
+                }
+            },
+            xaxis: { categories: chartData.labels, axisBorder: { show: false }, axisTicks: { show: false } },
+            yaxis: { show: false },
+            tooltip: {
+                theme: 'light',
+                y: {
+                    formatter: function (val) {
+                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
                     }
                 }
             }
-        });
+        };
+        const chart = new ApexCharts(document.querySelector('#cashFlowChart'), options);
+        chart.render();
+    }
+
+    function renderBudgetChart(alerts) {
+        let totalSpent = 0;
+        let totalLimit = 0;
+        if (alerts && alerts.length > 0) {
+            alerts.forEach(a => { totalSpent += a.spent; totalLimit += a.amount; });
+        }
+        let percentage = totalLimit > 0 ? (totalSpent / totalLimit) * 100 : 0;
+        const over = percentage >= 100;
+        if (percentage > 100) percentage = 100;
+        document.getElementById('totalSpent').textContent = formatShortCurrency(totalSpent);
+        document.getElementById('totalLimit').textContent = formatShortCurrency(totalLimit);
+
+        const options = {
+            series: [Math.round(percentage)],
+            chart: {
+                height: 280,
+                type: 'radialBar',
+                animations: { enabled: true, easing: 'easeinout', speed: 800, animateGradually: { enabled: true, delay: 150 }, dynamicAnimation: { enabled: true, speed: 350 } }
+            },
+            plotOptions: {
+                radialBar: {
+                    hollow: { size: '65%', background: 'transparent' },
+                    track: { background: '#f2f2f2' },
+                    dataLabels: {
+                        name: { show: true, label: 'Đã dùng', color: '#888', fontSize: '14px' },
+                        value: { fontSize: '32px', fontWeight: 700, color: over ? '#FF4560' : '#1A1A1A', formatter: function (val) { return val + '%'; } }
+                    }
+                }
+            },
+            fill: {
+                type: 'gradient',
+                gradient: { shade: 'dark', type: 'horizontal', gradientToColors: [over ? '#FF0000' : '#007CF0'], stops: [0, 100] }
+            },
+            stroke: { lineCap: 'round' },
+            colors: [over ? '#FF4560' : '#00D9F5']
+        };
+        const chart = new ApexCharts(document.querySelector('#budgetChart'), options);
+        chart.render();
+        const wrapper = document.querySelector('.budget-card .chart-wrapper');
+        if (over && wrapper) wrapper.classList.add('flash-warning');
+    }
+
+    function renderTransactions(transactions) {
+        const container = document.getElementById('recentTransactions');
+        if (!container) return;
+        if (!transactions || transactions.length === 0) {
+            container.innerHTML = '<div class="text-center py-4 text-muted">Không có giao dịch gần đây.</div>';
+            return;
+        }
+        container.innerHTML = transactions.map((t, index) => `
+            <div class="transaction-item" data-aos="fade-up" data-aos-delay="${index * 100}">
+                <div class="t-icon">${t.categoryIcon || '📄'}</div>
+                <div class="t-info">
+                    <div class="t-desc">${t.description}</div>
+                    <div class="t-date">${new Date(t.date).toLocaleDateString('vi-VN')}</div>
+                </div>
+                <div class="t-amount ${t.type === 'Income' ? 'text-success' : 'text-danger'}">${t.type === 'Income' ? '+' : '-'} ${formatCurrency(t.amount)}</div>
+            </div>
+        `).join('');
+        setTimeout(() => AOS.refresh(), 500);
+    }
+
+    function formatCurrency(amount) { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount); }
+    function formatShortCurrency(amount) {
+        if (amount >= 1000000000) return (amount / 1000000000).toFixed(1) + ' tỷ';
+        if (amount >= 1000000) return (amount / 1000000).toFixed(1) + ' tr';
+        if (amount >= 1000) return (amount / 1000).toFixed(0) + ' k';
+        return amount.toString();
     }
 
     async function loadCashFlowReport() {
@@ -784,7 +914,7 @@
 
     function displayCashFlowReport(data) {
         const container = document.getElementById('cashflowReport');
-        
+
         container.innerHTML = `
             <div class="report-summary">
                 <div class="summary-card">
@@ -857,10 +987,10 @@
 
     function displayMonthlyTrends(data) {
         const container = document.getElementById('trendsReport');
-        
+
         const trendClass = data.trend === 'Increasing' ? 'trend-increasing' : 
                           data.trend === 'Decreasing' ? 'trend-decreasing' : 'trend-stable';
-        
+
         container.innerHTML = `
             <div class="report-summary">
                 <div class="summary-card">
@@ -945,7 +1075,7 @@
 
     function displayCategoryBreakdown(data) {
         const container = document.getElementById('categoriesReport');
-        
+
         container.innerHTML = `
             <div class="report-summary">
                 <div class="summary-card">
@@ -1018,7 +1148,7 @@
 
     function displayAiSuggestions(suggestions) {
         const container = document.getElementById('aiSuggestions');
-        
+
         if (suggestions.length === 0) {
             container.innerHTML = '<p class="info-message">Chưa có thông tin chi tiết AI. Nhấp "Tạo thông tin chi tiết mới" để phân tích thói quen chi tiêu của bạn.</p>';
             return;
@@ -1072,7 +1202,7 @@
 
     document.getElementById('exportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         const data = {
             reportType: parseInt(document.getElementById('exportReportType').value),
             startDate: document.getElementById('exportStartDate').value,
@@ -1106,7 +1236,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            
+
             // Try to get filename from Content-Disposition header
             const contentDisposition = response.headers.get('Content-Disposition');
             let fileName = 'report.csv';
@@ -1116,7 +1246,7 @@
                     fileName = filenameMatch[1].replace(/['"]/g, '');
                 }
             }
-            
+
             a.download = fileName;
             document.body.appendChild(a);
             a.click();

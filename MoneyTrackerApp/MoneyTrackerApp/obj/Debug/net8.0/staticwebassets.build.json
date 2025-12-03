@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "4OeREM6KOcGzlIOvi8djUrFRouOiKpHzpyNk5CIIPdU=",
+  "Hash": "B4eUC2ahIWsDnKwesau5bRgZfnGxMFAvCki4aOj6YAQ=",
   "Source": "MoneyTrackerApp",
   "BasePath": "_content/MoneyTrackerApp",
   "Mode": "Default",
@@ -281,6 +281,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\site.js"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\subscription-utils.js",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "js/subscription-utils.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\subscription-utils.js"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",

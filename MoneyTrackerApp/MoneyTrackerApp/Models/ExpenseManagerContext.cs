@@ -83,6 +83,12 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<VwUserTransactionSummary> VwUserTransactionSummaries { get; set; }
 
+    public virtual DbSet<ServicePackage> ServicePackages { get; set; }
+
+    public virtual DbSet<Subscription> Subscriptions { get; set; }
+
+    public virtual DbSet<Payment> Payments { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
@@ -669,6 +675,64 @@ public partial class ExpenseManagerContext : DbContext
             entity.Property(e => e.TotalExpense).HasColumnType("decimal(38, 2)");
             entity.Property(e => e.TotalIncome).HasColumnType("decimal(38, 2)");
             entity.Property(e => e.UserName).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<ServicePackage>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_ServicePackages_UpdatedAt"));
+
+            entity.HasIndex(e => e.PackageType, "IX_ServicePackages_PackageType");
+            entity.HasIndex(e => e.IsActive, "IX_ServicePackages_IsActive");
+
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.BillingCycle).HasDefaultValue(1);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.DisplayOrder).HasDefaultValue(0);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+        });
+
+        modelBuilder.Entity<Subscription>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_Subscriptions_UpdatedAt"));
+
+            entity.HasIndex(e => e.UserId, "IX_Subscriptions_UserId");
+            entity.HasIndex(e => e.PackageId, "IX_Subscriptions_PackageId");
+            entity.HasIndex(e => e.Status, "IX_Subscriptions_Status");
+            entity.HasIndex(e => e.EndDate, "IX_Subscriptions_EndDate");
+
+            entity.Property(e => e.Status).HasDefaultValue(0);
+            entity.Property(e => e.AutoRenew).HasDefaultValue(true);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.Package).WithMany(p => p.Subscriptions)
+                .HasForeignKey(d => d.PackageId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.ToTable(tb => tb.HasTrigger("tr_Payments_UpdatedAt"));
+
+            entity.HasIndex(e => e.SubscriptionId, "IX_Payments_SubscriptionId");
+            entity.HasIndex(e => e.Status, "IX_Payments_Status");
+            entity.HasIndex(e => e.TransactionId, "IX_Payments_TransactionId");
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Currency).HasMaxLength(3).HasDefaultValue("VND");
+            entity.Property(e => e.Status).HasDefaultValue(0);
+            entity.Property(e => e.PaymentMethod).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.TransactionId).HasMaxLength(256);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Subscription).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.SubscriptionId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);

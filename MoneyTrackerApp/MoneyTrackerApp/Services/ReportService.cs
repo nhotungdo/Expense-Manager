@@ -23,25 +23,25 @@ public class ReportService : IReportService
     private readonly ExpenseManagerContext _context;
     private readonly ITransactionService _transactionService;
     private readonly IBudgetService _budgetService;
+    private readonly ISavingsGoalService _savingsGoalService;
 
-    public ReportService(ExpenseManagerContext context, ITransactionService transactionService, IBudgetService budgetService)
+    public ReportService(
+        ExpenseManagerContext context, 
+        ITransactionService transactionService, 
+        IBudgetService budgetService,
+        ISavingsGoalService savingsGoalService)
     {
         _context = context;
         _transactionService = transactionService;
         _budgetService = budgetService;
+        _savingsGoalService = savingsGoalService;
     }
 
-    /// <summary>
-    /// Generate cash flow report
-    /// </summary>
     public async Task<CashFlowReportDto> GenerateCashFlowReportAsync(long userId, DateTime startDate, DateTime endDate)
     {
         var transactions = await _context.Transactions
             .Include(t => t.Category)
-            .Where(t => t.UserId == userId 
-                && t.TransactionDate >= startDate 
-                && t.TransactionDate <= endDate
-                && t.TransactionType != 3) // Exclude transfers
+            .Where(t => t.UserId == userId && t.TransactionDate >= startDate && t.TransactionDate <= endDate)
             .ToListAsync();
 
         var incomeTransactions = transactions.Where(t => t.TransactionType == 1).ToList();
@@ -50,168 +50,133 @@ public class ReportService : IReportService
         var totalIncome = incomeTransactions.Sum(t => t.Amount);
         var totalExpense = expenseTransactions.Sum(t => t.Amount);
 
-        // Group by category
-        var incomeItems = incomeTransactions
-            .GroupBy(t => t.Category?.Name ?? "Uncategorized")
-            .Select(g => new CashFlowItemDto
-            {
-                CategoryName = g.Key,
-                Amount = g.Sum(t => t.Amount),
-                Percentage = totalIncome > 0 ? (g.Sum(t => t.Amount) / totalIncome) * 100 : 0
-            })
-            .OrderByDescending(i => i.Amount)
-            .ToList();
-
-        var expenseItems = expenseTransactions
-            .GroupBy(t => t.Category?.Name ?? "Uncategorized")
-            .Select(g => new CashFlowItemDto
-            {
-                CategoryName = g.Key,
-                Amount = g.Sum(t => t.Amount),
-                Percentage = totalExpense > 0 ? (g.Sum(t => t.Amount) / totalExpense) * 100 : 0
-            })
-            .OrderByDescending(i => i.Amount)
-            .ToList();
-
-        // Daily breakdown
-        var dailyBreakdown = transactions
-            .GroupBy(t => t.TransactionDate.Date)
-            .Select(g => new DailyCashFlowDto
-            {
-                Date = g.Key,
-                Income = g.Where(t => t.TransactionType == 1).Sum(t => t.Amount),
-                Expense = g.Where(t => t.TransactionType == 2).Sum(t => t.Amount),
-                NetFlow = g.Where(t => t.TransactionType == 1).Sum(t => t.Amount) - 
-                         g.Where(t => t.TransactionType == 2).Sum(t => t.Amount)
-            })
-            .OrderBy(d => d.Date)
-            .ToList();
-
-        return new CashFlowReportDto
+        var report = new CashFlowReportDto
         {
             StartDate = startDate,
             EndDate = endDate,
             TotalIncome = totalIncome,
             TotalExpense = totalExpense,
             NetCashFlow = totalIncome - totalExpense,
-            IncomeItems = incomeItems,
-            ExpenseItems = expenseItems,
-            DailyBreakdown = dailyBreakdown
+            IncomeItems = incomeTransactions
+                .GroupBy(t => t.Category?.Name ?? "Other")
+                .Select(g => new CashFlowItemDto
+                {
+                    CategoryName = g.Key,
+                    Amount = g.Sum(t => t.Amount),
+                    Percentage = totalIncome > 0 ? (g.Sum(t => t.Amount) / totalIncome) * 100 : 0
+                }).ToList(),
+            ExpenseItems = expenseTransactions
+                .GroupBy(t => t.Category?.Name ?? "Other")
+                .Select(g => new CashFlowItemDto
+                {
+                    CategoryName = g.Key,
+                    Amount = g.Sum(t => t.Amount),
+                    Percentage = totalExpense > 0 ? (g.Sum(t => t.Amount) / totalExpense) * 100 : 0
+                }).ToList(),
+            DailyBreakdown = transactions
+                .GroupBy(t => t.TransactionDate.Date)
+                .Select(g => new DailyCashFlowDto
+                {
+                    Date = g.Key,
+                    Income = g.Where(t => t.TransactionType == 1).Sum(t => t.Amount),
+                    Expense = g.Where(t => t.TransactionType == 2).Sum(t => t.Amount),
+                    NetFlow = g.Where(t => t.TransactionType == 1).Sum(t => t.Amount) - g.Where(t => t.TransactionType == 2).Sum(t => t.Amount)
+                })
+                .OrderBy(d => d.Date)
+                .ToList()
         };
+
+        return report;
     }
 
-    /// <summary>
-    /// Generate monthly trend report
-    /// </summary>
     public async Task<MonthlyTrendReportDto> GenerateMonthlyTrendReportAsync(long userId, int year)
     {
-        var startDate = new DateTime(year, 1, 1);
-        var endDate = new DateTime(year, 12, 31);
-
         var transactions = await _context.Transactions
-            .Where(t => t.UserId == userId 
-                && t.TransactionDate >= startDate 
-                && t.TransactionDate <= endDate
-                && t.TransactionType != 3) // Exclude transfers
+            .Where(t => t.UserId == userId && t.TransactionDate.Year == year)
             .ToListAsync();
 
         var monthlyData = new List<MonthlyDataDto>();
-
-        for (int month = 1; month <= 12; month++)
+        for (int i = 1; i <= 12; i++)
         {
-            var monthTransactions = transactions
-                .Where(t => t.TransactionDate.Month == month)
-                .ToList();
-
+            var monthTransactions = transactions.Where(t => t.TransactionDate.Month == i).ToList();
             var income = monthTransactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
             var expense = monthTransactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
-            var netIncome = income - expense;
-            var savingsRate = income > 0 ? (netIncome / income) * 100 : 0;
-
+            
             monthlyData.Add(new MonthlyDataDto
             {
-                Month = month,
-                MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month),
+                Month = i,
+                MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
                 Income = income,
                 Expense = expense,
-                NetIncome = netIncome,
-                SavingsRate = savingsRate
+                NetIncome = income - expense,
+                SavingsRate = income > 0 ? ((income - expense) / income) * 100 : 0
             });
         }
 
-        var averageIncome = monthlyData.Average(m => m.Income);
-        var averageExpense = monthlyData.Average(m => m.Expense);
-
-        // Determine trend
-        var firstHalfIncome = monthlyData.Take(6).Average(m => m.Income);
-        var secondHalfIncome = monthlyData.Skip(6).Average(m => m.Income);
-        var trend = secondHalfIncome > firstHalfIncome * 1.1m ? "Increasing" :
-                   secondHalfIncome < firstHalfIncome * 0.9m ? "Decreasing" : "Stable";
+        var avgIncome = monthlyData.Average(m => m.Income);
+        var avgExpense = monthlyData.Average(m => m.Expense);
+        
+        // Simple trend analysis
+        var firstHalf = monthlyData.Take(6).Sum(m => m.NetIncome);
+        var secondHalf = monthlyData.Skip(6).Sum(m => m.NetIncome);
+        string trend = "Stable";
+        if (secondHalf > firstHalf * 1.1m) trend = "Increasing";
+        else if (secondHalf < firstHalf * 0.9m) trend = "Decreasing";
 
         return new MonthlyTrendReportDto
         {
             Year = year,
             MonthlyData = monthlyData,
-            AverageIncome = averageIncome,
-            AverageExpense = averageExpense,
+            AverageIncome = avgIncome,
+            AverageExpense = avgExpense,
             Trend = trend
         };
     }
 
-    /// <summary>
-    /// Generate category breakdown report
-    /// </summary>
     public async Task<CategoryBreakdownReportDto> GenerateCategoryBreakdownAsync(long userId, DateTime startDate, DateTime endDate)
     {
         var transactions = await _context.Transactions
             .Include(t => t.Category)
-            .Where(t => t.UserId == userId 
-                && t.TransactionDate >= startDate 
-                && t.TransactionDate <= endDate
-                && t.TransactionType != 3)
+            .Where(t => t.UserId == userId && t.TransactionDate >= startDate && t.TransactionDate <= endDate)
             .ToListAsync();
 
-        var totalIncome = transactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
-        var totalExpense = transactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
-
-        var incomeCategories = transactions
-            .Where(t => t.TransactionType == 1)
-            .GroupBy(t => new { t.Category?.Name, t.Category?.Icon, t.Category?.Color })
-            .Select(g => new CategoryBreakdownItemDto
-            {
-                CategoryName = g.Key.Name ?? "Uncategorized",
-                CategoryIcon = g.Key.Icon,
-                CategoryColor = g.Key.Color,
-                Amount = g.Sum(t => t.Amount),
-                Percentage = totalIncome > 0 ? (g.Sum(t => t.Amount) / totalIncome) * 100 : 0,
-                TransactionCount = g.Count()
-            })
-            .OrderByDescending(c => c.Amount)
-            .ToList();
-
-        var expenseCategories = transactions
-            .Where(t => t.TransactionType == 2)
-            .GroupBy(t => new { t.Category?.Name, t.Category?.Icon, t.Category?.Color })
-            .Select(g => new CategoryBreakdownItemDto
-            {
-                CategoryName = g.Key.Name ?? "Uncategorized",
-                CategoryIcon = g.Key.Icon,
-                CategoryColor = g.Key.Color,
-                Amount = g.Sum(t => t.Amount),
-                Percentage = totalExpense > 0 ? (g.Sum(t => t.Amount) / totalExpense) * 100 : 0,
-                TransactionCount = g.Count()
-            })
-            .OrderByDescending(c => c.Amount)
-            .ToList();
+        var incomeTransactions = transactions.Where(t => t.TransactionType == 1).ToList();
+        var expenseTransactions = transactions.Where(t => t.TransactionType == 2).ToList();
+        var totalIncome = incomeTransactions.Sum(t => t.Amount);
+        var totalExpense = expenseTransactions.Sum(t => t.Amount);
 
         return new CategoryBreakdownReportDto
         {
             StartDate = startDate,
             EndDate = endDate,
-            IncomeCategories = incomeCategories,
-            ExpenseCategories = expenseCategories,
             TotalIncome = totalIncome,
-            TotalExpense = totalExpense
+            TotalExpense = totalExpense,
+            IncomeCategories = incomeTransactions
+                .GroupBy(t => t.Category)
+                .Select(g => new CategoryBreakdownItemDto
+                {
+                    CategoryName = g.Key?.Name ?? "Other",
+                    CategoryIcon = g.Key?.Icon,
+                    CategoryColor = g.Key?.Color,
+                    Amount = g.Sum(t => t.Amount),
+                    Percentage = totalIncome > 0 ? (g.Sum(t => t.Amount) / totalIncome) * 100 : 0,
+                    TransactionCount = g.Count()
+                })
+                .OrderByDescending(i => i.Amount)
+                .ToList(),
+            ExpenseCategories = expenseTransactions
+                .GroupBy(t => t.Category)
+                .Select(g => new CategoryBreakdownItemDto
+                {
+                    CategoryName = g.Key?.Name ?? "Other",
+                    CategoryIcon = g.Key?.Icon,
+                    CategoryColor = g.Key?.Color,
+                    Amount = g.Sum(t => t.Amount),
+                    Percentage = totalExpense > 0 ? (g.Sum(t => t.Amount) / totalExpense) * 100 : 0,
+                    TransactionCount = g.Count()
+                })
+                .OrderByDescending(i => i.Amount)
+                .ToList()
         };
     }
 
@@ -221,8 +186,9 @@ public class ReportService : IReportService
     public async Task<DashboardOverviewDto> GetDashboardOverviewAsync(long userId)
     {
         var now = DateTime.UtcNow;
-        var startOfMonth = new DateTime(now.Year, now.Month, 1);
-        var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+        var startOfCurrentMonth = new DateTime(now.Year, now.Month, 1);
+        var endOfCurrentMonth = startOfCurrentMonth.AddMonths(1).AddDays(-1);
+        var startOfSixMonthsAgo = startOfCurrentMonth.AddMonths(-5);
 
         // Get current balance
         var accounts = await _context.Accounts
@@ -230,40 +196,47 @@ public class ReportService : IReportService
             .ToListAsync();
         var currentBalance = accounts.Sum(a => a.CurrentBalance);
 
-        // Get monthly income and expense
-        var monthlyTransactions = await _context.Transactions
+        // Get transactions for the last 6 months (for chart)
+        var sixMonthTransactions = await _context.Transactions
             .Where(t => t.UserId == userId 
-                && t.TransactionDate >= startOfMonth 
-                && t.TransactionDate <= endOfMonth
+                && t.TransactionDate >= startOfSixMonthsAgo 
+                && t.TransactionDate <= endOfCurrentMonth
                 && t.TransactionType != 3)
             .ToListAsync();
 
-        var monthlyIncome = monthlyTransactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
-        var monthlyExpense = monthlyTransactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
+        // Calculate stats for the CURRENT month
+        var currentMonthTransactions = sixMonthTransactions
+            .Where(t => t.TransactionDate >= startOfCurrentMonth && t.TransactionDate <= endOfCurrentMonth)
+            .ToList();
+
+        var monthlyIncome = currentMonthTransactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
+        var monthlyExpense = currentMonthTransactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
         var monthlySavings = monthlyIncome - monthlyExpense;
         var savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome) * 100 : 0;
 
-        // Cash flow chart (last 7 days)
-        var last7Days = Enumerable.Range(0, 7)
-            .Select(i => now.AddDays(-6 + i).Date)
-            .ToList();
-
+        // Cash flow chart (last 6 months)
         var cashFlowChart = new CashFlowChartDto
         {
-            Labels = last7Days.Select(d => d.ToString("MM/dd")).ToList(),
+            Labels = new List<string>(),
             IncomeData = new List<decimal>(),
             ExpenseData = new List<decimal>()
         };
 
-        foreach (var day in last7Days)
+        for (int i = 0; i < 6; i++)
         {
-            var dayTransactions = monthlyTransactions.Where(t => t.TransactionDate.Date == day).ToList();
-            cashFlowChart.IncomeData.Add(dayTransactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount));
-            cashFlowChart.ExpenseData.Add(dayTransactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount));
+            var monthDate = startOfSixMonthsAgo.AddMonths(i);
+            cashFlowChart.Labels.Add(monthDate.ToString("MM/yyyy"));
+
+            var monthTrans = sixMonthTransactions
+                .Where(t => t.TransactionDate.Year == monthDate.Year && t.TransactionDate.Month == monthDate.Month)
+                .ToList();
+
+            cashFlowChart.IncomeData.Add(monthTrans.Where(t => t.TransactionType == 1).Sum(t => t.Amount));
+            cashFlowChart.ExpenseData.Add(monthTrans.Where(t => t.TransactionType == 2).Sum(t => t.Amount));
         }
 
-        // Expense pie chart (top 5 categories)
-        var expensePieChart = monthlyTransactions
+        // Expense pie chart (top 3 categories in current month)
+        var expensePieChart = currentMonthTransactions
             .Where(t => t.TransactionType == 2)
             .GroupBy(t => new { CategoryName = t.Category?.Name ?? "Other", Color = t.Category?.Color ?? "#999999" })
             .Select(g => new CategoryPieChartDto
@@ -273,7 +246,7 @@ public class ReportService : IReportService
                 Color = g.Key.Color
             })
             .OrderByDescending(c => c.Value)
-            .Take(5)
+            .Take(3)
             .ToList();
 
         // Recent transactions
@@ -281,6 +254,9 @@ public class ReportService : IReportService
 
         // Budget alerts
         var budgetAlerts = await _budgetService.GetBudgetAlertsAsync(userId);
+
+        // Savings Goals
+        var savingsGoals = await _savingsGoalService.GetUserSavingsGoalsAsync(userId, activeOnly: true);
 
         return new DashboardOverviewDto
         {
@@ -300,7 +276,8 @@ public class ReportService : IReportService
                 Date = t.TransactionDate,
                 CategoryIcon = t.CategoryIcon
             }).ToList(),
-            BudgetAlerts = budgetAlerts
+            BudgetAlerts = budgetAlerts,
+            SavingsGoals = savingsGoals.Take(3).ToList() // Take top 3 goals
         };
     }
 

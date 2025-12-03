@@ -1,0 +1,594 @@
+@page
+@model MoneyTrackerApp.Pages.Subscription.IndexModel
+@{
+    ViewData["Title"] = "Chọn gói dịch vụ";
+}
+
+<div class="subscription-page">
+    <div class="container">
+        <div class="page-header">
+            <h1>Chọn gói dịch vụ phù hợp</h1>
+            <p>Nâng cấp tài khoản để trải nghiệm đầy đủ tính năng</p>
+        </div>
+
+        <div id="packages-container" class="packages-grid">
+            <!-- Packages will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<style>
+    .subscription-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        color: white;
+        margin-bottom: 50px;
+    }
+
+    .page-header h1 {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        font-size: 18px;
+        opacity: 0.9;
+    }
+
+    .packages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .package-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px 30px;
+        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .package-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .package-card.popular {
+        border: 3px solid #667eea;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .package-badge {
+        position: absolute;
+        top: -15px;
+        right: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .package-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #1a202c;
+    }
+
+    .package-price {
+        font-size: 36px;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 5px;
+    }
+
+    .package-price small {
+        font-size: 16px;
+        color: #718096;
+        font-weight: 400;
+    }
+
+    .package-description {
+        color: #718096;
+        margin-bottom: 30px;
+        min-height: 40px;
+    }
+
+    .package-features {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 30px 0;
+    }
+
+    .package-features li {
+        padding: 12px 0;
+        color: #4a5568;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .package-features li:before {
+        content: "✓";
+        color: #48bb78;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .package-btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .package-btn.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .package-btn.primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .package-btn.outline {
+        background: white;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+
+    .package-btn.outline:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .loading {
+        text-align: center;
+        color: white;
+        font-size: 18px;
+        padding: 50px;
+    }
+
+    @@media (max-width: 768px) {
+        .packages-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+        }
+    }
+</style>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+    </div>
+</div>
+
+<style>
+    /* Toast Notification Styles */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+        z-index: 10000;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast.success {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .toast.error {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    }
+
+    .toast.warning {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    }
+
+    .toast.info {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    }
+
+    /* Loading Overlay Styles */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        backdrop-filter: blur(4px);
+    }
+
+    .loading-spinner {
+        text-align: center;
+        color: white;
+    }
+
+    .loading-spinner .spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    .loading-spinner p {
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .package-card.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+</style>
+
+<script>
+    // Global state
+    let packagesCache = null;
+    let isProcessing = false;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Check for return from login
+        checkLoginReturn();
+        
+        // Load packages
+        await loadPackages();
+    });
+
+    /**
+     * Check if user returned from login and has a pending package selection
+     */
+    function checkLoginReturn() {
+        const pendingPackage = sessionStorage.getItem('pendingPackageSelection');
+        if (pendingPackage) {
+            const packageData = JSON.parse(pendingPackage);
+            showToast('Đăng nhập thành công! Đang chuyển đến trang thanh toán...', 'success');
+            
+            // Clear the pending selection
+            sessionStorage.removeItem('pendingPackageSelection');
+            
+            // Redirect to payment after a short delay
+            setTimeout(() => {
+                window.location.href = `/Subscription/Payment?packageId=${packageData.id}`;
+            }, 1500);
+        }
+    }
+
+    /**
+     * Load all available packages from API
+     */
+    async function loadPackages() {
+        const container = document.getElementById('packages-container');
+        container.innerHTML = '<div class="loading">Đang tải gói dịch vụ...</div>';
+
+        try {
+            const response = await fetch('/api/Subscription/packages', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const packages = await response.json();
+            
+            if (!packages || packages.length === 0) {
+                container.innerHTML = '<div class="loading">Hiện tại không có gói dịch vụ nào.</div>';
+                return;
+            }
+
+            // Cache packages for later use
+            packagesCache = packages;
+            
+            // Render packages
+            container.innerHTML = packages.map(pkg => `
+                <div class="package-card ${pkg.isPopular ? 'popular' : ''}" 
+                     data-package-id="${pkg.id}"
+                     onclick="selectPackage(${pkg.id})">
+                    ${pkg.isPopular ? '<div class="package-badge">Phổ biến nhất</div>' : ''}
+                    <div class="package-name">${escapeHtml(fixEncoding(pkg.name))}</div>
+                    <div class="package-price">
+                        ${pkg.price.toLocaleString('vi-VN')}₫
+                        <small>/${escapeHtml(fixEncoding(pkg.billingCycleName.toLowerCase()))}</small>
+                    </div>
+                    <div class="package-description">${escapeHtml(fixEncoding(pkg.description || ''))}</div>
+                    <ul class="package-features">
+                        ${pkg.features.map(feature => `<li>${escapeHtml(fixEncoding(feature))}</li>`).join('')}
+                        ${pkg.maxTransactions > 0 ? `<li>Tối đa ${pkg.maxTransactions.toLocaleString('vi-VN')} giao dịch</li>` : ''}
+                        ${pkg.maxAccounts > 0 ? `<li>Tối đa ${pkg.maxAccounts} tài khoản</li>` : ''}
+                        ${pkg.hasAdvancedReports ? '<li>Báo cáo nâng cao</li>' : ''}
+                        ${pkg.hasAiAdvisor ? '<li>Tư vấn AI</li>' : ''}
+                        ${pkg.hasGroupExpense ? '<li>Chi tiêu nhóm</li>' : ''}
+                        ${pkg.hasPrioritySupport ? '<li>Hỗ trợ ưu tiên</li>' : ''}
+                    </ul>
+                    <button class="package-btn ${pkg.isPopular ? 'primary' : 'outline'}">
+                        ${pkg.price === 0 ? 'Dùng thử miễn phí' : 'Đăng ký ngay'}
+                    </button>
+                </div>
+            `).join('');
+
+            showToast('Đã tải gói dịch vụ thành công', 'success');
+        } catch (error) {
+            console.error('Error loading packages:', error);
+            container.innerHTML = `
+                <div class="loading">
+                    <p style="color: #e53e3e; margin-bottom: 20px;">
+                        ❌ Không thể tải gói dịch vụ: ${escapeHtml(error.message)}
+                    </p>
+                    <button class="package-btn primary" onclick="loadPackages()">
+                        🔄 Thử lại
+                    </button>
+                </div>
+            `;
+            showToast('Lỗi khi tải gói dịch vụ. Vui lòng thử lại.', 'error');
+        }
+    }
+
+    /**
+     * Handle package selection with authentication check
+     */
+    async function selectPackage(packageId) {
+        // Prevent multiple simultaneous selections
+        if (isProcessing) {
+            showToast('Đang xử lý yêu cầu trước đó...', 'warning');
+            return;
+        }
+
+        isProcessing = true;
+        showLoadingOverlay(true);
+
+        try {
+            // Get package details from cache
+            const selectedPackage = packagesCache?.find(p => p.id === packageId);
+            if (!selectedPackage) {
+                throw new Error('Không tìm thấy gói dịch vụ');
+            }
+
+            // Store package details in session storage
+            storePackageSelection(selectedPackage);
+
+            // Check authentication status
+            const authStatus = await checkAuthenticationStatus();
+
+            if (!authStatus.isAuthenticated) {
+                // User not logged in
+                handleUnauthenticatedUser(packageId);
+                return;
+            }
+
+            // Check for existing subscription
+            const hasActiveSubscription = await checkActiveSubscription();
+
+            if (hasActiveSubscription) {
+                showLoadingOverlay(false);
+                isProcessing = false;
+                showToast('Bạn đã có gói dịch vụ đang hoạt động. Vui lòng hủy gói hiện tại trước khi đăng ký gói mới.', 'warning');
+                return;
+            }
+
+            // All checks passed, proceed to payment
+            showToast('Đang chuyển đến trang thanh toán...', 'info');
+            setTimeout(() => {
+                window.location.href = `/Subscription/Payment?packageId=${packageId}`;
+            }, 500);
+
+        } catch (error) {
+            console.error('Error selecting package:', error);
+            showLoadingOverlay(false);
+            isProcessing = false;
+            showToast(`Lỗi: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * Store selected package details in session storage
+     */
+    function storePackageSelection(packageData) {
+        try {
+            const packageInfo = {
+                id: packageData.id,
+                name: packageData.name,
+                price: packageData.price,
+                billingCycle: packageData.billingCycleName,
+                timestamp: new Date().toISOString()
+            };
+            sessionStorage.setItem('selectedPackage', JSON.stringify(packageInfo));
+            sessionStorage.setItem('pendingPackageSelection', JSON.stringify(packageInfo));
+        } catch (error) {
+            console.warn('Failed to store package selection:', error);
+        }
+    }
+
+    /**
+     * Check if user is authenticated
+     */
+    async function checkAuthenticationStatus() {
+        try {
+            const response = await fetch('/api/Subscription/my-subscription', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            return {
+                isAuthenticated: response.status !== 401,
+                status: response.status
+            };
+        } catch (error) {
+            console.error('Error checking authentication:', error);
+            // Assume not authenticated on network error
+            return {
+                isAuthenticated: false,
+                status: 0,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Check if user has an active subscription
+     */
+    async function checkActiveSubscription() {
+        try {
+            const response = await fetch('/api/Subscription/my-subscription', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (response.status === 404) {
+                // No active subscription
+                return false;
+            }
+
+            if (response.ok) {
+                // Has active subscription
+                const subscription = await response.json();
+                return subscription && subscription.status === 'Active';
+            }
+
+            return false;
+        } catch (error) {
+            console.error('Error checking active subscription:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Handle unauthenticated user - redirect to login
+     */
+    function handleUnauthenticatedUser(packageId) {
+        showLoadingOverlay(false);
+        showToast('Vui lòng đăng nhập để tiếp tục', 'info');
+        
+        setTimeout(() => {
+            const returnUrl = encodeURIComponent(`/Subscription/Payment?packageId=${packageId}`);
+            window.location.href = `/Auth/Login?returnUrl=${returnUrl}`;
+        }, 1000);
+    }
+
+    /**
+     * Show/hide loading overlay
+     */
+    function showLoadingOverlay(show) {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+    }
+
+    /**
+     * Show toast notification
+     */
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function fixEncoding(text) {
+        if (!text) return '';
+        const suspect = /Ã|Â|Ä|Æ|¢|®|ð|Ð|¤|«|»|¶|…|°|²|³/;
+        if (!suspect.test(text)) return text;
+        try {
+            const bytes = new Uint8Array(text.length);
+            for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i);
+            return new TextDecoder('utf-8').decode(bytes);
+        } catch (e) {
+            try { return decodeURIComponent(escape(text)); } catch { return text; }
+        }
+    }
+
+    /**
+     * Handle errors globally
+     */
+    window.addEventListener('error', function(event) {
+        console.error('Global error:', event.error);
+        showToast('Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+    });
+
+    /**
+     * Handle unhandled promise rejections
+     */
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+        showToast('Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+    });
+</script>

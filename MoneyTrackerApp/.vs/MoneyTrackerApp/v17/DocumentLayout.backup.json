@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|f:\\ojt-review\\moneytrackerapp\\expense-manager\\moneytrackerapp\\moneytrackerapp\\pages\\subscription\\payment.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|solutionrelative:moneytrackerapp\\pages\\subscription\\payment.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|f:\\ojt-review\\moneytrackerapp\\expense-manager\\moneytrackerapp\\moneytrackerapp\\pages\\subscription\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|solutionrelative:moneytrackerapp\\pages\\subscription\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|f:\\ojt-review\\moneytrackerapp\\expense-manager\\moneytrackerapp\\moneytrackerapp\\services\\reportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|solutionrelative:moneytrackerapp\\services\\reportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|f:\\ojt-review\\moneytrackerapp\\expense-manager\\moneytrackerapp\\moneytrackerapp\\pages\\auth\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{7D5D1334-BF03-46C2-9C0B-C265A60FC42E}|MoneyTrackerApp\\MoneyTrackerApp.csproj|solutionrelative:moneytrackerapp\\pages\\auth\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -50,11 +62,50 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Payment.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Subscription\\Payment.cshtml",
+              "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Subscription\\Payment.cshtml",
+              "ToolTip": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Subscription\\Payment.cshtml",
+              "RelativeToolTip": "MoneyTrackerApp\\Pages\\Subscription\\Payment.cshtml",
+              "ViewState": "AgIAADsBAAAAAAAAAAAUwFABAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-03T07:33:18.18Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Subscription\\Index.cshtml",
+              "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Subscription\\Index.cshtml",
+              "ToolTip": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Subscription\\Index.cshtml",
+              "RelativeToolTip": "MoneyTrackerApp\\Pages\\Subscription\\Index.cshtml",
+              "ViewState": "AgIAAPoAAAAAAAAAAAAUwAwBAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-03T07:33:12.348Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ReportService.cs",
+              "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Services\\ReportService.cs",
+              "RelativeDocumentMoniker": "MoneyTrackerApp\\Services\\ReportService.cs",
+              "ToolTip": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Services\\ReportService.cs",
+              "RelativeToolTip": "MoneyTrackerApp\\Services\\ReportService.cs",
+              "ViewState": "AgIAANkAAAAAAAAAAAAwwO8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-03T07:04:45.898Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "ResetPassword.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Auth\\ResetPassword.cshtml",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Auth\\ResetPassword.cshtml",
@@ -62,12 +113,11 @@
               "RelativeToolTip": "MoneyTrackerApp\\Pages\\Auth\\ResetPassword.cshtml",
               "ViewState": "AgIAAEgAAAAAAAAAAAAUwF0AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-12-02T07:33:48.306Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-02T07:33:48.306Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "Register.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Auth\\Register.cshtml",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Auth\\Register.cshtml",
@@ -75,25 +125,24 @@
               "RelativeToolTip": "MoneyTrackerApp\\Pages\\Auth\\Register.cshtml",
               "ViewState": "AgIAAEgAAAAAAAAAAAAUwF0AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-12-02T07:33:43.455Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-02T07:33:43.455Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "Login.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Auth\\Login.cshtml",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Auth\\Login.cshtml",
               "ToolTip": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Auth\\Login.cshtml",
               "RelativeToolTip": "MoneyTrackerApp\\Pages\\Auth\\Login.cshtml",
-              "ViewState": "AgIAABgAAAAAAAAAAAAUwC0AAAAGAAAAAAAAAA==",
+              "ViewState": "AgIAABIAAAAAAAAAAAAIwC0AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-12-02T07:33:39.215Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "ForgotPassword.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Auth\\ForgotPassword.cshtml",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Auth\\ForgotPassword.cshtml",
@@ -101,12 +150,11 @@
               "RelativeToolTip": "MoneyTrackerApp\\Pages\\Auth\\ForgotPassword.cshtml",
               "ViewState": "AgIAAFoAAAAAAAAAAAAUwF0AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-12-02T07:33:28.345Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-02T07:33:28.345Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Shared\\_Layout.cshtml",
@@ -114,12 +162,11 @@
               "RelativeToolTip": "MoneyTrackerApp\\Pages\\Shared\\_Layout.cshtml",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAANcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-12-01T14:24:57.06Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-01T14:24:57.06Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "header.css",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\header.css",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\wwwroot\\css\\header.css",
@@ -131,7 +178,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "OnboardingService.cs",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Services\\OnboardingService.cs",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Services\\OnboardingService.cs",
@@ -143,7 +190,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 10,
               "Title": "Home.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Pages\\Home.cshtml",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Pages\\Home.cshtml",
@@ -155,7 +202,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 11,
               "Title": "appsettings.json",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\appsettings.json",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\appsettings.json",
@@ -167,7 +214,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "MoneyTrackerApp.csproj",
               "DocumentMoniker": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj",
               "RelativeDocumentMoniker": "MoneyTrackerApp\\MoneyTrackerApp.csproj",

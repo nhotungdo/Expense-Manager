@@ -1,0 +1,285 @@
+@page
+@model MoneyTrackerApp.Pages.Profile.MyWalletModel
+@{
+    ViewData["Title"] = "Ví của tôi";
+}
+
+<div class="my-wallet-container">
+    <!-- Top Section: Assets & Wallets (35%) -->
+    <div class="top-section">
+        <div class="container h-100 d-flex flex-column">
+            <!-- Header & Total Balance -->
+            <div class="d-flex justify-content-between align-items-start mb-3 pt-2">
+                <div>
+                    <h6 class="text-white-50 mb-1">Tổng tài sản</h6>
+                    <h2 class="fw-bold text-white mb-0">
+                        @Model.TotalBalance.ToString("N0") <span class="fs-5">@Model.DefaultCurrency</span>
+                    </h2>
+                </div>
+                <button class="btn btn-sm btn-light rounded-pill px-3 text-primary fw-bold shadow-sm">
+                    <i class="fas fa-plus me-1"></i> Thêm
+                </button>
+            </div>
+
+            <!-- Wallet Carousel -->
+            <div class="wallet-carousel-wrapper flex-grow-1 d-flex align-items-center">
+                <div class="wallet-carousel d-flex">
+                    @if (Model.Wallets.Any())
+                    {
+                        @foreach (var wallet in Model.Wallets)
+                        {
+                            <div class="wallet-card-wrapper" onclick="selectWallet(this, @wallet.Id)">
+                                <div class="wallet-card @(wallet.Id == Model.SelectedWalletId ? "active" : "")" style="--wallet-color: @(wallet.Color ?? "#4CAF50")">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="wallet-icon">
+                                            @wallet.Icon
+                                        </div>
+                                        @if (wallet.IsActive)
+                                        {
+                                            <span class="badge bg-white text-dark opacity-75 rounded-pill" style="font-size: 0.6rem;">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary rounded-pill" style="font-size: 0.6rem;">Hidden</span>
+                                        }
+                                    </div>
+                                    <div class="mt-auto">
+                                        <div class="wallet-name text-truncate">@wallet.Name</div>
+                                        <div class="wallet-balance">@wallet.CurrentBalance.ToString("N0") <small>@wallet.Currency</small></div>
+                                    </div>
+                                    <div class="card-shine"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-white text-center w-100">
+                            <p>Chưa có ví nào</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- Decorative Background -->
+        <div class="bg-decoration-1"></div>
+        <div class="bg-decoration-2"></div>
+    </div>
+
+    <!-- Bottom Section: Recent Transactions (65%) -->
+    <div class="bottom-section">
+        <div class="container py-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0 text-dark">Giao dịch gần đây</h5>
+                <a href="#" class="text-decoration-none text-muted small">Xem tất cả <i class="fas fa-chevron-right ms-1"></i></a>
+            </div>
+            
+            <div id="transactions-container">
+                <partial name="_WalletTransactions" model="Model.RecentTransactions" />
+            </div>
+            
+            <div id="loading-spinner" class="text-center py-5 d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Layout & Container */
+    .my-wallet-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px); /* Adjust based on header height */
+        margin: -1.5rem; /* Negative margin to break out of container padding if needed */
+        background-color: #f8f9fa;
+    }
+
+    /* Top Section */
+    .top-section {
+        height: 35%;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        position: relative;
+        overflow: hidden;
+        padding-bottom: 20px;
+        flex-shrink: 0;
+        z-index: 1;
+    }
+
+    .bg-decoration-1 {
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        z-index: -1;
+    }
+
+    .bg-decoration-2 {
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        z-index: -1;
+    }
+
+    /* Wallet Carousel */
+    .wallet-carousel-wrapper {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .wallet-carousel {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 15px;
+        padding: 10px 5px;
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+
+    .wallet-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .wallet-card-wrapper {
+        scroll-snap-align: center;
+        flex: 0 0 85%; /* Shows part of next card */
+        max-width: 320px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .wallet-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 20px;
+        height: 160px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+    }
+
+    .wallet-card.active {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .wallet-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        transform: translateX(-100%);
+        transition: 0.5s;
+    }
+
+    .wallet-card:hover::before {
+        transform: translateX(100%);
+    }
+
+    .wallet-icon {
+        font-size: 2rem;
+        background: rgba(255, 255, 255, 0.2);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+
+    .wallet-name {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 5px;
+    }
+
+    .wallet-balance {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    /* Bottom Section */
+    .bottom-section {
+        height: 65%;
+        background-color: white;
+        border-radius: 30px 30px 0 0;
+        margin-top: -25px; /* Overlap effect */
+        position: relative;
+        z-index: 2;
+        overflow-y: auto;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+    }
+
+    /* Responsive adjustments */
+    @@media (min-width: 768px) {
+        .wallet-card-wrapper {
+            flex: 0 0 300px;
+        }
+        
+        .my-wallet-container {
+            height: auto;
+            min-height: 80vh;
+            margin: 0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+        }
+        
+        .top-section {
+            height: 300px;
+        }
+        
+        .bottom-section {
+            height: auto;
+            min-height: 400px;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function selectWallet(element, walletId) {
+            // Update UI
+            document.querySelectorAll('.wallet-card').forEach(el => el.classList.remove('active'));
+            element.querySelector('.wallet-card').classList.add('active');
+            
+            // Show loading
+            document.getElementById('transactions-container').style.opacity = '0.5';
+            document.getElementById('loading-spinner').classList.remove('d-none');
+            
+            // Fetch transactions
+            fetch(`?handler=WalletTransactions&walletId=${walletId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('transactions-container').innerHTML = html;
+                    document.getElementById('transactions-container').style.opacity = '1';
+                    document.getElementById('loading-spinner').classList.add('d-none');
+                })
+                .catch(error => {
+                    console.error('Error fetching transactions:', error);
+                    document.getElementById('transactions-container').style.opacity = '1';
+                    document.getElementById('loading-spinner').classList.add('d-none');
+                });
+        }
+    </script>
+}

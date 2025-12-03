@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MoneyTrackerApp</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
@@ -127,7 +129,7 @@
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" asp-page="/Profile/Index"><i class="dropdown-icon">👤</i> Hồ sơ của tôi</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="dropdown-icon">💼</i> Ví của tôi</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Profile/MyWallet"><i class="dropdown-icon">💼</i> Ví của tôi</a></li>
                                     <li><a class="dropdown-item" asp-page="/Settings/Index"><i class="dropdown-icon">⚙️</i> Cài đặt</a></li>
                                     <li><a class="dropdown-item" href="#"><i class="dropdown-icon">❓</i> Trợ giúp & Hỗ trợ</a></li>
                                     <li><hr class="dropdown-divider"></li>

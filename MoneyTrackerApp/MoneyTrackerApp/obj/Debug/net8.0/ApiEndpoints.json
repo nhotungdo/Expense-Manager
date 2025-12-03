@@ -2479,6 +2479,105 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "CancelSubscription",
+    "RelativePath": "api/Subscription/cancel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MoneyTrackerApp.Controllers.CancelSubscriptionDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "GetMySubscription",
+    "RelativePath": "api/Subscription/my-subscription",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "GetPackages",
+    "RelativePath": "api/Subscription/packages",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "GetPackageById",
+    "RelativePath": "api/Subscription/packages/{packageId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "packageId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "PaymentCallback",
+    "RelativePath": "api/Subscription/payment-callback",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "vnp_TxnRef",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "vnp_ResponseCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "GetPaymentHistory",
+    "RelativePath": "api/Subscription/payments",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "Subscribe",
+    "RelativePath": "api/Subscription/subscribe",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MoneyTrackerApp.DTOs.CreateSubscriptionDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "MoneyTrackerApp.Controllers.TransactionsController",
     "Method": "GetTransactions",
     "RelativePath": "api/Transactions",

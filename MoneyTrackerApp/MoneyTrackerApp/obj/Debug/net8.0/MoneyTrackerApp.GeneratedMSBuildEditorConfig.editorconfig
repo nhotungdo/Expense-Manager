@@ -106,6 +106,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Profile/MyWallet.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZVxNeVdhbGxldC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Profile/_WalletTransactions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZVxfV2FsbGV0VHJhbnNhY3Rpb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Reports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -120,6 +128,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Subscription/Failed.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3Vic2NyaXB0aW9uXEZhaWxlZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Subscription/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3Vic2NyaXB0aW9uXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Subscription/Payment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3Vic2NyaXB0aW9uXFBheW1lbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Subscription/Success.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3Vic2NyaXB0aW9uXFN1Y2Nlc3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Transactions/Create.cshtml]
