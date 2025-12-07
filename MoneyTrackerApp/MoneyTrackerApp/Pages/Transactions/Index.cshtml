@@ -60,17 +60,27 @@
                     return;
                 }
 
-                container.innerHTML = data.map(t => `
+                container.innerHTML = data.map(t => {
+                    // Ensure we have valid data with fallbacks
+                    const description = t.description || t.categoryName || t.note || 'Giao dịch';
+                    const categoryName = t.categoryName || 'Chưa phân loại';
+                    const accountName = t.accountName || 'Ví không xác định';
+                    const transactionType = t.transactionTypeDisplay || 'Unknown';
+                    const amount = t.amount || 0;
+                    const currency = t.currency || 'VND';
+                    
+                    return `
                         <div class="transaction-item d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="fw-bold">${t.description}</div>
-                                <div class="small text-muted">${new Date(t.transactionDate).toLocaleString('vi-VN')} • ${t.accountName} • ${t.categoryName || 'Chưa phân loại'}</div>
+                                <div class="fw-bold">${description}</div>
+                                <div class="small text-muted">${new Date(t.transactionDate).toLocaleString('vi-VN')} • ${accountName} • ${categoryName}</div>
                             </div>
                             <div class="text-end">
-                                <div class="transaction-amount ${t.transactionTypeDisplay === 'Income' ? 'text-success' : 'text-danger'}">${t.transactionTypeDisplay === 'Income' ? '+' : '-'} ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: t.currency }).format(t.amount)}</div>
+                                <div class="transaction-amount ${transactionType === 'Income' ? 'text-success' : 'text-danger'}">${transactionType === 'Income' ? '+' : '-'} ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: currency }).format(amount)}</div>
                             </div>
                         </div>
-                    `).join('');
+                    `;
+                }).join('');
             } catch (err) {
                 console.error('Error loading transactions', err);
                 container.innerHTML = '<div class="text-danger p-3">Lỗi tải giao dịch.</div>';

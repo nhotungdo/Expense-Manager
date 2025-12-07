@@ -1,0 +1,54 @@
+@using MoneyTrackerApp.Models
+@using Microsoft.EntityFrameworkCore
+@inject ExpenseManagerContext DbContext
+
+@if (User.Identity.IsAuthenticated)
+{
+    var userName = User.Identity.Name;
+    // Simple fetch, consider caching or using a service in production
+    var user = await DbContext.Users.FirstOrDefaultAsync(u => u.UserName == userName || u.Email == userName);
+    var avatarUrl = !string.IsNullOrEmpty(user?.ProfilePictureUrl) ? user.ProfilePictureUrl : "/images/default-avatar.png";
+    var fullName = user?.FullName ?? User.Identity.Name;
+    var email = user?.Email ?? userName;
+
+    <div class="dropdown user-menu ms-3">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="@avatarUrl" alt="Avatar" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+            <span class="d-none d-md-inline text-dark fw-bold">@fullName</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userMenuDropdown">
+            <li>
+                <div class="px-3 py-2">
+                    <div class="fw-bold">@fullName</div>
+                    <div class="text-muted small">@email</div>
+                </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item" asp-page="/Profile/Index">
+                    <i class="fas fa-user me-2 text-primary"></i> Hồ sơ & Cài đặt
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" asp-page="/Auth/ChangePassword">
+                    <i class="fas fa-key me-2 text-warning"></i> Đổi mật khẩu
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form class="form-inline" asp-page="/Auth/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })" method="post">
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <div class="auth-buttons ms-3">
+        <a class="btn btn-outline-primary me-2" asp-page="/Auth/Login">Đăng nhập</a>
+        <a class="btn btn-primary" asp-page="/Auth/Register">Đăng ký</a>
+    </div>
+}

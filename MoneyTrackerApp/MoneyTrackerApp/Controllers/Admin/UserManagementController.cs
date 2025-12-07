@@ -7,8 +7,7 @@ namespace MoneyTrackerApp.Controllers.Admin
 {
     [ApiController]
     [Route("api/admin/users")]
-    // [Authorize(Roles = "Admin")] // Uncomment when roles are fully set up
-    [Authorize] // For now just require login, assuming only admin sees the UI
+    [Authorize(Roles = "Admin")]
     public class UserManagementController : ControllerBase
     {
         private readonly IUserManagementService _userService;

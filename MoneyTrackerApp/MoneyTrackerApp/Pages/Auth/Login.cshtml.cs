@@ -61,8 +61,13 @@ namespace MoneyTrackerApp.Pages.Auth
                     Expires = DateTime.UtcNow.AddMinutes(60)
                 });
 
-                // Redirect based on onboarding status
-                var baseUrl = user.OnboardingCompleted ? "/Index" : "/Onboarding/Welcome";
+                // Redirect based on role and onboarding status
+                var baseUrl = user.OnboardingCompleted ? "/Home" : "/Onboarding/Welcome";
+
+                if (user.Role == "Admin")
+                {
+                    baseUrl = "/Admin/Dashboard";
+                }
                 var redirectUrl = $"{baseUrl}?accessToken={Uri.EscapeDataString(accessToken)}&refreshToken={Uri.EscapeDataString(refreshToken)}";
                 return Redirect(redirectUrl);
             }

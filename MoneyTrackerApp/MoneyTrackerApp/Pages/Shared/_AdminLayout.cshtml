@@ -3,75 +3,229 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Bảng quản trị</title>
+    <title>@ViewData["Title"] - Trung tâm điều khiển</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <style>
-        .admin-sidebar {
-            min-height: 100vh;
-            background-color: #343a40;
-            color: white;
+        :root {
+            --admin-sidebar-bg: #2c3e50;
+            --admin-sidebar-text: #ecf0f1;
+            --admin-sidebar-active: #34495e;
+            --admin-header-bg: #ffffff;
+            --admin-accent: #3498db;
         }
-        .admin-sidebar a {
-            color: rgba(255,255,255,.8);
-            padding: 10px 20px;
-            display: block;
+
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        #wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        #sidebar-wrapper {
+            min-width: 260px;
+            max-width: 260px;
+            background-color: var(--admin-sidebar-bg);
+            color: var(--admin-sidebar-text);
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+
+        #sidebar-wrapper.toggled {
+            margin-left: -260px;
+        }
+
+        .sidebar-heading {
+            padding: 1.5rem 1.25rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar-brand-icon {
+             font-size: 1.5rem;
+             color: var(--admin-accent);
+        }
+
+        .list-group-item {
+            padding: 1rem 1.25rem;
+            background-color: transparent;
+            color: rgba(255,255,255,0.7);
+            border: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .list-group-item i {
+            width: 24px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        .list-group-item:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: #fff;
             text-decoration: none;
         }
-        .admin-sidebar a:hover, .admin-sidebar a.active {
-            color: white;
-            background-color: rgba(255,255,255,.1);
+
+        .list-group-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left: 4px solid var(--admin-accent);
         }
-        .admin-content {
-            padding: 20px;
+
+        /* Page Content */
+        #page-content-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles imported via partial, but layout css needed */
+        .admin-header {
+            background: var(--admin-header-bg);
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .search-bar-container {
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            background-color: #f1f3f4;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            outline: none;
+        }
+        .search-input:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            border: 1px solid #fff;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .admin-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            #sidebar-wrapper {
+                margin-left: -260px;
+            }
+            #sidebar-wrapper.toggled {
+                margin-left: 0;
+            }
+            .search-bar-container {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="d-flex">
-        <div class="admin-sidebar col-md-2 d-none d-md-block">
-            <div class="p-3">
-                <h4>Bảng quản trị</h4>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <i class="fas fa-chart-line sidebar-brand-icon"></i>
+                MoneyTracker Admin
             </div>
-            <nav>
-                <a href="/Admin/Dashboard" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Dashboard") == true ? "active" : "")">
-                    <i class="fas fa-tachometer-alt me-2"></i> Bảng điều khiển
+            <div class="list-group list-group-flush mt-3">
+                <a href="/Admin/Dashboard" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Dashboard") == true ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
                 </a>
-                <a href="/Admin/Users" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Users") == true ? "active" : "")">
-                    <i class="fas fa-users me-2"></i> Quản lý người dùng
+                <a href="/Admin/Users" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Users") == true ? "active" : "")">
+                    <i class="fas fa-users"></i> Quản lý User
                 </a>
-                <a href="/Admin/Settings" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
-                    <i class="fas fa-cogs me-2"></i> Cài đặt hệ thống
+                <a href="/Admin/Transactions" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Transactions") == true ? "active" : "")">
+                    <i class="fas fa-list-alt"></i> Sổ giao dịch
                 </a>
-                <a href="/Admin/MasterData/Categories" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("MasterData") == true ? "active" : "")">
-                    <i class="fas fa-database me-2"></i> Dữ liệu chính
+                <a href="/Admin/Settings" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
+                    <i class="fas fa-cog"></i> Cấu hình hệ thống
                 </a>
-                <a href="/Admin/Monitoring/AuditLogs" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring") == true ? "active" : "")">
-                    <i class="fas fa-history me-2"></i> Nhật ký kiểm toán
+                <a href="/Admin/Monitoring/AuditLogs" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring") == true ? "active" : "")">
+                    <i class="fas fa-shield-alt"></i> Nhật ký & Audit
                 </a>
-                <hr />
-                <a href="/Home">
-                    <i class="fas fa-arrow-left me-2"></i> Quay lại ứng dụng
+                <div class="mt-4 px-3 text-muted small text-uppercase fw-bold">Hệ thống</div>
+                <a href="/Home" class="list-group-item list-group-item-action">
+                    <i class="fas fa-sign-out-alt"></i> Thoát về ứng dụng
                 </a>
-            </nav>
+            </div>
         </div>
-        <div class="col-md-10 col-12">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-                <div class="container-fluid">
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                            <li class="nav-item">
-                                <span class="nav-link">Người dùng quản trị</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-            <div class="admin-content">
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Header -->
+            <partial name="_AdminHeader" />
+
+            <!-- Main Content -->
+            <div class="p-4" style="flex: 1; overflow-y: auto;">
                 @RenderBody()
             </div>
         </div>

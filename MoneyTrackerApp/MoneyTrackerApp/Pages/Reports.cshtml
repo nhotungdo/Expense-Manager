@@ -865,16 +865,25 @@
             container.innerHTML = '<div class="text-center py-4 text-muted">Không có giao dịch gần đây.</div>';
             return;
         }
-        container.innerHTML = transactions.map((t, index) => `
+        container.innerHTML = transactions.map((t, index) => {
+            // Add fallbacks to prevent undefined values
+            const description = t.description || t.categoryName || t.note || 'Giao dịch';
+            const categoryIcon = t.categoryIcon || '📄';
+            const date = t.date || t.transactionDate || new Date();
+            const type = t.type || t.transactionTypeDisplay || 'Expense';
+            const amount = t.amount || 0;
+            
+            return `
             <div class="transaction-item" data-aos="fade-up" data-aos-delay="${index * 100}">
-                <div class="t-icon">${t.categoryIcon || '📄'}</div>
+                <div class="t-icon">${categoryIcon}</div>
                 <div class="t-info">
-                    <div class="t-desc">${t.description}</div>
-                    <div class="t-date">${new Date(t.date).toLocaleDateString('vi-VN')}</div>
+                    <div class="t-desc">${description}</div>
+                    <div class="t-date">${new Date(date).toLocaleDateString('vi-VN')}</div>
                 </div>
-                <div class="t-amount ${t.type === 'Income' ? 'text-success' : 'text-danger'}">${t.type === 'Income' ? '+' : '-'} ${formatCurrency(t.amount)}</div>
+                <div class="t-amount ${type === 'Income' ? 'text-success' : 'text-danger'}">${type === 'Income' ? '+' : '-'} ${formatCurrency(amount)}</div>
             </div>
-        `).join('');
+            `;
+        }).join('');
         setTimeout(() => AOS.refresh(), 500);
     }
 

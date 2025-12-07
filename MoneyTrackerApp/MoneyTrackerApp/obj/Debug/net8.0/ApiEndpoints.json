@@ -1265,6 +1265,32 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "MoneyTrackerApp.Controllers.AuthController",
+    "Method": "Verify2FA",
+    "RelativePath": "api/Auth/verify-2fa",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "MoneyTrackerApp.Controllers.AuthController\u002BVerify2FARequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MoneyTrackerApp.Controllers.AuthController\u002BTokenResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "MoneyTrackerApp.Controllers.CategoriesController",
     "Method": "GetUserCategories",
     "RelativePath": "api/Categories",
@@ -1278,6 +1304,16 @@
         "IsRequired": false
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.CategoriesController",
+    "Method": "Debug",
+    "RelativePath": "api/Categories/debug",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -2496,6 +2532,22 @@
   },
   {
     "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "CheckStatus",
+    "RelativePath": "api/Subscription/check-status/{paymentId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "paymentId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
     "Method": "GetMySubscription",
     "RelativePath": "api/Subscription/my-subscription",
     "HttpMethod": "GET",
@@ -2537,18 +2589,7 @@
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [
-      {
-        "Name": "vnp_TxnRef",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "vnp_ResponseCode",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -2572,6 +2613,22 @@
       {
         "Name": "dto",
         "Type": "MoneyTrackerApp.DTOs.CreateSubscriptionDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SubscriptionController",
+    "Method": "PaymentWebhook",
+    "RelativePath": "api/Subscription/webhook",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "webhookData",
+        "Type": "System.Object",
         "IsRequired": true
       }
     ],

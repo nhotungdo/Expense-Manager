@@ -81,3 +81,11 @@ public class PaymentResponseDto
     public decimal Amount { get; set; }
     public string Currency { get; set; } = null!;
 }
+
+public class PaymentResultDto
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? TransactionId { get; set; }
+    public long? PaymentId { get; set; }
+}

@@ -46,6 +46,12 @@ namespace MoneyTrackerApp.Controllers
             public bool OnboardingCompleted { get; set; }
         }
 
+        public class Verify2FARequest
+        {
+            public string Email { get; set; } = string.Empty;
+            public string Code { get; set; } = string.Empty;
+        }
+
         [HttpGet("google/start")]
         [AllowAnonymous]
         public IActionResult GoogleStart()
@@ -95,8 +101,30 @@ namespace MoneyTrackerApp.Controllers
                 await _db.SaveChangesAsync();
             }
 
+            // [Security] Assign Admin Rights if email matches
+            if (email != null && email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))
+            {
+                if (user.Role != "Admin")
+                {
+                    user.Role = "Admin";
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            // [Audit] Log Login
+            _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
+            {
+                UserId = user.Id,
+                Action = "Login",
+                Details = "Google Login Success",
+                CreatedAt = DateTime.UtcNow,
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                UserAgent = Request.Headers["User-Agent"].ToString()
+            });
+            await _db.SaveChangesAsync();
+
             var pair = await _jwtService.IssueAsync(user);
-            
+
             Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
             {
                 HttpOnly = true,
@@ -155,16 +183,23 @@ namespace MoneyTrackerApp.Controllers
                 Theme = "light",
                 // Fix: GoogleId is required and unique in DB. 
                 // We generate a unique placeholder for local accounts.
-                GoogleId = $"local_{Guid.NewGuid()}" 
+                GoogleId = $"local_{Guid.NewGuid()}"
             };
 
             // 4. Hash Password
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
 
-            try 
+            try
             {
                 _db.Users.Add(user);
                 await _db.SaveChangesAsync();
+
+                // [Security] Assign Admin Rights if email matches
+                if (user.Email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    user.Role = "Admin";
+                    await _db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -172,9 +207,16 @@ namespace MoneyTrackerApp.Controllers
                 return StatusCode(500, new { message = "Lỗi lưu dữ liệu: " + ex.Message });
             }
 
-            // 5. Issue Tokens
+            // 5. Initialize Default Categories
+            var categoryService = HttpContext.RequestServices.GetService<MoneyTrackerApp.Services.ICategoryService>();
+            if (categoryService != null)
+            {
+                await categoryService.InitializeDefaultCategoriesAsync(user.Id);
+            }
+
+            // 6. Issue Tokens
             var pair = await _jwtService.IssueAsync(user);
-            
+
             // 6. Set Cookie (Important for auto-login consistency)
             Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
             {
@@ -198,8 +240,102 @@ namespace MoneyTrackerApp.Controllers
             var ok = user.PasswordHash != null && BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash);
             if (!ok) return Unauthorized(new { message = "Sai email hoặc mật khẩu" });
 
+            // [Security] Assign Admin Rights if email matches (Self-healing/Ensure)
+            if (user.Email != null && user.Email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))
+            {
+                if (user.Role != "Admin")
+                {
+                    user.Role = "Admin";
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            // [Security] 2FA Check
+            // Require 2FA if enabled OR if user is Admin
+            if (user.TwoFactorEnabled || user.Role == "Admin")
+            {
+                // Generate 6-digit code
+                var code = new Random().Next(100000, 999999).ToString();
+
+                // Save or Update Token
+                var existingToken = await _db.AspNetUserTokens
+                    .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "Auth" && t.Name == "2FA");
+
+                if (existingToken != null)
+                {
+                    existingToken.Value = code;
+                }
+                else
+                {
+                    _db.AspNetUserTokens.Add(new AspNetUserToken
+                    {
+                        UserId = user.Id,
+                        LoginProvider = "Auth",
+                        Name = "2FA",
+                        Value = code
+                    });
+                }
+
+                // Send Email
+                _db.Emails.Add(new MoneyTrackerApp.Models.Email
+                {
+                    UserId = user.Id,
+                    Subject = "Mã xác thực đăng nhập (2FA)",
+                    Body = $"Mã xác thực của bạn là: {code}",
+                    Status = "Queued",
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                await _db.SaveChangesAsync();
+
+                // Return 2FA required status
+                // If in Development, we might return the code for easier testing, but strict security says no.
+                // For this OJT task, I'll log it to console if I could, but I can't see console.
+                // The user needs to 'Test security'. 
+                return Ok(new { message = "2fa_required", email = user.Email });
+            }
+
+            // If no 2FA, issue token immediately
+            return await IssueTokenAndLog(user, "Login Success");
+        }
+
+        [HttpPost("verify-2fa")]
+        [AllowAnonymous]
+        public async Task<ActionResult<TokenResponse>> Verify2FA([FromBody] Verify2FARequest req)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
+            if (user == null) return Unauthorized(new { message = "Người dùng không tồn tại" });
+
+            var token = await _db.AspNetUserTokens
+                .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "Auth" && t.Name == "2FA");
+
+            if (token == null || token.Value != req.Code)
+            {
+                // [Audit] Log Failed
+                _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
+                {
+                    UserId = user.Id,
+                    Action = "Login 2FA Failed",
+                    Details = "Invalid Code",
+                    CreatedAt = DateTime.UtcNow,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    UserAgent = Request.Headers["User-Agent"].ToString()
+                });
+                await _db.SaveChangesAsync();
+                return BadRequest(new { message = "Mã xác thực không đúng" });
+            }
+
+            // Consume token
+            _db.AspNetUserTokens.Remove(token);
+            await _db.SaveChangesAsync();
+
+            return await IssueTokenAndLog(user, "Login 2FA Success");
+        }
+
+        private async Task<ActionResult<TokenResponse>> IssueTokenAndLog(User user, string auditAction)
+        {
             var pair = await _jwtService.IssueAsync(user);
-            
+
             Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
             {
                 HttpOnly = true,
@@ -207,6 +343,18 @@ namespace MoneyTrackerApp.Controllers
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddMinutes(60)
             });
+
+            // [Audit] Log Success
+            _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
+            {
+                UserId = user.Id,
+                Action = "Login",
+                Details = auditAction,
+                CreatedAt = DateTime.UtcNow,
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                UserAgent = Request.Headers["User-Agent"].ToString()
+            });
+            await _db.SaveChangesAsync();
 
             var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh, OnboardingCompleted = user.OnboardingCompleted };
             return Ok(tokens);
@@ -307,6 +455,6 @@ namespace MoneyTrackerApp.Controllers
             return Ok();
         }
 
-        
+
     }
 }

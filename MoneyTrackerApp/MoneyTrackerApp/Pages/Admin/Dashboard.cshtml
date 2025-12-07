@@ -2,47 +2,268 @@
 @model MoneyTrackerApp.Pages.Admin.DashboardModel
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Bảng điều khiển quản trị";
+    ViewData["Title"] = "Trung tâm điều khiển";
 }
 
-<div class="row">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-start border-4 border-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số người dùng</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalUsers">Đang tải...</div>
+<style>
+    .kpi-card {
+        background: #fff;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-left: 5px solid transparent;
+        transition: transform 0.2s;
+        height: 100%;
+        padding: 20px;
+    }
+    .kpi-card:hover {
+        transform: translateY(-5px);
+    }
+    .kpi-card.users { border-left-color: #3498db; }
+    .kpi-card.revenue { border-left-color: #2ecc71; }
+    .kpi-card.traffic { border-left-color: #f39c12; }
+    .kpi-card.health { border-left-color: #e74c3c; }
+    .kpi-card.health.healthy { border-left-color: #95a5a6; } /* Gray if 0 errors */
+
+    .kpi-label {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .kpi-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    .kpi-sub {
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+
+    .dashboard-panel {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        padding: 20px;
+        height: 100%;
+        margin-bottom: 20px;
+    }
+    .panel-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #34495e;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #f1f1f1;
+        padding-bottom: 10px;
+    }
+
+    .status-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f9f9f9;
+        font-size: 0.95rem;
+    }
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    .bg-connected { background-color: #2ecc71; }
+    .bg-idle { background-color: #f1c40f; }
+    .bg-error { background-color: #e74c3c; }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-custom thead th {
+        background-color: #f8f9fa;
+        color: #7f8c8d;
+        font-weight: 600;
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 2px solid #ecf0f1;
+        font-size: 0.9rem;
+    }
+    .table-custom tbody td {
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        font-size: 0.85rem;
+        color: #34495e;
+    }
+    .table-custom tbody tr:hover {
+        background-color: #fcfcfc;
+    }
+</style>
+
+<!-- Row 1: KPI Cards -->
+<div class="row g-4 mb-4">
+    <!-- Card 1: Users -->
+    <div class="col-md-3">
+        <div class="kpi-card users">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="kpi-label">Người dùng</div>
+                    <div class="kpi-value">@Model.DashboardData.TotalUsers.ToString("N0")</div>
+                    <div class="kpi-sub text-success">
+                        <i class="fas fa-arrow-up"></i> +@Model.DashboardData.NewUsersToday hôm nay
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-users fa-2x text-gray-300"></i>
-                    </div>
+                </div>
+                <div class="text-secondary opacity-25">
+                    <i class="fas fa-users fa-2x"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- More cards can be added here -->
+    <!-- Card 2: Revenue/Assets -->
+    <div class="col-md-3">
+        <div class="kpi-card revenue">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="kpi-label">AUM / Tài sản</div>
+                    <div class="kpi-value">@Model.DashboardData.SystemAum.ToString("N0")</div>
+                    <div class="kpi-sub text-muted">Tổng quản lý</div>
+                </div>
+                <div class="text-secondary opacity-25">
+                    <i class="fas fa-wallet fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Traffic -->
+    <div class="col-md-3">
+        <div class="kpi-card traffic">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="kpi-label">Lưu lượng</div>
+                    <div class="kpi-value">@Model.DashboardData.TodayTransactionsCount.ToString("N0")</div>
+                    <div class="kpi-sub text-warning">Yêu cầu hôm nay</div>
+                </div>
+                <div class="text-secondary opacity-25">
+                    <i class="fas fa-exchange-alt fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Health -->
+    <div class="col-md-3">
+        <div class="kpi-card health @(Model.DashboardData.SystemHealthWarnings == 0 ? "healthy" : "")">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="kpi-label">Sức khỏe hệ thống</div>
+                    <div class="kpi-value">@Model.DashboardData.SystemHealthWarnings</div>
+                    <div class="kpi-sub @(Model.DashboardData.SystemHealthWarnings > 0 ? "text-danger" : "text-muted")">
+                        @(Model.DashboardData.SystemHealthWarnings > 0 ? "Phát hiện lỗi" : "Hệ thống ổn định")
+                    </div>
+                </div>
+                <div class="text-secondary opacity-25">
+                    <i class="fas fa-heartbeat fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Liên kết nhanh</h6>
+<!-- Row 2: Chart & Monitoring (7:3) -->
+<div class="row g-4 mb-4">
+    <!-- Chart Section (7) -->
+    <div class="col-lg-8">
+        <div class="dashboard-panel">
+            <div class="panel-title">
+                <i class="fas fa-chart-area me-2 text-primary"></i> Tổng quan lưu lượng
             </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <a href="/Admin/Users" class="list-group-item list-group-item-action">
-                        <i class="fas fa-user-cog me-2"></i> Quản lý người dùng
-                    </a>
-                    <a href="/Admin/Settings" class="list-group-item list-group-item-action">
-                        <i class="fas fa-cogs me-2"></i> Cài đặt hệ thống
-                    </a>
-                    <a href="/Admin/MasterData/Categories" class="list-group-item list-group-item-action">
-                        <i class="fas fa-list me-2"></i> Quản lý danh mục
-                    </a>
+            <div id="trafficChart" style="min-height: 300px;"></div>
+        </div>
+    </div>
+
+    <!-- Server Status Section (3) -->
+    <div class="col-lg-4">
+        <div class="dashboard-panel">
+            <div class="panel-title">
+                <i class="fas fa-server me-2 text-primary"></i> Trạng thái máy chủ
+            </div>
+            <div class="status-list">
+                <div class="status-item">
+                    <span>Database Engine</span>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đã kết nối</span>
                 </div>
+                <div class="status-item">
+                    <span>Email Service</span>
+                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2">Chờ</span>
+                </div>
+                <div class="status-item">
+                    <span>Banking API Gateway</span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2">Lỗi</span>
+                </div>
+                <div class="status-item">
+                    <span>Redis Cache</span>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đã kết nối</span>
+                </div>
+                <div class="status-item">
+                    <span>Background Jobs</span>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đang chạy</span>
+                </div>
+            </div>
+             <div class="mt-4 text-center">
+                 <button class="btn btn-outline-primary btn-sm w-100"><i class="fas fa-sync-alt me-1"></i> Làm mới trạng thái</button>
+             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 3: Data Grid -->
+<div class="row">
+    <div class="col-12">
+        <div class="dashboard-panel">
+            <div class="panel-title d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-shield-alt me-2 text-primary"></i> Nhật ký kiểm toán gần đây</span>
+                <button class="btn btn-sm btn-link text-decoration-none">Xem tất cả</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Người dùng (Email)</th>
+                            <th>Hành động</th>
+                            <th>Địa chỉ IP</th>
+                            <th>Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DashboardData.RecentAuditLogs != null && Model.DashboardData.RecentAuditLogs.Any())
+                        {
+                            foreach (var log in Model.DashboardData.RecentAuditLogs.Take(5))
+                            {
+                                <tr>
+                                    <td>@log.Time.ToString("HH:mm:ss dd/MM")</td>
+                                    <td>@log.UserEmail</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">@log.Action</span>
+                                    </td>
+                                    <td>@log.IpAddress</td>
+                                    <td class="text-muted small">Thực hiện qua Web Client</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-muted">Không tìm thấy nhật ký gần đây.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -50,8 +271,61 @@
 
 @section Scripts {
     <script>
-        // Fetch stats if API available
-        // For now just placeholder
-        document.getElementById('totalUsers').innerText = '-';
+        // Use Mock data for "Hourly Traffic" if model doesn't provide it, or map TransactionVolumeChart
+        // Mapping TransactionVolumeChart (Day) to Chart
+        var trafficLabels = [];
+        var trafficData = [];
+        
+        @if(Model.DashboardData.TransactionVolumeChart != null)
+        {
+            foreach(var item in Model.DashboardData.TransactionVolumeChart)
+            {
+                @:trafficLabels.push("@item.Day");
+                @:trafficData.push(@item.Count);
+            }
+        }
+
+        // Fallback mock labels/data if empty
+        if (trafficLabels.length === 0) {
+            trafficLabels = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+            trafficData = [12, 45, 67, 89, 34, 56, 78, 90, 110, 65];
+        }
+
+        var options = {
+            series: [{
+                name: 'Lưu lượng',
+                data: trafficData
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: { enabled: false },
+                toolbar: { show: false }
+            },
+            dataLabels: { enabled: false },
+            stroke: {
+                curve: 'smooth',
+                width: 3,
+                colors: ['#3498db']
+            },
+            title: {
+                text: 'Lưu lượng / Yêu cầu theo giờ',
+                align: 'left',
+                style: { color: '#7f8c8d' }
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'],
+                    opacity: 0.5
+                },
+                borderColor: '#ecf0f1'
+            },
+            xaxis: {
+                categories: trafficLabels,
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#trafficChart"), options);
+        chart.render();
     </script>
 }

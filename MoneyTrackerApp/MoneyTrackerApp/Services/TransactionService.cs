@@ -287,6 +287,28 @@ public class TransactionService : ITransactionService
 
     private TransactionResponseDto MapToResponseDto(Transaction transaction)
     {
+        // Generate intelligent description: CategoryName > Note > Default based on type
+        string description;
+        if (!string.IsNullOrWhiteSpace(transaction.Category?.Name))
+        {
+            description = transaction.Category.Name;
+        }
+        else if (!string.IsNullOrWhiteSpace(transaction.Note))
+        {
+            description = transaction.Note;
+        }
+        else
+        {
+            // Default description based on transaction type
+            description = transaction.TransactionType switch
+            {
+                1 => "Thu nhập",
+                2 => "Chi tiêu",
+                3 => $"Chuyển khoản đến {transaction.PairedAccount?.Name ?? "ví khác"}",
+                _ => "Giao dịch"
+            };
+        }
+
         return new TransactionResponseDto
         {
             Id = transaction.Id,
@@ -309,7 +331,8 @@ public class TransactionService : ITransactionService
             AttachmentUrl = transaction.AttachmentUrl,
             OcrText = transaction.OcrText,
             CreatedAt = transaction.CreatedAt,
-            UpdatedAt = transaction.UpdatedAt
+            UpdatedAt = transaction.UpdatedAt,
+            Description = description
         };
     }
 

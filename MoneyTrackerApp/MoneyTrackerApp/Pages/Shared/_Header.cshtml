@@ -1,0 +1,92 @@
+
+<header class="app-header bg-white sticky-top" style="border-bottom: 1px solid rgba(0,0,0,0.08);">
+    <nav class="navbar navbar-expand-lg navbar-light py-2">
+        <div class="container-fluid">
+            <!-- 1. Logo / Brand -->
+            <a class="navbar-brand d-flex align-items-center me-4" asp-page="/Home" asp-area="">
+                <div class="brand-logo me-2 fs-3" style="color: #27ae60;">💰</div>
+                <div class="d-flex flex-column">
+                    <span class="fw-bold fs-5 text-dark lh-1">Money<span style="color: #27ae60;">Tracker</span></span>
+                </div>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <!-- 2. Wallet Context Switcher & 3. Balance Glance -->
+                    <partial name="_WalletSelector" />
+
+                    <!-- 4. Period Picker -->
+                    <div class="period-picker me-4 d-flex align-items-center border-end pe-4 d-none d-lg-flex">
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle border-0 bg-transparent fw-bolder p-0 d-flex align-items-center" type="button" id="periodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="badge bg-primary-subtle text-primary me-2"><i class="far fa-calendar-alt"></i></span>
+                                <span id="selectedPeriod" class="text-dark">@DateTime.Now.ToString("MMMM yyyy")</span>
+                            </button>
+                            <ul class="dropdown-menu shadow border-0" aria-labelledby="periodDropdown">
+                                <li><a class="dropdown-item active" href="#">Tháng này</a></li>
+                                <li><a class="dropdown-item" href="#">Tháng trước</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Links -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-semibold">
+                        <li class="nav-item">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="nav-link" asp-page="/Admin/Dashboard">Bảng điều khiển</a>
+                            }
+                            else
+                            {
+                                <a class="nav-link" asp-page="/Home">Ví của tôi</a>
+                            }
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Transactions/Index">Lịch sử</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Reports">Báo cáo</a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- 5. Add Transaction Button (Quick Add) -->
+                        <button class="btn rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center" style="background-color: #27ae60; color: white;" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                            <i class="fas fa-plus me-md-2"></i> <span class="d-none d-md-inline">Thêm giao dịch</span>
+                        </button>
+
+                        <!-- 6. Notifications -->
+                        <div class="dropdown">
+                            <a class="nav-link position-relative text-muted fs-5 p-1" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="far fa-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light p-1" style="font-size: 0.5rem;">
+                                    <span class="visually-hidden">Thông báo mới</span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="notifDropdown" style="width: 300px;">
+                                <li class="dropdown-header">Thông báo</li>
+                                <li><a class="dropdown-item text-wrap small" href="#"><i class="fas fa-exclamation-circle text-warning me-2"></i>Cảnh báo: Đã vượt quá ngân sách ăn uống</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- 7. User Menu -->
+                        <partial name="_LoginPartial" />
+                    </div>
+                }
+                else
+                {
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" asp-page="/Index">Trang chủ</a></li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                }
+            </div>
+        </div>
+    </nav>
+</header>

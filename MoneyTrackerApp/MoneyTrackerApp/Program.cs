@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<MoneyTrackerApp.Models.ExpenseManagerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBDefault"))
@@ -51,6 +52,7 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.OnboardingService>();
 // Register Admin Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IUserManagementService, MoneyTrackerApp.Services.UserManagementService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ISystemSettingsService, MoneyTrackerApp.Services.SystemSettingsService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IAdminDashboardService, MoneyTrackerApp.Services.AdminDashboardService>();
 
 // Register Subscription Service
 builder.Services.AddScoped<MoneyTrackerApp.Services.ISubscriptionService, MoneyTrackerApp.Services.SubscriptionService>();

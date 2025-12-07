@@ -1,0 +1,110 @@
+:root {
+    --bg-dark: #13132b;
+    --card-bg: #1e1e30;
+    --text-primary: #ffffff;
+    --text-secondary: #a9a9c2;
+    --accent-cyan: #00f2ff;
+    --accent-purple: #a55eea;
+    --accent-pink: #ff007f;
+    --sidebar-bg: #1e1e30;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-sidebar .brand-logo {
+    color: var(--accent-cyan);
+    font-size: 1.5rem;
+    padding: 20px;
+}
+
+.admin-sidebar a {
+    color: var(--text-secondary) !important;
+    transition: all 0.3s;
+    border-left: 3px solid transparent;
+}
+
+.admin-sidebar a:hover,
+.admin-sidebar a.active {
+    color: var(--text-primary) !important;
+    background: linear-gradient(90deg, rgba(0, 242, 255, 0.1) 0%, transparent 100%);
+    border-left-color: var(--accent-cyan);
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+/* Header */
+.admin-header {
+    background-color: transparent !important;
+    border-bottom: none !important;
+    padding-top: 20px;
+}
+
+.search-bar-admin .input-group-text,
+.search-bar-admin .form-control {
+    background-color: var(--card-bg);
+    border: none;
+    color: white;
+}
+
+.search-bar-admin .form-control:focus {
+    background-color: #2b2b45;
+    color: white;
+    box-shadow: none;
+}
+
+/* Cards */
+.card-dark {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card-dark .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Charts & Widgets */
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.map-container {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.neon-text {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 5px var(--accent-cyan);
+}
+
+.neon-border {
+    border: 1px solid var(--accent-cyan);
+    box-shadow: 0 0 5px var(--accent-cyan);
+}

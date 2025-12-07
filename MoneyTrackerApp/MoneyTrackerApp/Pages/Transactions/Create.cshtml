@@ -49,6 +49,13 @@
                             </div>
                         </div>
 
+                        <!-- Note -->
+                        <div class="mb-3">
+                            <label asp-for="Transaction.Note" class="form-label">Ghi chú</label>
+                            <textarea asp-for="Transaction.Note" class="form-control" rows="4" placeholder="Nhập ghi chú cho giao dịch"></textarea>
+                            <span asp-validation-for="Transaction.Note" class="text-danger"></span>
+                        </div>
+
                         <div class="row">
                             <!-- Account -->
                             <div class="col-md-6 mb-3">
@@ -59,8 +66,8 @@
                                 <span asp-validation-for="Transaction.AccountId" class="text-danger"></span>
                             </div>
 
-                            <!-- Category (Hidden for Transfer) -->
-                            <div class="col-md-6 mb-3" id="categoryGroup">
+                            <!-- Category (Hidden by default; always hidden for Transfer) -->
+                            <div class="col-md-6 mb-3 d-none" id="categoryGroup">
                                 <label asp-for="Transaction.CategoryId" class="form-label">Danh mục</label>
                                 <select asp-for="Transaction.CategoryId" class="form-select" id="categorySelect">
                                     <option value="">-- Chọn danh mục --</option>
@@ -78,11 +85,8 @@
                             </div>
                         </div>
 
-                        <!-- Note -->
-                        <div class="mb-3">
-                            <label asp-for="Transaction.Note" class="form-label">Ghi chú</label>
-                            <textarea asp-for="Transaction.Note" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="Transaction.Note" class="text-danger"></span>
+                        <div class="mb-2" id="categoryToggleRow">
+                            <button type="button" class="btn btn-link p-0" id="categoryToggleBtn">Thêm danh mục (tuỳ chọn)</button>
                         </div>
 
                         <!-- Hidden Currency Field -->
@@ -107,13 +111,29 @@
         function toggleType(type) {
             const categoryGroup = document.getElementById('categoryGroup');
             const pairedAccountGroup = document.getElementById('pairedAccountGroup');
+            const toggleRow = document.getElementById('categoryToggleRow');
+            const toggleBtn = document.getElementById('categoryToggleBtn');
             
             if (type == 3) { // Transfer
                 categoryGroup.classList.add('d-none');
                 pairedAccountGroup.classList.remove('d-none');
+                toggleRow.classList.add('d-none');
             } else {
-                categoryGroup.classList.remove('d-none');
                 pairedAccountGroup.classList.add('d-none');
+                // Hide category by default for Income/Expense
+                categoryGroup.classList.add('d-none');
+                toggleRow.classList.remove('d-none');
+                toggleBtn.textContent = 'Thêm danh mục (tuỳ chọn)';
+                toggleBtn.onclick = function () {
+                    const hidden = categoryGroup.classList.contains('d-none');
+                    if (hidden) {
+                        categoryGroup.classList.remove('d-none');
+                        toggleBtn.textContent = 'Ẩn danh mục';
+                    } else {
+                        categoryGroup.classList.add('d-none');
+                        toggleBtn.textContent = 'Thêm danh mục (tuỳ chọn)';
+                    }
+                };
                 filterCategories(type);
             }
         }

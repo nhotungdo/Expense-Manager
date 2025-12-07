@@ -169,21 +169,23 @@ public class SubscriptionController : ControllerBase
     /// <summary>
     /// VNPay payment callback
     /// </summary>
+    /// <summary>
+    /// VNPay payment callback
+    /// </summary>
     [HttpGet("payment-callback")]
-    public async Task<IActionResult> PaymentCallback([FromQuery] string vnp_TxnRef, [FromQuery] string vnp_ResponseCode)
+    public async Task<IActionResult> PaymentCallback()
     {
         try
         {
-            var success = vnp_ResponseCode == "00"; // VNPay success code
-            await _subscriptionService.ProcessPaymentCallbackAsync(vnp_TxnRef, success, vnp_ResponseCode);
+            var result = await _subscriptionService.ProcessVnPayPaymentReturn(Request.Query);
 
-            if (success)
+            if (result.Success)
             {
                 return Redirect("/Subscription/Success");
             }
             else
             {
-                return Redirect("/Subscription/Failed");
+                return Redirect($"/Subscription/Failed?message={Uri.EscapeDataString(result.Message)}");
             }
         }
         catch (Exception ex)
@@ -191,6 +193,39 @@ public class SubscriptionController : ControllerBase
             _logger.LogError($"Error processing payment callback: {ex.Message}");
             return Redirect("/Subscription/Failed");
         }
+    }
+
+    /// <summary>
+    /// Check payment status
+    /// </summary>
+    [HttpGet("check-status/{paymentId}")]
+    public async Task<IActionResult> CheckStatus(long paymentId)
+    {
+        try
+        {
+            var payment = await _subscriptionService.GetPaymentStatusAsync(paymentId);
+            if (payment == null)
+                return NotFound(new { message = "Không tìm thấy giao dịch" });
+
+            return Ok(payment);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error checking payment status: {ex.Message}");
+            return StatusCode(500, new { message = "Lỗi khi kiểm tra trạng thái thanh toán" });
+        }
+    }
+
+    /// <summary>
+    /// Webhook for payment notification (e.g. from Casso/Sepay)
+    /// </summary>
+    [HttpPost("webhook")]
+    public async Task<IActionResult> PaymentWebhook([FromBody] object webhookData)
+    {
+        // TODO: Implement specific webhook logic based on provider (Casso, Sepay, etc.)
+        // This is a placeholder for Step 7 & 8
+        _logger.LogInformation($"Received webhook: {webhookData}");
+        return Ok(new { success = true });
     }
 }
 

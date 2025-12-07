@@ -275,6 +275,7 @@ GO
 CREATE TABLE [DebtPayments] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [DebtId] bigint NOT NULL,
+    [Email] nvarchar(256) NULL,
     [TransactionId] bigint NOT NULL, -- Giao dịch (chi/thu) tương ứng
     [Amount] decimal(18,2) NOT NULL,
     [PaymentDate] datetime2 NOT NULL,

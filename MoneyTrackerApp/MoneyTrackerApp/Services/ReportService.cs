@@ -274,7 +274,9 @@ public class ReportService : IReportService
                 Amount = t.Amount,
                 Type = t.TransactionTypeDisplay,
                 Date = t.TransactionDate,
-                CategoryIcon = t.CategoryIcon
+                CategoryIcon = t.CategoryIcon,
+                CategoryName = t.CategoryName,
+                AccountName = t.AccountName
             }).ToList(),
             BudgetAlerts = budgetAlerts,
             SavingsGoals = savingsGoals.Take(3).ToList() // Take top 3 goals

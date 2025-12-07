@@ -446,10 +446,36 @@
             
             showLoadingOverlay(false);
             showToast('Đã tạo đơn hàng thành công. Vui lòng quét mã QR để thanh toán.', 'success');
+            
+            // Start polling for payment status
+            startPaymentStatusPolling(paymentData.paymentId);
         } catch (error) {
             showLoadingOverlay(false);
             handleInitializationError(error);
         }
+    }
+
+    let pollingInterval;
+    function startPaymentStatusPolling(paymentId) {
+        if (pollingInterval) clearInterval(pollingInterval);
+        
+        pollingInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/api/Subscription/check-status/${paymentId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 1) { // Completed
+                        clearInterval(pollingInterval);
+                        showToast('Thanh toán thành công!', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/Subscription/Success';
+                        }, 1500);
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }, 3000); // Check every 3 seconds
     }
 
     /**
@@ -495,7 +521,18 @@
     /**
      * Display package information
      */
+    /**
+     * Display package information
+     */
     function displayPackageInfo(pkg) {
+        if (!pkg) return;
+        
+        // Ensure properties exist to prevent crashes
+        const features = Array.isArray(pkg.features) ? pkg.features : [];
+        const price = typeof pkg.price === 'number' ? pkg.price : 0;
+        const maxTransactions = typeof pkg.maxTransactions === 'number' ? pkg.maxTransactions : 0;
+        const maxAccounts = typeof pkg.maxAccounts === 'number' ? pkg.maxAccounts : 0;
+
         document.getElementById('package-details').innerHTML = `
             <div class="package-detail">
                 <span class="label">Tên gói:</span>
@@ -510,9 +547,9 @@
                 <span class="value">${escapeHtml(pkg.billingCycleName)}</span>
             </div>
             <ul class="package-features">
-                ${pkg.features.map(feature => `<li>${escapeHtml(feature)}</li>`).join('')}
-                ${pkg.maxTransactions > 0 ? `<li>Tối đa ${pkg.maxTransactions.toLocaleString('vi-VN')} giao dịch</li>` : ''}
-                ${pkg.maxAccounts > 0 ? `<li>Tối đa ${pkg.maxAccounts} tài khoản</li>` : ''}
+                ${features.map(feature => `<li>${escapeHtml(feature)}</li>`).join('')}
+                ${maxTransactions > 0 ? `<li>Tối đa ${maxTransactions.toLocaleString('vi-VN')} giao dịch</li>` : ''}
+                ${maxAccounts > 0 ? `<li>Tối đa ${maxAccounts} tài khoản</li>` : ''}
                 ${pkg.hasAdvancedReports ? '<li>Báo cáo nâng cao</li>' : ''}
                 ${pkg.hasAiAdvisor ? '<li>Tư vấn AI</li>' : ''}
                 ${pkg.hasGroupExpense ? '<li>Chi tiêu nhóm</li>' : ''}
@@ -520,7 +557,7 @@
             </ul>
             <div class="total-amount">
                 <div class="label">Tổng thanh toán</div>
-                <div class="value">${pkg.price.toLocaleString('vi-VN')}₫</div>
+                <div class="value">${price.toLocaleString('vi-VN')}₫</div>
             </div>
         `;
     }
@@ -540,7 +577,7 @@
                 body: JSON.stringify({
                     packageId: packageId,
                     autoRenew: true,
-                    returnUrl: window.location.origin + '/Subscription/PaymentCallback'
+                    returnUrl: window.location.origin + '/api/Subscription/payment-callback'
                 })
             });
 

@@ -321,6 +321,25 @@
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
 
+  <!-- 2FA Modal -->
+  <div id="2fa-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div class="glass-card" style="max-width:400px; padding:30px; animation: slideIn 0.3s ease;">
+      <div style="text-align:center;">
+          <h2 style="color:white; margin-bottom:10px;">Xác thực 2 lớp</h2>
+          <p style="color:rgba(255,255,255,0.7); margin-bottom:20px;">Vui lòng nhập mã xác thực đã được gửi đến email của bạn.</p>
+          
+          <div id="2fa-error" class="alert alert-danger" style="display:none;"></div>
+
+          <div class="form-group">
+            <input type="text" id="2fa-code" placeholder="######" maxlength="6" style="text-align:center; letter-spacing:8px; font-size:24px; font-weight:bold; text-transform:uppercase;" />
+          </div>
+          
+          <button onclick="verify2FA()" class="btn btn-primary" id="btn-verify-2fa">Xác nhận</button>
+          <button onclick="close2FA()" class="btn" style="margin-top:10px; background:transparent; border:1px solid rgba(255,255,255,0.3); color:white;">Hủy bỏ</button>
+      </div>
+    </div>
+  </div>
+
   <div class="login-container">
     <div class="glass-card">
       <div class="login-header">
@@ -442,6 +461,14 @@
 
         const data = await response.json();
 
+        if (data.message === '2fa_required') {
+           document.getElementById('2fa-modal').style.display = 'flex';
+           window.pendingEmail = email; // Store for verification
+           submitBtn.disabled = false;
+           submitBtn.textContent = 'Đăng nhập';
+           return;
+        }
+
         // Save tokens
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
@@ -458,6 +485,57 @@
         submitBtn.disabled = false;
         submitBtn.textContent = 'Đăng nhập';
       }
+    }
+
+    // 2FA Functions
+    function close2FA() {
+        document.getElementById('2fa-modal').style.display = 'none';
+        document.getElementById('2fa-code').value = '';
+        document.getElementById('2fa-error').style.display = 'none';
+    }
+
+    async function verify2FA() {
+        const code = document.getElementById('2fa-code').value.trim();
+        const btn = document.getElementById('btn-verify-2fa');
+        const errorDiv = document.getElementById('2fa-error');
+        
+        if (!code) return;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang kiểm tra...';
+        errorDiv.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/auth/verify-2fa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: window.pendingEmail, code: code })
+            });
+            
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                errorDiv.textContent = data.message || 'Mã xác thực không đúng';
+                errorDiv.style.display = 'flex';
+                btn.disabled = false;
+                btn.textContent = 'Xác nhận';
+                return;
+            }
+
+            const data = await response.json();
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
+            
+            if (data.onboardingCompleted === false) {
+                window.location.href = '/Onboarding/Welcome';
+            } else {
+                window.location.href = '/home';
+            }
+        } catch (err) {
+            errorDiv.textContent = 'Lỗi kết nối';
+            errorDiv.style.display = 'flex';
+            btn.disabled = false;
+            btn.textContent = 'Xác nhận';
+        }
     }
 
     function showError(message) {

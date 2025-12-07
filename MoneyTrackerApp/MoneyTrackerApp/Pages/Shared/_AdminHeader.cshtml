@@ -1,0 +1,50 @@
+@using MoneyTrackerApp.Services
+@inject IAdminDashboardService DashboardService
+
+<nav class="admin-header">
+    <button class="btn btn-link link-dark border-0 p-0" id="menu-toggle">
+        <i class="fas fa-bars fa-lg"></i>
+    </button>
+
+    <div class="search-bar-container">
+        <div class="position-relative">
+            <i class="fas fa-search position-absolute text-muted" style="top: 10px; left: 12px; font-size: 0.9rem;"></i>
+            <input type="text" class="search-input" style="padding-left: 35px;" placeholder="Tìm user theo email, mã giao dịch...">
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <div class="notification-icon" title="Thông báo hệ thống">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge"></span>
+        </div>
+        
+        <div class="dropdown">
+            <div class="admin-profile dropdown-toggle" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="admin-avatar">AD</div>
+                <span class="admin-name d-none d-sm-block">System Admin</span>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow" aria-labelledby="adminDropdown">
+                <li><a class="dropdown-item" href="#">Hồ sơ</a></li>
+                <li><a class="dropdown-item" href="#">Cài đặt</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form class="form-inline" asp-area="" asp-page="/Auth/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })" method="post">
+                        <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Ensure toggle logic is present if not in layout
+    if (!document.getElementById('menu-toggle').hasAttribute('data-initialized')) {
+        document.getElementById('menu-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            $("#sidebar-wrapper").toggleClass("toggled");
+        });
+        document.getElementById('menu-toggle').setAttribute('data-initialized', 'true');
+    }
+</script>

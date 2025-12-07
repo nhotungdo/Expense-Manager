@@ -85,6 +85,11 @@ public class TransactionResponseDto
     public string? OcrText { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    
+    /// <summary>
+    /// Display description for the transaction (combines CategoryName and Note intelligently)
+    /// </summary>
+    public string Description { get; set; } = null!;
 }
 
 /// <summary>
