@@ -1,0 +1,63 @@
+@using Microsoft.AspNetCore.Identity
+
+<div class="topbar">
+    <!-- Search -->
+    <div class="search-bar">
+        <i class="fas fa-search text-muted"></i>
+        <input type="text" class="search-input" placeholder="Tìm kiếm giao dịch...">
+    </div>
+
+    <!-- Actions -->
+    <div class="user-actions">
+        <!-- Add Transaction Dropdown -->
+        <div class="dropdown">
+            <button class="btn-primary-action dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus"></i>
+                <span>Thêm nhanh</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="openTransactionModal('Income')">
+                    <i class="fas fa-arrow-down text-success me-2"></i>Thu nhập
+                </a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="openTransactionModal('Expense')">
+                    <i class="fas fa-arrow-up text-danger me-2"></i>Chi tiêu
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/Transactions/Index">
+                    <i class="fas fa-list me-2"></i>Xem tất cả giao dịch
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- Notifications -->
+        <div class="icon-btn">
+            <i class="far fa-bell"></i>
+            <span class="badge">3</span>
+        </div>
+
+        <!-- User Profile -->
+        <div class="dropdown">
+            <div class="user-avatar flex-center" data-bs-toggle="dropdown" aria-expanded="false">
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                   <span class="font-bold text-primary">@User.Identity.Name?.Substring(0, 1).ToUpper()</span>
+                }
+                else
+                {
+                    <i class="fas fa-user"></i>
+
+                }
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2">
+                <li><a class="dropdown-item" href="/Profile">Hồ sơ</a></li>
+                <li><a class="dropdown-item" href="/Settings">Cài đặt</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form asp-page="/Auth/Logout" method="post" class="d-inline">
+                        <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

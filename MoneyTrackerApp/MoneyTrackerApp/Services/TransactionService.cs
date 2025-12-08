@@ -136,32 +136,6 @@ public class TransactionService : ITransactionService
 
         _context.Transactions.Add(transaction);
 
-        // For transfer transactions, create paired transaction
-        if (dto.TransactionType == 3 && dto.PairedAccountId.HasValue)
-        {
-            var pairedTransaction = new Transaction
-            {
-                UserId = userId,
-                AccountId = dto.PairedAccountId.Value,
-                CategoryId = dto.CategoryId,
-                TransactionType = 3, // Transfer
-                Amount = dto.Amount,
-                Currency = dto.Currency,
-                Note = dto.Note,
-                TransactionDate = dto.TransactionDate,
-                PairedAccountId = dto.AccountId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _context.Transactions.Add(pairedTransaction);
-            await _context.SaveChangesAsync();
-
-            // Link the paired transactions
-            transaction.PairedTransactionId = pairedTransaction.Id;
-            pairedTransaction.PairedTransactionId = transaction.Id;
-        }
-
         await _context.SaveChangesAsync();
 
         // Reload with includes

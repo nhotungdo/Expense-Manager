@@ -12,18 +12,20 @@ namespace MoneyTrackerApp.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ReportController : ControllerBase
-{
-    private readonly IReportService _reportService;
-    private readonly IExportService _exportService;
-    private readonly ILogger<ReportController> _logger;
-
-    public ReportController(IReportService reportService, IExportService exportService, ILogger<ReportController> logger)
+    public class ReportController : ControllerBase
     {
-        _reportService = reportService;
-        _exportService = exportService;
-        _logger = logger;
-    }
+        private readonly IReportService _reportService;
+        private readonly IExportService _exportService;
+        private readonly ILogger<ReportController> _logger;
+        private readonly IWebHostEnvironment _env;
+
+        public ReportController(IReportService reportService, IExportService exportService, ILogger<ReportController> logger, IWebHostEnvironment env)
+        {
+            _reportService = reportService;
+            _exportService = exportService;
+            _logger = logger;
+            _env = env;
+        }
 
     private long GetUserId()
     {
@@ -35,10 +37,17 @@ public class ReportController : ControllerBase
     /// Get dashboard overview with charts and recent data
     /// </summary>
     [HttpGet("dashboard")]
+    [AllowAnonymous]
     public async Task<ActionResult<DashboardOverviewDto>> GetDashboard()
     {
         try
         {
+            // Allow anonymous access in Development for Dev preview/testing
+            if (!_env.IsDevelopment() && (User?.Identity?.IsAuthenticated != true))
+            {
+                return Unauthorized();
+            }
+
             var userId = GetUserId();
             var dashboard = await _reportService.GetDashboardOverviewAsync(userId);
             return Ok(dashboard);

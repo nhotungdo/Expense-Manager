@@ -160,6 +160,7 @@ public class RecentTransactionDto
     public string Type { get; set; } = null!;
     public DateTime Date { get; set; }
     public string? CategoryIcon { get; set; }
+    public string? CategoryColor { get; set; }
     public string? CategoryName { get; set; }
     public string? AccountName { get; set; }
 }

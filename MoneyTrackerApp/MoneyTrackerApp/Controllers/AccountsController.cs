@@ -19,17 +19,20 @@ public class AccountsController : ControllerBase
     private readonly ISharedAccountService _sharedAccountService;
     private readonly IBankConnectionService _bankConnectionService;
     private readonly INetWorthService _netWorthService;
+    private readonly IWebHostEnvironment _env;
 
     public AccountsController(
         IAccountService accountService,
         ISharedAccountService sharedAccountService,
         IBankConnectionService bankConnectionService,
-        INetWorthService netWorthService)
+        INetWorthService netWorthService,
+        IWebHostEnvironment env)
     {
         _accountService = accountService;
         _sharedAccountService = sharedAccountService;
         _bankConnectionService = bankConnectionService;
         _netWorthService = netWorthService;
+        _env = env;
     }
 
     // Helper to get current user ID from JWT claims
@@ -68,12 +71,15 @@ public class AccountsController : ControllerBase
     /// Get account summaries (minimal info for dashboard)
     /// </summary>
     [HttpGet("summaries")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(List<AccountSummaryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<AccountSummaryDto>>> GetAccountSummaries()
     {
         try
         {
+            if (!_env.IsDevelopment() && (User?.Identity?.IsAuthenticated != true))
+                return Unauthorized();
             var userId = GetUserId();
             var summaries = await _accountService.GetAccountSummariesAsync(userId);
             return Ok(summaries);

@@ -275,6 +275,7 @@ public class ReportService : IReportService
                 Type = t.TransactionTypeDisplay,
                 Date = t.TransactionDate,
                 CategoryIcon = t.CategoryIcon,
+                CategoryColor = t.CategoryColor,
                 CategoryName = t.CategoryName,
                 AccountName = t.AccountName
             }).ToList(),

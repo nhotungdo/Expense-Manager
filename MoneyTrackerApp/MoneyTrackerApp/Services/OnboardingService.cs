@@ -166,8 +166,8 @@ public class OnboardingService
                 UserId = userId,
                 Name = dto.Wallet.Name,
                 AccountType = dto.Wallet.AccountType,
-                InitialBalance = dto.Wallet.InitialBalance,
-                CurrentBalance = dto.Wallet.InitialBalance,
+                InitialBalance = 0, // Set to 0 because we create a transaction for this, and the trigger sums them
+                CurrentBalance = 0, // Let trigger update this from the transaction
                 Currency = dto.Profile.Currency,
                 Icon = dto.Wallet.Icon ?? "💰",
                 Color = dto.Wallet.Color ?? "#4CAF50",
@@ -283,54 +283,54 @@ public class OnboardingService
             case "student":
                 categories = new List<CategoryPreviewDto>
                 {
-                    new() { Name = "Tuition", Type = 0, Icon = "🎓", Color = "#FF5722", Description = "School fees and tuition" },
-                    new() { Name = "Books & Supplies", Type = 0, Icon = "📚", Color = "#FF9800", Description = "Books and study materials" },
-                    new() { Name = "Food & Drinks", Type = 0, Icon = "🍔", Color = "#FFC107", Description = "Meals and beverages" },
-                    new() { Name = "Transportation", Type = 0, Icon = "🚌", Color = "#9C27B0", Description = "Bus, taxi, etc." },
-                    new() { Name = "Entertainment", Type = 0, Icon = "🎮", Color = "#E91E63", Description = "Movies, games, etc." },
-                    new() { Name = "Scholarship", Type = 1, Icon = "🏆", Color = "#4CAF50", Description = "Scholarship income" },
-                    new() { Name = "Part-time Job", Type = 1, Icon = "💼", Color = "#8BC34A", Description = "Part-time work income" },
-                    new() { Name = "Allowance", Type = 1, Icon = "💰", Color = "#CDDC39", Description = "Monthly allowance" }
+                    new() { Name = "Học phí", Type = 0, Icon = "🎓", Color = "#FF5722", Description = "Học phí và các khoản lệ phí" },
+                    new() { Name = "Sách & Dụng cụ", Type = 0, Icon = "📚", Color = "#FF9800", Description = "Sách giáo khoa và dụng cụ học tập" },
+                    new() { Name = "Ăn uống", Type = 0, Icon = "🍔", Color = "#FFC107", Description = "Ăn uống hàng ngày" },
+                    new() { Name = "Di chuyển", Type = 0, Icon = "🚌", Color = "#9C27B0", Description = "Xe buýt, xăng xe" },
+                    new() { Name = "Giải trí", Type = 0, Icon = "🎮", Color = "#E91E63", Description = "Xem phim, chơi game, đi chơi" },
+                    new() { Name = "Học bổng", Type = 1, Icon = "🏆", Color = "#4CAF50", Description = "Thu nhập từ học bổng" },
+                    new() { Name = "Làm thêm", Type = 1, Icon = "💼", Color = "#8BC34A", Description = "Thu nhập từ việc làm thêm" },
+                    new() { Name = "Trợ cấp", Type = 1, Icon = "💰", Color = "#CDDC39", Description = "Trợ cấp hàng tháng từ gia đình" }
                 };
                 break;
 
             case "family":
                 categories = new List<CategoryPreviewDto>
                 {
-                    new() { Name = "Groceries", Type = 0, Icon = "🛒", Color = "#4CAF50", Description = "Food and household items" },
-                    new() { Name = "Utilities", Type = 0, Icon = "💡", Color = "#FF9800", Description = "Electricity, water, internet" },
-                    new() { Name = "Rent/Mortgage", Type = 0, Icon = "🏠", Color = "#F44336", Description = "Housing costs" },
-                    new() { Name = "Healthcare", Type = 0, Icon = "🏥", Color = "#2196F3", Description = "Medical expenses" },
-                    new() { Name = "Education", Type = 0, Icon = "🎓", Color = "#9C27B0", Description = "Children's education" },
-                    new() { Name = "Transportation", Type = 0, Icon = "🚗", Color = "#607D8B", Description = "Car, fuel, public transport" },
-                    new() { Name = "Salary", Type = 1, Icon = "💵", Color = "#4CAF50", Description = "Monthly salary" },
-                    new() { Name = "Bonus", Type = 1, Icon = "🎁", Color = "#8BC34A", Description = "Bonuses and rewards" }
+                    new() { Name = "Mua sắm", Type = 0, Icon = "🛒", Color = "#4CAF50", Description = "Thực phẩm và đồ dùng gia đình" },
+                    new() { Name = "Hóa đơn", Type = 0, Icon = "💡", Color = "#FF9800", Description = "Điện, nước, internet" },
+                    new() { Name = "Thuê nhà", Type = 0, Icon = "🏠", Color = "#F44336", Description = "Tiền thuê nhà hoặc trả góp" },
+                    new() { Name = "Sức khỏe", Type = 0, Icon = "🏥", Color = "#2196F3", Description = "Chi phí y tế" },
+                    new() { Name = "Giáo dục", Type = 0, Icon = "🎓", Color = "#9C27B0", Description = "Học phí cho con" },
+                    new() { Name = "Di chuyển", Type = 0, Icon = "🚗", Color = "#607D8B", Description = "Xăng xe, bảo dưỡng" },
+                    new() { Name = "Lương", Type = 1, Icon = "💵", Color = "#4CAF50", Description = "Lương hàng tháng" },
+                    new() { Name = "Thưởng", Type = 1, Icon = "🎁", Color = "#8BC34A", Description = "Tiền thưởng và quà tặng" }
                 };
                 break;
 
             case "business":
                 categories = new List<CategoryPreviewDto>
                 {
-                    new() { Name = "Office Supplies", Type = 0, Icon = "📎", Color = "#607D8B", Description = "Office materials" },
-                    new() { Name = "Marketing", Type = 0, Icon = "📢", Color = "#FF5722", Description = "Advertising and promotion" },
-                    new() { Name = "Salaries", Type = 0, Icon = "👥", Color = "#F44336", Description = "Employee salaries" },
-                    new() { Name = "Rent", Type = 0, Icon = "🏢", Color = "#FF9800", Description = "Office rent" },
-                    new() { Name = "Equipment", Type = 0, Icon = "💻", Color = "#9C27B0", Description = "Business equipment" },
-                    new() { Name = "Sales Revenue", Type = 1, Icon = "💰", Color = "#4CAF50", Description = "Product/service sales" },
-                    new() { Name = "Consulting", Type = 1, Icon = "🤝", Color = "#8BC34A", Description = "Consulting income" },
-                    new() { Name = "Investment", Type = 1, Icon = "📈", Color = "#00BCD4", Description = "Investment returns" }
+                    new() { Name = "Văn phòng phẩm", Type = 0, Icon = "📎", Color = "#607D8B", Description = "Dụng cụ văn phòng" },
+                    new() { Name = "Tiếp thị", Type = 0, Icon = "📢", Color = "#FF5722", Description = "Quảng cáo và khuyến mãi" },
+                    new() { Name = "Lương nhân viên", Type = 0, Icon = "👥", Color = "#F44336", Description = "Chi trả lương nhân viên" },
+                    new() { Name = "Thuê văn phòng", Type = 0, Icon = "🏢", Color = "#FF9800", Description = "Tiền thuê mặt bằng" },
+                    new() { Name = "Thiết bị", Type = 0, Icon = "💻", Color = "#9C27B0", Description = "Máy móc thiết bị kinh doanh" },
+                    new() { Name = "Doanh thu", Type = 1, Icon = "💰", Color = "#4CAF50", Description = "Doanh thu bán hàng" },
+                    new() { Name = "Tư vấn", Type = 1, Icon = "🤝", Color = "#8BC34A", Description = "Thu nhập từ tư vấn" },
+                    new() { Name = "Đầu tư", Type = 1, Icon = "📈", Color = "#00BCD4", Description = "Lợi nhuận đầu tư" }
                 };
                 break;
 
             case "freelancer":
                 categories = new List<CategoryPreviewDto>
                 {
-                    new() { Name = "Software & Tools", Type = 0, Icon = "🛠️", Color = "#2196F3", Description = "Professional tools" },
-                    new() { Name = "Internet & Phone", Type = 0, Icon = "📱", Color = "#FF9800", Description = "Communication costs" },
-                    new() { Name = "Marketing", Type = 0, Icon = "📢", Color = "#E91E63", Description = "Self-promotion" },
-                    new() { Name = "Education", Type = 0, Icon = "📖", Color = "#9C27B0", Description = "Courses and training" },
-                    new() { Name = "Project Income", Type = 1, Icon = "💼", Color = "#4CAF50", Description = "Client projects" },
-                    new() { Name = "Royalties", Type = 1, Icon = "🎨", Color = "#8BC34A", Description = "Royalty income" }
+                    new() { Name = "Phần mềm & Công cụ", Type = 0, Icon = "🛠️", Color = "#2196F3", Description = "Công cụ làm việc" },
+                    new() { Name = "Internet & Điện thoại", Type = 0, Icon = "📱", Color = "#FF9800", Description = "Chi phí liên lạc" },
+                    new() { Name = "Tiếp thị", Type = 0, Icon = "📢", Color = "#E91E63", Description = "Quảng bá bản thân" },
+                    new() { Name = "Đào tạo", Type = 0, Icon = "📖", Color = "#9C27B0", Description = "Khóa học và nâng cao kỹ năng" },
+                    new() { Name = "Dự án", Type = 1, Icon = "💼", Color = "#4CAF50", Description = "Thu nhập từ dự án" },
+                    new() { Name = "Tiền bản quyền", Type = 1, Icon = "🎨", Color = "#8BC34A", Description = "Thu nhập thụ động" }
                 };
                 break;
 
@@ -338,12 +338,12 @@ public class OnboardingService
             default:
                 categories = new List<CategoryPreviewDto>
                 {
-                    new() { Name = "Food", Type = 0, Icon = "🍔", Color = "#FF5722", Description = "Food and dining" },
-                    new() { Name = "Shopping", Type = 0, Icon = "🛍️", Color = "#E91E63", Description = "Shopping expenses" },
-                    new() { Name = "Bills", Type = 0, Icon = "📄", Color = "#FF9800", Description = "Utility bills" },
-                    new() { Name = "Other Expenses", Type = 0, Icon = "💸", Color = "#9E9E9E", Description = "Miscellaneous" },
-                    new() { Name = "Salary", Type = 1, Icon = "💰", Color = "#4CAF50", Description = "Income" },
-                    new() { Name = "Other Income", Type = 1, Icon = "💵", Color = "#8BC34A", Description = "Other income" }
+                    new() { Name = "Ăn uống", Type = 0, Icon = "🍔", Color = "#FF5722", Description = "Ăn uống hàng ngày" },
+                    new() { Name = "Mua sắm", Type = 0, Icon = "🛍️", Color = "#E91E63", Description = "Mua sắm cá nhân" },
+                    new() { Name = "Hóa đơn", Type = 0, Icon = "📄", Color = "#FF9800", Description = "Điện, nước, internet" },
+                    new() { Name = "Chi tiêu khác", Type = 0, Icon = "💸", Color = "#9E9E9E", Description = "Các khoản linh tinh" },
+                    new() { Name = "Lương", Type = 1, Icon = "💰", Color = "#4CAF50", Description = "Thu nhập chính" },
+                    new() { Name = "Thu nhập khác", Type = 1, Icon = "💵", Color = "#8BC34A", Description = "Các nguồn thu khác" }
                 };
                 break;
         }

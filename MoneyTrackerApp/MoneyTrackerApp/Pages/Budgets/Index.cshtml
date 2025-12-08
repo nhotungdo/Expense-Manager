@@ -1,0 +1,215 @@
+@page
+@model MoneyTrackerApp.Pages.Budgets.IndexModel
+@{
+    ViewData["Title"] = "Ngân sách";
+}
+
+<div class="budgets-page modern-page">
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Ngân sách
+                </h1>
+                <p class="page-subtitle">Quản lý và theo dõi ngân sách của bạn</p>
+            </div>
+            <div class="header-actions">
+                <select class="form-select" id="periodFilter" onchange="changePeriod()">
+                    <option value="week">Tuần này</option>
+                    <option value="month" selected>Tháng này</option>
+                    <option value="quarter">Quý này</option>
+                    <option value="year">Năm này</option>
+                </select>
+                <button class="btn btn-primary" onclick="openAddBudget()">
+                    <i class="fas fa-plus"></i>
+                    Tạo ngân sách
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Overview Dashboard -->
+    <div class="budget-dashboard">
+        <div class="budget-hero-card">
+            <div class="budget-progress-ring">
+                <svg viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="#e2e8f0" stroke-width="20"/>
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="#10b981" stroke-width="20" 
+                            id="progressCircle" stroke-dasharray="565" stroke-dashoffset="283" 
+                            transform="rotate(-90 100 100)" class="progress-circle"/>
+                </svg>
+                <div class="progress-center">
+                    <span class="progress-percent" id="budgetPercent">0%</span>
+                    <span class="progress-label">Đã sử dụng</span>
+                </div>
+            </div>
+            
+            <div class="budget-summary">
+                <div class="summary-item">
+                    <p class="summary-label">Tổng ngân sách</p>
+                    <h3 class="summary-value" id="totalBudget">0 ₫</h3>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-item">
+                    <p class="summary-label">Đã chi tiêu</p>
+                    <h3 class="summary-value spent" id="totalSpent">0 ₫</h3>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-item">
+                    <p class="summary-label">Còn lại</p>
+                    <h3 class="summary-value remaining" id="totalRemaining">0 ₫</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="budget-alerts-card">
+            <div class="alerts-header">
+                <h3 class="alerts-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Cảnh báo ngân sách
+                </h3>
+            </div>
+            <div class="alerts-list" id="budgetAlerts">
+                <div class="alert-item success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Tất cả ngân sách đang trong tầm kiểm soát</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spending Report -->
+    <div class="spending-report-section">
+        <div class="report-card">
+            <div class="report-header">
+                <h3 class="report-title">Báo cáo chi tiêu</h3>
+                <div class="report-tabs">
+                    <button class="report-tab active" data-tab="weekly" onclick="switchReportTab('weekly')">Tuần</button>
+                    <button class="report-tab" data-tab="monthly" onclick="switchReportTab('monthly')">Tháng</button>
+                </div>
+            </div>
+            <div class="report-chart-container">
+                <canvas id="spendingChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Categories -->
+    <div class="budget-categories-section">
+        <div class="section-header-inline">
+            <h3 class="section-title">
+                <i class="fas fa-layer-group"></i>
+                Ngân sách theo danh mục
+            </h3>
+            <div class="category-filters">
+                <button class="filter-chip active" data-status="all" onclick="filterByStatus('all')">
+                    Tất cả
+                </button>
+                <button class="filter-chip" data-status="safe" onclick="filterByStatus('safe')">
+                    <i class="fas fa-check"></i> An toàn
+                </button>
+                <button class="filter-chip" data-status="warning" onclick="filterByStatus('warning')">
+                    <i class="fas fa-exclamation"></i> Cảnh báo
+                </button>
+                <button class="filter-chip" data-status="exceeded" onclick="filterByStatus('exceeded')">
+                    <i class="fas fa-times"></i> Vượt mức
+                </button>
+            </div>
+        </div>
+
+        <div class="budgets-grid" id="budgetsList">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Đang tải ngân sách...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Budget Modal -->
+<div class="modal fade" id="budgetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Tạo ngân sách</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="budgetForm">
+                    <div class="form-group">
+                        <label>Loại ngân sách *</label>
+                        <select class="form-select" id="budgetType" onchange="toggleBudgetFields()">
+                            <option value="Category">Theo danh mục</option>
+                            <option value="Account">Theo tài khoản</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="categoryGroup">
+                        <label>Danh mục *</label>
+                        <select class="form-select" id="categoryId">
+                            <option value="">Chọn danh mục</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="accountGroup" style="display: none;">
+                        <label>Tài khoản *</label>
+                        <select class="form-select" id="accountId">
+                            <option value="">Chọn tài khoản</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số tiền giới hạn *</label>
+                        <div class="input-with-icon">
+                            <span class="currency-symbol">₫</span>
+                            <input type="number" class="form-control amount-input" id="limitAmount" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Chu kỳ *</label>
+                        <select class="form-select" id="period">
+                            <option value="Weekly">Hàng tuần</option>
+                            <option value="Monthly" selected>Hàng tháng</option>
+                            <option value="Yearly">Hàng năm</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày bắt đầu *</label>
+                        <input type="date" class="form-control" id="startDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày kết thúc</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="alertEnabled" checked>
+                        <label class="form-check-label" for="alertEnabled">
+                            Bật cảnh báo khi vượt ngân sách
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngưỡng cảnh báo (%)</label>
+                        <input type="number" class="form-control" id="alertThreshold" value="80" min="0" max="100">
+                        <small class="text-muted">Cảnh báo khi chi tiêu đạt % này</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveBudget()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="~/css/budgets.css">
+    <script src="~/js/budgets.js"></script>
+}

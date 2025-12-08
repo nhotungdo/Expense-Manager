@@ -289,6 +289,36 @@
       text-decoration: underline;
     }
 
+    /* Logo/Brand Icon */
+    .brand-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Focus visible for accessibility */
+    *:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* Improve button hover states */
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .btn-icon:active {
+      transform: scale(0.95);
+    }
+
     .alert {
       padding: 12px 16px;
       border-radius: 10px;
@@ -310,6 +340,55 @@
       border: 1px solid rgba(239, 68, 68, 0.3);
       color: #fca5a5;
     }
+
+    /* Responsive Design */
+    @@media (max-width: 576px) {
+      .glass-card {
+        padding: 32px 24px;
+        margin: 10px;
+      }
+
+      .login-header h1 {
+        font-size: 24px;
+      }
+
+      .login-header p {
+        font-size: 14px;
+      }
+
+      input {
+        padding: 12px 16px 12px 44px;
+        font-size: 14px;
+      }
+
+      .btn {
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      .blob {
+        display: none;
+      }
+    }
+
+    /* Loading spinner */
+    .fa-circle-notch {
+      animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Smooth transitions */
+    * {
+      transition: all 0.3s ease;
+    }
+
+    input, .btn {
+      transition: all 0.3s ease;
+    }
   </style>
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -321,28 +400,23 @@
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
 
-  <!-- 2FA Modal -->
-  <div id="2fa-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
-    <div class="glass-card" style="max-width:400px; padding:30px; animation: slideIn 0.3s ease;">
-      <div style="text-align:center;">
-          <h2 style="color:white; margin-bottom:10px;">Xác thực 2 lớp</h2>
-          <p style="color:rgba(255,255,255,0.7); margin-bottom:20px;">Vui lòng nhập mã xác thực đã được gửi đến email của bạn.</p>
-          
-          <div id="2fa-error" class="alert alert-danger" style="display:none;"></div>
-
-          <div class="form-group">
-            <input type="text" id="2fa-code" placeholder="######" maxlength="6" style="text-align:center; letter-spacing:8px; font-size:24px; font-weight:bold; text-transform:uppercase;" />
-          </div>
-          
-          <button onclick="verify2FA()" class="btn btn-primary" id="btn-verify-2fa">Xác nhận</button>
-          <button onclick="close2FA()" class="btn" style="margin-top:10px; background:transparent; border:1px solid rgba(255,255,255,0.3); color:white;">Hủy bỏ</button>
-      </div>
-    </div>
+  <!-- Theme & Language Controls -->
+  <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10;">
+    <button class="btn-icon" title="Đổi ngôn ngữ" style="background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:white; cursor:pointer; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center;" onclick="toggleLanguage()">
+      <i class="fas fa-globe"></i>
+    </button>
+    <button class="btn-icon" title="Giao diện" style="background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:white; cursor:pointer; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center;" onclick="toggleTheme()">
+      <i class="fas fa-moon"></i>
+    </button>
   </div>
 
+  <!-- Login Container -->
   <div class="login-container">
     <div class="glass-card">
       <div class="login-header">
+        <div class="brand-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
         <h1>Chào mừng trở lại!</h1>
         <p>Đăng nhập để tiếp tục quản lý tài chính</p>
       </div>
@@ -390,6 +464,12 @@
             <input type="password" id="password" name="password" placeholder="••••••••" required />
           </div>
         </div>
+        
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+          <a href="/Auth/ForgotPassword" style="color: rgba(255,255,255,0.8); font-size: 13px; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+            Quên mật khẩu?
+          </a>
+        </div>
 
         <button type="submit" class="btn btn-primary" id="submit-btn">
           Đăng nhập
@@ -414,7 +494,52 @@
     </div>
   </div>
 
+  <!-- 2FA Modal -->
+  <div id="2fa-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div class="glass-card" style="max-width:400px; padding:30px; animation: slideIn 0.3s ease;">
+      <div style="text-align:center;">
+        <h2 style="color:white; margin-bottom:10px;">Xác thực 2 lớp</h2>
+        <p style="color:rgba(255,255,255,0.7); margin-bottom:20px;">Vui lòng nhập mã xác thực đã được gửi đến email của bạn.</p>
+        
+        <div id="2fa-error" class="alert alert-danger" style="display:none;"></div>
+
+        <div class="form-group">
+          <input type="text" id="2fa-code" placeholder="######" maxlength="6" style="text-align:center; letter-spacing:8px; font-size:24px; font-weight:bold; text-transform:uppercase;" />
+        </div>
+        
+        <button onclick="verify2FA()" class="btn btn-primary" id="btn-verify-2fa">Xác nhận</button>
+        <button onclick="close2FA()" class="btn" style="margin-top:10px; background:transparent; border:1px solid rgba(255,255,255,0.3); color:white;">Hủy bỏ</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Helper function to get cookie
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    // Toggle language
+    function toggleLanguage() {
+      const currentLang = localStorage.getItem('language') || 'vi';
+      const newLang = currentLang === 'vi' ? 'en' : 'vi';
+      localStorage.setItem('language', newLang);
+      // In production, this would reload with new language
+      alert(`Ngôn ngữ đã chuyển sang: ${newLang === 'vi' ? 'Tiếng Việt' : 'English'}`);
+    }
+
+    // Toggle theme
+    function toggleTheme() {
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', newTheme);
+      // In production, this would apply theme
+      alert(`Giao diện đã chuyển sang: ${newTheme === 'light' ? 'Sáng' : 'Tối'}`);
+    }
+
     // Check for tokens in URL (from Google callback)
     const params = new URLSearchParams(location.search);
     const accessToken = params.get('accessToken');
@@ -540,14 +665,34 @@
 
     function showError(message) {
       const form = document.getElementById('login-form');
-      const existing = form.querySelector('.alert');
-      if (existing) existing.remove();
+      const existing = document.querySelector('.alert-danger');
+      if (existing && !existing.id) existing.remove();
 
       const alert = document.createElement('div');
       alert.className = 'alert alert-danger';
-      alert.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message;
+      alert.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>' + message + '</span>';
       form.parentElement.insertBefore(alert, form);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (alert.parentElement) {
+          alert.style.opacity = '0';
+          setTimeout(() => alert.remove(), 300);
+        }
+      }, 5000);
     }
+
+    // Add enter key support for 2FA
+    document.addEventListener('DOMContentLoaded', function() {
+      const twoFAInput = document.getElementById('2fa-code');
+      if (twoFAInput) {
+        twoFAInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            verify2FA();
+          }
+        });
+      }
+    });
   </script>
 </body>
 

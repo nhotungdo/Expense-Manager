@@ -1,0 +1,87 @@
+
+<!-- Quick Add Transaction Modal -->
+<div class="modal fade" id="globalTransactionModal" tabindex="-1" aria-labelledby="globalTransactionModalTitle" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-white">
+                <h5 class="modal-title fw-bold fs-4" id="globalTransactionModalTitle">Giao dịch mới</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-white">
+                <form id="globalTransactionForm" onsubmit="return false;">
+                    <input type="hidden" id="globalTransType" value="2">
+                    
+                    <!-- Amount Input -->
+                    <div class="mb-4 text-center">
+                        <label class="small text-muted text-uppercase fw-bold mb-2 tracking-wider">Số tiền</label>
+                        <div class="input-group justify-content-center align-items-center">
+                            <input type="number" 
+                                   class="form-control border-0 text-center fw-bold fs-1 p-0 shadow-none text-dark" 
+                                   id="globalTransAmount" 
+                                   placeholder="0" 
+                                   required 
+                                   min="0" 
+                                   step="any"
+                                   style="max-width: 250px; background: transparent;">
+                        </div>
+                        <span class="text-muted small fw-medium">VND</span>
+                    </div>
+
+                    <!-- Wallet Selection -->
+                    <div class="mb-3">
+                        <label class="fw-semibold small text-muted mb-1">Ví thanh toán</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
+                                <i class="fas fa-wallet text-muted"></i>
+                            </span>
+                            <select class="form-select bg-light border-0 py-2.5 rounded-end-3 shadow-none cursor-pointer" id="globalTransAccount" required>
+                                <option value="">Đang tải ví...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Date -->
+                        <div class="col-6">
+                            <label class="fw-semibold small text-muted mb-1">Thời gian</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3 ps-2 pe-2">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                                <input type="date" class="form-control bg-light border-0 py-2.5 rounded-end-3 shadow-none text-sm" id="globalTransDate" required>
+                            </div>
+                        </div>
+                        <!-- Category -->
+                        <div class="col-6">
+                            <label class="fw-semibold small text-muted mb-1">Danh mục</label>
+                             <div class="input-group">
+                                <select class="form-select bg-light border-0 py-2.5 rounded-3 shadow-none cursor-pointer" id="globalTransCategory" required>
+                                    <option value="">Chọn...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Note -->
+                    <div class="mb-4">
+                        <label class="fw-semibold small text-muted mb-1">Ghi chú</label>
+                        <div class="input-group">
+                             <span class="input-group-text bg-light border-0 rounded-start-3 ps-3 pt-2 align-items-start">
+                                <i class="fas fa-align-left text-muted mt-1"></i>
+                            </span>
+                            <textarea class="form-control bg-light border-0 rounded-end-3 shadow-none" 
+                                      id="globalTransNote" 
+                                      rows="2" 
+                                      placeholder="Nội dung chi tiêu..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm transition-all" id="globalBtnSaveTrans" style="border-radius: 1rem;">
+                        <i class="fas fa-check me-2"></i>Lưu giao dịch
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -246,7 +246,7 @@
                             foreach (var log in Model.DashboardData.RecentAuditLogs.Take(5))
                             {
                                 <tr>
-                                    <td>@log.Time.ToString("HH:mm:ss dd/MM")</td>
+                                    <td>@log.Time.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                     <td>@log.UserEmail</td>
                                     <td>
                                         <span class="badge bg-light text-dark border">@log.Action</span>

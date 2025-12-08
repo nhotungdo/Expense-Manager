@@ -1,0 +1,43 @@
+<div class="sidebar">
+    <div class="logo-area">
+        <i class="fas fa-wallet"></i> MoneyTracker
+    </div>
+    
+    <nav class="nav-menu">
+        <a href="/home" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().ToLower() == "/home" ? "active" : "")">
+            <i class="fas fa-th-large" style="width: 20px;"></i> Bảng điều khiển
+        </a>
+        <a href="/Transactions/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("transactions") == true ? "active" : "")">
+            <i class="fas fa-list" style="width: 20px;"></i> Giao dịch
+        </a>
+        <a href="/Wallets/Index" class="nav-item">
+            <i class="fas fa-credit-card" style="width: 20px;"></i> Ví
+        </a>
+        <a href="/Budgets/Index" class="nav-item">
+            <i class="fas fa-chart-pie" style="width: 20px;"></i> Ngân sách
+        </a>
+        <a href="/Reports" class="nav-item">
+            <i class="fas fa-chart-line" style="width: 20px;"></i> Báo cáo
+        </a>
+        <a href="/Debts/Index" class="nav-item">
+            <i class="fas fa-hand-holding-usd" style="width: 20px;"></i> Nợ
+        </a>
+        <a href="/Groups/Index" class="nav-item">
+            <i class="fas fa-users" style="width: 20px;"></i> Nhóm
+        </a>
+        <a href="/Investments/Index" class="nav-item">
+            <i class="fas fa-chart-bar" style="width: 20px;"></i> Đầu tư
+        </a>
+    </nav>
+    
+    <div class="nav-footer">
+        <a href="/Settings/Index" class="nav-item">
+            <i class="fas fa-cog" style="width: 20px;"></i> Cài đặt
+        </a>
+        <form class="form-inline" asp-page="/Auth/Logout" method="post">
+             <button type="submit" class="nav-item w-100 border-0 bg-transparent text-start" style="cursor:pointer;">
+                <i class="fas fa-sign-out-alt" style="width: 20px;"></i> Đăng xuất
+            </button>
+        </form>
+    </div>
+</div>

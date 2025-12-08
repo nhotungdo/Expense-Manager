@@ -1,0 +1,307 @@
+@page
+@model MoneyTrackerApp.Pages.Debts.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Nợ";
+}
+
+<div class="debts-page modern-page">
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    Quản lý Nợ
+                </h1>
+                <p class="page-subtitle">Theo dõi các khoản vay và cho vay</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="openDebtModal('Lend')">
+                    <i class="fas fa-arrow-up"></i>
+                    Cho vay
+                </button>
+                <button class="btn btn-primary" onclick="openDebtModal('Borrow')">
+                    <i class="fas fa-arrow-down"></i>
+                    Ghi nợ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debt Overview Cards -->
+    <div class="debt-overview">
+        <div class="overview-card total-debt">
+            <div class="overview-header">
+                <div class="overview-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <span class="overview-badge">Tổng quan</span>
+            </div>
+            <div class="overview-content">
+                <p class="overview-label">Tổng nợ phải trả</p>
+                <h2 class="overview-amount danger" id="totalBorrow">0 ₫</h2>
+                <div class="overview-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-list"></i>
+                        <span id="borrowCount">0</span> khoản
+                    </span>
+                    <span class="meta-item urgent">
+                        <i class="fas fa-clock"></i>
+                        <span id="urgentCount">0</span> sắp đến hạn
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="overview-card total-lend">
+            <div class="overview-header">
+                <div class="overview-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <span class="overview-badge">Cho vay</span>
+            </div>
+            <div class="overview-content">
+                <p class="overview-label">Tổng nợ phải thu</p>
+                <h2 class="overview-amount success" id="totalLend">0 ₫</h2>
+                <div class="overview-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-list"></i>
+                        <span id="lendCount">0</span> khoản
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="overview-card net-position">
+            <div class="overview-header">
+                <div class="overview-icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <span class="overview-badge">Chênh lệch</span>
+            </div>
+            <div class="overview-content">
+                <p class="overview-label">Vị thế ròng</p>
+                <h2 class="overview-amount" id="netPosition">0 ₫</h2>
+                <p class="overview-description" id="netDescription">Cân bằng</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debt Statistics Chart -->
+    <div class="debt-chart-section">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">Phân tích nợ theo thời gian</h3>
+                <div class="chart-filters">
+                    <button class="chart-filter-btn active" data-period="month">Tháng</button>
+                    <button class="chart-filter-btn" data-period="quarter">Quý</button>
+                    <button class="chart-filter-btn" data-period="year">Năm</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="debtTrendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="debt-category-card">
+            <h3 class="chart-title">Phân loại theo danh mục</h3>
+            <div class="category-chart-container">
+                <canvas id="debtCategoryChart"></canvas>
+            </div>
+            <div class="category-legend" id="categoryLegend"></div>
+        </div>
+    </div>
+
+    <!-- Debt Lists -->
+    <div class="debt-lists-container">
+        <!-- Debts I Owe -->
+        <div class="debt-list-section">
+            <div class="section-header-inline">
+                <h3 class="section-title danger">
+                    <i class="fas fa-arrow-down"></i>
+                    Tôi đi vay (Phải trả)
+                </h3>
+                <span class="count-badge danger" id="borrowCountBadge">0</span>
+            </div>
+            
+            <div class="debt-items" id="borrowList">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Đang tải...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debts Others Owe Me -->
+        <div class="debt-list-section">
+            <div class="section-header-inline">
+                <h3 class="section-title success">
+                    <i class="fas fa-arrow-up"></i>
+                    Người khác vay (Phải thu)
+                </h3>
+                <span class="count-badge success" id="lendCountBadge">0</span>
+            </div>
+            
+            <div class="debt-items" id="lendList">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Đang tải...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Reminders -->
+    <div class="reminders-section">
+        <div class="section-header-inline">
+            <h3 class="section-title">
+                <i class="fas fa-bell"></i>
+                Nhắc nhở thanh toán
+            </h3>
+        </div>
+        <div class="reminders-list" id="remindersList">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Debt Modal -->
+<div class="modal fade" id="debtModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="debtModalTitle">Thêm khoản nợ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="debtForm">
+                    <input type="hidden" id="debtId">
+                    <input type="hidden" id="debtType" value="Borrow">
+
+                    <!-- Debt Type Selector -->
+                    <div class="debt-type-selector">
+                        <button type="button" class="type-btn active" data-type="Borrow">
+                            <i class="fas fa-arrow-down"></i>
+                            Tôi đi vay
+                        </button>
+                        <button type="button" class="type-btn" data-type="Lend">
+                            <i class="fas fa-arrow-up"></i>
+                            Tôi cho vay
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Người liên quan *</label>
+                        <input type="text" class="form-control" id="debtPerson" placeholder="Tên người vay/cho vay" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số tiền *</label>
+                        <div class="input-with-icon">
+                            <span class="currency-symbol">₫</span>
+                            <input type="number" class="form-control amount-input" id="debtAmount" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Danh mục</label>
+                        <select class="form-select" id="debtCategory">
+                            <option value="Personal">Cá nhân</option>
+                            <option value="Business">Kinh doanh</option>
+                            <option value="Family">Gia đình</option>
+                            <option value="Friend">Bạn bè</option>
+                            <option value="Other">Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ngày vay</label>
+                            <input type="date" class="form-control" id="debtDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ngày đáo hạn</label>
+                            <input type="date" class="form-control" id="dueDate">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Lãi suất (%/năm)</label>
+                        <input type="number" class="form-control" id="interestRate" value="0" step="0.1" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea class="form-control" id="debtNote" rows="3" placeholder="Mục đích vay, điều khoản..."></textarea>
+                    </div>
+
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="enableReminder" checked>
+                        <label class="form-check-label" for="enableReminder">
+                            Bật nhắc nhở tự động
+                        </label>
+                    </div>
+
+                    <div class="form-group" id="reminderDaysGroup">
+                        <label>Nhắc trước (ngày)</label>
+                        <input type="number" class="form-control" id="reminderDays" value="3" min="1">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveDebt()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thanh toán nợ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentForm">
+                    <input type="hidden" id="paymentDebtId">
+                    
+                    <div class="payment-info">
+                        <p><strong>Người:</strong> <span id="paymentPerson"></span></p>
+                        <p><strong>Tổng nợ:</strong> <span id="paymentTotal"></span></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số tiền thanh toán *</label>
+                        <div class="input-with-icon">
+                            <span class="currency-symbol">₫</span>
+                            <input type="number" class="form-control amount-input" id="paymentAmount" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày thanh toán</label>
+                        <input type="date" class="form-control" id="paymentDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea class="form-control" id="paymentNote" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="processPayment()">Xác nhận thanh toán</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="~/css/debts.css">
+    <script src="~/js/debts.js"></script>
+}

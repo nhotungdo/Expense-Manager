@@ -1,0 +1,110 @@
+@page
+@model MoneyTrackerApp.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Danh mục";
+}
+
+<div class="categories-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Danh mục</h1>
+            <p class="page-subtitle">Quản lý danh mục thu chi</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="openAddCategory()">
+                <i class="fas fa-plus"></i>
+                Thêm danh mục
+            </button>
+        </div>
+    </div>
+
+    <!-- Category Type Tabs -->
+    <div class="category-tabs">
+        <button class="tab-btn active" data-type="Expense" onclick="filterByType('Expense')">
+            <i class="fas fa-arrow-up"></i>
+            Chi tiêu
+        </button>
+        <button class="tab-btn" data-type="Income" onclick="filterByType('Income')">
+            <i class="fas fa-arrow-down"></i>
+            Thu nhập
+        </button>
+    </div>
+
+    <!-- Categories List -->
+    <div class="categories-container">
+        <div class="categories-list" id="categoriesList">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Đang tải danh mục...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm danh mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label>Tên danh mục *</label>
+                        <input type="text" class="form-control" id="categoryName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Loại *</label>
+                        <select class="form-select" id="categoryType" required>
+                            <option value="Expense">Chi tiêu</option>
+                            <option value="Income">Thu nhập</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Danh mục cha</label>
+                        <select class="form-select" id="parentCategoryId">
+                            <option value="">Không có (Danh mục gốc)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Biểu tượng *</label>
+                        <div class="icon-grid" id="iconGrid">
+                            <!-- Icons will be populated by JS -->
+                        </div>
+                        <input type="hidden" id="icon" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Màu sắc *</label>
+                        <div class="color-selector" id="colorSelector">
+                            <button type="button" class="color-btn" data-color="#ef4444" style="background: #ef4444;"></button>
+                            <button type="button" class="color-btn" data-color="#f59e0b" style="background: #f59e0b;"></button>
+                            <button type="button" class="color-btn" data-color="#10b981" style="background: #10b981;"></button>
+                            <button type="button" class="color-btn" data-color="#3b82f6" style="background: #3b82f6;"></button>
+                            <button type="button" class="color-btn" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
+                            <button type="button" class="color-btn" data-color="#ec4899" style="background: #ec4899;"></button>
+                            <button type="button" class="color-btn" data-color="#14b8a6" style="background: #14b8a6;"></button>
+                            <button type="button" class="color-btn" data-color="#f97316" style="background: #f97316;"></button>
+                        </div>
+                        <input type="hidden" id="color" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveCategory()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="~/css/categories.css">
+    <script src="~/js/categories.js"></script>
+}

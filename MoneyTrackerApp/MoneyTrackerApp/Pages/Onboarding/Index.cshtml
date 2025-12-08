@@ -1,0 +1,152 @@
+@page
+@model MoneyTrackerApp.Pages.Onboarding.IndexModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thiết lập ban đầu - MoneyTracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/onboarding.css" />
+</head>
+<body class="onboarding-page">
+    <div class="onboarding-container">
+        <!-- Progress Bar -->
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 25%;"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <span>Thông tin</span>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <span>Thu nhập</span>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <span>Chi tiêu</span>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <span>Mục tiêu</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step Content -->
+        <div class="onboarding-content">
+            <!-- Step 1: Personal Information -->
+            <div class="step-content active" id="step1">
+                <div class="step-header">
+                    <h2>Thông tin cá nhân</h2>
+                    <p>Hãy cho chúng tôi biết thêm về bạn</p>
+                </div>
+                <form class="onboarding-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Họ *</label>
+                            <input type="text" class="form-control" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tên *</label>
+                            <input type="text" class="form-control" id="lastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Giới tính</label>
+                        <div class="gender-selector">
+                            <button type="button" class="gender-btn" data-gender="Male">
+                                <i class="fas fa-mars"></i>
+                                Nam
+                            </button>
+                            <button type="button" class="gender-btn" data-gender="Female">
+                                <i class="fas fa-venus"></i>
+                                Nữ
+                            </button>
+                            <button type="button" class="gender-btn" data-gender="Other">
+                                <i class="fas fa-genderless"></i>
+                                Khác
+                            </button>
+                        </div>
+                        <input type="hidden" id="gender">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày sinh</label>
+                        <input type="date" class="form-control" id="dateOfBirth">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 2: Income Setup -->
+            <div class="step-content" id="step2">
+                <div class="step-header">
+                    <h2>Thiết lập thu nhập</h2>
+                    <p>Bạn có những nguồn thu nhập nào?</p>
+                </div>
+                <div class="income-list" id="incomeList">
+                    <button class="add-income-btn" onclick="addIncomeSource()">
+                        <i class="fas fa-plus"></i>
+                        Thêm nguồn thu nhập
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Expense Setup -->
+            <div class="step-content" id="step3">
+                <div class="step-header">
+                    <h2>Chi tiêu hàng tháng</h2>
+                    <p>Ước tính chi tiêu trung bình của bạn</p>
+                </div>
+                <div class="expense-categories" id="expenseCategories">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+
+            <!-- Step 4: Financial Goals -->
+            <div class="step-content" id="step4">
+                <div class="step-header">
+                    <h2>Mục tiêu tài chính</h2>
+                    <p>Bạn muốn đạt được điều gì?</p>
+                </div>
+                <div class="goals-list" id="goalsList">
+                    <button class="add-goal-btn" onclick="addGoal()">
+                        <i class="fas fa-plus"></i>
+                        Thêm mục tiêu
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="onboarding-footer">
+            <button class="btn btn-outline" id="prevBtn" onclick="previousStep()" style="display: none;">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại
+            </button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                Tiếp theo
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="btn btn-success" id="finishBtn" onclick="finishOnboarding()" style="display: none;">
+                <i class="fas fa-check"></i>
+                Hoàn thành
+            </button>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/onboarding.js"></script>
+</body>
+</html>

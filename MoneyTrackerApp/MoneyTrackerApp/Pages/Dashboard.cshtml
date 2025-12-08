@@ -1,0 +1,199 @@
+@page
+@model MoneyTrackerApp.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="dashboard-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Tổng quan tài chính của bạn</p>
+        </div>
+        <div class="header-actions">
+            <select class="form-select" id="periodFilter">
+                <option value="week">Tuần này</option>
+                <option value="month" selected>Tháng này</option>
+                <option value="year">Năm này</option>
+                <option value="custom">Tùy chỉnh</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Financial Summary Cards -->
+    <div class="stats-grid">
+        <div class="stat-card income">
+            <div class="stat-icon">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="stat-content">
+                <p class="stat-label">Tổng thu nhập</p>
+                <h3 class="stat-value" id="totalIncome">0 ₫</h3>
+                <span class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +12.5%
+                </span>
+            </div>
+        </div>
+
+        <div class="stat-card expense">
+            <div class="stat-icon">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="stat-content">
+                <p class="stat-label">Tổng chi tiêu</p>
+                <h3 class="stat-value" id="totalExpense">0 ₫</h3>
+                <span class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i> -8.3%
+                </span>
+            </div>
+        </div>
+
+        <div class="stat-card net">
+            <div class="stat-icon">
+                <i class="fas fa-equals"></i>
+            </div>
+            <div class="stat-content">
+                <p class="stat-label">Thu nhập ròng</p>
+                <h3 class="stat-value" id="netIncome">0 ₫</h3>
+                <span class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +25.8%
+                </span>
+            </div>
+        </div>
+
+        <div class="stat-card balance">
+            <div class="stat-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="stat-content">
+                <p class="stat-label">Tổng số dư</p>
+                <h3 class="stat-value" id="totalBalance">0 ₫</h3>
+                <span class="stat-info">Tất cả tài khoản</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <!-- Transaction Types Pie Chart -->
+        <div class="chart-card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-pie"></i> Phân bổ giao dịch</h3>
+                <div class="chart-actions">
+                    <button class="btn-icon-sm" onclick="refreshChart('transactionTypes')">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body chart-container">
+                <canvas id="transactionTypesChart"></canvas>
+                <div class="chart-summary" id="transactionTypesSummary"></div>
+            </div>
+        </div>
+
+        <!-- Category Spending Pie Chart -->
+        <div class="chart-card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-pie"></i> Chi tiêu theo danh mục</h3>
+                <div class="chart-actions">
+                    <button class="btn-icon-sm" onclick="refreshChart('categories')">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body chart-container">
+                <canvas id="categoryChart"></canvas>
+                <div class="chart-summary" id="categorySummary"></div>
+            </div>
+        </div>
+
+        <!-- Income vs Expense Trend -->
+        <div class="chart-card chart-card-wide">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> Xu hướng thu chi</h3>
+                <div class="chart-legend">
+                    <span class="legend-item">
+                        <span class="legend-dot income"></span> Thu nhập
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-dot expense"></span> Chi tiêu
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="incomeExpenseChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Recent Transactions -->
+        <div class="content-card transactions-card">
+            <div class="card-header">
+                <h3>Giao dịch gần đây</h3>
+                <a href="/Transactions" class="btn-link">Xem tất cả</a>
+            </div>
+            <div class="card-body">
+                <div class="transactions-list" id="recentTransactions">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Đang tải...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Suggestions & Alerts -->
+        <div class="content-card">
+            <!-- AI Suggestions -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3><i class="fas fa-robot"></i> Gợi ý AI</h3>
+                    <a href="/AiAdvisor" class="btn-link">Xem thêm</a>
+                </div>
+                <div class="card-body">
+                    <div class="suggestions-list" id="aiSuggestions">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Alerts -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3><i class="fas fa-bell"></i> Cảnh báo</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alerts-list" id="financialAlerts">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accounts Overview -->
+    <div class="accounts-overview">
+        <div class="card-header">
+            <h3>Tài khoản của bạn</h3>
+            <a href="/Wallets" class="btn-link">Quản lý</a>
+        </div>
+        <div class="accounts-grid" id="accountsGrid">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="~/js/charts-config.js"></script>
+    <script src="~/js/dashboard.js"></script>
+}

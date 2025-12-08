@@ -104,6 +104,111 @@ namespace MoneyTrackerApp.Controllers
         }
 
         /// <summary>
+        /// Get categories in tree structure (hierarchy)
+        /// </summary>
+        [HttpGet("tree")]
+        [Authorize]
+        public async Task<IActionResult> GetCategoryTree([FromQuery] int? type = null)
+        {
+            try
+            {
+                var userId = GetUserId();
+                var categories = await _categoryService.GetCategoryTreeAsync(userId, type);
+                
+                // Keep the property names consistent with JS (camelCase)
+                // Assuming the DTO is serialized with default settings (camelCase), 
+                // but if manual mapping is needed like above:
+                // For tree structure, manual mapping recursively is tedious here. 
+                // We rely on standard JSON serialization.
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetCategoryTree");
+                return StatusCode(500, new { message = "Error retrieving category tree" });
+            }
+        }
+
+        /// <summary>
+        /// Create a new category
+        /// </summary>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> CreateCategory([FromBody] MoneyTrackerApp.DTOs.CreateCategoryDto dto)
+        {
+            try
+            {
+                var userId = GetUserId();
+                var result = await _categoryService.CreateCategoryAsync(userId, dto);
+                return CreatedAtAction(nameof(GetUserCategories), new { id = result.Id }, result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating category");
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// Update a category
+        /// </summary>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateCategory(long id, [FromBody] MoneyTrackerApp.DTOs.UpdateCategoryDto dto)
+        {
+            if (id != dto.Id)
+                return BadRequest(new { message = "ID mismatch" });
+
+            try
+            {
+                var userId = GetUserId();
+                var result = await _categoryService.UpdateCategoryAsync(userId, dto);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating category");
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// Delete a category
+        /// </summary>
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteCategory(long id)
+        {
+            try
+            {
+                var userId = GetUserId();
+                var result = await _categoryService.DeleteCategoryAsync(id, userId);
+                
+                if (!result)
+                    return NotFound(new { message = "Category not found" });
+
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                 _logger.LogError(ex, "Error deleting category");
+                 return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
         /// Debug endpoint to check if API is accessible (no auth required)
         /// </summary>
         [HttpGet("debug")]

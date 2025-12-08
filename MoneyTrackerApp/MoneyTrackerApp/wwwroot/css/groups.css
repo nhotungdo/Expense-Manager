@@ -1,0 +1,544 @@
+/* ========================================
+   GROUPS PAGE STYLES
+   ======================================== */
+
+@import url('modern-pages.css');
+
+/* Groups Overview */
+.groups-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.overview-stat-card {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s;
+}
+
+.overview-stat-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.overview-stat-card .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.overview-stat-card .stat-icon.balance {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--secondary);
+}
+
+.overview-stat-card .stat-icon.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.overview-stat-card .stat-content {
+    flex: 1;
+}
+
+.overview-stat-card .stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.overview-stat-card .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.overview-stat-card .stat-value.warning {
+    color: var(--warning);
+}
+
+/* Groups Section */
+.groups-section {
+    margin-bottom: 32px;
+}
+
+.groups-view-toggle {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-secondary);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.view-btn {
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-btn:hover {
+    color: var(--text-primary);
+}
+
+.view-btn.active {
+    background: var(--bg-primary);
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Groups Grid */
+.groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.group-card {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.group-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+}
+
+.group-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.group-card:hover::before {
+    transform: scaleX(1);
+}
+
+.group-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+}
+
+.group-icon-box {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.group-member-count {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+.group-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.group-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.group-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.group-total-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.group-total-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Group Details Modal */
+.group-header-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.group-icon-large {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.group-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Group Tabs */
+.group-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.group-tab {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.group-tab:hover {
+    color: var(--text-primary);
+}
+
+.group-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+/* Tab Content */
+.group-tab-content {
+    min-height: 400px;
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.tab-header h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Transactions List */
+.transaction-item {
+    padding: 16px;
+    border-radius: var(--border-radius);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.transaction-item:hover {
+    border-color: var(--primary);
+    background: var(--bg-primary);
+}
+
+.transaction-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 8px;
+}
+
+.transaction-description {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.transaction-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--danger);
+}
+
+.transaction-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Balances Container */
+.balances-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.balances-section, .settlements-section {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: 20px;
+}
+
+.balances-section h4, .settlements-section h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.balance-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--bg-primary);
+    margin-bottom: 8px;
+}
+
+.balance-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.balance-amount {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.balance-amount.positive {
+    color: var(--success);
+}
+
+.balance-amount.negative {
+    color: var(--danger);
+}
+
+.settlement-item {
+    padding: 14px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 2px solid rgba(245, 158, 11, 0.2);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.settlement-amount {
+    color: var(--warning);
+    font-weight: 700;
+}
+
+/* Members List */
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    margin-bottom: 12px;
+}
+
+.member-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.member-role {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.member-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Chat Container */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    margin-bottom: 16px;
+}
+
+.chat-message {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+}
+
+.chat-message.own {
+    flex-direction: row-reverse;
+}
+
+.chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.chat-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+}
+
+.chat-message.own .chat-bubble {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.chat-sender {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.chat-text {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.chat-time {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.chat-input-container {
+    display: flex;
+    gap: 12px;
+}
+
+.chat-input-container input {
+    flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .groups-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .groups-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .balances-container {
+        grid-template-columns: 1fr;
+    }
+
+    .group-tabs {
+        overflow-x: auto;
+    }
+
+    .chat-bubble {
+        max-width: 85%;
+    }
+}

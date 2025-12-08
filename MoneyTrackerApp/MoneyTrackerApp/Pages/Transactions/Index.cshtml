@@ -1,103 +1,286 @@
 @page
 @model MoneyTrackerApp.Pages.Transactions.IndexModel
 @{
-    Layout = "/Pages/Shared/_Layout.cshtml";
     ViewData["Title"] = "Giao dịch";
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Giao dịch</h2>
-        <div class="d-flex gap-2">
-            <input id="pageSearchInput" type="search" class="form-control" style="min-width:300px;"
-                placeholder="Tìm kiếm giao dịch...">
-            <button id="pageSearchBtn" class="btn btn-primary">Tìm kiếm</button>
+<div class="transactions-page modern-page">
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-receipt"></i>
+                    Giao dịch
+                </h1>
+                <p class="page-subtitle">Theo dõi chi tiết thu chi của bạn</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline btn-icon" onclick="toggleView()" title="Chuyển chế độ xem">
+                    <i class="fas fa-calendar" id="viewIcon"></i>
+                </button>
+                <button class="btn btn-outline" onclick="exportTransactions()">
+                    <i class="fas fa-download"></i>
+                    Xuất file
+                </button>
+                <button class="btn btn-primary" onclick="openAddTransaction()">
+                    <i class="fas fa-plus"></i>
+                    Thêm giao dịch
+                </button>
+            </div>
         </div>
     </div>
 
-    <div id="transactionsContainer">
-        <div class="text-center py-5 text-muted">Đang tải giao dịch...</div>
+    <!-- Search and Filter Bar -->
+    <div class="search-filter-bar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm giao dịch..." onkeyup="searchTransactions()">
+            <button class="clear-search" onclick="clearSearch()" style="display: none;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <button class="filter-toggle" onclick="toggleFilters()">
+            <i class="fas fa-sliders-h"></i>
+            Bộ lọc
+            <span class="filter-count" id="filterCount" style="display: none;">0</span>
+        </button>
     </div>
 
-    <nav id="transactionsPagination" aria-label="Transactions pagination" class="mt-3"></nav>
+    <!-- Advanced Filters (Collapsible) -->
+    <div class="filters-panel" id="filtersPanel" style="display: none;">
+        <div class="filters-grid">
+            <div class="filter-item">
+                <label>Loại giao dịch</label>
+                <div class="filter-chips-inline">
+                    <button class="chip-filter active" data-type="" onclick="filterByTransactionType('')">Tất cả</button>
+                    <button class="chip-filter" data-type="Income" onclick="filterByTransactionType('Income')">
+                        <i class="fas fa-arrow-down"></i> Thu nhập
+                    </button>
+                    <button class="chip-filter" data-type="Expense" onclick="filterByTransactionType('Expense')">
+                        <i class="fas fa-arrow-up"></i> Chi tiêu
+                    </button>
+                    <button class="chip-filter" data-type="Transfer" onclick="filterByTransactionType('Transfer')">
+                        <i class="fas fa-exchange-alt"></i> Chuyển khoản
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-item">
+                <label>Khoảng thời gian</label>
+                <select class="form-select" id="periodFilter" onchange="applyPeriodFilter()">
+                    <option value="today">Hôm nay</option>
+                    <option value="yesterday">Hôm qua</option>
+                    <option value="week" selected>Tuần này</option>
+                    <option value="month">Tháng này</option>
+                    <option value="last-month">Tháng trước</option>
+                    <option value="custom">Tùy chỉnh</option>
+                </select>
+            </div>
+
+            <div class="filter-item" id="customDateRange" style="display: none;">
+                <label>Từ ngày</label>
+                <input type="date" class="form-control" id="startDate">
+            </div>
+
+            <div class="filter-item" id="customDateRangeTo" style="display: none;">
+                <label>Đến ngày</label>
+                <input type="date" class="form-control" id="endDate">
+            </div>
+
+            <div class="filter-item">
+                <label>Tài khoản</label>
+                <select class="form-select" id="accountFilter">
+                    <option value="">Tất cả tài khoản</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
+                <label>Danh mục</label>
+                <select class="form-select" id="categoryFilter">
+                    <option value="">Tất cả danh mục</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="filters-actions">
+            <button class="btn btn-outline btn-sm" onclick="resetFilters()">
+                <i class="fas fa-redo"></i>
+                Đặt lại
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="applyFilters()">
+                <i class="fas fa-check"></i>
+                Áp dụng
+            </button>
+        </div>
+    </div>
+
+    <!-- Transaction Summary Cards -->
+    <div class="transaction-summary">
+        <div class="summary-card income-card">
+            <div class="summary-icon">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="summary-content">
+                <p class="summary-label">Thu nhập</p>
+                <h3 class="summary-amount" id="totalIncome">0 ₫</h3>
+                <span class="summary-count" id="incomeCount">0 giao dịch</span>
+            </div>
+        </div>
+        
+        <div class="summary-card expense-card">
+            <div class="summary-icon">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="summary-content">
+                <p class="summary-label">Chi tiêu</p>
+                <h3 class="summary-amount" id="totalExpense">0 ₫</h3>
+                <span class="summary-count" id="expenseCount">0 giao dịch</span>
+            </div>
+        </div>
+        
+        <div class="summary-card balance-card">
+            <div class="summary-icon">
+                <i class="fas fa-equals"></i>
+            </div>
+            <div class="summary-content">
+                <p class="summary-label">Chênh lệch</p>
+                <h3 class="summary-amount" id="netBalance">0 ₫</h3>
+                <span class="summary-trend" id="balanceTrend"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- List View (Timeline) -->
+    <div id="listView" class="transactions-timeline">
+        <div id="transactionsList">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Đang tải giao dịch...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar View -->
+    <div id="calendarView" class="calendar-view" style="display: none;">
+        <div class="calendar-header">
+            <button class="btn btn-outline btn-sm" onclick="previousMonth()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h3 id="calendarMonth">Tháng 12, 2025</h3>
+            <button class="btn btn-outline btn-sm" onclick="nextMonth()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div id="transactionsCalendar"></div>
+    </div>
 </div>
 
-<style>
-    .transaction-item {
-        border-bottom: 1px solid #e9ecef;
-        padding: 12px 0;
-    }
+<!-- Add/Edit Transaction Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm giao dịch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="transactionForm">
+                    <!-- Transaction Type -->
+                    <div class="transaction-type-selector">
+                        <button type="button" class="type-btn active" data-type="Expense">
+                            <i class="fas fa-arrow-up"></i>
+                            Chi tiêu
+                        </button>
+                        <button type="button" class="type-btn" data-type="Income">
+                            <i class="fas fa-arrow-down"></i>
+                            Thu nhập
+                        </button>
+                        <button type="button" class="type-btn" data-type="Transfer">
+                            <i class="fas fa-exchange-alt"></i>
+                            Chuyển khoản
+                        </button>
+                    </div>
+                    <input type="hidden" id="transactionType" value="Expense">
 
-    .transaction-amount {
-        font-weight: 700;
-    }
-</style>
+                    <!-- Amount -->
+                    <div class="form-group">
+                        <label>Số tiền *</label>
+                        <div class="input-with-icon">
+                            <span class="currency-symbol">₫</span>
+                            <input type="number" class="form-control amount-input" id="amount" required>
+                        </div>
+                    </div>
 
-@section Scripts {
-    <script>
-        function getQueryParam(name) {
-            const params = new URLSearchParams(location.search);
-            return params.get(name);
-        }
+                    <!-- Category -->
+                    <div class="form-group" id="categoryGroup">
+                        <label>Danh mục *</label>
+                        <select class="form-select" id="categoryId" required>
+                            <option value="">Chọn danh mục</option>
+                        </select>
+                    </div>
 
-        async function loadTransactions(page = 1) {
-            const search = getQueryParam('search') || getQueryParam('q') || document.getElementById('pageSearchInput').value || '';
-            const params = new URLSearchParams();
-            if (search) params.append('searchText', search);
-            params.append('pageNumber', page);
-            params.append('pageSize', 50);
+                    <!-- Account (Source) -->
+                    <div class="form-group">
+                        <label id="accountLabel">Tài khoản *</label>
+                        <select class="form-select" id="accountId" required>
+                            <option value="">Chọn tài khoản</option>
+                        </select>
+                    </div>
 
-            const container = document.getElementById('transactionsContainer');
-            container.innerHTML = '<div class="text-center py-4 text-muted">Đang tải giao dịch...</div>';
+                    <!-- Destination Account (for Transfer) -->
+                    <div class="form-group" id="pairedAccountGroup" style="display: none;">
+                        <label>Tài khoản đích *</label>
+                        <select class="form-select" id="pairedAccountId">
+                            <option value="">Chọn tài khoản đích</option>
+                        </select>
+                    </div>
 
-            try {
-                const res = await fetch('/api/Transactions?' + params.toString());
-                if (res.status === 401) { window.location.href = '/Auth/Login'; return; }
-                if (!res.ok) { container.innerHTML = '<div class="text-danger p-3">Không thể tải giao dịch.</div>'; return; }
-                const data = await res.json();
-                if (!data || data.length === 0) {
-                    container.innerHTML = '<div class="text-center py-4 text-muted">Không tìm thấy giao dịch nào.</div>';
-                    return;
-                }
+                    <!-- Date -->
+                    <div class="form-group">
+                        <label>Ngày giao dịch *</label>
+                        <input type="datetime-local" class="form-control" id="transactionDate" required>
+                    </div>
 
-                container.innerHTML = data.map(t => {
-                    // Ensure we have valid data with fallbacks
-                    const description = t.description || t.categoryName || t.note || 'Giao dịch';
-                    const categoryName = t.categoryName || 'Chưa phân loại';
-                    const accountName = t.accountName || 'Ví không xác định';
-                    const transactionType = t.transactionTypeDisplay || 'Unknown';
-                    const amount = t.amount || 0;
-                    const currency = t.currency || 'VND';
-                    
-                    return `
-                        <div class="transaction-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">${description}</div>
-                                <div class="small text-muted">${new Date(t.transactionDate).toLocaleString('vi-VN')} • ${accountName} • ${categoryName}</div>
+                    <!-- Note -->
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea class="form-control" id="note" rows="3"></textarea>
+                    </div>
+
+                    <!-- Receipt Upload -->
+                    <div class="form-group">
+                        <label>Hóa đơn / Biên lai</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" id="receiptFile" accept="image/*" style="display: none;">
+                            <div class="upload-placeholder" onclick="document.getElementById('receiptFile').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Nhấn để tải lên hình ảnh</p>
                             </div>
-                            <div class="text-end">
-                                <div class="transaction-amount ${transactionType === 'Income' ? 'text-success' : 'text-danger'}">${transactionType === 'Income' ? '+' : '-'} ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: currency }).format(amount)}</div>
+                            <div class="upload-preview" id="uploadPreview" style="display: none;">
+                                <img id="previewImage" src="" alt="Preview">
+                                <button type="button" class="btn-remove" onclick="removeReceipt()">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
-                    `;
-                }).join('');
-            } catch (err) {
-                console.error('Error loading transactions', err);
-                container.innerHTML = '<div class="text-danger p-3">Lỗi tải giao dịch.</div>';
-            }
-        }
+                        <div id="ocrResult" class="ocr-result" style="display: none;">
+                            <p><strong>Kết quả OCR:</strong></p>
+                            <pre id="ocrText"></pre>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveTransaction()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const q = getQueryParam('search');
-            if (q) document.getElementById('pageSearchInput').value = q;
-            document.getElementById('pageSearchBtn').addEventListener('click', function () {
-                const v = document.getElementById('pageSearchInput').value;
-                const url = new URL(location.href);
-                url.searchParams.set('search', v);
-                location.href = url.toString();
-            });
-
-            loadTransactions();
-        });
-    </script>
+@section Scripts {
+    <link rel="stylesheet" href="~/css/transactions.css">
+    <script src="~/js/transactions.js"></script>
 }

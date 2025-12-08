@@ -1,6 +1,7 @@
 @page
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
+
     ViewData["Title"] = "Transaction Utils Tests";
 }
 
@@ -23,6 +24,36 @@
             item.className = `p-2 mb-2 ${ok ? 'bg-success-subtle' : 'bg-danger-subtle'}`;
             item.textContent = ok ? `✔ ${name}` : `✖ ${name}: ${error}`;
             el.appendChild(item);
+        }
+
+        async function apiGet(path) {
+            const res = await fetch(path, { credentials: 'include' });
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) throw new Error('AUTH_REQUIRED');
+                throw new Error(`GET ${path} failed`);
+            }
+            return res.json();
+        }
+
+        async function apiPost(path, body) {
+            const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(body) });
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) throw new Error('AUTH_REQUIRED');
+                throw new Error(`POST ${path} failed`);
+            }
+            return res.json();
+        }
+
+        async function apiDelete(path) {
+            const res = await fetch(path, { method: 'DELETE', credentials: 'include' });
+            if (!res.ok && res.status !== 204) {
+                if (res.status === 401 || res.status === 403) throw new Error('AUTH_REQUIRED');
+                throw new Error(`DELETE ${path} failed`);
+            }
+        }
+
+        function isAuthenticatedUI() {
+            return !!document.querySelector('.app-wrapper');
         }
 
         const tests = [
@@ -62,15 +93,39 @@
                     assert(dto.Note === 'Lunch', 'note');
                     assert(dto.Currency === 'VND', 'currency');
                 }
+            },
+            {
+                name: 'Income increases total assets exactly once',
+                run: async () => {
+                    if (!isAuthenticatedUI()) {
+                        writeResult('Income increases total assets exactly once (bỏ qua: chưa đăng nhập)', true);
+                        return;
+                    }
+                    const dashboardBefore = await apiGet('/api/Report/dashboard');
+                    const accounts = await apiGet('/api/Accounts/summaries');
+                    if (!accounts || accounts.length === 0) throw new Error('No accounts available');
+                    const acc = accounts.find(a => a.includeInTotal) || accounts[0];
+                    const amount = 12345;
+                    const note = `TEST_INCOME_DOUBLE_CHECK_${Date.now()}`;
+                    const dto = { TransactionType: 1, Amount: amount, AccountId: acc.id, CategoryId: null, TransactionDate: new Date().toISOString().substring(0, 10), Note: note, Currency: 'VND' };
+                    const created = await apiPost('/api/Transactions', dto);
+                    const dashboardAfter = await apiGet('/api/Report/dashboard');
+                    const delta = Math.round((dashboardAfter.currentBalance - dashboardBefore.currentBalance) * 100) / 100;
+                    assert(delta === amount, `Expected delta ${amount}, got ${delta}`);
+                    // cleanup
+                    await apiDelete(`/api/Transactions/${created.id}`);
+                }
             }
         ];
 
         (async function run() {
             for (const t of tests) {
-                try { t.run(); writeResult(t.name, true); }
-                catch (e) { writeResult(t.name, false, e.message); }
+                try {
+                    const result = t.run();
+                    if (result && typeof result.then === 'function') await result;
+                    writeResult(t.name, true);
+                } catch (e) { writeResult(t.name, false, e.message); }
             }
         })();
     </script>
 }
-

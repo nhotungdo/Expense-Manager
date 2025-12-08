@@ -4,48 +4,68 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MoneyTrackerApp</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>@ViewData["Title"] - MoneyTracker</title>
+    <!-- Preconnect to external resources for better performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MoneyTrackerApp.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Modern Design System -->
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
+@using Microsoft.AspNetCore.Identity
+
 <body>
-    <partial name="_Header" />
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <div class="app-wrapper">
+            <!-- Sidebar -->
+            <partial name="_Sidebar" />
 
-    <div class="container-fluid main-content">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="app-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-left">
-                    <span class="footer-logo">💰 MoneyTracker</span>
-                    <span class="footer-text">&copy; 2025 - Đã đăng ký bản quyền</span>
-                </div>
-                <div class="footer-links">
-                    <a asp-page="/Privacy">Chính sách bảo mật</a>
-                    <a href="#">Điều khoản dịch vụ</a>
-                    <a href="#">Liên hệ</a>
-                    <a href="#">Trung tâm trợ giúp</a>
+            <!-- Main Content (Topbar + Body) -->
+            <div class="main-content">
+                <partial name="_TopBar" />
+                
+                <div class="content-body" style="padding: 0;">
+                    @RenderBody()
                 </div>
             </div>
         </div>
-    </footer>
+    }
+    else
+    {
+        <!-- Public Layout (Landing Page, Auth, etc.) -->
+        <div class="public-wrapper">
+             @RenderBody()
+        </div>
+    }
 
+    <partial name="_QuickAddModal" />
+
+    <!-- Core Libraries -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Performance & Utilities -->
+    <script src="~/js/performance.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/header.js" asp-append-version="true"></script>
-
+    
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="~/js/quick-add.js" asp-append-version="true"></script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>

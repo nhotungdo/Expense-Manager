@@ -1,0 +1,336 @@
+@page
+@model MoneyTrackerApp.Pages.Investments.IndexModel
+@{
+    ViewData["Title"] = "Đầu tư";
+}
+
+<div class="investments-page modern-page">
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-chart-line"></i>
+                    Đầu tư
+                </h1>
+                <p class="page-subtitle">Theo dõi danh mục đầu tư của bạn</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="exportPortfolio()">
+                    <i class="fas fa-download"></i>
+                    Xuất báo cáo
+                </button>
+                <button class="btn btn-primary" onclick="openInvestmentModal()">
+                    <i class="fas fa-plus"></i>
+                    Mua/Bán
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Dashboard -->
+    <div class="portfolio-dashboard">
+        <div class="portfolio-hero">
+            <div class="portfolio-value-card">
+                <div class="value-header">
+                    <p class="value-label">
+                        <i class="fas fa-briefcase"></i>
+                        Tổng giá trị danh mục
+                    </p>
+                    <div class="value-actions">
+                        <button class="btn-icon-sm" title="Làm mới">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <h1 class="portfolio-value" id="totalValue">0 ₫</h1>
+                <div class="value-change">
+                    <span class="change-badge positive" id="totalChange">
+                        <i class="fas fa-arrow-up"></i>
+                        +0 ₫ (+0%)
+                    </span>
+                    <span class="change-period">So với vốn đầu tư</span>
+                </div>
+            </div>
+
+            <div class="portfolio-stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon invested">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Vốn đầu tư</p>
+                        <h3 class="stat-value" id="totalInvested">0 ₫</h3>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon profit">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Lợi nhuận</p>
+                        <h3 class="stat-value success" id="totalProfit">0 ₫</h3>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon dividend">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Cổ tức</p>
+                        <h3 class="stat-value" id="totalDividend">0 ₫</h3>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon assets">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Tài sản</p>
+                        <h3 class="stat-value" id="assetCount">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Chart -->
+    <div class="performance-section">
+        <div class="performance-chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">Hiệu suất danh mục</h3>
+                <div class="chart-controls">
+                    <div class="time-range-selector">
+                        <button class="range-btn" data-range="1M">1T</button>
+                        <button class="range-btn" data-range="3M">3T</button>
+                        <button class="range-btn active" data-range="6M">6T</button>
+                        <button class="range-btn" data-range="1Y">1N</button>
+                        <button class="range-btn" data-range="ALL">Tất cả</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="allocation-card">
+            <h3 class="chart-title">Phân bổ tài sản</h3>
+            <div class="allocation-chart-container">
+                <canvas id="allocationChart"></canvas>
+            </div>
+            <div class="allocation-legend" id="allocationLegend"></div>
+        </div>
+    </div>
+
+    <!-- Risk Analysis -->
+    <div class="risk-analysis-section">
+        <div class="risk-card">
+            <div class="risk-header">
+                <h3 class="section-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Phân tích rủi ro
+                </h3>
+            </div>
+            <div class="risk-content">
+                <div class="risk-meter">
+                    <div class="risk-gauge" id="riskGauge">
+                        <div class="gauge-fill" style="width: 45%"></div>
+                    </div>
+                    <div class="risk-labels">
+                        <span>Thấp</span>
+                        <span>Trung bình</span>
+                        <span>Cao</span>
+                    </div>
+                </div>
+                <div class="risk-score">
+                    <p class="risk-label">Mức độ rủi ro</p>
+                    <h3 class="risk-value" id="riskLevel">Trung bình</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="diversification-card">
+            <h3 class="section-title">
+                <i class="fas fa-chart-pie"></i>
+                Đa dạng hóa
+            </h3>
+            <div class="diversification-score">
+                <div class="score-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="10"/>
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="10" 
+                                stroke-dasharray="283" stroke-dashoffset="85" transform="rotate(-90 50 50)"/>
+                    </svg>
+                    <div class="score-text">
+                        <span class="score-number">70</span>
+                        <span class="score-label">%</span>
+                    </div>
+                </div>
+                <p class="diversification-status">Danh mục khá đa dạng</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Holdings Table -->
+    <div class="holdings-section">
+        <div class="section-header-inline">
+            <h3 class="section-title">
+                <i class="fas fa-list"></i>
+                Danh mục nắm giữ
+            </h3>
+            <div class="holdings-filters">
+                <select class="form-select form-select-sm" id="assetTypeFilter">
+                    <option value="">Tất cả loại</option>
+                    <option value="Stock">Cổ phiếu</option>
+                    <option value="Crypto">Crypto</option>
+                    <option value="Bond">Trái phiếu</option>
+                    <option value="Fund">Quỹ</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="holdings-table-container">
+            <table class="holdings-table">
+                <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên tài sản</th>
+                        <th>Loại</th>
+                        <th class="text-right">Số lượng</th>
+                        <th class="text-right">Giá vốn</th>
+                        <th class="text-right">Giá hiện tại</th>
+                        <th class="text-right">Giá trị</th>
+                        <th class="text-right">Lợi nhuận</th>
+                        <th class="text-center">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="holdingsTableBody">
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="loading-state">
+                                <div class="spinner"></div>
+                                <p>Đang tải danh mục...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Market News -->
+    <div class="market-news-section">
+        <div class="section-header-inline">
+            <h3 class="section-title">
+                <i class="fas fa-newspaper"></i>
+                Tin tức thị trường
+            </h3>
+            <button class="btn btn-outline btn-sm" onclick="refreshNews()">
+                <i class="fas fa-sync-alt"></i>
+                Làm mới
+            </button>
+        </div>
+        <div class="news-grid" id="newsGrid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Investment Transaction Modal -->
+<div class="modal fade" id="investmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="investmentModalTitle">Giao dịch đầu tư</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="investmentForm">
+                    <input type="hidden" id="investmentId">
+
+                    <!-- Transaction Type -->
+                    <div class="transaction-type-selector">
+                        <button type="button" class="type-btn active" data-type="Buy">
+                            <i class="fas fa-arrow-down"></i>
+                            Mua
+                        </button>
+                        <button type="button" class="type-btn" data-type="Sell">
+                            <i class="fas fa-arrow-up"></i>
+                            Bán
+                        </button>
+                    </div>
+                    <input type="hidden" id="transactionType" value="Buy">
+
+                    <div class="form-group">
+                        <label>Loại tài sản *</label>
+                        <select class="form-select" id="assetType" required>
+                            <option value="Stock">Cổ phiếu</option>
+                            <option value="Crypto">Cryptocurrency</option>
+                            <option value="Bond">Trái phiếu</option>
+                            <option value="Fund">Quỹ đầu tư</option>
+                            <option value="RealEstate">Bất động sản</option>
+                            <option value="Commodity">Hàng hóa</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mã tài sản (Symbol) *</label>
+                        <input type="text" class="form-control" id="symbol" placeholder="VD: AAPL, BTC, VCB" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tên tài sản</label>
+                        <input type="text" class="form-control" id="assetName" placeholder="Tên đầy đủ">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Số lượng *</label>
+                            <input type="number" class="form-control" id="quantity" step="any" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Giá đơn vị *</label>
+                            <input type="number" class="form-control" id="price" step="any" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phí giao dịch</label>
+                        <input type="number" class="form-control" id="fee" value="0" step="any">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày giao dịch *</label>
+                        <input type="date" class="form-control" id="transactionDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea class="form-control" id="note" rows="2"></textarea>
+                    </div>
+
+                    <div class="transaction-summary">
+                        <div class="summary-row">
+                            <span>Tổng giá trị:</span>
+                            <strong id="totalValue">0 ₫</strong>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveInvestment()">Lưu giao dịch</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="~/css/investments.css">
+    <script src="~/js/investments.js"></script>
+}

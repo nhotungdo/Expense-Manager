@@ -109,6 +109,14 @@ auth.AddGoogle(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+var supportedCultures = new[] { new System.Globalization.CultureInfo("vi-VN") };
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("vi-VN"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
