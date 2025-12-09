@@ -4,132 +4,166 @@
     ViewData["Title"] = "Thanh toán thành công";
 }
 
-<div class="result-page success">
-    <div class="container">
-        <div class="result-card">
-            <div class="icon-container">
-                <svg class="success-icon" viewBox="0 0 52 52">
-                    <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
-                    <path class="success-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
+<div class="result-container">
+    <div class="result-card success">
+        <div class="result-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1>Thanh toán thành công!</h1>
+        <p class="result-message">
+            Cảm ơn bạn đã đăng ký gói dịch vụ. Tài khoản của bạn đã được nâng cấp thành công.
+        </p>
+        
+        <div class="result-details">
+            <div class="detail-item">
+                <i class="fas fa-envelope"></i>
+                <span>Email xác nhận đã được gửi đến hộp thư của bạn</span>
             </div>
-            <h1>Thanh toán thành công!</h1>
-            <p>Gói dịch vụ của bạn đã được kích hoạt.</p>
-            <div class="actions">
-                <a href="/Dashboard" class="btn btn-primary">Về trang chủ</a>
-                <a href="/Subscription" class="btn btn-outline">Xem gói dịch vụ</a>
+            <div class="detail-item">
+                <i class="fas fa-file-invoice"></i>
+                <span>Hóa đơn điện tử có thể tải xuống trong phần lịch sử thanh toán</span>
             </div>
+        </div>
+
+        <div class="result-actions">
+            <a href="/Dashboard" class="btn btn-primary">
+                <i class="fas fa-home"></i>
+                Về trang chủ
+            </a>
+            <a href="/Subscription/Manage" class="btn btn-outline">
+                <i class="fas fa-cog"></i>
+                Quản lý gói dịch vụ
+            </a>
         </div>
     </div>
 </div>
 
 <style>
-    .result-page {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-    }
+.result-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
 
-    .result-page.success {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    }
+.result-card {
+    background: white;
+    border-radius: 24px;
+    padding: 48px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
 
-    .container {
-        max-width: 600px;
-        width: 100%;
-    }
+.result-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
 
+.result-card.success .result-icon {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.result-card h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.result-message {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.result-details {
+    background: var(--background);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    text-align: left;
+}
+
+.detail-item {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-item i {
+    color: var(--primary);
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.result-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+@@media (max-width: 768px) {
     .result-card {
-        background: white;
-        border-radius: 20px;
-        padding: 60px 40px;
-        text-align: center;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        padding: 32px 24px;
     }
 
-    .icon-container {
-        margin-bottom: 30px;
-    }
-
-    .success-icon {
-        width: 100px;
-        height: 100px;
-    }
-
-    .success-circle {
-        stroke: #48bb78;
-        stroke-width: 2;
-        stroke-dasharray: 166;
-        stroke-dashoffset: 166;
-        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-    }
-
-    .success-check {
-        stroke: #48bb78;
-        stroke-width: 3;
-        stroke-linecap: round;
-        stroke-dasharray: 48;
-        stroke-dashoffset: 48;
-        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-    }
-
-    @@keyframes stroke {
-        100% {
-            stroke-dashoffset: 0;
-        }
-    }
-
-    h1 {
-        font-size: 32px;
-        font-weight: 700;
-        color: #1a202c;
-        margin-bottom: 15px;
-    }
-
-    p {
-        font-size: 18px;
-        color: #718096;
-        margin-bottom: 40px;
-    }
-
-    .actions {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
+    .result-actions {
+        flex-direction: column;
     }
 
     .btn {
-        padding: 15px 30px;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-block;
+        width: 100%;
+        justify-content: center;
     }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        transform: scale(1.05);
-        box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
-    }
-
-    .btn-outline {
-        background: white;
-        border: 2px solid #48bb78;
-        color: #48bb78;
-    }
-
-    .btn-outline:hover {
-        background: #48bb78;
-        color: white;
-    }
+}
 </style>

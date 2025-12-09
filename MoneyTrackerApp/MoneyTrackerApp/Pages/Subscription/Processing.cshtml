@@ -1,0 +1,124 @@
+@page
+@model MoneyTrackerApp.Pages.Subscription.ProcessingModel
+@{
+    ViewData["Title"] = "Processing Payment";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/service-packages.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .processing-container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .transaction-id {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            color: #667eea;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="processing-container">
+        <div class="spinner"></div>
+        <h1>Processing Your Payment</h1>
+        <p>Please wait while we process your payment. This may take a few moments.</p>
+        <p>Do not close this window or press the back button.</p>
+        
+        @if (!string.IsNullOrEmpty(Model.TransactionId))
+        {
+            <div class="transaction-id">
+                Transaction ID: @Model.TransactionId
+            </div>
+        }
+
+        <a href="/servicepackages" class="back-link">← Back to Packages</a>
+    </div>
+
+    <script>
+        // Auto-refresh every 5 seconds to check status
+        setTimeout(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const transactionId = urlParams.get('transaction');
+            if (transactionId) {
+                fetch(`/api/payments/status/${transactionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.href = `/subscription/success?transaction=${transactionId}`;
+                        } else if (data.status === 'failed') {
+                            window.location.href = `/subscription/failed?transaction=${transactionId}`;
+                        }
+                    });
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

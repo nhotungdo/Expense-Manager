@@ -4,190 +4,368 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="dashboard-page">
-    <!-- Page Header -->
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Dashboard</h1>
-            <p class="page-subtitle">Tổng quan tài chính của bạn</p>
-        </div>
-        <div class="header-actions">
-            <select class="form-select" id="periodFilter">
-                <option value="week">Tuần này</option>
-                <option value="month" selected>Tháng này</option>
-                <option value="year">Năm này</option>
-                <option value="custom">Tùy chỉnh</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Financial Summary Cards -->
-    <div class="stats-grid">
-        <div class="stat-card income">
-            <div class="stat-icon">
-                <i class="fas fa-arrow-down"></i>
+<!-- Modern Dashboard with Advanced Charts -->
+<div class="dashboard-modern">
+    <!-- Page Header with Actions -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-title-section">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-chart-line"></i>
+                    Bảng điều khiển tài chính
+                </h1>
+                <p class="dashboard-subtitle">
+                    <i class="far fa-calendar-alt"></i>
+                    <span id="currentDate"></span> • Thông tin thời gian thực
+                </p>
             </div>
-            <div class="stat-content">
-                <p class="stat-label">Tổng thu nhập</p>
-                <h3 class="stat-value" id="totalIncome">0 ₫</h3>
-                <span class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> +12.5%
-                </span>
-            </div>
-        </div>
-
-        <div class="stat-card expense">
-            <div class="stat-icon">
-                <i class="fas fa-arrow-up"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Tổng chi tiêu</p>
-                <h3 class="stat-value" id="totalExpense">0 ₫</h3>
-                <span class="stat-change negative">
-                    <i class="fas fa-arrow-down"></i> -8.3%
-                </span>
-            </div>
-        </div>
-
-        <div class="stat-card net">
-            <div class="stat-icon">
-                <i class="fas fa-equals"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Thu nhập ròng</p>
-                <h3 class="stat-value" id="netIncome">0 ₫</h3>
-                <span class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> +25.8%
-                </span>
-            </div>
-        </div>
-
-        <div class="stat-card balance">
-            <div class="stat-icon">
-                <i class="fas fa-wallet"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Tổng số dư</p>
-                <h3 class="stat-value" id="totalBalance">0 ₫</h3>
-                <span class="stat-info">Tất cả tài khoản</span>
+            <div class="header-actions">
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="week">
+                        <i class="fas fa-calendar-week"></i> 7 Ngày
+                    </button>
+                    <button class="period-btn" data-period="month">
+                        <i class="fas fa-calendar-alt"></i> 30 Ngày
+                    </button>
+                    <button class="period-btn" data-period="quarter">
+                        <i class="fas fa-calendar"></i> Quý
+                    </button>
+                    <button class="period-btn" data-period="year">
+                        <i class="fas fa-calendar-check"></i> Năm
+                    </button>
+                </div>
+                <button class="btn-refresh" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="charts-row">
-        <!-- Transaction Types Pie Chart -->
-        <div class="chart-card">
-            <div class="card-header">
-                <h3><i class="fas fa-chart-pie"></i> Phân bổ giao dịch</h3>
-                <div class="chart-actions">
-                    <button class="btn-icon-sm" onclick="refreshChart('transactionTypes')">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+    <!-- AI Insight Widget -->
+    <partial name="_AiInsightWidget" />
+
+    <!-- KPI Cards Grid -->
+    <div class="kpi-grid">
+        <!-- Total Balance - Featured Card -->
+        <div class="kpi-card featured balance-card">
+            <div class="kpi-card-bg"></div>
+            <div class="kpi-content">
+                <div class="kpi-header">
+                    <div class="kpi-icon-wrapper balance">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="kpi-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="balanceTrend">+12.5%</span>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body chart-container">
-                <canvas id="transactionTypesChart"></canvas>
-                <div class="chart-summary" id="transactionTypesSummary"></div>
+                <div class="kpi-body">
+                    <p class="kpi-label">Tổng số dư</p>
+                    <h2 class="kpi-value" id="totalBalance">0 ₫</h2>
+                    <p class="kpi-subtitle">Trên tất cả tài khoản</p>
+                </div>
+                <div class="kpi-sparkline">
+                    <canvas id="balanceSparkline"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Category Spending Pie Chart -->
-        <div class="chart-card">
-            <div class="card-header">
-                <h3><i class="fas fa-chart-pie"></i> Chi tiêu theo danh mục</h3>
-                <div class="chart-actions">
-                    <button class="btn-icon-sm" onclick="refreshChart('categories')">
-                        <i class="fas fa-sync-alt"></i>
+        <!-- Income Card -->
+        <div class="kpi-card income-card">
+            <div class="kpi-content">
+                <div class="kpi-header">
+                    <div class="kpi-icon-wrapper income">
+                        <i class="fas fa-arrow-trend-up"></i>
+                    </div>
+                    <div class="kpi-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="incomeTrend">+8.2%</span>
+                    </div>
+                </div>
+                <div class="kpi-body">
+                    <p class="kpi-label">Tổng thu nhập</p>
+                    <h3 class="kpi-value" id="totalIncome">0 ₫</h3>
+                    <p class="kpi-subtitle">Kỳ này</p>
+                </div>
+                <div class="kpi-sparkline">
+                    <canvas id="incomeSparkline"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense Card -->
+        <div class="kpi-card expense-card">
+            <div class="kpi-content">
+                <div class="kpi-header">
+                    <div class="kpi-icon-wrapper expense">
+                        <i class="fas fa-arrow-trend-down"></i>
+                    </div>
+                    <div class="kpi-trend negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="expenseTrend">-3.1%</span>
+                    </div>
+                </div>
+                <div class="kpi-body">
+                    <p class="kpi-label">Tổng chi tiêu</p>
+                    <h3 class="kpi-value" id="totalExpense">0 ₫</h3>
+                    <p class="kpi-subtitle">Kỳ này</p>
+                </div>
+                <div class="kpi-sparkline">
+                    <canvas id="expenseSparkline"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Savings Rate Card -->
+        <div class="kpi-card savings-card">
+            <div class="kpi-content">
+                <div class="kpi-header">
+                    <div class="kpi-icon-wrapper savings">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <div class="kpi-badge">
+                        <i class="fas fa-star"></i> Mục tiêu
+                    </div>
+                </div>
+                <div class="kpi-body">
+                    <p class="kpi-label">Tỷ lệ tiết kiệm</p>
+                    <h3 class="kpi-value" id="savingsRate">0%</h3>
+                    <p class="kpi-subtitle">Của tổng thu nhập</p>
+                </div>
+                <div class="progress-ring">
+                    <svg width="80" height="80">
+                        <circle cx="40" cy="40" r="35" class="progress-ring-circle-bg"></circle>
+                        <circle cx="40" cy="40" r="35" class="progress-ring-circle" id="savingsProgress"></circle>
+                    </svg>
+                    <div class="progress-ring-text" id="savingsPercentage">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Charts Grid -->
+    <div class="charts-grid">
+        <!-- Cash Flow Analysis - Main Chart -->
+        <div class="chart-card main-chart">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-area"></i>
+                        Phân tích dòng tiền
+                    </h3>
+                    <p class="chart-subtitle">Xu hướng thu nhập và chi tiêu theo thời gian</p>
+                </div>
+                <div class="chart-controls">
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot income"></span>
+                            <span>Thu nhập</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot expense"></span>
+                            <span>Chi tiêu</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot net"></span>
+                            <span>Ròng</span>
+                        </div>
+                    </div>
+                    <button class="chart-action-btn" onclick="toggleChartType('cashflow')">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="chart-action-btn" onclick="exportChart('cashflow')">
+                        <i class="fas fa-download"></i>
                     </button>
                 </div>
             </div>
-            <div class="card-body chart-container">
+            <div class="chart-body">
+                <canvas id="cashflowChart"></canvas>
+            </div>
+            <div class="chart-footer">
+                <div class="chart-stat">
+                    <span class="stat-label">Thu nhập TB</span>
+                    <span class="stat-value income" id="avgIncome">0 ₫</span>
+                </div>
+                <div class="chart-stat">
+                    <span class="stat-label">Chi tiêu TB</span>
+                    <span class="stat-value expense" id="avgExpense">0 ₫</span>
+                </div>
+                <div class="chart-stat">
+                    <span class="stat-label">Dòng tiền ròng</span>
+                    <span class="stat-value" id="netFlow">0 ₫</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Distribution -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Chi tiêu theo danh mục
+                    </h3>
+                    <p class="chart-subtitle">Danh mục chi tiêu hàng đầu</p>
+                </div>
+                <button class="chart-action-btn" onclick="viewAllCategories()">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+            <div class="chart-body">
                 <canvas id="categoryChart"></canvas>
-                <div class="chart-summary" id="categorySummary"></div>
+            </div>
+            <div class="category-list" id="categoryList">
+                <!-- Dynamic category items -->
             </div>
         </div>
 
-        <!-- Income vs Expense Trend -->
-        <div class="chart-card chart-card-wide">
-            <div class="card-header">
-                <h3><i class="fas fa-chart-line"></i> Xu hướng thu chi</h3>
-                <div class="chart-legend">
-                    <span class="legend-item">
-                        <span class="legend-dot income"></span> Thu nhập
-                    </span>
-                    <span class="legend-item">
-                        <span class="legend-dot expense"></span> Chi tiêu
-                    </span>
-                </div>
-            </div>
-            <div class="card-body">
-                <canvas id="incomeExpenseChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Content Grid -->
-    <div class="content-grid">
         <!-- Recent Transactions -->
-        <div class="content-card transactions-card">
-            <div class="card-header">
-                <h3>Giao dịch gần đây</h3>
-                <a href="/Transactions" class="btn-link">Xem tất cả</a>
+        <div class="chart-card transactions-card">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">
+                        <i class="fas fa-receipt"></i>
+                        Hoạt động gần đây
+                    </h3>
+                    <p class="chart-subtitle">Giao dịch mới nhất</p>
+                </div>
+                <a href="/Transactions" class="chart-link">
+                    Xem tất cả <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-            <div class="card-body">
-                <div class="transactions-list" id="recentTransactions">
-                    <div class="loading-state">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Đang tải...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Suggestions & Alerts -->
-        <div class="content-card">
-            <!-- AI Suggestions -->
-            <div class="card-section">
-                <div class="card-header">
-                    <h3><i class="fas fa-robot"></i> Gợi ý AI</h3>
-                    <a href="/AiAdvisor" class="btn-link">Xem thêm</a>
-                </div>
-                <div class="card-body">
-                    <div class="suggestions-list" id="aiSuggestions">
-                        <div class="loading-state">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Financial Alerts -->
-            <div class="card-section">
-                <div class="card-header">
-                    <h3><i class="fas fa-bell"></i> Cảnh báo</h3>
-                </div>
-                <div class="card-body">
-                    <div class="alerts-list" id="financialAlerts">
-                        <div class="loading-state">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </div>
+            <div class="transactions-list" id="recentTransactions">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải giao dịch...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Accounts Overview -->
-    <div class="accounts-overview">
-        <div class="card-header">
-            <h3>Tài khoản của bạn</h3>
-            <a href="/Wallets" class="btn-link">Quản lý</a>
-        </div>
-        <div class="accounts-grid" id="accountsGrid">
-            <div class="loading-state">
-                <i class="fas fa-spinner fa-spin"></i>
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <button onclick="openTransactionModal('Income')" class="flex items-center gap-3 p-4 bg-white hover:bg-emerald-50 border-2 border-slate-200 hover:border-emerald-500 rounded-xl transition-all group">
+            <div class="w-12 h-12 bg-emerald-100 group-hover:bg-emerald-500 rounded-xl flex items-center justify-center transition-colors">
+                <i class="fas fa-plus text-emerald-600 group-hover:text-white"></i>
             </div>
+            <div class="text-left">
+                <p class="font-semibold text-slate-900">Thêm thu nhập</p>
+                <p class="text-xs text-slate-500">Ghi lại thu nhập</p>
+            </div>
+        </button>
+
+        <button onclick="openTransactionModal('Expense')" class="flex items-center gap-3 p-4 bg-white hover:bg-red-50 border-2 border-slate-200 hover:border-red-500 rounded-xl transition-all group">
+            <div class="w-12 h-12 bg-red-100 group-hover:bg-red-500 rounded-xl flex items-center justify-center transition-colors">
+                <i class="fas fa-minus text-red-600 group-hover:text-white"></i>
+            </div>
+            <div class="text-left">
+                <p class="font-semibold text-slate-900">Thêm chi tiêu</p>
+                <p class="text-xs text-slate-500">Theo dõi chi tiêu</p>
+            </div>
+        </button>
+
+        <a href="/Transactions/Transfer" class="flex items-center gap-3 p-4 bg-white hover:bg-blue-50 border-2 border-slate-200 hover:border-blue-500 rounded-xl transition-all group">
+            <div class="w-12 h-12 bg-blue-100 group-hover:bg-blue-500 rounded-xl flex items-center justify-center transition-colors">
+                <i class="fas fa-exchange-alt text-blue-600 group-hover:text-white"></i>
+            </div>
+            <div class="text-left">
+                <p class="font-semibold text-slate-900">Chuyển khoản</p>
+                <p class="text-xs text-slate-500">Giữa các ví</p>
+            </div>
+        </a>
+
+        <a href="/Budgets/Create" class="flex items-center gap-3 p-4 bg-white hover:bg-purple-50 border-2 border-slate-200 hover:border-purple-500 rounded-xl transition-all group">
+            <div class="w-12 h-12 bg-purple-100 group-hover:bg-purple-500 rounded-xl flex items-center justify-center transition-colors">
+                <i class="fas fa-chart-pie text-purple-600 group-hover:text-white"></i>
+            </div>
+            <div class="text-left">
+                <p class="font-semibold text-slate-900">Đặt ngân sách</p>
+                <p class="text-xs text-slate-500">Lập kế hoạch chi tiêu</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Secondary Charts & Insights -->
+    <div class="secondary-grid">
+        <!-- Monthly Comparison -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">
+                        <i class="fas fa-calendar-days"></i>
+                        So sánh hàng tháng
+                    </h3>
+                    <p class="chart-subtitle">Hiệu suất 6 tháng qua</p>
+                </div>
+            </div>
+            <div class="chart-body">
+                <canvas id="monthlyComparisonChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Account Distribution -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">
+                        <i class="fas fa-wallet"></i>
+                        Phân bổ tài khoản
+                    </h3>
+                    <p class="chart-subtitle">Số dư trên các tài khoản</p>
+                </div>
+            </div>
+            <div class="chart-body">
+                <canvas id="accountDistributionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- AI Insights Panel -->
+        <div class="insights-card">
+            <div class="insights-header">
+                <div class="insights-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div style="flex: 1;">
+                    <h3 class="insights-title">Cố vấn tài chính AI</h3>
+                    <p class="insights-subtitle">Đề xuất cá nhân hóa</p>
+                </div>
+                <button class="chart-action-btn" onclick="generateNewAIInsights()" title="Tạo gợi ý mới">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="insights-body" id="aiInsights">
+                <div class="insight-item">
+                    <div class="insight-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Tiến triển tốt!</h4>
+                        <p>Bạn đang đi đúng hướng để đạt mục tiêu tiết kiệm vào tháng tới.</p>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Cảnh báo chi tiêu</h4>
+                        <p>Chi phí ăn uống cao hơn 15% so với bình thường. Hãy cân nhắc giảm để tiết kiệm 200.000 ₫.</p>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon info">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Mẹo thông minh</h4>
+                        <p>Hóa đơn tiện ích của bạn ổn định. Hãy cân nhắc thiết lập thanh toán tự động để không bỏ lỡ.</p>
+                    </div>
+                </div>
+            </div>
+            <a href="/AiAdvisor" class="insights-footer">
+                <span>Xem tất cả thông tin</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 </div>
@@ -196,4 +374,61 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="~/js/charts-config.js"></script>
     <script src="~/js/dashboard.js"></script>
+    <style>
+        @@keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @@keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        .insights-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chart-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-action-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .chart-action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .chart-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 }

@@ -52,22 +52,15 @@ public class SubscriptionService : ISubscriptionService
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
-            PackageType = p.PackageType,
-            PackageTypeName = ((PackageType)p.PackageType).ToString(),
             Price = p.Price,
-            BillingCycle = p.BillingCycle,
-            BillingCycleName = GetBillingCycleName(p.BillingCycle),
+            OriginalPrice = p.OriginalPrice,
+            DurationDays = p.DurationDays,
             Features = string.IsNullOrEmpty(p.Features) 
                 ? new List<string>() 
                 : JsonSerializer.Deserialize<List<string>>(p.Features) ?? new List<string>(),
-            MaxTransactions = p.MaxTransactions,
-            MaxAccounts = p.MaxAccounts,
-            MaxBudgets = p.MaxBudgets,
-            HasAdvancedReports = p.HasAdvancedReports,
-            HasAiAdvisor = p.HasAiAdvisor,
-            HasGroupExpense = p.HasGroupExpense,
-            HasPrioritySupport = p.HasPrioritySupport,
-            IsPopular = p.PackageType == (int)PackageType.Pro
+            IsPopular = p.IsPopular,
+            BadgeText = p.BadgeText,
+            BadgeColor = p.BadgeColor
         }).ToList();
     }
 
@@ -83,22 +76,15 @@ public class SubscriptionService : ISubscriptionService
             Id = package.Id,
             Name = package.Name,
             Description = package.Description,
-            PackageType = package.PackageType,
-            PackageTypeName = ((PackageType)package.PackageType).ToString(),
             Price = package.Price,
-            BillingCycle = package.BillingCycle,
-            BillingCycleName = GetBillingCycleName(package.BillingCycle),
+            OriginalPrice = package.OriginalPrice,
+            DurationDays = package.DurationDays,
             Features = string.IsNullOrEmpty(package.Features)
                 ? new List<string>()
                 : JsonSerializer.Deserialize<List<string>>(package.Features) ?? new List<string>(),
-            MaxTransactions = package.MaxTransactions,
-            MaxAccounts = package.MaxAccounts,
-            MaxBudgets = package.MaxBudgets,
-            HasAdvancedReports = package.HasAdvancedReports,
-            HasAiAdvisor = package.HasAiAdvisor,
-            HasGroupExpense = package.HasGroupExpense,
-            HasPrioritySupport = package.HasPrioritySupport,
-            IsPopular = package.PackageType == (int)PackageType.Pro
+            IsPopular = package.IsPopular,
+            BadgeText = package.BadgeText,
+            BadgeColor = package.BadgeColor
         };
     }
 
@@ -153,7 +139,7 @@ public class SubscriptionService : ISubscriptionService
             PackageId = package.Id,
             Status = (int)SubscriptionStatus.Pending,
             StartDate = DateTime.UtcNow,
-            EndDate = DateTime.UtcNow.AddMonths(package.BillingCycle),
+            EndDate = DateTime.UtcNow.AddDays(package.DurationDays),
             AutoRenew = dto.AutoRenew,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

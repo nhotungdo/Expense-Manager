@@ -83,22 +83,4 @@ public class CurrencyConversionResultDto
     public DateTime RateDate { get; set; }
 }
 
-/// <summary>
-/// DTO for AI financial suggestion
-/// </summary>
-public class AiSuggestionDto
-{
-    public long Id { get; set; }
-    public string SuggestionType { get; set; } = null!;
-    public string Suggestion { get; set; } = null!;
-    public DateTime CreatedAt { get; set; }
-}
 
-/// <summary>
-/// DTO for generating AI suggestions
-/// </summary>
-public class GenerateAiSuggestionsDto
-{
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
-}

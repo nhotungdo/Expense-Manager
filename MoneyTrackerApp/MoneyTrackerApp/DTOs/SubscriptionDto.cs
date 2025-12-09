@@ -1,28 +1,6 @@
 namespace MoneyTrackerApp.DTOs;
 
-/// <summary>
-/// DTO for service package
-/// </summary>
-public class ServicePackageDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Description { get; set; }
-    public int PackageType { get; set; }
-    public string PackageTypeName { get; set; } = null!;
-    public decimal Price { get; set; }
-    public int BillingCycle { get; set; }
-    public string BillingCycleName { get; set; } = null!;
-    public List<string> Features { get; set; } = new();
-    public int MaxTransactions { get; set; }
-    public int MaxAccounts { get; set; }
-    public int MaxBudgets { get; set; }
-    public bool HasAdvancedReports { get; set; }
-    public bool HasAiAdvisor { get; set; }
-    public bool HasGroupExpense { get; set; }
-    public bool HasPrioritySupport { get; set; }
-    public bool IsPopular { get; set; }
-}
+
 
 /// <summary>
 /// DTO for subscription

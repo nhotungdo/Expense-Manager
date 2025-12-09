@@ -138,3 +138,4 @@ F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\ob
 F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\obj\Debug\net8.0\MoneyTrackerApp.pdb
 F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\obj\Debug\net8.0\MoneyTrackerApp.genruntimeconfig.cache
 F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\obj\Debug\net8.0\ref\MoneyTrackerApp.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\Dapper.dll

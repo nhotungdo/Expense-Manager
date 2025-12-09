@@ -1,0 +1,29 @@
+@* AI Insight Widget for Dashboard *@
+<div class="ai-insight-widget" id="aiInsightWidget">
+    <div class="ai-insight-header">
+        <div class="ai-insight-icon">
+            <i class="fas fa-lightbulb"></i>
+        </div>
+        <h3 class="ai-insight-title">Góc nhìn AI</h3>
+        <button class="ai-insight-refresh" onclick="refreshAiInsight()">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
+    <div class="ai-insight-content">
+        <div class="ai-insight-loading">
+            <div class="spinner"></div>
+            <p>Đang phân tích dữ liệu của bạn...</p>
+        </div>
+        <div class="ai-insight-message" style="display: none;">
+            <p class="insight-text"></p>
+            <div class="ai-insight-actions">
+                <button class="btn-insight-action" onclick="openAiChat()">
+                    <i class="fas fa-comments"></i> Xem chi tiết
+                </button>
+                <button class="btn-insight-dismiss" onclick="dismissInsight()">
+                    <i class="fas fa-times"></i> Bỏ qua
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

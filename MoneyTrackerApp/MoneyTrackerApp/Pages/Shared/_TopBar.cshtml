@@ -1,63 +1,121 @@
 @using Microsoft.AspNetCore.Identity
 
-<div class="topbar">
-    <!-- Search -->
-    <div class="search-bar">
-        <i class="fas fa-search text-muted"></i>
-        <input type="text" class="search-input" placeholder="Tìm kiếm giao dịch...">
+<!-- Modern Top Navigation Bar -->
+<header class="fixed top-0 left-64 right-0 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-30">
+    <!-- Search Bar -->
+    <div class="flex-1 max-w-xl">
+        <div class="relative">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input 
+                type="text" 
+                placeholder="Tìm kiếm giao dịch, ví, danh mục..." 
+                class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+            />
+        </div>
     </div>
 
-    <!-- Actions -->
-    <div class="user-actions">
-        <!-- Add Transaction Dropdown -->
-        <div class="dropdown">
-            <button class="btn-primary-action dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <!-- Right Actions -->
+    <div class="flex items-center gap-3">
+        <!-- Quick Add Button -->
+        <div class="relative quick-add-dropdown">
+            <button 
+                type="button" 
+                onclick="toggleQuickAdd()"
+                class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-semibold text-sm hover:shadow-lg hover:scale-105 transition-all duration-200">
                 <i class="fas fa-plus"></i>
                 <span>Thêm nhanh</span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="openTransactionModal('Income')">
-                    <i class="fas fa-arrow-down text-success me-2"></i>Thu nhập
-                </a></li>
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="openTransactionModal('Expense')">
-                    <i class="fas fa-arrow-up text-danger me-2"></i>Chi tiêu
-                </a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/Transactions/Index">
-                    <i class="fas fa-list me-2"></i>Xem tất cả giao dịch
-                </a></li>
-            </ul>
+            
+            <!-- Dropdown Menu -->
+            <div id="quickAddMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
+                <a href="javascript:void(0)" onclick="openTransactionModal('Income')" class="flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 transition-colors">
+                    <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-arrow-down text-emerald-600"></i>
+                    </div>
+                    <span class="font-medium text-slate-700">Thêm thu nhập</span>
+                </a>
+                <a href="javascript:void(0)" onclick="openTransactionModal('Expense')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors">
+                    <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-arrow-up text-red-600"></i>
+                    </div>
+                    <span class="font-medium text-slate-700">Thêm chi tiêu</span>
+                </a>
+                <div class="border-t border-slate-200 my-2"></div>
+                <a href="/Transactions/Index" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                    <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-list text-slate-600"></i>
+                    </div>
+                    <span class="font-medium text-slate-700">Xem tất cả</span>
+                </a>
+            </div>
         </div>
 
         <!-- Notifications -->
-        <div class="icon-btn">
-            <i class="far fa-bell"></i>
-            <span class="badge">3</span>
-        </div>
+        <button class="relative w-10 h-10 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-center transition-colors">
+            <i class="far fa-bell text-slate-600 text-lg"></i>
+            <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">3</span>
+        </button>
 
-        <!-- User Profile -->
-        <div class="dropdown">
-            <div class="user-avatar flex-center" data-bs-toggle="dropdown" aria-expanded="false">
-                @if (User?.Identity?.IsAuthenticated == true)
-                {
-                   <span class="font-bold text-primary">@User.Identity.Name?.Substring(0, 1).ToUpper()</span>
-                }
-                else
-                {
-                    <i class="fas fa-user"></i>
-
-                }
+        <!-- User Profile Dropdown -->
+        <div class="relative user-dropdown">
+            <button 
+                type="button"
+                onclick="toggleUserMenu()"
+                class="flex items-center gap-3 pl-3 pr-4 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <span class="text-white font-bold text-sm">@User.Identity.Name?.Substring(0, 1).ToUpper()</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-user text-white text-sm"></i>
+                    }
+                </div>
+                <span class="font-semibold text-slate-700 text-sm">@User.Identity?.Name</span>
+                <i class="fas fa-chevron-down text-slate-400 text-xs"></i>
+            </button>
+            
+            <!-- User Dropdown Menu -->
+            <div id="userMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
+                <a href="/Profile" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                    <i class="fas fa-user-circle text-slate-600 w-5"></i>
+                    <span class="font-medium text-slate-700">Xem hồ sơ</span>
+                </a>
+                <a href="/Settings" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                    <i class="fas fa-cog text-slate-600 w-5"></i>
+                    <span class="font-medium text-slate-700">Cài đặt</span>
+                </a>
+                <div class="border-t border-slate-200 my-2"></div>
+                <form asp-page="/Auth/Logout" method="post">
+                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors text-left">
+                        <i class="fas fa-sign-out-alt text-red-600 w-5"></i>
+                        <span class="font-medium text-red-600">Đăng xuất</span>
+                    </button>
+                </form>
             </div>
-            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2">
-                <li><a class="dropdown-item" href="/Profile">Hồ sơ</a></li>
-                <li><a class="dropdown-item" href="/Settings">Cài đặt</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <form asp-page="/Auth/Logout" method="post" class="d-inline">
-                        <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
-                    </form>
-                </li>
-            </ul>
         </div>
     </div>
-</div>
+</header>
+
+<script>
+    function toggleQuickAdd() {
+        const menu = document.getElementById('quickAddMenu');
+        menu.classList.toggle('hidden');
+    }
+    
+    function toggleUserMenu() {
+        const menu = document.getElementById('userMenu');
+        menu.classList.toggle('hidden');
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.quick-add-dropdown')) {
+            document.getElementById('quickAddMenu')?.classList.add('hidden');
+        }
+        if (!event.target.closest('.user-dropdown')) {
+            document.getElementById('userMenu')?.classList.add('hidden');
+        }
+    });
+</script>

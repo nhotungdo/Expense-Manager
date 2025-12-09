@@ -66,4 +66,80 @@ public class AiAdvisorController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while generating suggestions" });
         }
     }
+
+    /// <summary>
+    /// Chat with AI financial advisor
+    /// </summary>
+    [HttpPost("chat")]
+    public async Task<ActionResult<AiChatResponseDto>> Chat([FromBody] AiChatRequestDto request)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var response = await _aiAdvisorService.ChatAsync(userId, request.Message);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in AI chat");
+            return StatusCode(500, new { message = "An error occurred during chat" });
+        }
+    }
+
+    /// <summary>
+    /// Get daily AI insight for dashboard widget
+    /// </summary>
+    [HttpGet("daily-insight")]
+    public async Task<ActionResult<AiInsightDto>> GetDailyInsight()
+    {
+        try
+        {
+            var userId = GetUserId();
+            var insight = await _aiAdvisorService.GetDailyInsightAsync(userId);
+            return Ok(insight);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting daily insight");
+            return StatusCode(500, new { message = "An error occurred while getting insight" });
+        }
+    }
+
+    /// <summary>
+    /// Get cashflow forecast
+    /// </summary>
+    [HttpGet("cashflow-forecast")]
+    public async Task<ActionResult<AiCashflowForecastDto>> GetCashflowForecast()
+    {
+        try
+        {
+            var userId = GetUserId();
+            var forecast = await _aiAdvisorService.GetCashflowForecastAsync(userId);
+            return Ok(forecast);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting cashflow forecast");
+            return StatusCode(500, new { message = "An error occurred while getting forecast" });
+        }
+    }
+
+    /// <summary>
+    /// Mark a suggestion as read
+    /// </summary>
+    [HttpPut("suggestions/{id}/read")]
+    public async Task<ActionResult> MarkAsRead(long id)
+    {
+        try
+        {
+            var userId = GetUserId();
+            await _aiAdvisorService.MarkSuggestionAsReadAsync(userId, id);
+            return Ok(new { message = "Suggestion marked as read" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error marking suggestion as read");
+            return StatusCode(500, new { message = "An error occurred" });
+        }
+    }
 }

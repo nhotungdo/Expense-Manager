@@ -681,13 +681,13 @@ public partial class ExpenseManagerContext : DbContext
         {
             entity.ToTable(tb => tb.HasTrigger("tr_ServicePackages_UpdatedAt"));
 
-            entity.HasIndex(e => e.PackageType, "IX_ServicePackages_PackageType");
+
             entity.HasIndex(e => e.IsActive, "IX_ServicePackages_IsActive");
 
             entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.BillingCycle).HasDefaultValue(1);
+
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.DisplayOrder).HasDefaultValue(0);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");

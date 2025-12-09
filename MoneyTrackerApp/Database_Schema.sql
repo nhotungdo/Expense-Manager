@@ -1,4 +1,4 @@
--- Create Database
+﻿-- Create Database
 CREATE DATABASE ExpenseManager;
 GO
 
@@ -6,7 +6,7 @@ USE ExpenseManager;
 GO
 
 -- =============================================
--- 1. USERS TABLE (Giữ nguyên)
+-- 1. USERS TABLE (Giá»¯ nguyÃªn)
 -- =============================================
 CREATE TABLE [Users] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -55,20 +55,20 @@ CREATE UNIQUE INDEX [IX_Users_Email] ON [Users] ([Email]);
 GO
 
 -- =============================================
--- 2. ACCOUNTS (WALLETS) TABLE (BẢNG MỚI)
+-- 2. ACCOUNTS (WALLETS) TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [Accounts] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
     [Name] nvarchar(100) NOT NULL,
-    [AccountType] int NOT NULL, -- 1 = Tiền mặt, 2 = Ngân hàng, 3 = Ví điện tử, 4 = Thẻ tín dụng, 5 = Tiết kiệm
+    [AccountType] int NOT NULL, -- 1 = Tiá»n máº·t, 2 = NgÃ¢n hÃ ng, 3 = VÃ­ Ä‘iá»‡n tá»­, 4 = Tháº» tÃ­n dá»¥ng, 5 = Tiáº¿t kiá»‡m
     [InitialBalance] decimal(18,2) NOT NULL DEFAULT 0,
     [CurrentBalance] decimal(18,2) NOT NULL DEFAULT 0,
     [Currency] nvarchar(3) NOT NULL DEFAULT 'VND',
     [Icon] nvarchar(50) NULL,
     [Color] nvarchar(20) NULL,
     [IsActive] bit NOT NULL DEFAULT 1,
-    [IncludeInTotal] bit NOT NULL DEFAULT 1, -- Có tính vào tổng số dư không
+    [IncludeInTotal] bit NOT NULL DEFAULT 1, -- CÃ³ tÃ­nh vÃ o tá»•ng sá»‘ dÆ° khÃ´ng
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     [UpdatedAt] datetime2 NULL,
     CONSTRAINT [PK_Accounts] PRIMARY KEY ([Id]),
@@ -81,11 +81,11 @@ CREATE INDEX [IX_Accounts_UserId] ON [Accounts] ([UserId]);
 GO
 
 -- =============================================
--- 3. CATEGORIES TABLE (CHỈNH SỬA)
+-- 3. CATEGORIES TABLE (CHá»ˆNH Sá»¬A)
 -- =============================================
 CREATE TABLE [Categories] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
-    [ParentCategoryId] bigint NULL, -- Hỗ trợ danh mục cha-con
+    [ParentCategoryId] bigint NULL, -- Há»— trá»£ danh má»¥c cha-con
     [Name] nvarchar(100) NOT NULL,
     [Type] int NOT NULL, -- 1 = Income, 2 = Expense
     [Description] nvarchar(512) NULL,
@@ -109,22 +109,22 @@ CREATE INDEX [IX_Categories_ParentCategoryId] ON [Categories] ([ParentCategoryId
 GO
 
 -- =============================================
--- 4. TRANSACTIONS TABLE (Unified) (CHỈNH SỬA)
+-- 4. TRANSACTIONS TABLE (Unified) (CHá»ˆNH Sá»¬A)
 -- =============================================
 CREATE TABLE [Transactions] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
-    [AccountId] bigint NOT NULL, -- Giao dịch thuộc tài khoản/ví nào
+    [AccountId] bigint NOT NULL, -- Giao dá»‹ch thuá»™c tÃ i khoáº£n/vÃ­ nÃ o
     [CategoryId] bigint NULL,
     [TransactionType] int NOT NULL, -- 1 = Income, 2 = Expense, 3 = Transfer
     [Amount] decimal(18,2) NOT NULL,
     [Currency] nvarchar(3) NOT NULL DEFAULT 'VND',
     [Note] nvarchar(512) NULL,
     [TransactionDate] datetime2 NOT NULL,
-    [PairedAccountId] bigint NULL, -- Dùng cho Transfer, là tài khoản đích
-    [PairedTransactionId] bigint NULL, -- Dùng cho Transfer, liên kết với giao dịch đối ứng
-    [AttachmentUrl] nvarchar(512) NULL, -- Đính kèm hóa đơn
-    [OcrText] nvarchar(max) NULL, -- Lưu kết quả OCR
+    [PairedAccountId] bigint NULL, -- DÃ¹ng cho Transfer, lÃ  tÃ i khoáº£n Ä‘Ã­ch
+    [PairedTransactionId] bigint NULL, -- DÃ¹ng cho Transfer, liÃªn káº¿t vá»›i giao dá»‹ch Ä‘á»‘i á»©ng
+    [AttachmentUrl] nvarchar(512) NULL, -- ÄÃ­nh kÃ¨m hÃ³a Ä‘Æ¡n
+    [OcrText] nvarchar(max) NULL, -- LÆ°u káº¿t quáº£ OCR
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     [UpdatedAt] datetime2 NULL,
     CONSTRAINT [PK_Transactions] PRIMARY KEY ([Id]),
@@ -150,8 +150,8 @@ GO
 CREATE TABLE [Budgets] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
-    [CategoryId] bigint NULL, -- Ngân sách cho danh mục
-    [AccountId] bigint NULL, -- Ngân sách cho một tài khoản cụ thể
+    [CategoryId] bigint NULL, -- NgÃ¢n sÃ¡ch cho danh má»¥c
+    [AccountId] bigint NULL, -- NgÃ¢n sÃ¡ch cho má»™t tÃ i khoáº£n cá»¥ thá»ƒ
     [Amount] decimal(18,2) NOT NULL,
     [Period] int NOT NULL, -- 1 = Weekly, 2 = Monthly, 3 = Yearly, 4 = Custom
     [StartDate] datetime2 NOT NULL,
@@ -172,7 +172,7 @@ CREATE INDEX [IX_Budgets_AccountId] ON [Budgets] ([AccountId]);
 GO
 
 -- =============================================
--- 6. SAVINGS GOALS TABLE (BẢNG MỚI)
+-- 6. SAVINGS GOALS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [SavingsGoals] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -195,12 +195,12 @@ CREATE INDEX [IX_SavingsGoals_UserId] ON [SavingsGoals] ([UserId]);
 GO
 
 -- =============================================
--- 7. SAVINGS TRANSACTIONS TABLE (BẢNG MỚI)
+-- 7. SAVINGS TRANSACTIONS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [SavingsTransactions] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [SavingsGoalId] bigint NOT NULL,
-    [TransactionId] bigint NOT NULL, -- Giao dịch (chi) tương ứng từ bảng Transactions
+    [TransactionId] bigint NOT NULL, -- Giao dá»‹ch (chi) tÆ°Æ¡ng á»©ng tá»« báº£ng Transactions
     [Amount] decimal(18,2) NOT NULL,
     [TransactionDate] datetime2 NOT NULL,
     [Note] nvarchar(512) NULL,
@@ -215,7 +215,7 @@ CREATE INDEX [IX_SavingsTransactions_TransactionId] ON [SavingsTransactions] ([T
 GO
 
 -- =============================================
--- 8. SCHEDULED TRANSACTIONS (RECURRING) TABLE (BẢNG MỚI)
+-- 8. SCHEDULED TRANSACTIONS (RECURRING) TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [ScheduledTransactions] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -225,10 +225,10 @@ CREATE TABLE [ScheduledTransactions] (
     [TransactionType] int NOT NULL, -- 1 = Income, 2 = Expense
     [Amount] decimal(18,2) NOT NULL,
     [Frequency] nvarchar(20) NOT NULL, -- 'daily', 'weekly', 'monthly', 'yearly'
-    [Interval] int NOT NULL DEFAULT 1, -- VD: 2 + 'monthly' = 2 tháng/lần
+    [Interval] int NOT NULL DEFAULT 1, -- VD: 2 + 'monthly' = 2 thÃ¡ng/láº§n
     [StartDate] date NOT NULL,
     [EndDate] date NULL,
-    [NextRunDate] date NOT NULL, -- Ngày chạy tiếp theo (quan trọng cho job)
+    [NextRunDate] date NOT NULL, -- NgÃ y cháº¡y tiáº¿p theo (quan trá»ng cho job)
     [Note] nvarchar(512) NULL,
     [IsActive] bit NOT NULL DEFAULT 1,
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
@@ -245,17 +245,17 @@ CREATE INDEX [IX_ScheduledTransactions_NextRunDate] ON [ScheduledTransactions] (
 GO
 
 -- =============================================
--- 9. DEBTS TABLE (BẢNG MỚI)
+-- 9. DEBTS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [Debts] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
-    [DebtType] int NOT NULL, -- 1 = Nợ phải trả (I owe), 2 = Nợ phải thu (I am owed)
-    [Name] nvarchar(100) NOT NULL, -- VD: "Vay mua xe", "Tùng mượn tiền"
-    [PersonName] nvarchar(100) NULL, -- Người cho vay / Người vay
+    [DebtType] int NOT NULL, -- 1 = Ná»£ pháº£i tráº£ (I owe), 2 = Ná»£ pháº£i thu (I am owed)
+    [Name] nvarchar(100) NOT NULL, -- VD: "Vay mua xe", "TÃ¹ng mÆ°á»£n tiá»n"
+    [PersonName] nvarchar(100) NULL, -- NgÆ°á»i cho vay / NgÆ°á»i vay
     [InitialAmount] decimal(18,2) NOT NULL,
     [AmountPaid] decimal(18,2) NOT NULL DEFAULT 0,
-    [InterestRate] decimal(5,2) NOT NULL DEFAULT 0, -- Lãi suất %/năm
+    [InterestRate] decimal(5,2) NOT NULL DEFAULT 0, -- LÃ£i suáº¥t %/nÄƒm
     [StartDate] date NOT NULL,
     [DueDate] date NULL,
     [Status] int NOT NULL DEFAULT 1, -- 1 = Active, 2 = Paid
@@ -270,13 +270,13 @@ CREATE INDEX [IX_Debts_UserId] ON [Debts] ([UserId]);
 GO
 
 -- =============================================
--- 10. DEBT PAYMENTS TABLE (BẢNG MỚI)
+-- 10. DEBT PAYMENTS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [DebtPayments] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [DebtId] bigint NOT NULL,
     [Email] nvarchar(256) NULL,
-    [TransactionId] bigint NOT NULL, -- Giao dịch (chi/thu) tương ứng
+    [TransactionId] bigint NOT NULL, -- Giao dá»‹ch (chi/thu) tÆ°Æ¡ng á»©ng
     [Amount] decimal(18,2) NOT NULL,
     [PaymentDate] datetime2 NOT NULL,
     [Note] nvarchar(512) NULL,
@@ -290,20 +290,20 @@ CREATE INDEX [IX_DebtPayments_DebtId] ON [DebtPayments] ([DebtId]);
 GO
 
 -- =============================================
--- 11. SHARED ACCOUNTS TABLE (BẢNG MỚI)
+-- 11. SHARED ACCOUNTS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [SharedAccounts] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
-    [AccountId] bigint NOT NULL, -- Tài khoản được chia sẻ
-    [UserId] bigint NOT NULL, -- Người được chia sẻ
+    [AccountId] bigint NOT NULL, -- TÃ i khoáº£n Ä‘Æ°á»£c chia sáº»
+    [UserId] bigint NOT NULL, -- NgÆ°á»i Ä‘Æ°á»£c chia sáº»
     [Permission] int NOT NULL, -- 1 = ViewOnly, 2 = ViewAndAdd, 3 = FullAccess
-    [SharedByUserId] bigint NOT NULL, -- Người chủ sở hữu chia sẻ
+    [SharedByUserId] bigint NOT NULL, -- NgÆ°á»i chá»§ sá»Ÿ há»¯u chia sáº»
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     CONSTRAINT [PK_SharedAccounts] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_SharedAccounts_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_SharedAccounts_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
     CONSTRAINT [FK_SharedAccounts_Users_SharedByUserId] FOREIGN KEY ([SharedByUserId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
-    CONSTRAINT [UK_SharedAccounts_AccountId_UserId] UNIQUE ([AccountId], [UserId]) -- Đảm bảo không chia sẻ 2 lần
+    CONSTRAINT [UK_SharedAccounts_AccountId_UserId] UNIQUE ([AccountId], [UserId]) -- Äáº£m báº£o khÃ´ng chia sáº» 2 láº§n
 );
 GO
 
@@ -312,13 +312,13 @@ CREATE INDEX [IX_SharedAccounts_UserId] ON [SharedAccounts] ([UserId]);
 GO
 
 -- =============================================
--- 12. INVESTMENTS TABLE (*** ĐÃ SỬA LỖI 1785 ***)
+-- 12. INVESTMENTS TABLE (*** ÄÃƒ Sá»¬A Lá»–I 1785 ***)
 -- =============================================
 CREATE TABLE [Investments] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
-    [AccountId] bigint NULL, -- Tài khoản dùng để mua
-    [Name] nvarchar(100) NOT NULL, -- VD: "Cổ phiếu FPT", "Bitcoin"
+    [AccountId] bigint NULL, -- TÃ i khoáº£n dÃ¹ng Ä‘á»ƒ mua
+    [Name] nvarchar(100) NOT NULL, -- VD: "Cá»• phiáº¿u FPT", "Bitcoin"
     [AssetType] nvarchar(50) NOT NULL, -- 'Stock', 'Crypto', 'Gold', 'Fund'
     [Quantity] decimal(18,8) NOT NULL,
     [PurchasePrice] decimal(18,2) NOT NULL,
@@ -329,7 +329,7 @@ CREATE TABLE [Investments] (
     [UpdatedAt] datetime2 NULL,
     CONSTRAINT [PK_Investments] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Investments_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE,
-    CONSTRAINT [FK_Investments_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION -- Sửa từ SET NULL
+    CONSTRAINT [FK_Investments_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION -- Sá»­a tá»« SET NULL
 );
 GO
 
@@ -337,21 +337,21 @@ CREATE INDEX [IX_Investments_UserId] ON [Investments] ([UserId]);
 GO
 
 -- =============================================
--- 13. BANK CONNECTIONS TABLE (*** ĐÃ SỬA LỖI 1785 ***)
+-- 13. BANK CONNECTIONS TABLE (*** ÄÃƒ Sá»¬A Lá»–I 1785 ***)
 -- =============================================
 CREATE TABLE [BankConnections] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
     [UserId] bigint NOT NULL,
-    [AccountId] bigint NOT NULL, -- Liên kết với tài khoản nội bộ
+    [AccountId] bigint NOT NULL, -- LiÃªn káº¿t vá»›i tÃ i khoáº£n ná»™i bá»™
     [Provider] nvarchar(50) NOT NULL, -- VD: 'Plaid', 'VietQR'
-    [AccessToken] nvarchar(max) NOT NULL, -- Nên được mã hóa
-    [ItemId] nvarchar(256) NULL, -- ID định danh từ provider
+    [AccessToken] nvarchar(max) NOT NULL, -- NÃªn Ä‘Æ°á»£c mÃ£ hÃ³a
+    [ItemId] nvarchar(256) NULL, -- ID Ä‘á»‹nh danh tá»« provider
     [LastSync] datetime2 NULL,
     [SyncStatus] nvarchar(20) NULL,
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     CONSTRAINT [PK_BankConnections] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_BankConnections_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE,
-    CONSTRAINT [FK_BankConnections_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION -- Sửa từ CASCADE
+    CONSTRAINT [FK_BankConnections_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION -- Sá»­a tá»« CASCADE
 );
 GO
 
@@ -359,7 +359,7 @@ CREATE INDEX [IX_BankConnections_UserId] ON [BankConnections] ([UserId]);
 GO
 
 -- =============================================
--- 14. CURRENCY RATES TABLE (BẢNG MỚI)
+-- 14. CURRENCY RATES TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [CurrencyRates] (
     [Id] int IDENTITY(1,1) NOT NULL,
@@ -465,7 +465,7 @@ CREATE TABLE [Reports] (
     [ReportName] nvarchar(256) NOT NULL,
     [StartDate] date NOT NULL,
     [EndDate] date NOT NULL,
-    [Parameters] nvarchar(max) NULL, -- JSON string (có thể chứa AccountId, CategoryId...)
+    [Parameters] nvarchar(max) NULL, -- JSON string (cÃ³ thá»ƒ chá»©a AccountId, CategoryId...)
     [FilePath] nvarchar(512) NULL,
     [FileFormat] nvarchar(10) NULL, -- 'pdf', 'excel', 'csv'
     [GeneratedAt] datetime2 NULL,
@@ -566,7 +566,7 @@ CREATE UNIQUE INDEX [IX_SystemSettings_SettingKey] ON [SystemSettings] ([Setting
 GO
 
 -- =============================================
--- 22. ONBOARDING STATUS TABLE (BẢNG MỚI)
+-- 22. ONBOARDING STATUS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [OnboardingStatus] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -591,7 +591,7 @@ CREATE INDEX [IX_OnboardingStatus_IsCompleted] ON [OnboardingStatus] ([IsComplet
 GO
 
 -- =============================================
--- 23. FINANCIAL ALERTS TABLE (BẢNG MỚI)
+-- 23. FINANCIAL ALERTS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [FinancialAlerts] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -614,7 +614,7 @@ CREATE INDEX [IX_FinancialAlerts_CreatedAt] ON [FinancialAlerts] ([CreatedAt]);
 GO
 
 -- =============================================
--- 24. GROUP EXPENSES TABLE (BẢNG MỚI)
+-- 24. GROUP EXPENSES TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [GroupExpenses] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -635,7 +635,7 @@ CREATE INDEX [IX_GroupExpenses_CreatedByUserId] ON [GroupExpenses] ([CreatedByUs
 GO
 
 -- =============================================
--- 25. GROUP MEMBERS TABLE (BẢNG MỚI)
+-- 25. GROUP MEMBERS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [GroupMembers] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -654,7 +654,7 @@ CREATE INDEX [IX_GroupMembers_UserId] ON [GroupMembers] ([UserId]);
 GO
 
 -- =============================================
--- 26. GROUP TRANSACTIONS TABLE (BẢNG MỚI)
+-- 26. GROUP TRANSACTIONS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [GroupTransactions] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -678,7 +678,7 @@ CREATE INDEX [IX_GroupTransactions_PaidByUserId] ON [GroupTransactions] ([PaidBy
 GO
 
 -- =============================================
--- 27. GROUP TRANSACTION SPLITS TABLE (BẢNG MỚI)
+-- 27. GROUP TRANSACTION SPLITS TABLE (Báº¢NG Má»šI)
 -- =============================================
 CREATE TABLE [GroupTransactionSplits] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
@@ -723,7 +723,7 @@ GO
 
 
 -- =============================================
--- CREATE STORED PROCEDURES (CẬP NHẬT)
+-- CREATE STORED PROCEDURES (Cáº¬P NHáº¬T)
 -- =============================================
 -- Procedure to get user dashboard statistics
 CREATE PROCEDURE [dbo].[GetUserDashboardStats]
@@ -734,7 +734,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     
-    -- Tính toán tổng thu, chi (Không bao gồm Transfer)
+    -- TÃ­nh toÃ¡n tá»•ng thu, chi (KhÃ´ng bao gá»“m Transfer)
     SELECT 
         ISNULL(SUM(CASE WHEN [TransactionType] = 1 THEN Amount ELSE 0 END), 0) AS TotalIncome,
         ISNULL(SUM(CASE WHEN [TransactionType] = 2 THEN Amount ELSE 0 END), 0) AS TotalExpense,
@@ -742,10 +742,10 @@ BEGIN
         COUNT(CASE WHEN [TransactionType] IN (1, 2) THEN 1 ELSE NULL END) AS TransactionCount
     FROM [Transactions]
     WHERE [UserId] = @UserId 
-        AND [TransactionType] IN (1, 2) -- Chỉ tính Thu/Chi
+        AND [TransactionType] IN (1, 2) -- Chá»‰ tÃ­nh Thu/Chi
         AND [TransactionDate] BETWEEN @StartDate AND @EndDate;
 
-    -- Tính toán tổng số dư từ tất cả các ví
+    -- TÃ­nh toÃ¡n tá»•ng sá»‘ dÆ° tá»« táº¥t cáº£ cÃ¡c vÃ­
     SELECT 
         ISNULL(SUM([CurrentBalance]), 0) AS TotalBalance
     FROM [Accounts]
@@ -771,7 +771,7 @@ BEGIN
     FROM [Categories] c
     LEFT JOIN [Transactions] t ON c.[Id] = t.[CategoryId] 
         AND t.[UserId] = @UserId 
-        AND t.[TransactionType] = 2 -- Chỉ tính chi
+        AND t.[TransactionType] = 2 -- Chá»‰ tÃ­nh chi
         AND t.[TransactionDate] BETWEEN @StartDate AND @EndDate
     WHERE c.[Type] = 2 AND c.[IsActive] = 1
     GROUP BY c.[Id], c.[Name], c.[Icon], c.[Color]
@@ -795,7 +795,7 @@ BEGIN
             SUM([Amount]) AS [Amount]
         FROM [Transactions]
         WHERE [UserId] = @UserId
-            AND [TransactionType] IN (1, 2) -- Chỉ tính Thu/Chi
+            AND [TransactionType] IN (1, 2) -- Chá»‰ tÃ­nh Thu/Chi
             AND [TransactionDate] >= DATEADD(MONTH, -@Months, GETDATE())
         GROUP BY YEAR([TransactionDate]), MONTH([TransactionDate]), [TransactionType]
     )
@@ -866,7 +866,7 @@ END
 GO
 
 -- =============================================
--- CREATE VIEWS (CẬP NHẬT)
+-- CREATE VIEWS (Cáº¬P NHáº¬T)
 -- =============================================
 -- View for user transaction summary
 CREATE VIEW [vw_UserTransactionSummary] AS
@@ -905,9 +905,9 @@ GROUP BY c.[Id], c.[Name], c.[Type], c.[Icon], c.[Color];
 GO
 
 -- =============================================
--- *** PHẦN DỌN DẸP TRIGGER TRƯỚC KHI TẠO ***
+-- *** PHáº¦N Dá»ŒN Dáº¸P TRIGGER TRÆ¯á»šC KHI Táº O ***
 -- =============================================
--- Chạy đoạn này để dọn dẹp các đối tượng cũ có thể gây lỗi
+-- Cháº¡y Ä‘oáº¡n nÃ y Ä‘á»ƒ dá»n dáº¹p cÃ¡c Ä‘á»‘i tÆ°á»£ng cÅ© cÃ³ thá»ƒ gÃ¢y lá»—i
 IF OBJECT_ID('tr_Users_UpdatedAt', 'TR') IS NOT NULL
     DROP TRIGGER [tr_Users_UpdatedAt];
 IF OBJECT_ID('tr_Categories_UpdatedAt', 'TR') IS NOT NULL
@@ -936,7 +936,7 @@ GO
 
 
 -- =============================================
--- CREATE TRIGGERS (*** ĐÃ SỬA LỖI 8124 ***)
+-- CREATE TRIGGERS (*** ÄÃƒ Sá»¬A Lá»–I 8124 ***)
 -- =============================================
 CREATE TRIGGER [tr_Users_UpdatedAt] ON [Users]
 AFTER UPDATE
@@ -1058,25 +1058,25 @@ BEGIN
 END
 GO
 
--- Trigger quan trọng: Tự động cập nhật số dư Account (*** ĐÃ SỬA LỖI 8124 ***)
+-- Trigger quan trá»ng: Tá»± Ä‘á»™ng cáº­p nháº­t sá»‘ dÆ° Account (*** ÄÃƒ Sá»¬A Lá»–I 8124 ***)
 CREATE TRIGGER [tr_Transactions_UpdateAccountBalance] ON [Transactions]
 AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Tạm lưu các AccountId bị ảnh hưởng
+    -- Táº¡m lÆ°u cÃ¡c AccountId bá»‹ áº£nh hÆ°á»Ÿng
     DECLARE @AffectedAccounts TABLE (AccountId bigint);
     INSERT INTO @AffectedAccounts (AccountId) SELECT AccountId FROM inserted;
     INSERT INTO @AffectedAccounts (AccountId) SELECT AccountId FROM deleted;
     INSERT INTO @AffectedAccounts (AccountId) SELECT PairedAccountId FROM inserted WHERE PairedAccountId IS NOT NULL;
     INSERT INTO @AffectedAccounts (AccountId) SELECT PairedAccountId FROM deleted WHERE PairedAccountId IS NOT NULL;
 
-    -- Cập nhật số dư cho các AccountId bị ảnh hưởng
+    -- Cáº­p nháº­t sá»‘ dÆ° cho cÃ¡c AccountId bá»‹ áº£nh hÆ°á»Ÿng
     UPDATE acc
     SET [CurrentBalance] = acc.[InitialBalance] 
     
-    + ISNULL(( -- Phần 1: Tính tổng Thu, Chi, Chuyển đi (Source)
+    + ISNULL(( -- Pháº§n 1: TÃ­nh tá»•ng Thu, Chi, Chuyá»ƒn Ä‘i (Source)
         SELECT SUM(
             CASE 
                 WHEN t.[TransactionType] = 1 THEN t.[Amount]   -- Income (+)
@@ -1086,10 +1086,10 @@ BEGIN
             END
         )
         FROM [Transactions] t
-        WHERE t.[AccountId] = acc.[Id] -- Lọc theo tài khoản chính
+        WHERE t.[AccountId] = acc.[Id] -- Lá»c theo tÃ i khoáº£n chÃ­nh
     ), 0) 
     
-    + ISNULL(( -- Phần 2: Tính tổng Chuyển đến (Destination)
+    + ISNULL(( -- Pháº§n 2: TÃ­nh tá»•ng Chuyá»ƒn Ä‘áº¿n (Destination)
         SELECT SUM(
             CASE 
                 WHEN t.[TransactionType] = 3 THEN t.[Amount] -- Transfer IN (+)
@@ -1097,7 +1097,7 @@ BEGIN
             END
         )
         FROM [Transactions] t
-        WHERE t.[PairedAccountId] = acc.[Id] -- Lọc theo tài khoản nhận
+        WHERE t.[PairedAccountId] = acc.[Id] -- Lá»c theo tÃ i khoáº£n nháº­n
     ), 0)
     
     FROM [Accounts] acc
@@ -1106,7 +1106,7 @@ BEGIN
 END
 GO
 
--- Trigger: Tự động cập nhật tiến độ Mục tiêu Tiết kiệm
+-- Trigger: Tá»± Ä‘á»™ng cáº­p nháº­t tiáº¿n Ä‘á»™ Má»¥c tiÃªu Tiáº¿t kiá»‡m
 CREATE TRIGGER [tr_SavingsTransactions_UpdateGoal] ON [SavingsTransactions]
 AFTER INSERT, DELETE, UPDATE
 AS
@@ -1125,5 +1125,248 @@ BEGIN
     ), 0)
     FROM [SavingsGoals] sg
     WHERE sg.Id IN (SELECT DISTINCT GoalId FROM @AffectedGoals);
+END
+GO
+
+-- =============================================
+-- 28. SUBSCRIPTION SYSTEM (Merged from AddSubscriptionTables.sql and seed-service-packages.sql)
+-- =============================================
+
+-- Create ServicePackages table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ServicePackages]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[ServicePackages](
+        [Id] INT IDENTITY(1,1) NOT NULL,
+        [Name] NVARCHAR(100) NOT NULL,
+        [Description] NVARCHAR(500) NULL,
+        [PackageType] INT NOT NULL DEFAULT 0,
+        [Price] DECIMAL(18, 2) NOT NULL,
+        [OriginalPrice] DECIMAL(18, 2) NULL,
+        [BillingCycle] INT NOT NULL DEFAULT 1,
+        [DurationDays] INT NOT NULL DEFAULT 30,
+        [Features] NVARCHAR(MAX) NULL,
+        [MaxTransactions] INT NOT NULL DEFAULT 0,
+        [MaxAccounts] INT NOT NULL DEFAULT 0,
+        [MaxBudgets] INT NOT NULL DEFAULT 0,
+        [HasAdvancedReports] BIT NOT NULL DEFAULT 0,
+        [HasAiAdvisor] BIT NOT NULL DEFAULT 0,
+        [HasGroupExpense] BIT NOT NULL DEFAULT 0,
+        [HasPrioritySupport] BIT NOT NULL DEFAULT 0,
+        [IsPopular] BIT NOT NULL DEFAULT 0,
+        [IsActive] BIT NOT NULL DEFAULT 1,
+        [BadgeText] NVARCHAR(50) NULL,
+        [BadgeColor] NVARCHAR(50) NULL,
+        [DisplayOrder] INT NOT NULL DEFAULT 0,
+        [CreatedAt] DATETIME NULL DEFAULT GETUTCDATE(),
+        [UpdatedAt] DATETIME NULL,
+        CONSTRAINT [PK_ServicePackages] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+
+    CREATE NONCLUSTERED INDEX [IX_ServicePackages_PackageType] ON [dbo].[ServicePackages]([PackageType] ASC);
+    CREATE NONCLUSTERED INDEX [IX_ServicePackages_IsActive] ON [dbo].[ServicePackages]([IsActive] ASC);
+END
+GO
+
+-- Create Subscriptions table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Subscriptions]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[Subscriptions](
+        [Id] BIGINT IDENTITY(1,1) NOT NULL,
+        [UserId] BIGINT NOT NULL,
+        [PackageId] INT NOT NULL,
+        [Status] INT NOT NULL DEFAULT 0,
+        [StartDate] DATETIME NOT NULL,
+        [EndDate] DATETIME NOT NULL,
+        [CancelledAt] DATETIME NULL,
+        [CancellationReason] NVARCHAR(500) NULL,
+        [AutoRenew] BIT NOT NULL DEFAULT 1,
+        [CreatedAt] DATETIME NULL DEFAULT GETUTCDATE(),
+        [UpdatedAt] DATETIME NULL,
+        CONSTRAINT [PK_Subscriptions] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_Subscriptions_Users] FOREIGN KEY([UserId]) REFERENCES [dbo].[Users]([Id]),
+        CONSTRAINT [FK_Subscriptions_ServicePackages] FOREIGN KEY([PackageId]) REFERENCES [dbo].[ServicePackages]([Id])
+    );
+
+    CREATE NONCLUSTERED INDEX [IX_Subscriptions_UserId] ON [dbo].[Subscriptions]([UserId] ASC);
+    CREATE NONCLUSTERED INDEX [IX_Subscriptions_PackageId] ON [dbo].[Subscriptions]([PackageId] ASC);
+    CREATE NONCLUSTERED INDEX [IX_Subscriptions_Status] ON [dbo].[Subscriptions]([Status] ASC);
+    CREATE NONCLUSTERED INDEX [IX_Subscriptions_EndDate] ON [dbo].[Subscriptions]([EndDate] ASC);
+END
+GO
+
+-- Create Payments table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Payments]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[Payments](
+        [Id] BIGINT IDENTITY(1,1) NOT NULL,
+        [SubscriptionId] BIGINT NOT NULL,
+        [Amount] DECIMAL(18, 2) NOT NULL,
+        [Currency] NVARCHAR(3) NOT NULL DEFAULT 'VND',
+        [Status] INT NOT NULL DEFAULT 0,
+        [PaymentMethod] NVARCHAR(50) NOT NULL,
+        [TransactionId] NVARCHAR(256) NULL,
+        [PaymentData] NVARCHAR(MAX) NULL,
+        [PaidAt] DATETIME NULL,
+        [FailureReason] NVARCHAR(500) NULL,
+        [CreatedAt] DATETIME NULL DEFAULT GETUTCDATE(),
+        [UpdatedAt] DATETIME NULL,
+        CONSTRAINT [PK_Payments] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_Payments_Subscriptions] FOREIGN KEY([SubscriptionId]) REFERENCES [dbo].[Subscriptions]([Id])
+    );
+
+    CREATE NONCLUSTERED INDEX [IX_Payments_SubscriptionId] ON [dbo].[Payments]([SubscriptionId] ASC);
+    CREATE NONCLUSTERED INDEX [IX_Payments_Status] ON [dbo].[Payments]([Status] ASC);
+    CREATE NONCLUSTERED INDEX [IX_Payments_TransactionId] ON [dbo].[Payments]([TransactionId] ASC);
+END
+GO
+
+-- Create triggers for UpdatedAt
+IF NOT EXISTS (SELECT * FROM sys.triggers WHERE name = 'tr_ServicePackages_UpdatedAt')
+BEGIN
+    EXEC('
+    CREATE TRIGGER tr_ServicePackages_UpdatedAt
+    ON ServicePackages
+    AFTER UPDATE
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        UPDATE ServicePackages
+        SET UpdatedAt = GETUTCDATE()
+        FROM ServicePackages sp
+        INNER JOIN inserted i ON sp.Id = i.Id;
+    END
+    ');
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.triggers WHERE name = 'tr_Subscriptions_UpdatedAt')
+BEGIN
+    EXEC('
+    CREATE TRIGGER tr_Subscriptions_UpdatedAt
+    ON Subscriptions
+    AFTER UPDATE
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        UPDATE Subscriptions
+        SET UpdatedAt = GETUTCDATE()
+        FROM Subscriptions s
+        INNER JOIN inserted i ON s.Id = i.Id;
+    END
+    ');
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.triggers WHERE name = 'tr_Payments_UpdatedAt')
+BEGIN
+    EXEC('
+    CREATE TRIGGER tr_Payments_UpdatedAt
+    ON Payments
+    AFTER UPDATE
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        UPDATE Payments
+        SET UpdatedAt = GETUTCDATE()
+        FROM Payments p
+        INNER JOIN inserted i ON p.Id = i.Id;
+    END
+    ');
+END
+GO
+
+-- =============================================
+-- 29. PAYMENT TRANSACTIONS TABLE (For link.com gateway)
+-- =============================================
+-- Create PaymentTransactions table to store payment gateway data
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PaymentTransactions]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[PaymentTransactions](
+        [Id] BIGINT IDENTITY(1,1) NOT NULL,
+        [UserId] BIGINT NOT NULL,
+        [PackageId] INT NOT NULL,
+        [PackageName] NVARCHAR(100) NOT NULL,
+        [Amount] DECIMAL(18, 2) NOT NULL,
+        [Currency] NVARCHAR(3) NOT NULL DEFAULT 'VND',
+        [SessionToken] NVARCHAR(512) NULL,
+        [PaymentGatewayUrl] NVARCHAR(512) NOT NULL DEFAULT 'https://link.com',
+        [GatewayTransactionId] NVARCHAR(256) NULL,
+        [GatewayResponse] NVARCHAR(MAX) NULL,
+        [Status] INT NOT NULL DEFAULT 0, -- 0=Pending, 1=Processing, 2=Success, 3=Failed, 4=Cancelled
+        [RedirectUrl] NVARCHAR(512) NULL,
+        [ReturnUrl] NVARCHAR(512) NULL,
+        [CancelUrl] NVARCHAR(512) NULL,
+        [IpAddress] NVARCHAR(45) NULL,
+        [UserAgent] NVARCHAR(512) NULL,
+        [RequestTimestamp] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        [ResponseTimestamp] DATETIME2 NULL,
+        [CompletedAt] DATETIME2 NULL,
+        [FailureReason] NVARCHAR(500) NULL,
+        [CreatedAt] DATETIME2 NULL DEFAULT GETUTCDATE(),
+        [UpdatedAt] DATETIME2 NULL,
+        CONSTRAINT [PK_PaymentTransactions] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_PaymentTransactions_Users] FOREIGN KEY([UserId]) REFERENCES [dbo].[Users]([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_PaymentTransactions_ServicePackages] FOREIGN KEY([PackageId]) REFERENCES [dbo].[ServicePackages]([Id])
+    );
+
+    CREATE NONCLUSTERED INDEX [IX_PaymentTransactions_UserId] ON [dbo].[PaymentTransactions]([UserId] ASC);
+    CREATE NONCLUSTERED INDEX [IX_PaymentTransactions_PackageId] ON [dbo].[PaymentTransactions]([PackageId] ASC);
+    CREATE NONCLUSTERED INDEX [IX_PaymentTransactions_Status] ON [dbo].[PaymentTransactions]([Status] ASC);
+    CREATE NONCLUSTERED INDEX [IX_PaymentTransactions_GatewayTransactionId] ON [dbo].[PaymentTransactions]([GatewayTransactionId] ASC);
+    CREATE NONCLUSTERED INDEX [IX_PaymentTransactions_RequestTimestamp] ON [dbo].[PaymentTransactions]([RequestTimestamp] ASC);
+END
+GO
+
+-- Create trigger for PaymentTransactions UpdatedAt
+IF NOT EXISTS (SELECT * FROM sys.triggers WHERE name = 'tr_PaymentTransactions_UpdatedAt')
+BEGIN
+    EXEC('
+    CREATE TRIGGER tr_PaymentTransactions_UpdatedAt
+    ON PaymentTransactions
+    AFTER UPDATE
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        UPDATE PaymentTransactions
+        SET UpdatedAt = GETUTCDATE()
+        FROM PaymentTransactions pt
+        INNER JOIN inserted i ON pt.Id = i.Id;
+    END
+    ');
+END
+GO
+
+-- Insert default service packages
+IF NOT EXISTS (SELECT * FROM ServicePackages)
+BEGIN
+    SET IDENTITY_INSERT ServicePackages ON;
+
+    INSERT INTO ServicePackages (Id, Name, Description, Price, OriginalPrice, DurationDays, BillingCycle, Features, IsPopular, IsActive, BadgeText, BadgeColor, DisplayOrder, CreatedAt, PackageType, MaxTransactions, MaxAccounts, MaxBudgets, HasAdvancedReports, HasAiAdvisor, HasGroupExpense, HasPrioritySupport)
+    VALUES 
+    (1, N'Gói Miễn Phí', N'Hoàn hảo để bắt đầu quản lý tài chính cá nhân', 0, NULL, 365, 1, 
+    N'["Theo dõi thu chi cơ bản","Tối đa 3 ví","Báo cáo hàng tháng","Hỗ trợ qua email","Lưu trữ 100 giao dịch"]', 
+    0, 1, NULL, NULL, 1, GETUTCDATE(), 0, 100, 3, 3, 0, 0, 0, 0),
+    
+    (2, N'Gói Cơ Bản', N'Dành cho người dùng cá nhân muốn quản lý tốt hơn', 99000, 149000, 30, 1, 
+    N'["Tất cả tính năng Miễn Phí","Không giới hạn ví","Báo cáo chi tiết","Phân loại tự động","Lưu trữ không giới hạn","Xuất báo cáo Excel/PDF","Hỗ trợ ưu tiên"]', 
+    0, 1, N'Giảm 33%', N'discount', 2, GETUTCDATE(), 1, -1, -1, -1, 1, 0, 0, 0),
+    
+    (3, N'Gói Chuyên Nghiệp', N'Giải pháp toàn diện cho quản lý tài chính chuyên nghiệp', 199000, 299000, 30, 1, 
+    N'["Tất cả tính năng Cơ Bản","AI phân tích chi tiêu","Dự báo tài chính","Quản lý đầu tư","Theo dõi nợ & tiết kiệm","Chia sẻ chi tiêu nhóm","Tích hợp ngân hàng","Hỗ trợ 24/7","Tư vấn tài chính cá nhân"]', 
+    1, 1, N'Phổ biến nhất', N'popular', 3, GETUTCDATE(), 2, -1, -1, -1, 1, 1, 1, 1),
+    
+    (4, N'Gói Doanh Nghiệp', N'Giải pháp cho doanh nghiệp và nhóm làm việc', 499000, NULL, 30, 1, 
+    N'["Tất cả tính năng Chuyên Nghiệp","Quản lý nhiều người dùng","Phân quyền chi tiết","API tích hợp","Báo cáo tùy chỉnh","Sao lưu tự động","Bảo mật nâng cao","Đào tạo & onboarding","Account manager riêng"]', 
+    0, 1, NULL, NULL, 4, GETUTCDATE(), 3, -1, -1, -1, 1, 1, 1, 1),
+    
+    (5, N'Gói Năm - Cơ Bản', N'Tiết kiệm 20% khi đăng ký theo năm', 950000, 1188000, 365, 12, 
+    N'["Tất cả tính năng Gói Cơ Bản","Thanh toán 1 lần/năm","Tiết kiệm 238.000đ","Ưu tiên cập nhật tính năng mới"]', 
+    0, 1, N'Tiết kiệm 20%', N'discount', 5, GETUTCDATE(), 1, -1, -1, -1, 1, 0, 0, 0),
+    
+    (6, N'Gói Năm - Chuyên Nghiệp', N'Tiết kiệm 25% khi đăng ký theo năm', 1790000, 2388000, 365, 12, 
+    N'["Tất cả tính năng Gói Chuyên Nghiệp","Thanh toán 1 lần/năm","Tiết kiệm 598.000đ","Tặng 1 tháng sử dụng","Ưu tiên hỗ trợ VIP"]', 
+    1, 1, N'Ưu đãi nhất', N'popular', 6, GETUTCDATE(), 2, -1, -1, -1, 1, 1, 1, 1);
+
+    SET IDENTITY_INSERT ServicePackages OFF;
 END
 GO

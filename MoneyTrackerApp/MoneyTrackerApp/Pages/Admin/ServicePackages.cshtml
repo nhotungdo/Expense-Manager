@@ -1,0 +1,150 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.ServicePackagesModel
+@{
+    ViewData["Title"] = "Quản lý gói dịch vụ";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-box-open"></i>
+                Quản lý gói dịch vụ
+            </h2>
+            <p class="text-muted mb-0">Tạo và quản lý các gói dịch vụ cho người dùng</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i>
+            Thêm gói mới
+        </button>
+    </div>
+
+    <!-- Packages Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="packagesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên gói</th>
+                            <th>Giá</th>
+                            <th>Thời hạn</th>
+                            <th>Phổ biến</th>
+                            <th>Trạng thái</th>
+                            <th>Thứ tự</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packagesTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Đang tải...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal fade" id="packageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm gói dịch vụ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="packageForm">
+                    <input type="hidden" id="packageId" />
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tên gói *</label>
+                            <input type="text" class="form-control" id="packageName" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Giá (VNĐ) *</label>
+                            <input type="number" class="form-control" id="packagePrice" required />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Giá gốc (VNĐ)</label>
+                            <input type="number" class="form-control" id="packageOriginalPrice" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Thời hạn (ngày) *</label>
+                            <input type="number" class="form-control" id="packageDuration" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="packageDescription" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tính năng (mỗi dòng một tính năng) *</label>
+                        <textarea class="form-control" id="packageFeatures" rows="5" required></textarea>
+                        <small class="text-muted">Nhập mỗi tính năng trên một dòng</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Nhãn</label>
+                            <input type="text" class="form-control" id="packageBadgeText" placeholder="VD: Phổ biến nhất" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Màu nhãn</label>
+                            <select class="form-select" id="packageBadgeColor">
+                                <option value="">Không có</option>
+                                <option value="popular">Popular (Vàng)</option>
+                                <option value="discount">Discount (Đỏ)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Thứ tự hiển thị</label>
+                            <input type="number" class="form-control" id="packageDisplayOrder" value="0" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="packageIsPopular" />
+                                <label class="form-check-label" for="packageIsPopular">
+                                    Đánh dấu là phổ biến
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="packageIsActive" checked />
+                                <label class="form-check-label" for="packageIsActive">
+                                    Kích hoạt
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="savePackage()">
+                    <i class="fas fa-save"></i>
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-service-packages.js"></script>
+}

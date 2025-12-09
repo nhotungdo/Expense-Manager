@@ -1,48 +1,47 @@
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MoneyTrackerApp.Models;
-
-/// <summary>
-/// Service package model
-/// </summary>
-public partial class ServicePackage
+namespace MoneyTrackerApp.Models
 {
-    public int Id { get; set; }
+    public class ServicePackage
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+        [Required]
+        [StringLength(100)]
+        public string Name { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+        [StringLength(500)]
+        public string? Description { get; set; }
 
-    public int PackageType { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; }
 
-    public decimal Price { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? OriginalPrice { get; set; }
 
-    public int BillingCycle { get; set; } // 1 = Monthly, 3 = Quarterly, 12 = Yearly
+        public int DurationDays { get; set; }
 
-    public string? Features { get; set; } // JSON array of features
+        public string Features { get; set; } = string.Empty; // JSON array of features
 
-    public int MaxTransactions { get; set; }
+        public bool IsPopular { get; set; }
 
-    public int MaxAccounts { get; set; }
+        public bool IsActive { get; set; } = true;
 
-    public int MaxBudgets { get; set; }
+        [StringLength(50)]
+        public string? BadgeText { get; set; }
 
-    public bool HasAdvancedReports { get; set; }
+        [StringLength(50)]
+        public string? BadgeColor { get; set; }
 
-    public bool HasAiAdvisor { get; set; }
+        public int DisplayOrder { get; set; }
 
-    public bool HasGroupExpense { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public bool HasPrioritySupport { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
-    public bool IsActive { get; set; }
-
-    public int DisplayOrder { get; set; }
-
-    public DateTime? CreatedAt { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+        // Navigation property
+        public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+    }
 }

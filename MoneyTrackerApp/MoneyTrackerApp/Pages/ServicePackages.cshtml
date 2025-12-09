@@ -1,0 +1,206 @@
+@page
+@model MoneyTrackerApp.Pages.ServicePackagesModel
+@{
+    ViewData["Title"] = "Gói dịch vụ";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Money Tracker</title>
+    <link rel="stylesheet" href="~/css/main.css" />
+    <link rel="stylesheet" href="~/css/service-packages.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-sparkles"></i>
+                <span>Nâng cấp trải nghiệm của bạn</span>
+            </div>
+            <h1 class="hero-title">Chọn gói dịch vụ phù hợp với bạn</h1>
+            <p class="hero-subtitle">
+                Quản lý tài chính thông minh hơn với các tính năng cao cấp. 
+                Bắt đầu miễn phí, nâng cấp bất cứ lúc nào.
+            </p>
+        </div>
+        <div class="hero-decoration">
+            <div class="decoration-circle circle-1"></div>
+            <div class="decoration-circle circle-2"></div>
+            <div class="decoration-circle circle-3"></div>
+        </div>
+    </section>
+
+    <!-- Filter & Sort Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>
+                        <i class="fas fa-filter"></i>
+                        Lọc theo:
+                    </label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">
+                            <i class="fas fa-th"></i> Tất cả
+                        </button>
+                        <button class="filter-btn" data-filter="popular">
+                            <i class="fas fa-fire"></i> Phổ biến
+                        </button>
+                        <button class="filter-btn" data-filter="monthly">
+                            <i class="fas fa-calendar-alt"></i> Theo tháng
+                        </button>
+                        <button class="filter-btn" data-filter="yearly">
+                            <i class="fas fa-calendar-check"></i> Theo năm
+                        </button>
+                    </div>
+                </div>
+                <div class="sort-group">
+                    <label>
+                        <i class="fas fa-sort"></i>
+                        Sắp xếp:
+                    </label>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="default">Mặc định</option>
+                        <option value="price-asc">Giá: Thấp đến cao</option>
+                        <option value="price-desc">Giá: Cao đến thấp</option>
+                        <option value="duration-asc">Thời hạn: Ngắn đến dài</option>
+                        <option value="duration-desc">Thời hạn: Dài đến ngắn</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Packages Grid -->
+    <section class="packages-section">
+        <div class="container">
+            <div class="packages-grid" id="packagesGrid">
+                <!-- Loading State -->
+                <div class="loading-state" id="loadingState">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải gói dịch vụ...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Comparison Section -->
+    <section class="comparison-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">So sánh tính năng</h2>
+                <p class="section-subtitle">Xem chi tiết các tính năng của từng gói</p>
+            </div>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table" id="comparisonTable">
+                    <thead>
+                        <tr>
+                            <th>Tính năng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Câu hỏi thường gặp</h2>
+                <p class="section-subtitle">Giải đáp thắc mắc của bạn</p>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Tôi có thể thay đổi gói dịch vụ không?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Có, bạn có thể nâng cấp hoặc hạ cấp gói dịch vụ bất cứ lúc nào. Phí sẽ được tính theo tỷ lệ thời gian sử dụng.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Phương thức thanh toán nào được chấp nhận?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Chúng tôi chấp nhận thẻ tín dụng, thẻ ghi nợ, chuyển khoản ngân hàng và ví điện tử.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Có chính sách hoàn tiền không?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Có, chúng tôi có chính sách hoàn tiền trong vòng 30 ngày nếu bạn không hài lòng với dịch vụ.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Dữ liệu của tôi có an toàn không?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Tất cả dữ liệu được mã hóa và lưu trữ an toàn. Chúng tôi tuân thủ các tiêu chuẩn bảo mật cao nhất.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Sẵn sàng bắt đầu?</h2>
+                <p>Tham gia hàng nghìn người dùng đang quản lý tài chính thông minh hơn</p>
+                <div class="cta-buttons">
+                    <a href="/Auth/Register" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket"></i>
+                        Bắt đầu miễn phí
+                    </a>
+                    <a href="/Contact" class="btn btn-outline btn-lg">
+                        <i class="fas fa-phone"></i>
+                        Liên hệ tư vấn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Package Detail Modal -->
+    <div class="modal" id="packageModal">
+        <div class="modal-backdrop" onclick="closePackageModal()"></div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalTitle">Chi tiết gói dịch vụ</h3>
+                    <button class="modal-close" onclick="closePackageModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/service-packages.js"></script>
+</body>
+</html>

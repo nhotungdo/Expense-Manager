@@ -43,6 +43,7 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTracker
 // Register System Utility Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ICurrencyService, MoneyTrackerApp.Services.CurrencyService>();
+builder.Services.AddHttpClient(); // Add HttpClient for AI services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IAiAdvisorService, MoneyTrackerApp.Services.AiAdvisorService>();
 
 // Register Onboarding Service
@@ -56,6 +57,12 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IAdminDashboardService, Mone
 
 // Register Subscription Service
 builder.Services.AddScoped<MoneyTrackerApp.Services.ISubscriptionService, MoneyTrackerApp.Services.SubscriptionService>();
+
+// Register Service Package Service
+builder.Services.AddScoped<MoneyTrackerApp.Services.IServicePackageService, MoneyTrackerApp.Services.ServicePackageService>();
+
+// Register Payment Gateway Service (link.com integration)
+builder.Services.AddScoped<MoneyTrackerApp.Services.PaymentGatewayService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");

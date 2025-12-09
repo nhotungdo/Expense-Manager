@@ -4,67 +4,99 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MoneyTracker</title>
+    <title>@ViewData["Title"] - Money Tracker</title>
+    
     <!-- Preconnect to external resources for better performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Fonts - Plus Jakarta Sans for modern fintech look -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- External Libraries -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Tailwind CSS v3.4 -->
+    <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        income: '#10b981',
+                        expense: '#ef4444',
+                    }
+                }
+            }
+        }
+    </script>
     
-    <!-- Modern Design System -->
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ai-chat.css" asp-append-version="true" />
 </head>
 
 @using Microsoft.AspNetCore.Identity
 
-<body>
+<body class="bg-slate-50 font-sans antialiased">
     @if (User?.Identity?.IsAuthenticated == true)
     {
-        <div class="app-wrapper">
+        <!-- Authenticated Layout -->
+        <div class="min-h-screen">
             <!-- Sidebar -->
             <partial name="_Sidebar" />
 
-            <!-- Main Content (Topbar + Body) -->
-            <div class="main-content">
-                <partial name="_TopBar" />
-                
-                <div class="content-body" style="padding: 0;">
+            <!-- Top Navigation -->
+            <partial name="_TopBar" />
+
+            <!-- Main Content Area -->
+            <main class="ml-64 mt-16 min-h-screen bg-slate-50">
+                <div class="p-6">
                     @RenderBody()
                 </div>
-            </div>
+            </main>
         </div>
     }
     else
     {
         <!-- Public Layout (Landing Page, Auth, etc.) -->
-        <div class="public-wrapper">
+        <div class="min-h-screen">
              @RenderBody()
         </div>
     }
 
+    <!-- Quick Add Modal -->
     <partial name="_QuickAddModal" />
+
+    <!-- AI Chat Window (only for authenticated users) -->
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <partial name="_AiChatWindow" />
+    }
 
     <!-- Core Libraries -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Performance & Utilities -->
-    <script src="~/js/performance.js" asp-append-version="true"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    
-    <!-- Chart.js for Data Visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Bootstrap 5.3 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Application Scripts -->
+    <script src="~/js/performance.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/quick-add.js" asp-append-version="true"></script>
+    <script src="~/js/ai-chat.js" asp-append-version="true"></script>
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>
