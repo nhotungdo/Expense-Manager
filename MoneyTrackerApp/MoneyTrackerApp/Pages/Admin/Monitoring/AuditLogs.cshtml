@@ -3,7 +3,90 @@
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Nhật ký kiểm toán";
 }
-<h2>Nhật ký kiểm toán</h2>
-<div class="alert alert-info">
-    <i class="fas fa-info-circle"></i> Mô-đun này hiện đang được xây dựng.
+<div class="container-fluid">
+    <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="mb-1">Nhật ký kiểm toán</h2>
+            <p class="text-muted mb-0">Ai đã hoàn tiền, đổi giá, hủy gói.</p>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-outline-secondary"><i class="fas fa-file-export me-1"></i> Xuất CSV</button>
+            <button class="btn btn-primary"><i class="fas fa-sync me-1"></i> Làm mới</button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Người dùng</label>
+                    <input class="form-control form-control-sm" placeholder="Email / User ID" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Hành động</label>
+                    <select class="form-select form-select-sm">
+                        <option>Tất cả</option>
+                        <option>Refund</option>
+                        <option>Price Change</option>
+                        <option>Cancel Subscription</option>
+                        <option>Grant</option>
+                        <option>Login</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Khoảng thời gian</label>
+                    <input type="date" class="form-control form-control-sm" />
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-secondary w-100">Lọc</button>
+                    <button class="btn btn-sm btn-light w-100">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <h5 class="mb-0">Bản ghi gần nhất</h5>
+                <div class="ms-auto small text-muted">Dữ liệu mẫu — nối API audit.</div>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Người dùng</th>
+                            <th>Hành động</th>
+                            <th>Chi tiết</th>
+                            <th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025-01-02 09:20</td>
+                            <td>admin@sample.com</td>
+                            <td><span class="badge bg-light text-dark border">Refund</span></td>
+                            <td>Hoàn tiền TX-0001, thu hồi gói Pro</td>
+                            <td class="text-muted">192.168.1.10</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-02 10:05</td>
+                            <td>ops@sample.com</td>
+                            <td><span class="badge bg-light text-dark border">Price Change</span></td>
+                            <td>Chỉnh giá gói Business từ 499k → 449k</td>
+                            <td class="text-muted">192.168.1.11</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-02 11:00</td>
+                            <td>support@sample.com</td>
+                            <td><span class="badge bg-light text-dark border">Cancel</span></td>
+                            <td>Hủy gói user kol@brand.com theo yêu cầu</td>
+                            <td class="text-muted">192.168.1.12</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

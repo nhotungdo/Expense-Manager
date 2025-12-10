@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using MoneyTrackerApp.Configurations;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -61,8 +62,20 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.ISubscriptionService, MoneyT
 // Register Service Package Service
 builder.Services.AddScoped<MoneyTrackerApp.Services.IServicePackageService, MoneyTrackerApp.Services.ServicePackageService>();
 
-// Register Payment Gateway Service (link.com integration)
-builder.Services.AddScoped<MoneyTrackerApp.Services.PaymentGatewayService>();
+// Register Data Protection (required for VNPay encryption)
+builder.Services.AddDataProtection();
+
+// Register VNPay Error Handler
+builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayErrorHandler>();
+
+// Register VNPay Monitoring Service (Singleton for metrics tracking)
+builder.Services.AddSingleton<MoneyTrackerApp.Services.VnPayMonitoringService>();
+
+// Register VNPay QR Payment Service (Only payment method supported)
+builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayService>();
+
+// Admin options
+builder.Services.Configure<AdminOptions>(builder.Configuration.GetSection("Admin"));
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");

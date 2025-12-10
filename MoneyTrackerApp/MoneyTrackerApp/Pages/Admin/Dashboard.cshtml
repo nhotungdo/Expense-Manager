@@ -2,330 +2,368 @@
 @model MoneyTrackerApp.Pages.Admin.DashboardModel
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Trung tâm điều khiển";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<style>
-    .kpi-card {
-        background: #fff;
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        border-left: 5px solid transparent;
-        transition: transform 0.2s;
-        height: 100%;
-        padding: 20px;
-    }
-    .kpi-card:hover {
-        transform: translateY(-5px);
-    }
-    .kpi-card.users { border-left-color: #3498db; }
-    .kpi-card.revenue { border-left-color: #2ecc71; }
-    .kpi-card.traffic { border-left-color: #f39c12; }
-    .kpi-card.health { border-left-color: #e74c3c; }
-    .kpi-card.health.healthy { border-left-color: #95a5a6; } /* Gray if 0 errors */
+<div class="container-fluid admin-dashboard pb-5">
+    <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="mb-1">Admin Dashboard</h2>
+            <p class="text-muted mb-0">
+                Chỉ email quản trị <strong>@Model.AdminEmail</strong> mới được truy cập.
+            </p>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="/Dashboard">
+                Chuyển tới bảng điều khiển người dùng
+            </a>
+            <a class="btn btn-primary" href="/Admin/Users">
+                Đi tới quản lý người dùng
+            </a>
+        </div>
+    </div>
 
-    .kpi-label {
-        font-size: 0.9rem;
-        color: #7f8c8d;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-    .kpi-value {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-    .kpi-sub {
-        font-size: 0.8rem;
-        margin-top: 5px;
-    }
+    <!-- 1. Overview -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">Monthly Recurring Revenue (MRR)</div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0">@Model.DashboardData.TotalBalance.ToString("N0")</h3>
+                        <span class="text-primary"><i class="fas fa-coins"></i></span>
+                    </div>
+                    <p class="mb-0 text-muted small">Doanh thu định kỳ hàng tháng.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">Active Subscribers (Pro)</div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0">@Model.DashboardData.ActiveUsers.ToString("N0")</h3>
+                        <span class="text-success"><i class="fas fa-user-check"></i></span>
+                    </div>
+                    <p class="mb-0 text-muted small">Tổng người đang giữ gói Pro.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">New Signups (7 ngày)</div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0">@Model.DashboardData.NewUsersLast7Days.ToString("N0")</h3>
+                        <span class="text-info"><i class="fas fa-user-plus"></i></span>
+                    </div>
+                    <p class="mb-0 text-muted small">Đăng ký mới theo ngày/tuần.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">Churn Rate</div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0">-- %</h3>
+                        <span class="text-warning"><i class="fas fa-random"></i></span>
+                    </div>
+                    <p class="mb-0 text-muted small">Tỷ lệ hủy / tổng người dùng.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    .dashboard-panel {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        padding: 20px;
-        height: 100%;
-        margin-bottom: 20px;
-    }
-    .panel-title {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #34495e;
-        margin-bottom: 15px;
-        border-bottom: 1px solid #f1f1f1;
-        padding-bottom: 10px;
-    }
-
-    .status-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f9f9f9;
-        font-size: 0.95rem;
-    }
-    .status-indicator {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 8px;
-    }
-    .bg-connected { background-color: #2ecc71; }
-    .bg-idle { background-color: #f1c40f; }
-    .bg-error { background-color: #e74c3c; }
-
-    .table-custom {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-    .table-custom thead th {
-        background-color: #f8f9fa;
-        color: #7f8c8d;
-        font-weight: 600;
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 2px solid #ecf0f1;
-        font-size: 0.9rem;
-    }
-    .table-custom tbody td {
-        padding: 12px 15px;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        font-size: 0.85rem;
-        color: #34495e;
-    }
-    .table-custom tbody tr:hover {
-        background-color: #fcfcfc;
-    }
-</style>
-
-<!-- Row 1: KPI Cards -->
-<div class="row g-4 mb-4">
-    <!-- Card 1: Users -->
-    <div class="col-md-3">
-        <div class="kpi-card users">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="kpi-label">Người dùng</div>
-                    <div class="kpi-value">@Model.DashboardData.TotalUsers.ToString("N0")</div>
-                    <div class="kpi-sub text-success">
-                        <i class="fas fa-arrow-up"></i> +@Model.DashboardData.NewUsersToday hôm nay
+    <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h5 class="mb-1">Revenue growth</h5>
+                            <p class="text-muted small mb-0">Biểu đồ doanh thu theo thời gian.</p>
+                        </div>
+                        <button class="btn btn-light btn-sm" type="button">
+                            <i class="fas fa-download me-1"></i>Xuất dữ liệu
+                        </button>
+                    </div>
+                    <div class="bg-light border rounded p-4 text-center text-muted">
+                        Placeholder chart — nối API analytics để hiển thị.
                     </div>
                 </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-users fa-2x"></i>
-                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Card 2: Revenue/Assets -->
-    <div class="col-md-3">
-        <div class="kpi-card revenue">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="kpi-label">AUM / Tài sản</div>
-                    <div class="kpi-value">@Model.DashboardData.SystemAum.ToString("N0")</div>
-                    <div class="kpi-sub text-muted">Tổng quản lý</div>
-                </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-wallet fa-2x"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 3: Traffic -->
-    <div class="col-md-3">
-        <div class="kpi-card traffic">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="kpi-label">Lưu lượng</div>
-                    <div class="kpi-value">@Model.DashboardData.TodayTransactionsCount.ToString("N0")</div>
-                    <div class="kpi-sub text-warning">Yêu cầu hôm nay</div>
-                </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-exchange-alt fa-2x"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 4: Health -->
-    <div class="col-md-3">
-        <div class="kpi-card health @(Model.DashboardData.SystemHealthWarnings == 0 ? "healthy" : "")">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="kpi-label">Sức khỏe hệ thống</div>
-                    <div class="kpi-value">@Model.DashboardData.SystemHealthWarnings</div>
-                    <div class="kpi-sub @(Model.DashboardData.SystemHealthWarnings > 0 ? "text-danger" : "text-muted")">
-                        @(Model.DashboardData.SystemHealthWarnings > 0 ? "Phát hiện lỗi" : "Hệ thống ổn định")
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Chuyển đổi Free → Trial → Paid</h5>
+                    <div class="bg-light border rounded p-4 text-center text-muted mb-3">
+                        Placeholder funnel chart.
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Free → Trial</span>
+                        <span class="text-success">-- %</span>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Trial → Paid</span>
+                        <span class="text-success">-- %</span>
                     </div>
                 </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-heartbeat fa-2x"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. User & Subscription Management -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
+                <div>
+                    <h5 class="mb-1">User & Subscription Management</h5>
+                    <p class="text-muted small mb-0">Tìm kiếm nhanh, lọc trạng thái, thao tác gói.</p>
+                </div>
+                <a class="btn btn-outline-primary ms-auto" href="/Admin/Users">
+                    <i class="fas fa-users me-1"></i>Mở danh sách người dùng
+                </a>
+            </div>
+            <div class="row g-3">
+                <div class="col-lg-5">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input class="form-control" placeholder="Email / User ID / Số điện thoại" />
+                        <button class="btn btn-outline-secondary" type="button">Tìm kiếm</button>
+                    </div>
+                    <div class="mt-3 d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark border">Active</span>
+                        <span class="badge bg-light text-dark border">Trialing</span>
+                        <span class="badge bg-light text-dark border">Past Due</span>
+                        <span class="badge bg-light text-dark border">Cancelled</span>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="fw-semibold mb-1">Grant Subscription</div>
+                                <p class="text-muted small mb-2">Cấp gói Pro cho nhân sự/KOL.</p>
+                                <button class="btn btn-sm btn-primary w-100" type="button">Cấp ngay</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="fw-semibold mb-1">Immediate Cancellation</div>
+                                <p class="text-muted small mb-2">Hủy gói khi khách yêu cầu.</p>
+                                <button class="btn btn-sm btn-outline-danger w-100" type="button">Hủy ngay</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="fw-semibold mb-1">Manual Extension</div>
+                                <p class="text-muted small mb-2">Thêm ngày sử dụng bù lỗi.</p>
+                                <button class="btn btn-sm btn-outline-primary w-100" type="button">Gia hạn</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="small text-muted">
+                Chi tiết người dùng: lịch sử mua gói, ngày hết hạn/lần gia hạn tiếp, phương thức thanh toán liên kết.
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Transactions & Financials -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
+                <div>
+                    <h5 class="mb-1">Transactions & Financials</h5>
+                    <p class="text-muted small mb-0">Theo dõi thanh toán, hoàn tiền, xuất báo cáo.</p>
+                </div>
+                <a class="btn btn-outline-primary ms-auto" href="/Admin/ServicePackages">
+                    <i class="fas fa-file-invoice-dollar me-1"></i>Mở giao dịch
+                </a>
+            </div>
+            <div class="row g-3">
+                <div class="col-lg-8">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Giao dịch</th>
+                                    <th>Trạng thái</th>
+                                    <th>Cổng</th>
+                                    <th>Số tiền</th>
+                                    <th class="text-end">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted">—</td>
+                                    <td><span class="badge bg-light text-dark border">Chưa tải</span></td>
+                                    <td class="text-muted">Stripe/Paypal/Momo</td>
+                                    <td class="text-muted">—</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button">Chi tiết</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 d-flex flex-wrap gap-2 small text-muted">
+                        <span class="badge bg-light text-dark border">Successful</span>
+                        <span class="badge bg-light text-dark border">Failed</span>
+                        <span class="badge bg-light text-dark border">Stripe</span>
+                        <span class="badge bg-light text-dark border">Paypal</span>
+                        <span class="badge bg-light text-dark border">Momo</span>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="border rounded p-3 mb-3">
+                        <div class="fw-semibold mb-1">Refund Management</div>
+                        <p class="text-muted small mb-2">Hoàn tiền toàn phần/một phần, tự động thu hồi gói Pro.</p>
+                        <button class="btn btn-sm btn-outline-primary w-100 mb-2" type="button">
+                            <i class="fas fa-undo me-1"></i>Refund
+                        </button>
+                        <input class="form-control form-control-sm" placeholder="Lý do hoàn tiền" />
+                    </div>
+                    <div class="border rounded p-3">
+                        <div class="fw-semibold mb-1">Export Reports</div>
+                        <p class="text-muted small mb-2">Xuất Excel/CSV danh sách hóa đơn cho kế toán.</p>
+                        <button class="btn btn-sm btn-outline-secondary w-100" type="button">
+                            <i class="fas fa-file-export me-1"></i>Xuất báo cáo
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Row 2: Chart & Monitoring (7:3) -->
-<div class="row g-4 mb-4">
-    <!-- Chart Section (7) -->
-    <div class="col-lg-8">
-        <div class="dashboard-panel">
-            <div class="panel-title">
-                <i class="fas fa-chart-area me-2 text-primary"></i> Tổng quan lưu lượng
+    <!-- 4. Plans & Promotions -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
+                <div>
+                    <h5 class="mb-1">Service Plans & Promotions</h5>
+                    <p class="text-muted small mb-0">CRUD gói, giá linh hoạt, mã khuyến mãi.</p>
+                </div>
+                <div class="ms-auto d-flex gap-2">
+                    <a class="btn btn-outline-primary" href="/Admin/ServicePackages">
+                        <i class="fas fa-box-open me-1"></i>Quản lý gói
+                    </a>
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-plus me-1"></i>Tạo gói mới
+                    </button>
+                </div>
             </div>
-            <div id="trafficChart" style="min-height: 300px;"></div>
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <div class="border rounded p-3 h-100">
+                        <div class="fw-semibold mb-1">CRUD Service Packages</div>
+                        <ul class="text-muted small mb-0 ps-3">
+                            <li>Tạo gói mới (Business, Student,...).</li>
+                            <li>Chỉnh sửa giá, mô tả, tên gói.</li>
+                            <li>Ẩn/hiện gói (ví dụ gói khuyến mãi dịp Tết).</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="border rounded p-3 h-100">
+                        <div class="fw-semibold mb-1">Promotions / Coupons</div>
+                        <ul class="text-muted small mb-0 ps-3">
+                            <li>Tạo mã giảm giá (vd: GEMINI50 -50%).</li>
+                            <li>Giới hạn lượt dùng hoặc ngày hết hạn.</li>
+                            <li>Chọn gói áp dụng, hiển thị trạng thái còn hiệu lực.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Server Status Section (3) -->
-    <div class="col-lg-4">
-        <div class="dashboard-panel">
-            <div class="panel-title">
-                <i class="fas fa-server me-2 text-primary"></i> Trạng thái máy chủ
-            </div>
-            <div class="status-list">
-                <div class="status-item">
-                    <span>Database Engine</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đã kết nối</span>
-                </div>
-                <div class="status-item">
-                    <span>Email Service</span>
-                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2">Chờ</span>
-                </div>
-                <div class="status-item">
-                    <span>Banking API Gateway</span>
-                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2">Lỗi</span>
-                </div>
-                <div class="status-item">
-                    <span>Redis Cache</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đã kết nối</span>
-                </div>
-                <div class="status-item">
-                    <span>Background Jobs</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đang chạy</span>
-                </div>
-            </div>
-             <div class="mt-4 text-center">
-                 <button class="btn btn-outline-primary btn-sm w-100"><i class="fas fa-sync-alt me-1"></i> Làm mới trạng thái</button>
-             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Row 3: Data Grid -->
-<div class="row">
-    <div class="col-12">
-        <div class="dashboard-panel">
-            <div class="panel-title d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-shield-alt me-2 text-primary"></i> Nhật ký kiểm toán gần đây</span>
-                <button class="btn btn-sm btn-link text-decoration-none">Xem tất cả</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table-custom">
-                    <thead>
-                        <tr>
-                            <th>Thời gian</th>
-                            <th>Người dùng (Email)</th>
-                            <th>Hành động</th>
-                            <th>Địa chỉ IP</th>
-                            <th>Chi tiết</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.DashboardData.RecentAuditLogs != null && Model.DashboardData.RecentAuditLogs.Any())
-                        {
-                            foreach (var log in Model.DashboardData.RecentAuditLogs.Take(5))
+    <!-- 5. Logs & Webhooks -->
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h5 class="mb-1">Audit Logs</h5>
+                            <p class="text-muted small mb-0">Ghi nhận ai đã refund/hủy/đổi giá.</p>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Người dùng</th>
+                                    <th>Hành động</th>
+                                    <th>IP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @if (Model.DashboardData.RecentAuditLogs.Any())
+                            {
+                                foreach (var log in Model.DashboardData.RecentAuditLogs)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@log.Time.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@log.UserEmail</td>
+                                        <td><span class="badge bg-light text-dark border">@log.Action</span></td>
+                                        <td class="text-muted">@log.IpAddress</td>
+                                    </tr>
+                                }
+                            }
+                            else
                             {
                                 <tr>
-                                    <td>@log.Time.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                    <td>@log.UserEmail</td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border">@log.Action</span>
-                                    </td>
-                                    <td>@log.IpAddress</td>
-                                    <td class="text-muted small">Thực hiện qua Web Client</td>
+                                    <td colspan="4" class="text-center text-muted py-3">Chưa có nhật ký.</td>
                                 </tr>
                             }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center py-3 text-muted">Không tìm thấy nhật ký gần đây.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Webhook Logs & System Metrics</h5>
+                    <div class="border rounded p-3 mb-3">
+                        <div class="fw-semibold mb-2">Webhook Logs</div>
+                        <p class="text-muted small mb-2">Lịch sử thông báo từ cổng thanh toán (Stripe, Paypal, Momo...).</p>
+                        <button class="btn btn-sm btn-outline-secondary w-100 mb-2" type="button">
+                            <i class="fas fa-redo me-1"></i>Retry webhook lỗi
+                        </button>
+                        <div class="small text-muted">Hiển thị payload ngắn gọn, lần thử gần nhất.</div>
+                    </div>
+                    <div class="border rounded p-3">
+                        <div class="fw-semibold mb-2">Tình trạng dịch vụ</div>
+                        <ul class="list-group list-group-flush">
+                            @foreach (var metric in Model.DashboardData.SystemMetrics)
+                            {
+                                var badgeClass = metric.Tone switch
+                                {
+                                    "success" => "bg-success bg-opacity-10 text-success border border-success",
+                                    "warning" => "bg-warning bg-opacity-10 text-warning border border-warning",
+                                    "danger" => "bg-danger bg-opacity-10 text-danger border border-danger",
+                                    _ => "bg-light text-muted border"
+                                };
+                                <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
+                                    <div class="me-2">
+                                        <div class="fw-semibold">@metric.Name</div>
+                                        <div class="text-muted small">@metric.Detail</div>
+                                    </div>
+                                    <span class="badge @badgeClass">@metric.Status</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        // Use Mock data for "Hourly Traffic" if model doesn't provide it, or map TransactionVolumeChart
-        // Mapping TransactionVolumeChart (Day) to Chart
-        var trafficLabels = [];
-        var trafficData = [];
-        
-        @if(Model.DashboardData.TransactionVolumeChart != null)
-        {
-            foreach(var item in Model.DashboardData.TransactionVolumeChart)
-            {
-                @:trafficLabels.push("@item.Day");
-                @:trafficData.push(@item.Count);
-            }
-        }
-
-        // Fallback mock labels/data if empty
-        if (trafficLabels.length === 0) {
-            trafficLabels = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-            trafficData = [12, 45, 67, 89, 34, 56, 78, 90, 110, 65];
-        }
-
-        var options = {
-            series: [{
-                name: 'Lưu lượng',
-                data: trafficData
-            }],
-            chart: {
-                height: 350,
-                type: 'line',
-                zoom: { enabled: false },
-                toolbar: { show: false }
-            },
-            dataLabels: { enabled: false },
-            stroke: {
-                curve: 'smooth',
-                width: 3,
-                colors: ['#3498db']
-            },
-            title: {
-                text: 'Lưu lượng / Yêu cầu theo giờ',
-                align: 'left',
-                style: { color: '#7f8c8d' }
-            },
-            grid: {
-                row: {
-                    colors: ['#f3f3f3', 'transparent'],
-                    opacity: 0.5
-                },
-                borderColor: '#ecf0f1'
-            },
-            xaxis: {
-                categories: trafficLabels,
-            }
-        };
-
-        var chart = new ApexCharts(document.querySelector("#trafficChart"), options);
-        chart.render();
-    </script>
-}

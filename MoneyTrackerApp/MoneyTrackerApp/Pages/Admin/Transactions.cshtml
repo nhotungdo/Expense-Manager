@@ -1,0 +1,177 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.TransactionsModel
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Sổ giao dịch";
+}
+
+<div class="container-fluid">
+    <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="mb-1">Sổ giao dịch</h2>
+            <p class="text-muted mb-0">Theo dõi thanh toán, hoàn tiền, tình trạng cổng.</p>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-outline-secondary"><i class="fas fa-file-export me-1"></i> Xuất CSV</button>
+            <button class="btn btn-primary"><i class="fas fa-sync-alt me-1"></i> Làm mới</button>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Doanh thu định kỳ (MRR)</div>
+                    <h4 class="mb-0">--</h4>
+                    <div class="text-muted small">Kéo từ analytics/payments.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Thanh toán thành công</div>
+                    <h4 class="mb-0">--</h4>
+                    <div class="text-muted small">24h gần nhất.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Hoàn tiền</div>
+                    <h4 class="mb-0">--</h4>
+                    <div class="text-muted small">Số lượng/giá trị.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Cổng thanh toán</div>
+                    <h4 class="mb-0">Stripe / Paypal / Momo</h4>
+                    <div class="text-muted small">Sẵn sàng / cảnh báo.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-3">
+                    <label class="form-label small text-muted">Khoảng thời gian</label>
+                    <input type="date" class="form-control mb-2">
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label small text-muted">Trạng thái</label>
+                    <select class="form-select">
+                        <option>Tất cả</option>
+                        <option>Thành công</option>
+                        <option>Thất bại</option>
+                        <option>Hoàn tiền</option>
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label small text-muted">Cổng thanh toán</label>
+                    <select class="form-select">
+                        <option>Tất cả</option>
+                        <option>Stripe</option>
+                        <option>Paypal</option>
+                        <option>Momo</option>
+                        <option>VNPay</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 d-flex gap-2">
+                    <button class="btn btn-outline-secondary w-100"><i class="fas fa-filter me-1"></i>Lọc</button>
+                    <button class="btn btn-light w-100"><i class="fas fa-eraser me-1"></i>Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <h5 class="mb-0">Danh sách giao dịch</h5>
+                <div class="ms-auto small text-muted">Hiển thị dữ liệu mẫu — cần nối API.</div>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Người dùng</th>
+                            <th>Gói</th>
+                            <th>Cổng</th>
+                            <th>Trạng thái</th>
+                            <th>Số tiền</th>
+                            <th>Thời gian</th>
+                            <th class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#TX-0001</td>
+                            <td>user@example.com</td>
+                            <td>Pro Monthly</td>
+                            <td>Stripe</td>
+                            <td><span class="badge bg-success-subtle text-success border">Success</span></td>
+                            <td>299,000₫</td>
+                            <td>2025-01-01 12:30</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary">Chi tiết</button>
+                                    <button class="btn btn-outline-primary">Hoàn tiền</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#TX-0002</td>
+                            <td>kol@brand.com</td>
+                            <td>Pro Annual</td>
+                            <td>Paypal</td>
+                            <td><span class="badge bg-danger-subtle text-danger border">Failed</span></td>
+                            <td>2,990,000₫</td>
+                            <td>2025-01-01 13:15</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary">Chi tiết</button>
+                                    <button class="btn btn-outline-warning">Retry</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#TX-0003</td>
+                            <td>employee@company.com</td>
+                            <td>Grant Pro</td>
+                            <td>Manual</td>
+                            <td><span class="badge bg-info-subtle text-info border">Comp</span></td>
+                            <td>0₫</td>
+                            <td>2025-01-02 08:45</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary">Chi tiết</button>
+                                    <button class="btn btn-outline-danger">Hủy</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted small">Hiển thị 3 bản ghi mẫu.</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><span class="page-link">Trước</span></li>
+                        <li class="page-item active"><span class="page-link">1</span></li>
+                        <li class="page-item"><span class="page-link">2</span></li>
+                        <li class="page-item"><span class="page-link">Sau</span></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+

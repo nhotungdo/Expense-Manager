@@ -18,12 +18,14 @@ namespace MoneyTrackerApp.Controllers
         private readonly ExpenseManagerContext _db;
         private readonly IConfiguration _config;
         private readonly MoneyTrackerApp.Services.JwtTokenService _jwtService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService)
+        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, ILogger<AuthController> logger)
         {
             _db = db;
             _config = config;
             _jwtService = jwtService;
+            _logger = logger;
         }
 
         public class RegisterRequest
@@ -44,6 +46,7 @@ namespace MoneyTrackerApp.Controllers
             public string AccessToken { get; set; } = string.Empty;
             public string RefreshToken { get; set; } = string.Empty;
             public bool OnboardingCompleted { get; set; }
+            public string Role { get; set; } = string.Empty;
         }
 
         public class Verify2FARequest
@@ -64,77 +67,85 @@ namespace MoneyTrackerApp.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GoogleCallback()
         {
-            var authResult = await HttpContext.AuthenticateAsync("External");
-            if (!authResult.Succeeded || authResult.Principal == null) return Redirect("/Auth/Login?error=google_failed");
-
-            var claims = authResult.Principal.Claims.ToList();
-            var sub = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "sub")?.Value;
-            var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-            if (string.IsNullOrEmpty(sub)) return Redirect("/Auth/Login?error=google_no_sub");
-
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.GoogleId == sub || (email != null && u.Email == email));
-            if (user == null)
+            try
             {
-                user = new User
+                var authResult = await HttpContext.AuthenticateAsync("External");
+                if (!authResult.Succeeded || authResult.Principal == null) return Redirect("/Auth/Login?error=google_failed");
+
+                var claims = authResult.Principal.Claims.ToList();
+                var sub = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "sub")?.Value;
+                var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                if (string.IsNullOrEmpty(sub)) return Redirect("/Auth/Login?error=google_no_sub");
+
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.GoogleId == sub || (email != null && u.Email == email));
+                if (user == null)
                 {
-                    GoogleId = sub,
-                    Email = email,
-                    UserName = email,
-                    NormalizedEmail = email?.ToUpperInvariant(),
-                    NormalizedUserName = email?.ToUpperInvariant(),
-                    FullName = name,
-                    EmailConfirmed = true,
-                    Enabled = true,
-                    Role = "User",
-                    Language = "vi",
-                    DefaultCurrency = "VND",
-                    Timezone = "Asia/Ho_Chi_Minh",
-                    Theme = "light"
-                };
-                _db.Users.Add(user);
-                await _db.SaveChangesAsync();
-            }
-            else if (string.IsNullOrEmpty(user.GoogleId))
-            {
-                user.GoogleId = sub;
-                await _db.SaveChangesAsync();
-            }
-
-            // [Security] Assign Admin Rights if email matches
-            if (email != null && email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))
-            {
-                if (user.Role != "Admin")
-                {
-                    user.Role = "Admin";
+                    user = new User
+                    {
+                        GoogleId = sub,
+                        Email = email,
+                        UserName = email,
+                        NormalizedEmail = email?.ToUpperInvariant(),
+                        NormalizedUserName = email?.ToUpperInvariant(),
+                        FullName = name,
+                        EmailConfirmed = true,
+                        Enabled = true,
+                        Role = "User",
+                        Language = "vi",
+                        DefaultCurrency = "VND",
+                        Timezone = "Asia/Ho_Chi_Minh",
+                        Theme = "light"
+                    };
+                    _db.Users.Add(user);
                     await _db.SaveChangesAsync();
                 }
+                else if (string.IsNullOrEmpty(user.GoogleId))
+                {
+                    user.GoogleId = sub;
+                    await _db.SaveChangesAsync();
+                }
+
+                // [Security] Assign Admin Rights if email matches
+                if (email != null && email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (user.Role != "Admin")
+                    {
+                        user.Role = "Admin";
+                        await _db.SaveChangesAsync();
+                    }
+                }
+
+                // [Audit] Log Login
+                _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
+                {
+                    UserId = user.Id,
+                    Action = "Login",
+                    Details = "Google Login Success",
+                    CreatedAt = DateTime.UtcNow,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    UserAgent = Request.Headers["User-Agent"].ToString()
+                });
+                await _db.SaveChangesAsync();
+
+                var pair = await _jwtService.IssueAsync(user);
+
+                Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMinutes(60)
+                });
+
+                var url = $"/Auth/Login?accessToken={Uri.EscapeDataString(pair.access)}&refreshToken={Uri.EscapeDataString(pair.refresh)}&role={Uri.EscapeDataString(user.Role)}";
+                return Redirect(url);
             }
-
-            // [Audit] Log Login
-            _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
+            catch (Exception ex)
             {
-                UserId = user.Id,
-                Action = "Login",
-                Details = "Google Login Success",
-                CreatedAt = DateTime.UtcNow,
-                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                UserAgent = Request.Headers["User-Agent"].ToString()
-            });
-            await _db.SaveChangesAsync();
-
-            var pair = await _jwtService.IssueAsync(user);
-
-            Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(60)
-            });
-
-            var url = $"/Auth/Login?accessToken={Uri.EscapeDataString(pair.access)}&refreshToken={Uri.EscapeDataString(pair.refresh)}";
-            return Redirect(url);
+                _logger.LogError(ex, "Google authentication failed");
+                return Redirect("/Auth/Login?error=google_unavailable");
+            }
         }
 
         [HttpGet("me")]
@@ -226,7 +237,13 @@ namespace MoneyTrackerApp.Controllers
                 Expires = DateTime.UtcNow.AddMinutes(60)
             });
 
-            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh, OnboardingCompleted = user.OnboardingCompleted };
+            var tokens = new TokenResponse
+            {
+                AccessToken = pair.access,
+                RefreshToken = pair.refresh,
+                OnboardingCompleted = user.OnboardingCompleted,
+                Role = user.Role
+            };
             return Ok(tokens);
         }
 
@@ -356,7 +373,13 @@ namespace MoneyTrackerApp.Controllers
             });
             await _db.SaveChangesAsync();
 
-            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh, OnboardingCompleted = user.OnboardingCompleted };
+            var tokens = new TokenResponse
+            {
+                AccessToken = pair.access,
+                RefreshToken = pair.refresh,
+                OnboardingCompleted = user.OnboardingCompleted,
+                Role = user.Role
+            };
             return Ok(tokens);
         }
 
@@ -386,7 +409,13 @@ namespace MoneyTrackerApp.Controllers
             if (user == null) return Unauthorized();
 
             var pair = await _jwtService.IssueAsync(user);
-            var tokens = new TokenResponse { AccessToken = pair.access, RefreshToken = pair.refresh, OnboardingCompleted = user.OnboardingCompleted };
+            var tokens = new TokenResponse
+            {
+                AccessToken = pair.access,
+                RefreshToken = pair.refresh,
+                OnboardingCompleted = user.OnboardingCompleted,
+                Role = user.Role
+            };
             return Ok(tokens);
         }
 

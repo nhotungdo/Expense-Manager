@@ -5,40 +5,77 @@
     ViewData["Title"] = "Cài đặt hệ thống";
 }
 
-<h2>Cài đặt hệ thống</h2>
-
-<div class="card mb-4">
-    <div class="card-header">
-        Cấu hình chung
-    </div>
-    <div class="card-body">
-        <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="maintenanceMode">
-            <label class="form-check-label" for="maintenanceMode">Chế độ bảo trì</label>
-            <div class="form-text">Ngăn người dùng không phải quản trị viên truy cập hệ thống.</div>
+<div class="container-fluid">
+    <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="mb-1">Cài đặt hệ thống</h2>
+            <p class="text-muted mb-0">Bật/tắt maintenance, cấu hình bảo mật, thanh toán, thông báo.</p>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-outline-secondary"><i class="fas fa-file-export me-1"></i> Xuất cấu hình</button>
+            <button class="btn btn-primary"><i class="fas fa-sync-alt me-1"></i> Làm mới</button>
         </div>
     </div>
-</div>
 
-<div class="card">
-    <div class="card-header">
-        Tất cả cài đặt
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="maintenanceMode">
+                        <label class="form-check-label fw-semibold" for="maintenanceMode">Chế độ bảo trì</label>
+                    </div>
+                    <div class="text-muted small mt-2">Chặn người dùng thường truy cập.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="fw-semibold mb-1">Bảo mật</div>
+                    <div class="text-muted small">2FA bắt buộc với admin, khóa API key, giới hạn IP.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="fw-semibold mb-1">Thanh toán</div>
+                    <div class="text-muted small">Stripe/Paypal/Momo: webhooks, secret key, callback URL.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="fw-semibold mb-1">Thông báo</div>
+                    <div class="text-muted small">Email/SMS/Push; template và ngưỡng cảnh báo.</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Khóa</th>
-                        <th>Giá trị</th>
-                        <th>Mô tả</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody id="settingsTableBody">
-                    <!-- Loaded via JS -->
-                </tbody>
-            </table>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <h5 class="mb-0">Tất cả cài đặt</h5>
+                <div class="ms-auto small text-muted">Danh sách tải từ API /api/admin/settings.</div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Khóa</th>
+                            <th>Giá trị</th>
+                            <th>Mô tả</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="settingsTableBody">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

@@ -219,23 +219,17 @@ public class SubscriptionService : ISubscriptionService
 
     public async Task<PaymentResultDto> ProcessVnPayPaymentReturn(IQueryCollection collections)
     {
-        var vnpay = new VnPayLibrary();
-        foreach (var (key, value) in collections)
-        {
-            if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
-            {
-                vnpay.AddResponseData(key, value.ToString());
-            }
-        }
+        var vnp_Data = collections
+            .Where(kvp => kvp.Key.StartsWith("vnp_"))
+            .ToDictionary(k => k.Key, v => v.Value.ToString());
 
-        var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
-        var vnp_ResponseCode = collections.FirstOrDefault(p => p.Key == "vnp_ResponseCode").Value;
-        var vnp_OrderInfo = collections.FirstOrDefault(p => p.Key == "vnp_OrderInfo").Value;
-        long vnp_TxnRef = Convert.ToInt64(collections.FirstOrDefault(p => p.Key == "vnp_TxnRef").Value);
-        string vnp_TransactionNo = collections.FirstOrDefault(p => p.Key == "vnp_TransactionNo").Value;
-        string vnp_HashSecret = _configuration["Vnpay:HashSecret"];
+        var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value.ToString();
+        var vnp_ResponseCode = collections.FirstOrDefault(p => p.Key == "vnp_ResponseCode").Value.ToString();
+        var vnp_TxnRef = collections.FirstOrDefault(p => p.Key == "vnp_TxnRef").Value.ToString();
+        var vnp_TransactionNo = collections.FirstOrDefault(p => p.Key == "vnp_TransactionNo").Value.ToString();
+        var vnp_HashSecret = _configuration["Vnpay:HashSecret"] ?? string.Empty;
 
-        bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, vnp_HashSecret);
+        bool checkSignature = VnPayHelper.ValidateSignature(vnp_Data, vnp_SecureHash, vnp_HashSecret);
 
         if (!checkSignature)
         {
@@ -246,9 +240,18 @@ public class SubscriptionService : ISubscriptionService
             };
         }
 
+        if (!long.TryParse(vnp_TxnRef, out var txnRefLong))
+        {
+            return new PaymentResultDto
+            {
+                Success = false,
+                Message = "Invalid transaction reference"
+            };
+        }
+
         var payment = await _context.Payments
             .Include(p => p.Subscription)
-            .FirstOrDefaultAsync(p => p.Id == vnp_TxnRef);
+            .FirstOrDefaultAsync(p => p.Id == txnRefLong);
 
         if (payment == null)
         {
@@ -275,7 +278,7 @@ public class SubscriptionService : ISubscriptionService
             payment.Status = (int)PaymentStatus.Completed;
             payment.PaidAt = DateTime.UtcNow;
             payment.TransactionId = vnp_TransactionNo;
-            payment.PaymentData = JsonSerializer.Serialize(collections.ToDictionary(k => k.Key, v => v.Value.ToString()));
+            payment.PaymentData = JsonSerializer.Serialize(vnp_Data);
 
             // Activate subscription
             var subscription = payment.Subscription;
@@ -297,7 +300,7 @@ public class SubscriptionService : ISubscriptionService
             payment.Status = (int)PaymentStatus.Failed;
             payment.FailureReason = $"VNPay Error: {vnp_ResponseCode}";
             payment.TransactionId = vnp_TransactionNo;
-             payment.PaymentData = JsonSerializer.Serialize(collections.ToDictionary(k => k.Key, v => v.Value.ToString()));
+            payment.PaymentData = JsonSerializer.Serialize(vnp_Data);
 
             // Cancel subscription
             var subscription = payment.Subscription;
@@ -393,35 +396,22 @@ public class SubscriptionService : ISubscriptionService
 
     private string GenerateVNPayUrl(long paymentId, decimal amount, string? returnUrl)
     {
-        string vnp_Returnurl = returnUrl ?? _configuration["Vnpay:PaymentBackReturnUrl"];
-        string vnp_Url = _configuration["Vnpay:BaseUrl"];
-        string vnp_TmnCode = _configuration["Vnpay:TmnCode"];
-        string vnp_HashSecret = _configuration["Vnpay:HashSecret"];
-        
-        if (string.IsNullOrEmpty(vnp_Returnurl) || string.IsNullOrEmpty(vnp_Url) || string.IsNullOrEmpty(vnp_TmnCode) || string.IsNullOrEmpty(vnp_HashSecret))
-        {
-             // Fallback to defaults if config is missing (for safety)
-             vnp_Returnurl = vnp_Returnurl ?? "http://localhost:5000/Subscription/PaymentCallback";
-             vnp_Url = vnp_Url ?? "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        }
+        var vnp_Returnurl = returnUrl ?? _configuration["Vnpay:PaymentBackReturnUrl"];
+        var vnp_Url = _configuration["Vnpay:BaseUrl"];
+        var vnp_TmnCode = _configuration["Vnpay:TmnCode"];
+        var vnp_HashSecret = _configuration["Vnpay:HashSecret"];
+        var ip = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "127.0.0.1";
 
-        VnPayLibrary vnpay = new VnPayLibrary();
-
-        vnpay.AddRequestData("vnp_Version", "2.1.0");
-        vnpay.AddRequestData("vnp_Command", "pay");
-        vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-        vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString()); 
-        vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-        vnpay.AddRequestData("vnp_CurrCode", "VND");
-        vnpay.AddRequestData("vnp_IpAddr", _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "127.0.0.1");
-        vnpay.AddRequestData("vnp_Locale", "vn");
-        vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + paymentId);
-        vnpay.AddRequestData("vnp_OrderType", "other");
-        vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-        vnpay.AddRequestData("vnp_TxnRef", paymentId.ToString()); 
-
-        string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
-        return paymentUrl;
+        // Build via helper; amount already in VND, helper multiplies *100
+        return VnPayHelper.BuildPaymentUrl(
+            vnp_Url ?? "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+            vnp_TmnCode ?? string.Empty,
+            vnp_HashSecret ?? string.Empty,
+            vnp_Returnurl ?? "http://localhost:5000/Subscription/PaymentCallback",
+            $"Thanh toan don hang:{paymentId}",
+            ip,
+            paymentId.ToString(),
+            (long)(amount * 100));
     }
 
     private string GenerateQRCode(long paymentId, decimal amount)

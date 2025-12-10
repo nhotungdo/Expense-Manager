@@ -540,16 +540,34 @@
       alert(`Giao diện đã chuyển sang: ${newTheme === 'light' ? 'Sáng' : 'Tối'}`);
     }
 
+    function redirectAfterAuth(role, onboardingCompleted) {
+      const normalizedRole = (role || '').toLowerCase();
+      if (normalizedRole === 'admin') {
+        window.location.href = '/Admin/Dashboard';
+        return;
+      }
+
+      if (onboardingCompleted === false) {
+        window.location.href = '/Onboarding/Welcome';
+      } else {
+        window.location.href = '/home';
+      }
+    }
+
     // Check for tokens in URL (from Google callback)
     const params = new URLSearchParams(location.search);
     const accessToken = params.get('accessToken');
     const refreshToken = params.get('refreshToken');
+    const roleFromUrl = params.get('role');
 
     if (accessToken && refreshToken) {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
-      // Redirect to home
-      window.location.href = '/home';
+      if (roleFromUrl) {
+        localStorage.setItem('role', roleFromUrl);
+      }
+      // Redirect based on role (onboarding not known for Google flow)
+      redirectAfterAuth(roleFromUrl, /*onboardingCompleted*/ undefined);
     }
 
     // Handle form submission
@@ -598,12 +616,9 @@
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
 
-        // Redirect based on onboarding status
-        if (data.onboardingCompleted === false) {
-            window.location.href = '/Onboarding/Welcome';
-        } else {
-            window.location.href = '/home';
-        }
+        localStorage.setItem('role', data.role || '');
+        // Redirect based on role/onboarding status
+        redirectAfterAuth(data.role, data.onboardingCompleted);
       } catch (error) {
         console.error('Login error:', error);
         showError('Lỗi hệ thống. Vui lòng thử lại.');
@@ -649,12 +664,9 @@
             const data = await response.json();
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
-            
-            if (data.onboardingCompleted === false) {
-                window.location.href = '/Onboarding/Welcome';
-            } else {
-                window.location.href = '/home';
-            }
+            localStorage.setItem('role', data.role || '');
+
+            redirectAfterAuth(data.role, data.onboardingCompleted);
         } catch (err) {
             errorDiv.textContent = 'Lỗi kết nối';
             errorDiv.style.display = 'flex';

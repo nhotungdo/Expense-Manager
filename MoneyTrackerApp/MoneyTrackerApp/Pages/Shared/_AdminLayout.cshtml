@@ -209,6 +209,9 @@
                 <a href="/Admin/Settings" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
                     <i class="fas fa-cog"></i> Cấu hình hệ thống
                 </a>
+                <a href="/Admin/Monitoring/Logs" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring/Logs") == true ? "active" : "")">
+                    <i class="fas fa-clipboard-list"></i> Logs hệ thống
+                </a>
                 <a href="/Admin/Monitoring/AuditLogs" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring") == true ? "active" : "")">
                     <i class="fas fa-shield-alt"></i> Nhật ký & Audit
                 </a>

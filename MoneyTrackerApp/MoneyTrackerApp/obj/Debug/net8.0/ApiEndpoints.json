@@ -2059,6 +2059,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "MoneyTrackerApp.Controllers.PaymentController",
+    "Method": "CreateQrPayment",
+    "RelativePath": "api/payments/vnpay/qr",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "MoneyTrackerApp.Controllers.CreateQrPaymentRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "MoneyTrackerApp.Controllers.ProfileController",
     "Method": "GetProfile",
     "RelativePath": "api/Profile",

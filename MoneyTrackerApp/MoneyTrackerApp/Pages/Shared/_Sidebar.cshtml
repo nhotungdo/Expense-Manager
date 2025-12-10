@@ -66,6 +66,15 @@
             <i class="fas fa-cog w-5 text-base"></i>
             <span>Cài đặt</span>
         </a>
+        <!-- Chuyển đến dashboard admin chỉ có email của admin mới hiển thị-->
+        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+        {
+            <a href="/Admin/Dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                <i class="fas fa-chart-line w-5 text-base"></i>
+                <span>Dashboard Admin</span>
+            </a>
+        }
+        
         <form asp-page="/Auth/Logout" method="post" class="w-full">
             <button type="submit" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm text-slate-600 w-full text-left hover:bg-red-50 hover:text-red-600">
                 <i class="fas fa-sign-out-alt w-5 text-base"></i>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MoneyTrackerApp.Pages.Admin.Settings
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
         public void OnGet()

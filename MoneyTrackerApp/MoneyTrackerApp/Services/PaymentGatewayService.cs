@@ -19,10 +19,17 @@ namespace MoneyTrackerApp.Services
             IConfiguration configuration,
             ILogger<PaymentGatewayService> logger)
         {
-            _configuration = configuration;
-            _logger = logger;
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
-            _gatewayUrl = configuration["PaymentGateway:Url"] ?? "https://link.com";
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            
+            _connectionString = configuration.GetConnectionString("DBDefault");
+            if (string.IsNullOrEmpty(_connectionString))
+            {
+                _logger.LogError("Connection string 'DBDefault' not found in configuration");
+                throw new InvalidOperationException("Connection string 'DBDefault' not found. Please check appsettings.json");
+            }
+            
+            _gatewayUrl = configuration["PaymentGateway:Url"] ?? "https://payment-gateway.example.com";
             _merchantId = configuration["PaymentGateway:MerchantId"] ?? "MERCHANT_ID";
             _secretKey = configuration["PaymentGateway:SecretKey"] ?? "SECRET_KEY";
         }
@@ -146,7 +153,7 @@ namespace MoneyTrackerApp.Services
             }
         }
 
-        // Process return callback from link.com
+        // Process return callback from payment gateway
         public async Task<PaymentCallbackResult> ProcessReturnCallbackAsync(
             string sessionToken,
             string gatewayTransactionId,
@@ -308,7 +315,7 @@ namespace MoneyTrackerApp.Services
                     INSERT INTO Payments 
                     (SubscriptionId, Amount, Currency, Status, PaymentMethod, TransactionId, PaidAt, CreatedAt)
                     VALUES 
-                    (@SubscriptionId, @Amount, @Currency, 2, 'link.com', @TransactionId, GETUTCDATE(), GETUTCDATE());";
+                    (@SubscriptionId, @Amount, @Currency, 2, 'payment_gateway', @TransactionId, GETUTCDATE(), GETUTCDATE());";
 
                 await connection.ExecuteAsync(
                     paymentSql,
@@ -357,7 +364,7 @@ namespace MoneyTrackerApp.Services
             }
         }
 
-        // Process webhook from link.com
+        // Process webhook from payment gateway
         public async Task<bool> ProcessWebhookAsync(WebhookPayload payload, string signature)
         {
             try

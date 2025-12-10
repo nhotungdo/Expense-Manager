@@ -6,6 +6,7 @@ namespace MoneyTrackerApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     public class ServicePackageController : ControllerBase
     {
         private readonly IServicePackageService _packageService;

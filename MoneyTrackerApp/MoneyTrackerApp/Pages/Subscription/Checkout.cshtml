@@ -1,390 +1,52 @@
 @page
 @model MoneyTrackerApp.Pages.Subscription.CheckoutModel
 @{
-    ViewData["Title"] = "Thanh toán";
+    ViewData["Title"] = "Thanh toán VNPay";
+    Layout = "_Layout";
 }
 
-<div class="checkout-container">
-    <div class="checkout-header">
-        <a href="/ServicePackages" class="back-link">
-            <i class="fas fa-arrow-left"></i>
-            Quay lại
-        </a>
-        <h1>Xác nhận đơn hàng</h1>
-    </div>
-
-    <div class="checkout-content">
-        <!-- Order Summary -->
-        <div class="order-summary">
-            <h2>Thông tin gói dịch vụ</h2>
-            <div class="package-info" id="packageInfo">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Đang tải thông tin...</p>
+<section class="container mt-4">
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <h2>Thông tin gói</h2>
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-muted mb-1" id="packageName">Đang tải...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span id="packageDescription" class="text-secondary">Vui lòng đợi</span>
+                        <strong id="packagePrice">0 ₫</strong>
+                    </div>
                 </div>
             </div>
-
-            <div class="order-details" id="orderDetails" style="display: none;">
-                <div class="detail-row">
-                    <span>Giá gói</span>
-                    <span id="packagePrice">0 ₫</span>
-                </div>
-                <div class="detail-row">
-                    <span>Thuế VAT (10%)</span>
-                    <span id="taxAmount">0 ₫</span>
-                </div>
-                <div class="detail-row discount-row" id="discountRow" style="display: none;">
-                    <span>Giảm giá</span>
-                    <span id="discountAmount">0 ₫</span>
-                </div>
-                <div class="detail-row total-row">
-                    <span>Tổng cộng</span>
-                    <span id="totalAmount">0 ₫</span>
-                </div>
-            </div>
-
-            <!-- Discount Code -->
-            <div class="discount-section" id="discountSection" style="display: none;">
-                <h3>Mã giảm giá</h3>
-                <div class="discount-input-group">
-                    <input type="text" id="discountCode" placeholder="Nhập mã giảm giá" />
-                    <button type="button" class="btn-apply" onclick="applyDiscount()">
-                        Áp dụng
+        </div>
+        <div class="col-lg-6 mb-3">
+            <h2>Thanh toán VNPay QR</h2>
+            <form id="checkoutForm" class="card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Email nhận hóa đơn</label>
+                        <input type="email" class="form-control" id="billingEmail" placeholder="you@example.com" required />
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required />
+                        <label class="form-check-label" for="agreeTerms">
+                            Tôi đồng ý với điều khoản & chính sách
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" id="payButton">
+                        <span>Thanh toán bằng VNPay QR</span>
                     </button>
                 </div>
-                <div id="discountMessage" class="discount-message"></div>
-            </div>
-        </div>
-
-        <!-- Payment Methods -->
-        <div class="payment-methods">
-            <h2>Phương thức thanh toán</h2>
-            <div class="payment-options">
-                <label class="payment-option">
-                    <input type="radio" name="paymentMethod" value="vnpay" checked />
-                    <div class="option-content">
-                        <img src="/images/vnpay-logo.png" alt="VNPay" onerror="this.style.display='none'" />
-                        <span>VNPay</span>
-                    </div>
-                </label>
-                <label class="payment-option">
-                    <input type="radio" name="paymentMethod" value="momo" />
-                    <div class="option-content">
-                        <img src="/images/momo-logo.png" alt="Momo" onerror="this.style.display='none'" />
-                        <span>Momo</span>
-                    </div>
-                </label>
-                <label class="payment-option">
-                    <input type="radio" name="paymentMethod" value="bank" />
-                    <div class="option-content">
-                        <i class="fas fa-university"></i>
-                        <span>Chuyển khoản ngân hàng</span>
-                    </div>
-                </label>
-            </div>
-
-            <!-- Terms and Conditions -->
-            <div class="terms-section">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="agreeTerms" />
-                    <span>
-                        Tôi đồng ý với 
-                        <a href="/Terms" target="_blank">điều khoản dịch vụ</a> 
-                        và 
-                        <a href="/Privacy" target="_blank">chính sách bảo mật</a>
-                    </span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="agreeAutoRenew" />
-                    <span>
-                        Tôi đồng ý với việc tự động gia hạn gói dịch vụ khi hết hạn
-                    </span>
-                </label>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='/ServicePackages'">
-                    Hủy
-                </button>
-                <button type="button" class="btn btn-primary" id="btnProceedPayment" onclick="proceedToPayment()">
-                    <i class="fas fa-lock"></i>
-                    Thanh toán
-                </button>
-            </div>
+            </form>
         </div>
     </div>
-</div>
+</section>
 
-<style>
-.checkout-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px;
-}
+<script>
+    window.checkoutContext = {
+        packageId: @Model.PackageId,
+        userId: @Model.UserId
+    };
+</script>
+<script src="~/js/vnpay-checkout.js"></script>
 
-.checkout-header {
-    margin-bottom: 32px;
-}
-
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--primary);
-    text-decoration: none;
-    margin-bottom: 16px;
-    font-weight: 500;
-}
-
-.back-link:hover {
-    text-decoration: underline;
-}
-
-.checkout-header h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.checkout-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-}
-
-.order-summary, .payment-methods {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.order-summary h2, .payment-methods h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: var(--text-primary);
-}
-
-.package-info {
-    margin-bottom: 24px;
-}
-
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-secondary);
-}
-
-.loading i {
-    font-size: 32px;
-    margin-bottom: 12px;
-}
-
-.order-details {
-    border-top: 1px solid var(--border-color);
-    padding-top: 16px;
-}
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    font-size: 16px;
-}
-
-.detail-row.discount-row {
-    color: var(--success);
-}
-
-.detail-row.total-row {
-    border-top: 2px solid var(--border-color);
-    margin-top: 8px;
-    padding-top: 16px;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.discount-section {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border-color);
-}
-
-.discount-section h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-
-.discount-input-group {
-    display: flex;
-    gap: 8px;
-}
-
-.discount-input-group input {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.btn-apply {
-    padding: 12px 24px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.btn-apply:hover {
-    background: var(--primary-dark);
-}
-
-.discount-message {
-    margin-top: 8px;
-    font-size: 14px;
-}
-
-.discount-message.success {
-    color: var(--success);
-}
-
-.discount-message.error {
-    color: var(--danger);
-}
-
-.payment-options {
-    display: grid;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-.payment-option {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.payment-option:hover {
-    border-color: var(--primary);
-    background: var(--primary-light);
-}
-
-.payment-option input[type="radio"] {
-    margin-right: 12px;
-}
-
-.payment-option input[type="radio"]:checked + .option-content {
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.option-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.option-content img {
-    height: 24px;
-}
-
-.option-content i {
-    font-size: 24px;
-}
-
-.terms-section {
-    margin-bottom: 24px;
-    padding: 16px;
-    background: var(--background);
-    border-radius: 8px;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: start;
-    gap: 8px;
-    margin-bottom: 12px;
-    cursor: pointer;
-}
-
-.checkbox-label:last-child {
-    margin-bottom: 0;
-}
-
-.checkbox-label input[type="checkbox"] {
-    margin-top: 4px;
-}
-
-.checkbox-label a {
-    color: var(--primary);
-    text-decoration: none;
-}
-
-.checkbox-label a:hover {
-    text-decoration: underline;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 12px;
-}
-
-.btn {
-    flex: 1;
-    padding: 14px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s;
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: var(--primary-dark);
-}
-
-.btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.btn-secondary {
-    background: var(--background);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-    background: var(--border-color);
-}
-
-@@media (max-width: 768px) {
-    .checkout-content {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-
-<script src="/js/checkout.js"></script>

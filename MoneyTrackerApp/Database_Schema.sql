@@ -1276,7 +1276,7 @@ END
 GO
 
 -- =============================================
--- 29. PAYMENT TRANSACTIONS TABLE (For link.com gateway)
+-- 29. PAYMENT TRANSACTIONS TABLE (For payment gateway)
 -- =============================================
 -- Create PaymentTransactions table to store payment gateway data
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PaymentTransactions]') AND type in (N'U'))
@@ -1289,7 +1289,7 @@ BEGIN
         [Amount] DECIMAL(18, 2) NOT NULL,
         [Currency] NVARCHAR(3) NOT NULL DEFAULT 'VND',
         [SessionToken] NVARCHAR(512) NULL,
-        [PaymentGatewayUrl] NVARCHAR(512) NOT NULL DEFAULT 'https://link.com',
+        [PaymentGatewayUrl] NVARCHAR(512) NULL,
         [GatewayTransactionId] NVARCHAR(256) NULL,
         [GatewayResponse] NVARCHAR(MAX) NULL,
         [Status] INT NOT NULL DEFAULT 0, -- 0=Pending, 1=Processing, 2=Success, 3=Failed, 4=Cancelled
