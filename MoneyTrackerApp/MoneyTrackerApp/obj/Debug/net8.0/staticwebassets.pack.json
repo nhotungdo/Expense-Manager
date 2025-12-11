@@ -9,14 +9,6 @@
       "PackagePath": "staticwebassets\\css\\admin-dark.css"
     },
     {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\ai-advisor.css",
-      "PackagePath": "staticwebassets\\css\\ai-advisor.css"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\ai-chat.css",
-      "PackagePath": "staticwebassets\\css\\ai-chat.css"
-    },
-    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\animations.css",
       "PackagePath": "staticwebassets\\css\\animations.css"
     },
@@ -35,6 +27,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\checkout.css",
       "PackagePath": "staticwebassets\\css\\checkout.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\christmas.css",
+      "PackagePath": "staticwebassets\\css\\christmas.css"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\dashboard.css",
@@ -89,16 +85,20 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\images\\santa-hat.png",
+      "PackagePath": "staticwebassets\\images\\santa-hat.png"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\images\\snowflake.png",
+      "PackagePath": "staticwebassets\\images\\snowflake.png"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\admin-ai.js",
+      "PackagePath": "staticwebassets\\js\\admin-ai.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\admin-service-packages.js",
       "PackagePath": "staticwebassets\\js\\admin-service-packages.js"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\ai-advisor.js",
-      "PackagePath": "staticwebassets\\js\\ai-advisor.js"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\ai-chat.js",
-      "PackagePath": "staticwebassets\\js\\ai-chat.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\api-mock.js",
@@ -109,12 +109,20 @@
       "PackagePath": "staticwebassets\\js\\auth.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\budgets.js",
+      "PackagePath": "staticwebassets\\js\\budgets.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\charts-config.js",
       "PackagePath": "staticwebassets\\js\\charts-config.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\checkout.test.js",
       "PackagePath": "staticwebassets\\js\\checkout.test.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\christmas.js",
+      "PackagePath": "staticwebassets\\js\\christmas.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\dashboard.js",
@@ -175,6 +183,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\transactions-utils.js",
       "PackagePath": "staticwebassets\\js\\transactions-utils.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\user-ai.js",
+      "PackagePath": "staticwebassets\\js\\user-ai.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\vnpay-checkout.js",
@@ -407,6 +419,14 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\1_7fae67f3-0c15-470d-bdff-b3605193bb49.png",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\1_7fae67f3-0c15-470d-bdff-b3605193bb49.png"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\2_ba6b8f33-748a-449e-93fa-952aa3cb09e2.jpg",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\2_ba6b8f33-748a-449e-93fa-952aa3cb09e2.jpg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.MoneyTrackerApp.Microsoft.AspNetCore.StaticWebAssets.props",

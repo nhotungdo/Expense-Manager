@@ -77,7 +77,6 @@ public partial class User
 
     public virtual ICollection<Account> Accounts { get; set; } = new List<Account>();
 
-    public virtual ICollection<AiSuggestion> AiSuggestions { get; set; } = new List<AiSuggestion>();
 
     public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; } = new List<AspNetUserClaim>();
 

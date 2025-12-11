@@ -71,16 +71,16 @@ public class ExportService : IExportService
 
         var html = new StringBuilder();
         html.Append("<html><head><style>table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid black; padding: 8px; text-align: left; } th { background-color: #f2f2f2; }</style></head><body>");
-        html.Append("<h1>Transaction Report</h1>");
-        html.Append($"<p>Period: {startDate?.ToString("dd/MM/yyyy") ?? "All"} - {endDate?.ToString("dd/MM/yyyy") ?? "All"}</p>");
+        html.Append("<h1>Báo cáo giao dịch</h1>");
+        html.Append($"<p>Giai đoạn: {startDate?.ToString("dd/MM/yyyy") ?? "Tất cả"} - {endDate?.ToString("dd/MM/yyyy") ?? "Tất cả"}</p>");
         html.Append("<table>");
-        html.Append("<tr><th>Date</th><th>Type</th><th>Category</th><th>Account</th><th>Amount</th><th>Currency</th></tr>");
+        html.Append("<tr><th>Ngày</th><th>Loại</th><th>Danh mục</th><th>Tài khoản</th><th>Số tiền</th><th>Tiền tệ</th></tr>");
 
         foreach (var transaction in transactions)
         {
             html.Append("<tr>");
             html.Append($"<td>{transaction.TransactionDate:dd/MM/yyyy}</td>");
-            html.Append($"<td>{(transaction.TransactionType == 1 ? "Income" : "Expense")}</td>");
+            html.Append($"<td>{(transaction.TransactionType == 1 ? "Thu nhập" : "Chi tiêu")}</td>");
             html.Append($"<td>{transaction.Category?.Name ?? "N/A"}</td>");
             html.Append($"<td>{transaction.Account?.Name ?? "N/A"}</td>");
             html.Append($"<td>{transaction.Amount:N2}</td>");
@@ -89,7 +89,7 @@ public class ExportService : IExportService
         }
 
         html.Append("</table>");
-        html.Append($"<h3>Total Amount: {transactions.Sum(t => t.Amount):N2}</h3>");
+        html.Append($"<h3>Tổng tiền: {transactions.Sum(t => t.Amount):N2}</h3>");
         html.Append("</body></html>");
 
         return Encoding.UTF8.GetBytes(html.ToString());
@@ -121,13 +121,13 @@ public class ExportService : IExportService
         var csv = new StringBuilder();
         
         // Headers
-        csv.AppendLine("Date,Type,Category,Account,Amount,Currency,Note");
+        csv.AppendLine("Ngày,Loại,Danh mục,Tài khoản,Số tiền,Tiền tệ,Ghi chú");
 
         // Data
         foreach (var transaction in transactions)
         {
             csv.AppendLine($"{transaction.TransactionDate:dd/MM/yyyy}," +
-                          $"{(transaction.TransactionType == 1 ? "Income" : "Expense")}," +
+                          $"{(transaction.TransactionType == 1 ? "Thu nhập" : "Chi tiêu")}," +
                           $"\"{transaction.Category?.Name ?? "N/A"}\"," +
                           $"\"{transaction.Account?.Name ?? "N/A"}\"," +
                           $"{transaction.Amount}," +
@@ -155,22 +155,22 @@ public class ExportService : IExportService
         var expense = transactions.Where(t => t.TransactionType == 0).Sum(t => t.Amount);
 
         var csv = new StringBuilder();
-        csv.AppendLine($"Cash Flow Report - {month}/{year}");
-        csv.AppendLine("Type,Amount");
-        csv.AppendLine($"Total Income,{income}");
-        csv.AppendLine($"Total Expense,{expense}");
-        csv.AppendLine($"Net Cash Flow,{income - expense}");
+        csv.AppendLine($"Báo cáo dòng tiền - {month}/{year}");
+        csv.AppendLine("Loại,Số tiền");
+        csv.AppendLine($"Tổng thu nhập,{income}");
+        csv.AppendLine($"Tổng chi tiêu,{expense}");
+        csv.AppendLine($"Dòng tiền ròng,{income - expense}");
         csv.AppendLine();
-        csv.AppendLine("Category Breakdown");
-        csv.AppendLine("Category,Amount,Type");
+        csv.AppendLine("Chi tiết danh mục");
+        csv.AppendLine("Danh mục,Số tiền,Loại");
 
         var categoryGroups = transactions
             .GroupBy(t => new { t.Category?.Name, t.TransactionType })
             .Select(g => new
             {
-                Category = g.Key.Name ?? "Uncategorized",
+                Category = g.Key.Name ?? "Chưa phân loại",
                 Amount = g.Sum(t => t.Amount),
-                Type = g.Key.TransactionType == 1 ? "Income" : "Expense"
+                Type = g.Key.TransactionType == 1 ? "Thu nhập" : "Chi tiêu"
             })
             .OrderByDescending(g => g.Amount);
 
@@ -187,14 +187,14 @@ public class ExportService : IExportService
         var data = await GetCashFlowDataAsync(userId, startDate, endDate);
 
         var csv = new StringBuilder();
-        csv.AppendLine($"Cash Flow Report - {startDate:dd/MM/yyyy} to {endDate:dd/MM/yyyy}");
-        csv.AppendLine("Type,Amount");
-        csv.AppendLine($"Total Income,{data.Income}");
-        csv.AppendLine($"Total Expense,{data.Expense}");
-        csv.AppendLine($"Net Cash Flow,{data.NetCashFlow}");
+        csv.AppendLine($"Báo cáo dòng tiền - {startDate:dd/MM/yyyy} đến {endDate:dd/MM/yyyy}");
+        csv.AppendLine("Loại,Số tiền");
+        csv.AppendLine($"Tổng thu nhập,{data.Income}");
+        csv.AppendLine($"Tổng chi tiêu,{data.Expense}");
+        csv.AppendLine($"Dòng tiền ròng,{data.NetCashFlow}");
         csv.AppendLine();
-        csv.AppendLine("Category Breakdown");
-        csv.AppendLine("Category,Amount,Type");
+        csv.AppendLine("Chi tiết danh mục");
+        csv.AppendLine("Danh mục,Số tiền,Loại");
 
         foreach (var group in data.CategoryGroups)
         {
@@ -218,19 +218,19 @@ public class ExportService : IExportService
         html.Append(".income { color: green; } .expense { color: red; }");
         html.Append("</style></head><body>");
         
-        html.Append($"<h1>Cash Flow Report</h1>");
-        html.Append($"<p>Period: {startDate:dd/MM/yyyy} - {endDate:dd/MM/yyyy}</p>");
+        html.Append($"<h1>Báo cáo dòng tiền</h1>");
+        html.Append($"<p>Giai đoạn: {startDate:dd/MM/yyyy} - {endDate:dd/MM/yyyy}</p>");
         
         html.Append("<div class='summary'>");
-        html.Append($"<h3>Summary</h3>");
-        html.Append($"<p>Total Income: <span class='income'>{data.Income:N2}</span></p>");
-        html.Append($"<p>Total Expense: <span class='expense'>{data.Expense:N2}</span></p>");
-        html.Append($"<p>Net Cash Flow: <strong>{data.NetCashFlow:N2}</strong></p>");
+        html.Append($"<h3>Tổng quan</h3>");
+        html.Append($"<p>Tổng thu nhập: <span class='income'>{data.Income:N2}</span></p>");
+        html.Append($"<p>Tổng chi tiêu: <span class='expense'>{data.Expense:N2}</span></p>");
+        html.Append($"<p>Dòng tiền ròng: <strong>{data.NetCashFlow:N2}</strong></p>");
         html.Append("</div>");
 
-        html.Append("<h3>Category Breakdown</h3>");
+        html.Append("<h3>Chi tiết danh mục</h3>");
         html.Append("<table>");
-        html.Append("<tr><th>Category</th><th>Type</th><th>Amount</th></tr>");
+        html.Append("<tr><th>Danh mục</th><th>Loại</th><th>Số tiền</th></tr>");
         
         foreach (var group in data.CategoryGroups)
         {
@@ -259,7 +259,7 @@ public class ExportService : IExportService
         var data = await GetCategoryDataAsync(userId, startDate, endDate);
 
         var csv = new StringBuilder();
-        csv.AppendLine("Category,Type,Transaction Count,Total Amount,Average Amount");
+        csv.AppendLine("Danh mục,Loại,Số giao dịch,Tổng tiền,Trung bình");
 
         foreach (var stat in data)
         {
@@ -281,11 +281,11 @@ public class ExportService : IExportService
         html.Append("th { background-color: #f2f2f2; }");
         html.Append("</style></head><body>");
         
-        html.Append($"<h1>Category Breakdown Report</h1>");
-        html.Append($"<p>Period: {startDate?.ToString("dd/MM/yyyy") ?? "All"} - {endDate?.ToString("dd/MM/yyyy") ?? "All"}</p>");
+        html.Append($"<h1>Báo cáo chi tiết danh mục</h1>");
+        html.Append($"<p>Giai đoạn: {startDate?.ToString("dd/MM/yyyy") ?? "Tất cả"} - {endDate?.ToString("dd/MM/yyyy") ?? "Tất cả"}</p>");
         
         html.Append("<table>");
-        html.Append("<tr><th>Category</th><th>Type</th><th>Count</th><th>Total Amount</th><th>Avg Amount</th></tr>");
+        html.Append("<tr><th>Danh mục</th><th>Loại</th><th>Số lượng</th><th>Tổng tiền</th><th>Trung bình</th></tr>");
         
         foreach (var stat in data)
         {
@@ -313,8 +313,8 @@ public class ExportService : IExportService
         var data = await GetMonthlyTrendsDataAsync(userId, year);
 
         var csv = new StringBuilder();
-        csv.AppendLine($"Monthly Trends Report - {year}");
-        csv.AppendLine("Month,Income,Expense,Net Savings");
+        csv.AppendLine($"Báo cáo xu hướng tháng - {year}");
+        csv.AppendLine("Tháng,Thu nhập,Chi tiêu,Tiết kiệm ròng");
 
         foreach (var month in data)
         {
@@ -336,10 +336,10 @@ public class ExportService : IExportService
         html.Append("th { background-color: #f2f2f2; }");
         html.Append("</style></head><body>");
         
-        html.Append($"<h1>Monthly Trends Report - {year}</h1>");
+        html.Append($"<h1>Báo cáo xu hướng tháng - {year}</h1>");
         
         html.Append("<table>");
-        html.Append("<tr><th>Month</th><th>Income</th><th>Expense</th><th>Net Savings</th></tr>");
+        html.Append("<tr><th>Tháng</th><th>Thu nhập</th><th>Chi tiêu</th><th>Tiết kiệm ròng</th></tr>");
         
         foreach (var month in data)
         {
@@ -376,9 +376,9 @@ public class ExportService : IExportService
             .GroupBy(t => new { t.Category?.Name, t.TransactionType })
             .Select(g => new CategoryGroupData
             {
-                Category = g.Key.Name ?? "Uncategorized",
+                Category = g.Key.Name ?? "Chưa phân loại",
                 Amount = g.Sum(t => t.Amount),
-                Type = g.Key.TransactionType == 1 ? "Income" : "Expense"
+                Type = g.Key.TransactionType == 1 ? "Thu nhập" : "Chi tiêu"
             })
             .OrderByDescending(g => g.Amount)
             .ToList();
@@ -410,8 +410,8 @@ public class ExportService : IExportService
             .GroupBy(t => new { t.Category?.Name, t.TransactionType })
             .Select(g => new CategoryStatData
             {
-                Category = g.Key.Name ?? "Uncategorized",
-                Type = g.Key.TransactionType == 1 ? "Income" : "Expense",
+                Category = g.Key.Name ?? "Chưa phân loại",
+                Type = g.Key.TransactionType == 1 ? "Thu nhập" : "Chi tiêu",
                 Count = g.Count(),
                 Total = g.Sum(t => t.Amount),
                 Average = g.Average(t => t.Amount)

@@ -295,7 +295,7 @@ public class ScheduledTransactionService : IScheduledTransactionService
             CategoryIcon = scheduled.Category?.Icon,
             CategoryColor = scheduled.Category?.Color,
             TransactionType = scheduled.TransactionType,
-            TransactionTypeDisplay = scheduled.TransactionType == 1 ? "Income" : "Expense",
+            TransactionTypeDisplay = scheduled.TransactionType == 1 ? "Thu nhập" : "Chi tiêu",
             Amount = scheduled.Amount,
             Frequency = scheduled.Frequency,
             Interval = scheduled.Interval,

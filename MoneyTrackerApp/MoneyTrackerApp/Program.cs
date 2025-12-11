@@ -45,7 +45,6 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTracker
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ICurrencyService, MoneyTrackerApp.Services.CurrencyService>();
 builder.Services.AddHttpClient(); // Add HttpClient for AI services
-builder.Services.AddScoped<MoneyTrackerApp.Services.IAiAdvisorService, MoneyTrackerApp.Services.AiAdvisorService>();
 
 // Register Onboarding Service
 // Register Onboarding Service
@@ -61,6 +60,10 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.ISubscriptionService, MoneyT
 
 // Register Service Package Service
 builder.Services.AddScoped<MoneyTrackerApp.Services.IServicePackageService, MoneyTrackerApp.Services.ServicePackageService>();
+
+// Register AI Services
+builder.Services.AddScoped<MoneyTrackerApp.Services.IUserAiService, MoneyTrackerApp.Services.UserAiService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IAdminAiService, MoneyTrackerApp.Services.AdminAiService>();
 
 // Register Data Protection (required for VNPay encryption)
 builder.Services.AddDataProtection();

@@ -12,3 +12,4 @@ namespace MoneyTrackerApp.Pages.Admin.Monitoring
     }
 }
 
+

@@ -1,215 +1,262 @@
 @page
 @model MoneyTrackerApp.Pages.Budgets.IndexModel
 @{
-    ViewData["Title"] = "Ngân sách";
+    ViewData["Title"] = "Quản lý Ngân sách";
+    var culture = new System.Globalization.CultureInfo("vi-VN");
 }
 
-<div class="budgets-page modern-page">
+@Html.AntiForgeryToken()
+
+<div class="container-fluid py-4" id="budgetData" 
+     data-spent="@Model.TotalSpent" 
+     data-limit="@Model.TotalBudget" 
+     data-api="@Model.ApiSpent"
+     data-pro="@Model.ProSpent"
+     data-storage="@Model.StorageSpent"
+     data-other="@Model.OtherSpent">
+    
     <!-- Page Header -->
-    <div class="page-header-modern">
-        <div class="header-content">
-            <div>
-                <h1 class="page-title">
-                    <i class="fas fa-chart-pie"></i>
-                    Ngân sách
-                </h1>
-                <p class="page-subtitle">Quản lý và theo dõi ngân sách của bạn</p>
-            </div>
-            <div class="header-actions">
-                <select class="form-select" id="periodFilter" onchange="changePeriod()">
-                    <option value="week">Tuần này</option>
-                    <option value="month" selected>Tháng này</option>
-                    <option value="quarter">Quý này</option>
-                    <option value="year">Năm này</option>
-                </select>
-                <button class="btn btn-primary" onclick="openAddBudget()">
-                    <i class="fas fa-plus"></i>
-                    Tạo ngân sách
-                </button>
-            </div>
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="h3 fw-bold text-gray-800 mb-1">
+                <i class="fas fa-wallet text-primary me-2"></i>Quản lý & Kiểm soát Ngân sách
+            </h1>
+            <p class="text-muted mb-0">Kiểm soát chi tiêu chi tiết và cấu hình giới hạn để tránh vượt ngân sách.</p>
         </div>
     </div>
 
-    <!-- Budget Overview Dashboard -->
-    <div class="budget-dashboard">
-        <div class="budget-hero-card">
-            <div class="budget-progress-ring">
-                <svg viewBox="0 0 200 200">
-                    <circle cx="100" cy="100" r="90" fill="none" stroke="#e2e8f0" stroke-width="20"/>
-                    <circle cx="100" cy="100" r="90" fill="none" stroke="#10b981" stroke-width="20" 
-                            id="progressCircle" stroke-dasharray="565" stroke-dashoffset="283" 
-                            transform="rotate(-90 100 100)" class="progress-circle"/>
-                </svg>
-                <div class="progress-center">
-                    <span class="progress-percent" id="budgetPercent">0%</span>
-                    <span class="progress-label">Đã sử dụng</span>
-                </div>
-            </div>
-            
-            <div class="budget-summary">
-                <div class="summary-item">
-                    <p class="summary-label">Tổng ngân sách</p>
-                    <h3 class="summary-value" id="totalBudget">0 ₫</h3>
-                </div>
-                <div class="summary-divider"></div>
-                <div class="summary-item">
-                    <p class="summary-label">Đã chi tiêu</p>
-                    <h3 class="summary-value spent" id="totalSpent">0 ₫</h3>
-                </div>
-                <div class="summary-divider"></div>
-                <div class="summary-item">
-                    <p class="summary-label">Còn lại</p>
-                    <h3 class="summary-value remaining" id="totalRemaining">0 ₫</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="budget-alerts-card">
-            <div class="alerts-header">
-                <h3 class="alerts-title">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Cảnh báo ngân sách
-                </h3>
-            </div>
-            <div class="alerts-list" id="budgetAlerts">
-                <div class="alert-item success">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Tất cả ngân sách đang trong tầm kiểm soát</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Spending Report -->
-    <div class="spending-report-section">
-        <div class="report-card">
-            <div class="report-header">
-                <h3 class="report-title">Báo cáo chi tiêu</h3>
-                <div class="report-tabs">
-                    <button class="report-tab active" data-tab="weekly" onclick="switchReportTab('weekly')">Tuần</button>
-                    <button class="report-tab" data-tab="monthly" onclick="switchReportTab('monthly')">Tháng</button>
-                </div>
-            </div>
-            <div class="report-chart-container">
-                <canvas id="spendingChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Budget Categories -->
-    <div class="budget-categories-section">
-        <div class="section-header-inline">
-            <h3 class="section-title">
-                <i class="fas fa-layer-group"></i>
-                Ngân sách theo danh mục
-            </h3>
-            <div class="category-filters">
-                <button class="filter-chip active" data-status="all" onclick="filterByStatus('all')">
-                    Tất cả
-                </button>
-                <button class="filter-chip" data-status="safe" onclick="filterByStatus('safe')">
-                    <i class="fas fa-check"></i> An toàn
-                </button>
-                <button class="filter-chip" data-status="warning" onclick="filterByStatus('warning')">
-                    <i class="fas fa-exclamation"></i> Cảnh báo
-                </button>
-                <button class="filter-chip" data-status="exceeded" onclick="filterByStatus('exceeded')">
-                    <i class="fas fa-times"></i> Vượt mức
-                </button>
-            </div>
-        </div>
-
-        <div class="budgets-grid" id="budgetsList">
-            <div class="loading-state">
-                <div class="spinner"></div>
-                <p>Đang tải ngân sách...</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add/Edit Budget Modal -->
-<div class="modal fade" id="budgetModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Tạo ngân sách</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="budgetForm">
-                    <div class="form-group">
-                        <label>Loại ngân sách *</label>
-                        <select class="form-select" id="budgetType" onchange="toggleBudgetFields()">
-                            <option value="Category">Theo danh mục</option>
-                            <option value="Account">Theo tài khoản</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="categoryGroup">
-                        <label>Danh mục *</label>
-                        <select class="form-select" id="categoryId">
-                            <option value="">Chọn danh mục</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="accountGroup" style="display: none;">
-                        <label>Tài khoản *</label>
-                        <select class="form-select" id="accountId">
-                            <option value="">Chọn tài khoản</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Số tiền giới hạn *</label>
-                        <div class="input-with-icon">
-                            <span class="currency-symbol">₫</span>
-                            <input type="number" class="form-control amount-input" id="limitAmount" required>
+    <!-- 1. Health Monitor Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-secondary text-uppercase fs-7 mb-3">Sức khỏe Ngân sách</h5>
+                    
+                    <div class="d-flex justify-content-between align-items-baseline mb-2">
+                        <div>
+                            <span class="display-6 fw-bold text-dark" id="txtSpentAmount">@Model.TotalSpent.ToString("C0", culture)</span>
+                            <span class="text-muted ms-2">/ <span id="txtLimitAmount">@((Model.TotalBudget > 0 ? Model.TotalBudget : 0).ToString("C0", culture))</span></span>
+                        </div>
+                        <div class="fw-bold" id="lblPercentageStatus">
+                            <!-- Populated by JS -->
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Chu kỳ *</label>
-                        <select class="form-select" id="period">
-                            <option value="Weekly">Hàng tuần</option>
-                            <option value="Monthly" selected>Hàng tháng</option>
-                            <option value="Yearly">Hàng năm</option>
-                        </select>
+                    <div class="progress position-relative" style="height: 32px; background-color: #e9ecef; border-radius: 8px;">
+                        <!-- Main Usage Bar -->
+                        <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: 0%;" 
+                             id="mainProgressBar">
+                        </div>
+                        <!-- Forecast Marker (Ghost bar) -->
+                        <div class="position-absolute h-100 border-end border-2 border-danger border-dashed" 
+                             style="width: @((Model.TotalBudget > 0 ? Math.Min((Model.ProjectedSpent/Model.TotalBudget)*100, 100) : 0).ToString("0"))%; top: 0; left: 0; pointer-events: none;"
+                             title="Dự báo cuối tháng">
+                             <span class="position-absolute top-0 start-100 translate-middle-x badge bg-danger rounded-pill mt-n2 small-badge">
+                                 Dự báo
+                             </span>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Ngày bắt đầu *</label>
-                        <input type="date" class="form-control" id="startDate" required>
+                    
+                    <div class="mt-2 text-muted small d-flex align-items-center">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <span>Dự kiến cuối tháng sẽ dùng hết <strong>@Model.ProjectedSpent.ToString("C0", culture)</strong></span>
                     </div>
-
-                    <div class="form-group">
-                        <label>Ngày kết thúc</label>
-                        <input type="date" class="form-control" id="endDate">
-                    </div>
-
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="alertEnabled" checked>
-                        <label class="form-check-label" for="alertEnabled">
-                            Bật cảnh báo khi vượt ngân sách
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ngưỡng cảnh báo (%)</label>
-                        <input type="number" class="form-control" id="alertThreshold" value="80" min="0" max="100">
-                        <small class="text-muted">Cảnh báo khi chi tiêu đạt % này</small>
-                    </div>
-                </form>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" onclick="saveBudget()">Lưu</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- LEFT COLUMN: Configuration -->
+        <div class="col-lg-5 mb-4">
+            <div class="d-flex flex-column gap-4">
+                
+                <!-- 2. Budget Configuration -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="fas fa-sliders-h me-2"></i>Cài đặt Hạn mức</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="budgetInput" class="form-label fw-bold small text-uppercase text-muted">Ngân sách hàng tháng</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-end-0">₫</span>
+                                <input type="number" class="form-control border-start-0" id="budgetInput" value="@Model.TotalBudget.ToString("0")">
+                            </div>
+                            <div class="mt-2 d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="setQuickBudget(1000000)">1 Triệu</button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="setQuickBudget(2000000)">2 Triệu</button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="setQuickBudget(5000000)">5 Triệu</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase text-muted mb-2">Loại giới hạn</label>
+                            <div class="border rounded p-3">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="thresholdAction" id="softCap" checked>
+                                    <label class="form-check-label" for="softCap">
+                                        <span class="d-block fw-bold text-dark">Giới hạn Mềm (Soft Cap)</span>
+                                        <small class="text-muted">Chỉ gửi cảnh báo, dịch vụ vẫn hoạt động bình thường.</small>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="thresholdAction" id="hardCap">
+                                    <label class="form-check-label" for="hardCap">
+                                        <span class="d-block fw-bold text-dark">Giới hạn Cứng (Hard Cap)</span>
+                                        <small class="text-muted">Tự động ngắt dịch vụ/API khi chạm ngưỡng.</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary w-100 fw-bold py-2" id="btnUpdateBudget" onclick="updateBudget()">
+                            <i class="fas fa-save me-2"></i>Cập nhật Ngân sách
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Alert Rules -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-warning"><i class="fas fa-bell me-2"></i>Cấu hình Cảnh báo</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Mốc kích hoạt</label>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="alert50" checked>
+                                    <label class="form-check-label" for="alert50">Gửi cảnh báo khi đạt <strong>50%</strong></label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="alert80" checked>
+                                    <label class="form-check-label" for="alert80">Gửi cảnh báo khi đạt <strong>80%</strong></label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="alert100" checked>
+                                    <label class="form-check-label" for="alert100">Gửi cảnh báo khi đạt <strong>100%</strong></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label fw-bold small text-uppercase text-muted">Kênh thông báo</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="form-check p-2 border rounded">
+                                        <input class="form-check-input ms-1" type="checkbox" id="channelEmail" checked>
+                                        <label class="form-check-label ms-2" for="channelEmail">Email</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check p-2 border rounded">
+                                        <input class="form-check-input ms-1" type="checkbox" id="channelApp" checked>
+                                        <label class="form-check-label ms-2" for="channelApp">In-App</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check p-2 border rounded bg-light">
+                                        <input class="form-check-input ms-1" type="checkbox" id="channelSMS" disabled>
+                                        <label class="form-check-label ms-2 text-muted" for="channelSMS">SMS (Pro)</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check p-2 border rounded">
+                                        <input class="form-check-input ms-1" type="checkbox" id="channelWebhook">
+                                        <label class="form-check-label ms-2" for="channelWebhook">Webhook</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Analytics -->
+        <div class="col-lg-7">
+            <div class="d-flex flex-column gap-4">
+                
+                <!-- 4. Cost Breakdown -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 fw-bold text-info"><i class="fas fa-chart-pie me-2"></i>Phân bổ chi tiêu</h6>
+                        <span class="badge bg-light text-dark border">Tháng này</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-5 text-center">
+                                <div style="height: 200px; position: relative;">
+                                    <canvas id="costBreakdownChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-7 border-start-md ps-md-4">
+                                <h6 class="fw-bold text-muted small text-uppercase mb-3">Top tiêu hao</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge rounded-circle p-1 me-2" style="background-color: #3b82f6;"> </span>
+                                            <span>OpenAI API</span>
+                                        </div>
+                                        <span class="fw-bold text-dark">1.200.000đ</span>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge rounded-circle p-1 me-2" style="background-color: #10b981;"> </span>
+                                            <span>Hosting Gói Pro</span>
+                                        </div>
+                                        <span class="fw-bold text-dark">300.000đ</span>
+                                    </li>
+                                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge rounded-circle p-1 me-2" style="background-color: #f59e0b;"> </span>
+                                            <span>AWS Storage</span>
+                                        </div>
+                                        <span class="fw-bold text-dark">50.000đ</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. AI Advisor -->
+                <div class="card shadow-sm border-0 bg-gradient-primary-soft">
+                    <div class="card-header bg-transparent border-0 py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="fas fa-robot me-2"></i>AI Advisor</h6>
+                    </div>
+                    <div class="card-body position-relative pt-0">
+                        <div class="d-flex align-items-start">
+                           <div class="flex-shrink-0">
+                               <div class="bg-white rounded-circle p-2 shadow-sm text-center" style="width: 48px; height: 48px;">
+                                   <i class="fas fa-lightbulb text-warning fs-4"></i>
+                               </div>
+                           </div>
+                           <div class="flex-grow-1 ms-3">
+                               <h6 class="fw-bold text-dark">Phát hiện chi tiêu bất thường</h6>
+                               <p class="text-secondary small mb-2 text-justify">
+                                   Hệ thống phát hiện chi phí <strong>OpenAI API</strong> tăng 20% so với trung bình tháng trước, chủ yếu vào các ngày thứ Ba.
+                               </p>
+                               <div class="alert alert-info border-0 bg-opacity-10 d-flex align-items-center py-2 px-3 mb-0 rounded-3">
+                                   <i class="fas fa-magic text-info me-2"></i>
+                                   <small class="fw-semibold text-info">Gợi ý: Nâng cấp lên gói Annual Plan có thể tiết kiệm 15% chi phí.</small>
+                               </div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <link rel="stylesheet" href="~/css/budgets.css">
-    <script src="~/js/budgets.js"></script>
+    <script src="~/lib/chartjs/chart.min.js"></script> <!-- Ensure ChartJS is loaded via layout or here -->
+    <link rel="stylesheet" href="~/css/budgets.css" asp-append-version="true" />
+    <script src="~/js/budgets.js" asp-append-version="true"></script>
 }

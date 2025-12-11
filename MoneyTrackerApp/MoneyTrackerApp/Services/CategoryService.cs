@@ -277,21 +277,21 @@ public class CategoryService : ICategoryService
         var defaultCategories = new List<Category>
         {
             // Income Categories
-            new Category { Name = "Salary", Type = 1, Icon = "💰", Color = "#4CAF50", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Freelance", Type = 1, Icon = "💼", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Investment", Type = 1, Icon = "📈", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Gift", Type = 1, Icon = "🎁", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Other Income", Type = 1, Icon = "💵", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Lương", Type = 1, Icon = "💰", Color = "#4CAF50", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Bán thời gian", Type = 1, Icon = "💼", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Đầu tư", Type = 1, Icon = "📈", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Quà tặng", Type = 1, Icon = "🎁", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Thu nhập khác", Type = 1, Icon = "💵", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
 
             // Expense Categories
-            new Category { Name = "Food & Dining", Type = 2, Icon = "🍔", Color = "#FF5722", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Transportation", Type = 2, Icon = "🚗", Color = "#3F51B5", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Shopping", Type = 2, Icon = "🛍️", Color = "#E91E63", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Entertainment", Type = 2, Icon = "🎬", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Bills & Utilities", Type = 2, Icon = "📄", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Healthcare", Type = 2, Icon = "🏥", Color = "#F44336", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Education", Type = 2, Icon = "📚", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Other Expense", Type = 2, Icon = "💸", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow }
+            new Category { Name = "Ăn uống", Type = 2, Icon = "🍔", Color = "#FF5722", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Di chuyển", Type = 2, Icon = "🚗", Color = "#3F51B5", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Mua sắm", Type = 2, Icon = "🛍️", Color = "#E91E63", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Giải trí", Type = 2, Icon = "🎬", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Hóa đơn & Tiện ích", Type = 2, Icon = "📄", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Sức khỏe", Type = 2, Icon = "🏥", Color = "#F44336", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Giáo dục", Type = 2, Icon = "📚", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            new Category { Name = "Chi tiêu khác", Type = 2, Icon = "💸", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow }
         };
 
         _context.Categories.AddRange(defaultCategories);
@@ -312,7 +312,7 @@ public class CategoryService : ICategoryService
             ParentCategoryName = category.ParentCategory?.Name,
             Name = category.Name,
             Type = category.Type,
-            TypeDisplay = category.Type == 1 ? "Income" : "Expense",
+            TypeDisplay = category.Type == 1 ? "Thu nhập" : "Chi tiêu",
             Description = category.Description,
             Icon = category.Icon,
             Color = category.Color,

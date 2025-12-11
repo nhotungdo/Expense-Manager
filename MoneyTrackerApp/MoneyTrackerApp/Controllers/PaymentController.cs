@@ -77,3 +77,4 @@ public class CreateQrPaymentRequest
     public int PackageId { get; set; }
 }
 
+

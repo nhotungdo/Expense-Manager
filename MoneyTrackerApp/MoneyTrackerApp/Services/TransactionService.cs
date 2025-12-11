@@ -314,10 +314,10 @@ public class TransactionService : ITransactionService
     {
         return transactionType switch
         {
-            1 => "Income",
-            2 => "Expense",
-            3 => "Transfer",
-            _ => "Unknown"
+            1 => "Thu nhập",
+            2 => "Chi tiêu",
+            3 => "Chuyển tiền",
+            _ => "Không xác định"
         };
     }
 }

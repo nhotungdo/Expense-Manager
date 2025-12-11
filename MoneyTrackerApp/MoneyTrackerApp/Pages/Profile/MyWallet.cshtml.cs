@@ -12,20 +12,24 @@ namespace MoneyTrackerApp.Pages.Profile
     {
         private readonly IAccountService _accountService;
         private readonly ITransactionService _transactionService;
+        private readonly ISubscriptionService _subscriptionService;
         private readonly ILogger<MyWalletModel> _logger;
 
         public MyWalletModel(
             IAccountService accountService, 
             ITransactionService transactionService,
+            ISubscriptionService subscriptionService,
             ILogger<MyWalletModel> logger)
         {
             _accountService = accountService;
             _transactionService = transactionService;
+            _subscriptionService = subscriptionService;
             _logger = logger;
         }
 
         public List<AccountResponseDto> Wallets { get; set; } = new();
         public List<TransactionResponseDto> RecentTransactions { get; set; } = new();
+        public SubscriptionDto? CurrentSubscription { get; set; }
         public decimal TotalBalance { get; set; }
         public string DefaultCurrency { get; set; } = "VND";
         public long SelectedWalletId { get; set; }
@@ -36,6 +40,7 @@ namespace MoneyTrackerApp.Pages.Profile
             if (userId > 0)
             {
                 Wallets = await _accountService.GetUserAccountsAsync(userId);
+                CurrentSubscription = await _subscriptionService.GetActiveSubscriptionAsync(userId);
                 
                 if (Wallets.Any())
                 {
@@ -45,10 +50,9 @@ namespace MoneyTrackerApp.Pages.Profile
                     // Select first wallet by default
                     SelectedWalletId = Wallets.First().Id;
                     
-                    // Fetch transactions for the first wallet
+                    // Fetch transactions
                     RecentTransactions = await _transactionService.GetUserTransactionsAsync(userId, new TransactionFilterDto
                     {
-                        AccountId = SelectedWalletId,
                         PageSize = 20,
                         PageNumber = 1
                     });
@@ -56,17 +60,26 @@ namespace MoneyTrackerApp.Pages.Profile
             }
         }
 
-        public async Task<IActionResult> OnGetWalletTransactionsAsync(long walletId)
+        public async Task<IActionResult> OnGetWalletTransactionsAsync(long? walletId, string? filterType, string? dateRange)
         {
             var userId = GetUserId();
             if (userId <= 0) return Unauthorized();
 
-            var transactions = await _transactionService.GetUserTransactionsAsync(userId, new TransactionFilterDto
+            var filter = new TransactionFilterDto
             {
-                AccountId = walletId,
+                AccountId = walletId ?? 0, // 0 means all if filtered by "All"
                 PageSize = 20,
                 PageNumber = 1
-            });
+                // Todo: Implement date range and type fitlering in service if needed
+            };
+            
+            // Basic filtering mapping for demo
+            if (!string.IsNullOrEmpty(filterType) && filterType != "All")
+            {
+                // Map filterType to TransactionType if possible, currently simple fetch
+            }
+
+            var transactions = await _transactionService.GetUserTransactionsAsync(userId, filter);
 
             return Partial("_WalletTransactions", transactions);
         }
