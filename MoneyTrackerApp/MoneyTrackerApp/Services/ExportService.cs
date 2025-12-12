@@ -152,7 +152,7 @@ public class ExportService : IExportService
             .ToListAsync();
 
         var income = transactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
-        var expense = transactions.Where(t => t.TransactionType == 0).Sum(t => t.Amount);
+        var expense = transactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
 
         var csv = new StringBuilder();
         csv.AppendLine($"Báo cáo dòng tiền - {month}/{year}");
@@ -370,7 +370,7 @@ public class ExportService : IExportService
             .ToListAsync();
 
         var income = transactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
-        var expense = transactions.Where(t => t.TransactionType == 0).Sum(t => t.Amount);
+        var expense = transactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
 
         var categoryGroups = transactions
             .GroupBy(t => new { t.Category?.Name, t.TransactionType })
@@ -435,7 +435,7 @@ public class ExportService : IExportService
             {
                 Month = g.Key,
                 Income = g.Where(t => t.TransactionType == 1).Sum(t => t.Amount),
-                Expense = g.Where(t => t.TransactionType == 0).Sum(t => t.Amount)
+                Expense = g.Where(t => t.TransactionType == 2).Sum(t => t.Amount)
             })
             .OrderBy(m => m.Month)
             .ToList();

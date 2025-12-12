@@ -115,6 +115,11 @@ public class TransactionService : ITransactionService
 
             if (pairedAccount == null)
                 throw new InvalidOperationException("Paired account not found or you don't have permission");
+                
+            // Update paired account balance for transfer
+            pairedAccount.CurrentBalance += dto.Amount;
+            pairedAccount.UpdatedAt = DateTime.UtcNow;
+            _context.Accounts.Update(pairedAccount);
         }
 
         var transaction = new Transaction
@@ -135,6 +140,23 @@ public class TransactionService : ITransactionService
         };
 
         _context.Transactions.Add(transaction);
+
+        // Update account balance
+        if (transaction.TransactionType == 1) // Income
+        {
+            account.CurrentBalance += transaction.Amount;
+        }
+        else if (transaction.TransactionType == 2) // Expense
+        {
+            account.CurrentBalance -= transaction.Amount;
+        }
+        else if (transaction.TransactionType == 3) // Transfer (Out)
+        {
+            account.CurrentBalance -= transaction.Amount;
+        }
+
+        account.UpdatedAt = DateTime.UtcNow;
+        _context.Accounts.Update(account);
 
         await _context.SaveChangesAsync();
 
@@ -167,7 +189,50 @@ public class TransactionService : ITransactionService
             transaction.CategoryId = dto.CategoryId.Value;
 
         if (dto.Amount.HasValue)
+        {
+            // Revert old amount
+            if (transaction.TransactionType == 1) // Income
+            {
+                transaction.Account.CurrentBalance -= transaction.Amount;
+            }
+            else if (transaction.TransactionType == 2) // Expense
+            {
+                transaction.Account.CurrentBalance += transaction.Amount;
+            }
+            else if (transaction.TransactionType == 3) // Transfer
+            {
+                transaction.Account.CurrentBalance += transaction.Amount;
+                if (transaction.PairedAccount != null)
+                {
+                    transaction.PairedAccount.CurrentBalance -= transaction.Amount;
+                }
+            }
+
+            // Apply new amount
             transaction.Amount = dto.Amount.Value;
+
+            if (transaction.TransactionType == 1) // Income
+            {
+                transaction.Account.CurrentBalance += transaction.Amount;
+            }
+            else if (transaction.TransactionType == 2) // Expense
+            {
+                transaction.Account.CurrentBalance -= transaction.Amount;
+            }
+            else if (transaction.TransactionType == 3) // Transfer
+            {
+                transaction.Account.CurrentBalance -= transaction.Amount;
+                if (transaction.PairedAccount != null)
+                {
+                    transaction.PairedAccount.CurrentBalance += transaction.Amount;
+                    transaction.PairedAccount.UpdatedAt = DateTime.UtcNow;
+                    _context.Accounts.Update(transaction.PairedAccount);
+                }
+            }
+            
+            transaction.Account.UpdatedAt = DateTime.UtcNow;
+            _context.Accounts.Update(transaction.Account);
+        }
 
         if (!string.IsNullOrWhiteSpace(dto.Note))
             transaction.Note = dto.Note;
@@ -192,6 +257,8 @@ public class TransactionService : ITransactionService
     public async Task<bool> DeleteTransactionAsync(long transactionId, long userId)
     {
         var transaction = await _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.PairedAccount)
             .Include(t => t.PairedTransaction)
             .Where(t => t.Id == transactionId && t.UserId == userId)
             .FirstOrDefaultAsync();
@@ -210,6 +277,31 @@ public class TransactionService : ITransactionService
         }
 
         _context.Transactions.Remove(transaction);
+
+        // Revert balance
+        if (transaction.TransactionType == 1) // Income
+        {
+            transaction.Account.CurrentBalance -= transaction.Amount;
+        }
+        else if (transaction.TransactionType == 2) // Expense
+        {
+            transaction.Account.CurrentBalance += transaction.Amount;
+        }
+        else if (transaction.TransactionType == 3) // Transfer
+        {
+            transaction.Account.CurrentBalance += transaction.Amount;
+            
+            if (transaction.PairedAccount != null)
+            {
+                transaction.PairedAccount.CurrentBalance -= transaction.Amount;
+                transaction.PairedAccount.UpdatedAt = DateTime.UtcNow;
+                _context.Accounts.Update(transaction.PairedAccount);
+            }
+        }
+
+        transaction.Account.UpdatedAt = DateTime.UtcNow;
+        _context.Accounts.Update(transaction.Account);
+
         await _context.SaveChangesAsync();
 
         return true;

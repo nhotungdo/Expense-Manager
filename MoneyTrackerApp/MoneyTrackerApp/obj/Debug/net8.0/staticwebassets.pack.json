@@ -81,16 +81,12 @@
       "PackagePath": "staticwebassets\\css\\wallets.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\requirement_update.md",
+      "PackagePath": "staticwebassets\\docs\\requirement_update.md"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\images\\santa-hat.png",
-      "PackagePath": "staticwebassets\\images\\santa-hat.png"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\images\\snowflake.png",
-      "PackagePath": "staticwebassets\\images\\snowflake.png"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\admin-ai.js",
@@ -183,6 +179,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\transactions-utils.js",
       "PackagePath": "staticwebassets\\js\\transactions-utils.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\transactions.js",
+      "PackagePath": "staticwebassets\\js\\transactions.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\user-ai.js",

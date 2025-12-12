@@ -48,13 +48,13 @@ function updateProgressUI(spent, limit) {
         progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
 
         if (percentage >= 100) {
-            progressBar.classList.add('bg-danger');
-            lblStatus.innerHTML = '<span class="text-danger fw-bold">' + percentage.toFixed(0) + '% (Vượt ngân sách!)</span>';
+            progressBar.classList.add('candy-cane-bar'); // Christmas Effect: Candy Cane
+            // Christmas Effect: Sad Santa / Coal
+            lblStatus.innerHTML = '<span class="text-danger fw-bold d-flex align-items-center gap-2"><span class="christmas-icon">🎅😭</span> <span>' + percentage.toFixed(0) + '% (Vượt ngân sách! Coi chừng bị tặng than!)</span></span>';
         } else if (percentage >= 80) {
-            progressBar.classList.add('bg-warning'); // Actually Bootstrap warning is yellow/orange
-            // Let's use danger for high warning, or custom class. Bootstrap warning is fine.
             progressBar.classList.add('bg-danger');
-            lblStatus.innerHTML = '<span class="text-danger fw-bold">' + percentage.toFixed(0) + '% (Nguy hiểm)</span>';
+            progressBar.classList.add('candy-cane-bar'); // Apply candy cane to high usage too
+            lblStatus.innerHTML = '<span class="text-danger fw-bold d-flex align-items-center gap-2"><span class="christmas-icon">🎄</span> <span>' + percentage.toFixed(0) + '% (Nguy hiểm)</span></span>';
         } else if (percentage >= 50) {
             progressBar.classList.add('bg-warning');
             lblStatus.innerHTML = '<span class="text-warning fw-bold">' + percentage.toFixed(0) + '% (Cần chú ý)</span>';

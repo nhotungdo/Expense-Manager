@@ -1,109 +1,72 @@
-Trang **"Quản lý Ngân sách" (Budget Management)** khác với trang "Ví của tôi". Nếu "Ví" là nơi chứa tiền và lịch sử nạp/rút, thì "Ngân sách" là nơi **kiểm soát chi tiêu** và **cài đặt giới hạn** để tránh việc người dùng bị "sốc" khi nhận hóa đơn cuối tháng (Bill Shock).
+Xóa giao diện trang Giao dịch cũ đi sau đó code lại cho tôi giao diện (UI) của trang **Giao dịch (Transactions)** thường được chia thành hai phần chính: **Màn hình Danh sách (Lịch sử)** và **Màn hình Thêm/Sửa Giao dịch**.Lưu ý viết code sạch hơn code cũ.
 
-Dưới đây là mô tả chi tiết các thành phần UI/UX cho trang này:
+Dưới đây là các thành phần UI chi tiết:
 
------
+### 1. Màn hình Tổng quan & Danh sách (Dashboard/List View)
 
-### 1\. Khu vực "Sức khỏe Ngân sách" (Budget Health Monitor)
+Khu vực này giúp người dùng xem lại lịch sử chi tiêu.
 
-Đây là phần hiển thị trực quan nhất, giúp người dùng biết ngay lập tức họ có đang tiêu lạm hay không.
+* **Bộ lọc Thời gian (Time Filter):**
+    * Dropdown hoặc Tab chọn: Ngày / Tuần / Tháng / Năm / Tùy chỉnh.
+    * Hiển thị khoảng thời gian: `StartDate` đến `EndDate` (Sử dụng cho query `GetUserDashboardStats`).
+* **Thẻ Tổng quan (Summary Cards):**
+    * **Tổng thu (Total Income):** Hiển thị tổng tiền vào (màu xanh).
+    * **Tổng chi (Total Expense):** Hiển thị tổng tiền ra (màu đỏ).
+    * **Số dư ròng (Net Income):** Hiệu số Thu - Chi.
+* **Thanh Tìm kiếm & Lọc nâng cao (Search & Filter Bar):**
+    * Tìm kiếm theo ghi chú (`Note`) hoặc số tiền (`Amount`).
+    * Lọc theo Loại giao dịch (Thu/Chi/Chuyển).
+    * Lọc theo Ví (`AccountId`) hoặc Danh mục (`CategoryId`).
+* **Danh sách Giao dịch (Transaction List):**
+    * **Nhóm theo ngày:** Gom các giao dịch cùng `TransactionDate` lại với nhau.
+    * **Item Giao dịch (Mỗi dòng):**
+        * **Icon:** Icon của danh mục (`Categories.Icon`) trên nền màu (`Categories.Color`).
+        * **Tên danh mục:** Hiển thị `Categories.Name` (Ví dụ: Ăn uống, Lương).
+        * **Ghi chú:** Hiển thị `Transactions.Note` (Ví dụ: Ăn phở, Tiền cafe).
+        * **Số tiền:** Hiển thị `Transactions.Amount` kèm `Currency` (VND/USD). Màu đỏ nếu là Chi (`Type=2`), Xanh nếu là Thu (`Type=1`).
+        * **Tên Ví:** Hiển thị nhỏ bên dưới để biết nguồn tiền (Ví dụ: Vietcombank, Tiền mặt).
 
-  * **Thanh Tiến độ Ngân sách (Budget Progress Bar):**
-      * Một thanh ngang lớn hiển thị mức tiêu dùng hiện tại so với giới hạn đã đặt.
-      * **Màu sắc động:**
-          * Xanh lá: \< 50% (An toàn).
-          * Vàng: 51% - 80% (Cần chú ý).
-          * Đỏ: \> 80% (Cảnh báo nguy hiểm).
-      * *Ví dụ text:* "Bạn đã dùng **1.500.000đ** trên tổng ngân sách **2.000.000đ** (75%)".
-  * **Dự báo chi tiêu (Spending Forecast):**
-      * Hiển thị một vạch mờ trên thanh tiến độ, dự đoán mức tiêu dùng đến cuối tháng dựa trên tốc độ hiện tại.
-      * *Text:* "Dự kiến cuối tháng sẽ dùng hết 2.100.000đ (Vượt ngân sách 5%)".
+---
 
-### 2\. Khu vực Cài đặt Hạn mức (Budget Configuration)
+### 2. Màn hình Thêm/Sửa Giao dịch (Add/Edit Form)
 
-Nơi người dùng thiết lập "luật chơi" cho tài khoản của mình.
+Đây là form nhập liệu, các trường ở đây map trực tiếp vào bảng `Transactions`.
 
-  * **Input nhập số tiền:**
-      * Ô nhập liệu lớn: "Đặt ngân sách hàng tháng".
-      * Gợi ý nhanh (Chips): [1 Triệu] [2 Triệu] [5 Triệu].
-  * **Loại giới hạn (Threshold Action):** (Rất quan trọng cho dịch vụ SaaS/API)
-      * *Radio Button 1:* **Giới hạn Mềm (Soft Cap):** Chỉ gửi cảnh báo, dịch vụ vẫn chạy tiếp khi vượt ngưỡng (Phù hợp khách hàng doanh nghiệp không muốn gián đoạn).
-      * *Radio Button 2:* **Giới hạn Cứng (Hard Cap):** Tự động ngắt dịch vụ/API khi chạm ngưỡng (Phù hợp người dùng cá nhân sợ tốn tiền).
-  * **Nút Lưu:** "Cập nhật ngân sách".
+* **Tab Loại Giao dịch (Transaction Type Switcher):**
+    * 3 Tabs: **Thu nhập** (Income) | **Chi tiêu** (Expense) | **Chuyển tiền** (Transfer).
+    * *Lưu ý:* Nếu chọn "Chuyển tiền", UI sẽ thay đổi để hiện 2 ví (Nguồn & Đích).
 
-### 3\. Khu vực Cảnh báo (Alert Rules)
+* **Nhập Số tiền (Amount Input):**
+    * Bàn phím số (Numpad).
+    * Dropdown chọn đơn vị tiền tệ (`Currency`), mặc định lấy từ `Users.DefaultCurrency`.
+    * Hiển thị tỷ giá quy đổi nếu ví nguồn khác đơn vị tiền tệ (dùng `CurrencyRates`).
 
-Người dùng muốn được thông báo như thế nào và khi nào.
+* **Chọn Danh mục (Category Selector):**
+    * Lưới hoặc Danh sách các icon danh mục.
+    * Phân cấp: Danh mục cha -> Danh mục con (dựa trên `ParentCategoryId`).
+    * Nút "Tạo mới danh mục" nếu chưa có.
 
-  * **Các mốc kích hoạt (Threshold Triggers):**
-      * Danh sách checkbox hoặc thanh trượt (slider) đa điểm.
-      * ☑ Gửi cảnh báo khi đạt 50%.
-      * ☑ Gửi cảnh báo khi đạt 80%.
-      * ☑ Gửi cảnh báo khi đạt 100%.
-  * **Kênh thông báo (Notification Channels):**
-      * ☑ Email.
-      * ☑ SMS (có thể tính phí).
-      * ☑ Notification trên App/Web.
-      * ☑ Webhook (Dành cho Dev muốn tích hợp vào Slack/Telegram riêng).
+* **Chọn Thời gian (Date & Time Picker):**
+    * Lịch chọn ngày giờ (`TransactionDate`), mặc định là `NOW()`.
 
-### 4\. Khu vực Phân tích chi tiêu (Cost Breakdown)
+* **Chọn Ví/Tài khoản (Account Selector):**
+    * **Ví nguồn:** Dropdown danh sách `Accounts` (Ví dụ: Tiền mặt, Thẻ tín dụng).
+    * **Ví đích (Nếu là Chuyển khoản):** Dropdown thứ 2 để chọn `PairedAccountId`.
 
-Trả lời câu hỏi: "Tại sao tôi lại tốn nhiều tiền thế?"
+* **Ghi chú & Mô tả (Note):**
+    * Ô nhập văn bản (`Note`) cho chi tiết giao dịch.
 
-  * **Biểu đồ tròn (Donut Chart):** Chia tỉ lệ các khoản chi.
-      * *Ví dụ:* 60% cho GPT-4 API, 30% cho phí duy trì Gói Pro, 10% cho phí lưu trữ (Storage).
-  * **Top tiêu hao (Top Consumers):**
-      * Danh sách 5 mục tốn tiền nhất.
-      * *Ví dụ:* "Project A: 500k", "Project B: 200k".
+* **Tiện ích mở rộng (Attachments & OCR):**
+    * **Nút Chụp ảnh/Tải ảnh:** Để lưu vào `AttachmentUrl` (Hóa đơn, biên lai).
+    * **Nút "Quét hóa đơn" (Scan Receipt):** Kích hoạt tính năng OCR để điền tự động vào `OcrText`.
 
-### 5\. Góc AI Tư vấn (AI Budget Advisor)
+* **Liên kết nâng cao (Advanced Options):**
+    * **Chi tiêu cho ai? (Debt/Group):** Liên kết với bảng `Debts` (nếu trả nợ) hoặc `GroupTransactions` (nếu chi tiêu nhóm).
+    * **Sự kiện/Tiết kiệm:** Chọn nếu giao dịch này đóng góp vào `SavingsGoals`.
 
-Tận dụng tính năng AI mà chúng ta đã bàn trước đó.
-
-  * **Thẻ Insight (Card):**
-      * "Tháng này bạn tiêu nhiều hơn tháng trước 20% do việc sử dụng API tăng đột biến vào ngày thứ Ba."
-      * "Gợi ý: Nếu bạn nâng cấp lên gói Enterprise, với mức dùng hiện tại, bạn sẽ tiết kiệm được 15% so với trả theo lượt (Pay-as-you-go)."
-
------
-
-### Gợi ý Bố cục (Layout Skeleton)
-
-```text
-+---------------------------------------------------------------+
-|  TITLE: Quản lý & Kiểm soát Ngân sách                         |
-+---------------------------------------------------------------+
-|                                                               |
-|  [ KHU VỰC 1: HEALTH MONITOR - Chiếm chiều ngang ]            |
-|  +---------------------------------------------------------+  |
-|  |  Đã dùng: 1.5tr / 2.0tr                                 |  |
-|  |  [||||||||||||||||||||||||-------] 75% (Màu Vàng)       |  |
-|  |  (Dự báo sẽ vượt ngưỡng vào ngày 28/12)                 |  |
-|  +---------------------------------------------------------+  |
-|                                                               |
-|  [ Cột Trái - Cài đặt ]             [ Cột Phải - Phân tích ]  |
-|                                                               |
-|  +-----------------------+          +----------------------+  |
-|  | CÀI ĐẶT HẠN MỨC       |          | PHÂN BỔ CHI TIÊU     |  |
-|  | [ Input: 2.000.000 ]  |          |      (Biểu đồ)       |  |
-|  |                       |          |      O  Sub: 30%     |  |
-|  | (o) Soft Cap (Báo)    |          |         API: 70%     |  |
-|  | ( ) Hard Cap (Ngắt)   |          |                      |  |
-|  +-----------------------+          +----------------------+  |
-|                                                               |
-|  +-----------------------+          +----------------------+  |
-|  | CẤU HÌNH CẢNH BÁO     |          | AI INSIGHTS          |  |
-|  | [x] Báo khi đạt 50%   |          | "Bạn nên tắt server  |  |
-|  | [x] Báo khi đạt 90%   |          | test vào cuối tuần   |  |
-|  | Gửi qua: [Email]      |          | để tiết kiệm..."     |  |
-|  +-----------------------+          +----------------------+  |
-|                                                               |
-+---------------------------------------------------------------+
-```
-
-### Ý tưởng kết hợp Giáng sinh (Christmas Theme)
-
-Vì anh đang làm theme Noel, đây là vài chi tiết nhỏ có thể thêm vào trang Ngân sách cho vui mắt:
-
-  * **Thanh tiến độ (Progress Bar):** Thay vì màu xanh/đỏ trơn, có thể làm hiệu ứng **"Thanh kẹo gậy" (Candy Cane)** sọc trắng đỏ chéo nhau.
-  * **Khi vượt ngân sách:** Thay vì icon cảnh báo tam giác vàng bình thường, có thể hiện hình **"Ông già Noel mặt buồn"** hoặc **"Cục than đen"** (biểu tượng quà tặng cho trẻ hư).
+### 3. Các thành phần thông minh (AI & Smart Features)
+* **Gợi ý tự động (AI Suggestions):**
+    * Khi nhập tên "Cafe", hệ thống tự động gợi ý chọn danh mục "Ăn uống" hoặc ví thường dùng (Dựa trên thói quen cũ hoặc `AiSuggestions`).
+* **Cảnh báo Ngân sách (Budget Alert):**
+    * Khi nhập số tiền, nếu vượt quá hạn mức trong `Budgets`, hiển thị cảnh báo nhỏ ngay trên nút Lưu.
 

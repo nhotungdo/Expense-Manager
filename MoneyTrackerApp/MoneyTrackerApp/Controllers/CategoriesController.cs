@@ -74,20 +74,20 @@ namespace MoneyTrackerApp.Controllers
                     {
                         testResult = new List<dynamic>
                         {
-                            new { id = 1L, name = "Food & Dining", icon = "🍔", type = 2, description = "", color = "", isActive = true },
-                            new { id = 2L, name = "Transportation", icon = "🚗", type = 2, description = "", color = "", isActive = true },
-                            new { id = 3L, name = "Shopping", icon = "🛍️", type = 2, description = "", color = "", isActive = true },
-                            new { id = 4L, name = "Entertainment", icon = "🎬", type = 2, description = "", color = "", isActive = true },
-                            new { id = 5L, name = "Bills & Utilities", icon = "📄", type = 2, description = "", color = "", isActive = true }
+                            new { id = 1L, name = "Ăn uống", icon = "🍔", type = 2, description = "", color = "", isActive = true },
+                            new { id = 2L, name = "Di chuyển", icon = "🚗", type = 2, description = "", color = "", isActive = true },
+                            new { id = 3L, name = "Mua sắm", icon = "🛍️", type = 2, description = "", color = "", isActive = true },
+                            new { id = 4L, name = "Giải trí", icon = "🎬", type = 2, description = "", color = "", isActive = true },
+                            new { id = 5L, name = "Hóa đơn & Tiện ích", icon = "📄", type = 2, description = "", color = "", isActive = true }
                         };
                     }
                     else if (type == 1)
                     {
                         testResult = new List<dynamic>
                         {
-                            new { id = 1L, name = "Salary", icon = "💰", type = 1, description = "", color = "", isActive = true },
-                            new { id = 2L, name = "Freelance", icon = "💼", type = 1, description = "", color = "", isActive = true },
-                            new { id = 3L, name = "Investment", icon = "📈", type = 1, description = "", color = "", isActive = true }
+                            new { id = 1L, name = "Lương", icon = "💰", type = 1, description = "", color = "", isActive = true },
+                            new { id = 2L, name = "Làm thêm", icon = "💼", type = 1, description = "", color = "", isActive = true },
+                            new { id = 3L, name = "Đầu tư", icon = "📈", type = 1, description = "", color = "", isActive = true }
                         };
                     }
 

@@ -167,7 +167,7 @@ public class OnboardingService
                 Name = dto.Wallet.Name,
                 AccountType = dto.Wallet.AccountType,
                 InitialBalance = 0, // Set to 0 because we create a transaction for this, and the trigger sums them
-                CurrentBalance = 0, // Let trigger update this from the transaction
+                CurrentBalance = dto.Wallet.InitialBalance, // Set directly to ensure Total Assets is correct logic
                 Currency = dto.Profile.Currency,
                 Icon = dto.Wallet.Icon ?? "💰",
                 Color = dto.Wallet.Color ?? "#4CAF50",
