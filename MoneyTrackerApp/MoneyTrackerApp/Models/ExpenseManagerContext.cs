@@ -17,6 +17,7 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
+    public virtual DbSet<AiSuggestion> AiSuggestions { get; set; }
 
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
 
@@ -115,6 +116,18 @@ public partial class ExpenseManagerContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Accounts).HasForeignKey(d => d.UserId);
         });
 
+        modelBuilder.Entity<AiSuggestion>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_AiSuggestions_UserId");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Suggestion).HasMaxLength(1024);
+            entity.Property(e => e.SuggestionType)
+                .HasMaxLength(50)
+                .HasDefaultValue("Financial Advice");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AiSuggestions).HasForeignKey(d => d.UserId);
+        });
 
         modelBuilder.Entity<AspNetRole>(entity =>
         {

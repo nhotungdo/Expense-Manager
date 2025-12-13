@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using MoneyTrackerApp.Configurations;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -45,6 +44,7 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTracker
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ICurrencyService, MoneyTrackerApp.Services.CurrencyService>();
 builder.Services.AddHttpClient(); // Add HttpClient for AI services
+builder.Services.AddScoped<MoneyTrackerApp.Services.IAiAdvisorService, MoneyTrackerApp.Services.AiAdvisorService>();
 
 // Register Onboarding Service
 // Register Onboarding Service
@@ -61,10 +61,6 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.ISubscriptionService, MoneyT
 // Register Service Package Service
 builder.Services.AddScoped<MoneyTrackerApp.Services.IServicePackageService, MoneyTrackerApp.Services.ServicePackageService>();
 
-// Register AI Services
-builder.Services.AddScoped<MoneyTrackerApp.Services.IUserAiService, MoneyTrackerApp.Services.UserAiService>();
-builder.Services.AddScoped<MoneyTrackerApp.Services.IAdminAiService, MoneyTrackerApp.Services.AdminAiService>();
-
 // Register Data Protection (required for VNPay encryption)
 builder.Services.AddDataProtection();
 
@@ -76,9 +72,6 @@ builder.Services.AddSingleton<MoneyTrackerApp.Services.VnPayMonitoringService>()
 
 // Register VNPay QR Payment Service (Only payment method supported)
 builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayService>();
-
-// Admin options
-builder.Services.Configure<AdminOptions>(builder.Configuration.GetSection("Admin"));
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");

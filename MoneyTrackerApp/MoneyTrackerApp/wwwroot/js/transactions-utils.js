@@ -98,3 +98,100 @@ export async function createTransaction(dto, signal) {
   }
 }
 
+/**
+ * Call API to update transaction
+ * @param {string|number} id - transaction id
+ * @param {Object} dto - payload
+ * @returns {Promise<{ok:boolean, status:number, data?:Object, error?:string}>}
+ */
+export async function updateTransaction(id, dto) {
+  try {
+    const res = await fetch(`/api/Transactions/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ ...dto, Id: id }) // ensure Id is in body
+    });
+
+    if (!res.ok) {
+      let message = 'Không thể cập nhật giao dịch';
+      try { const err = await res.json(); message = err.message || message; } catch { }
+      return { ok: false, status: res.status, error: message };
+    }
+    const data = await res.json();
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+/**
+ * Get transaction details
+ * @param {string|number} id 
+ * @returns {Promise<{ok:boolean, data?:Object, error?:string}>}
+ */
+export async function getTransaction(id) {
+  try {
+    const res = await fetch(`/api/Transactions/${id}`, {
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    if (!res.ok) return { ok: false };
+    const data = await res.json();
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+/**
+ * Delete transaction
+ * @param {string|number} id 
+ * @returns {Promise<{ok:boolean}>}
+ */
+export async function deleteTransaction(id) {
+  try {
+    const res = await fetch(`/api/Transactions/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    return { ok: res.ok };
+  } catch (e) {
+    return { ok: false };
+  }
+}
+
+/**
+ * Upload file attachment
+ * @param {File} file 
+ * @returns {Promise<{url: string}>}
+ */
+export async function uploadAttachment(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/Ocr/upload', {
+    method: 'POST',
+    credentials: 'include',
+    body: formData
+  });
+  if (res.ok) return res.json();
+  throw new Error('Upload failed');
+}
+
+/**
+ * Process OCR
+ * @param {string} base64Image 
+ * @returns {Promise<{amount?:number, date?:string, vendor?:string}>}
+ */
+export async function processOcr(base64Image) {
+  const res = await fetch('/api/Ocr/process', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ imageBase64: base64Image })
+  });
+  if (res.ok) return res.json();
+  throw new Error('OCR failed');
+}

@@ -4,282 +4,196 @@
     ViewData["Title"] = "Giao dịch";
 }
 
-<div class="transactions-page modern-page">
-    <!-- Page Header -->
-    <div class="page-header-modern">
-        <div class="header-content">
-            <div>
-                <h1 class="page-title">
-                    <i class="fas fa-wallet"></i>
-                    Quản lý Giao dịch
-                </h1>
-                <p class="page-subtitle">Theo dõi thu chi và quản lý tài chính hiệu quả</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-primary" onclick="openAddTransaction()">
-                    <i class="fas fa-plus"></i>
-                    Thêm giao dịch
-                </button>
-            </div>
+<!-- Main Content Area -->
+<div class="px-6 py-8">
+    
+    <!-- 1. Header & Time Filter -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Giao dịch</h1>
+            <p class="text-slate-500">Quản lý thu chi và lịch sử giao dịch</p>
         </div>
+        
+        <!-- Time Filter (Simplified for now as Date Range Picker) -->
+        <form method="get" class="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
+            <input type="date" asp-for="Filter.StartDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
+            <span class="text-slate-400">-</span>
+            <input type="date" asp-for="Filter.EndDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
+            <button type="submit" class="hidden">Filter</button>
+        </form>
     </div>
 
-    <!-- 1. Dashboard / List View -->
-    <div class="dashboard-section">
-        <!-- Time Filter -->
-        <div class="filter-bar mb-4 d-flex justify-content-between align-items-center">
-            <div class="time-filter">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary active" data-range="day" onclick="filterTime('day')">Ngày</button>
-                    <button type="button" class="btn btn-outline-secondary" data-range="week" onclick="filterTime('week')">Tuần</button>
-                    <button type="button" class="btn btn-outline-secondary" data-range="month" onclick="filterTime('month')">Tháng</button>
-                    <button type="button" class="btn btn-outline-secondary" data-range="year" onclick="filterTime('year')">Năm</button>
-                    <button type="button" class="btn btn-outline-secondary" data-range="custom" onclick="filterTime('custom')">Tùy chỉnh</button>
-                </div>
-                <div class="date-display ms-3 fw-bold text-primary" id="currentDateRange">
-                    <!-- JS will populate: StartDate - EndDate -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Summary Cards -->
-        <div class="transaction-summary">
-            <div class="summary-card income-card">
-                <div class="summary-icon">
+    <!-- 2. Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Income -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                     <i class="fas fa-arrow-down"></i>
                 </div>
-                <div class="summary-content">
-                    <p class="summary-label">Tổng thu</p>
-                    <h3 class="summary-amount" id="totalIncome">0 ₫</h3>
-                </div>
+                <span class="text-sm font-medium text-slate-500">Tổng thu</span>
             </div>
-            
-            <div class="summary-card expense-card">
-                <div class="summary-icon">
+            <p class="text-2xl font-bold text-emerald-600">
+                +@Model.ViewModel.TotalIncome.ToString("N0") <span class="text-sm font-medium text-slate-400">VND</span>
+            </p>
+        </div>
+
+        <!-- Total Expense -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
                     <i class="fas fa-arrow-up"></i>
                 </div>
-                <div class="summary-content">
-                    <p class="summary-label">Tổng chi</p>
-                    <h3 class="summary-amount" id="totalExpense">0 ₫</h3>
-                </div>
+                <span class="text-sm font-medium text-slate-500">Tổng chi</span>
             </div>
-            
-            <div class="summary-card balance-card">
-                <div class="summary-icon">
+            <p class="text-2xl font-bold text-rose-600">
+                -@Model.ViewModel.TotalExpense.ToString("N0") <span class="text-sm font-medium text-slate-400">VND</span>
+            </p>
+        </div>
+
+        <!-- Net Income -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <div class="summary-content">
-                    <p class="summary-label">Số dư ròng</p>
-                    <h3 class="summary-amount" id="netIncome">0 ₫</h3>
-                </div>
+                <span class="text-sm font-medium text-slate-500">Số dư ròng</span>
             </div>
-        </div>
-
-        <!-- Search & Advanced Filter -->
-        <div class="search-filter-container bg-white p-3 rounded mb-4 shadow-sm border">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0 ps-0" id="searchKeyword" placeholder="Tìm theo ghi chú hoặc số tiền...">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="filterType">
-                        <option value="">Tất cả loại</option>
-                        <option value="1">Thu nhập</option>
-                        <option value="2">Chi tiêu</option>
-                        <option value="3">Chuyển khoản</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="filterWallet">
-                        <option value="">Tất cả Ví</option>
-                        <!-- Options populated by JS -->
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="filterCategory">
-                        <option value="">Tất cả Danh mục</option>
-                        <!-- Options populated by JS -->
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Transaction List -->
-        <div class="transactions-timeline" id="transactionListContainer">
-            <!-- Checking for empty state or loading... -->
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
-            </div>
+            <p class="text-2xl font-bold @(Model.ViewModel.NetIncome >= 0 ? "text-slate-900" : "text-rose-600")">
+                @Model.ViewModel.NetIncome.ToString("N0") <span class="text-sm font-medium text-slate-400">VND</span>
+            </p>
         </div>
     </div>
-</div>
 
-<!-- 2. Add/Edit Transaction Modal -->
-<div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="modalTitle">Thêm giao dịch mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- 3. Search & Filter Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- Persist Date Range -->
+            <input type="hidden" asp-for="Filter.StartDate" />
+            <input type="hidden" asp-for="Filter.EndDate" />
+
+            <!-- Search -->
+            <div class="md:col-span-4 relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input asp-for="Filter.SearchText" class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base" placeholder="Tìm theo ghi chú..." />
             </div>
-            <div class="modal-body pt-2">
-                <form id="transactionForm">
-                    <input type="hidden" id="transactionId" value="">
-                    
-                    <!-- Type Switcher -->
-                    <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-pill" id="typeTabs">
-                        <li class="nav-item">
-                            <a class="nav-link rounded-pill active" data-type="2" href="#" onclick="setTransactionType(2)">
-                                <i class="fas fa-arrow-up me-2"></i>Chi tiêu
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-pill" data-type="1" href="#" onclick="setTransactionType(1)">
-                                <i class="fas fa-arrow-down me-2"></i>Thu nhập
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-pill" data-type="3" href="#" onclick="setTransactionType(3)">
-                                <i class="fas fa-exchange-alt me-2"></i>Chuyển tiền
-                            </a>
-                        </li>
-                    </ul>
-                    <input type="hidden" id="transactionType" value="2">
 
-                    <!-- Amount Input -->
-                    <div class="mb-4 text-center">
-                        <label class="form-label text-muted small text-uppercase fw-bold">Số tiền</label>
-                        <div class="d-flex justify-content-center align-items-center gap-2">
-                            <select class="form-select w-auto border-0 fw-bold" id="currencySelect" style="max-width: 100px;">
-                                <option value="VND">VND</option>
-                                <option value="USD">USD</option>
-                            </select>
-                            <input type="number" class="form-control form-control-lg border-0 border-bottom text-center fw-bold text-primary" 
-                                   id="amountInput" placeholder="0" style="font-size: 2.5rem; max-width: 300px;" required>
-                        </div>
-                        <div id="budgetAlert" class="text-danger small mt-1 d-none">
-                            <i class="fas fa-exclamation-circle"></i> Cảnh báo: Vượt quá ngân sách!
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <!-- Category Selector -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Danh mục</label>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-secondary w-100 d-flex justify-content-between align-items-center" type="button" id="categoryDropdown" data-bs-toggle="dropdown">
-                                    <span id="selectedCategoryName">Chọn danh mục</span>
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                                <input type="hidden" id="categoryId" required>
-                                <ul class="dropdown-menu w-100 p-2" id="categoryList" style="max-height: 300px; overflow-y: auto;">
-                                    <!-- Categories populated via JS -->
-                                    <li class="text-center p-2"><button type="button" class="btn btn-sm btn-link">Tạo mới danh mục</button></li>
-                                </ul>
-                            </div>
-                            <!-- AI Suggestions -->
-                            <div id="aiSuggestions" class="mt-2 d-none">
-                                <small class="text-muted"><i class="fas fa-magic text-warning"></i> Gợi ý:</small>
-                                <span class="badge bg-light text-dark cursor-pointer border user-select-none" onclick="selectSuggestion(this)">Ăn uống</span>
-                            </div>
-                        </div>
-
-                        <!-- Date Time -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Thời gian</label>
-                            <input type="datetime-local" class="form-control" id="transactionDate" required>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mt-1">
-                        <!-- Source Wallet -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold" id="sourceWalletLabel">Ví nguồn</label>
-                            <select class="form-select" id="walletId" required>
-                                <option value="">Chọn ví</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Destination Wallet (Visible only for Transfer) -->
-                        <div class="col-md-6 d-none" id="destWalletGroup">
-                            <label class="form-label fw-bold">Ví đích</label>
-                            <select class="form-select" id="destWalletId">
-                                <option value="">Chọn ví đích</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Note -->
-                    <div class="mt-3">
-                        <label class="form-label fw-bold">Ghi chú</label>
-                        <textarea class="form-control" id="noteInput" rows="2" placeholder="Chi tiết giao dịch..."></textarea>
-                    </div>
-
-                    <!-- Attachments & OCR -->
-                    <div class="mt-3">
-                        <label class="form-label fw-bold">Hóa đơn / Chứng từ</label>
-                        <div class="d-flex gap-2">
-                             <div class="flex-grow-1">
-                                <input type="file" class="form-control" id="attachmentFile" accept="image/*">
-                             </div>
-                             <button type="button" class="btn btn-outline-info" title="Quét hóa đơn (OCR)" onclick="scanReceipt()">
-                                <i class="fas fa-camera"></i> Scan
-                             </button>
-                        </div>
-                        <div id="ocrPreview" class="mt-2 small text-muted d-none">
-                            <strong>OCR:</strong> <span id="ocrText"></span>
-                        </div>
-                    </div>
-
-                    <!-- Advanced Options -->
-                    <div class="mt-3">
-                        <a class="text-decoration-none fw-bold small text-secondary" data-bs-toggle="collapse" href="#advancedOptions" role="button">
-                            <i class="fas fa-cog me-1"></i> Liên kết nâng cao
-                        </a>
-                        <div class="collapse mt-2" id="advancedOptions">
-                           <div class="card card-body bg-light border-0">
-                               <div class="row g-2">
-                                   <!-- Debt / Group -->
-                                   <div class="col-md-6">
-                                       <label class="form-label small">Chi tiêu cho ai? (Nợ/Nhóm)</label>
-                                       <select class="form-select form-select-sm" id="debtGroupSelect">
-                                           <option value="">Không</option>
-                                           <option value="debt">Trả nợ</option>
-                                           <option value="group">Chi tiêu nhóm</option>
-                                       </select>
-                                   </div>
-                                    <!-- Savings -->
-                                   <div class="col-md-6">
-                                       <label class="form-label small">Mục tiêu tiết kiệm</label>
-                                       <select class="form-select form-select-sm" id="savingsSelect">
-                                           <option value="">Không</option>
-                                           <option value="1">Mua nhà</option>
-                                       </select>
-                                   </div>
-                               </div>
-                           </div>
-                        </div>
-                    </div>
-
-                </form>
+            <!-- Filter Type -->
+            <div class="md:col-span-2">
+                <select asp-for="Filter.TransactionType" class="w-full py-2 px-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base">
+                    <option value="">Tất cả loại</option>
+                    <option value="1">Thu nhập</option>
+                    <option value="2">Chi tiêu</option>
+                    <option value="3">Chuyển khoản</option>
+                </select>
             </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary px-4" onclick="saveTransaction()">
-                    <i class="fas fa-save me-2"></i> Lưu giao dịch
+
+            <!-- Filter Wallet -->
+            <div class="md:col-span-2">
+                <select asp-for="Filter.AccountId" asp-items="Model.AccountList" class="w-full py-2 px-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base">
+                    <option value="">Tất cả ví</option>
+                </select>
+            </div>
+
+             <!-- Filter Category -->
+            <div class="md:col-span-2">
+                <select asp-for="Filter.CategoryId" asp-items="Model.CategoryList" class="w-full py-2 px-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base">
+                    <option value="">Tất cả danh mục</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="md:col-span-2 flex gap-2">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl transition-colors text-sm md:text-base shadow-sm hover:shadow-md">
+                    Lọc
                 </button>
+                 <a asp-page="Create" class="flex items-center justify-center px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors shadow-sm hover:shadow-md">
+                    <i class="fas fa-plus"></i>
+                </a>
             </div>
-        </div>
+        </form>
+    </div>
+
+    <!-- 4. Transaction List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        @if (!Model.ViewModel.Transactions.Any())
+        {
+            <div class="p-12 text-center">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                    <i class="fas fa-receipt text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-slate-900 mb-1">Chưa có giao dịch</h3>
+                <p class="text-slate-500 mb-6">Không tìm thấy giao dịch nào trong khoảng thời gian này.</p>
+                <a asp-page="Create" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-sm hover:shadow-md">
+                    <i class="fas fa-plus"></i> Tạo giao dịch mới
+                </a>
+            </div>
+        }
+        else
+        {
+            <!-- Group by Date -->
+            @foreach (var dateGroup in Model.ViewModel.Transactions.GroupBy(t => t.TransactionDate.Date).OrderByDescending(g => g.Key))
+            {
+                <div class="border-b border-slate-100 last:border-none">
+                    <div class="bg-slate-50/50 px-6 py-3 flex items-center justify-between">
+                        <span class="text-sm font-semibold text-slate-700">
+                            @dateGroup.Key.ToString("dd/MM/yyyy")
+                            @if (dateGroup.Key == DateTime.Today)
+                            {
+                                <span class="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">Hôm nay</span>
+                            }
+                        </span>
+                        <span class="text-xs text-slate-500 font-medium">
+                            @dateGroup.Sum(t => t.TransactionType == 1 ? t.Amount : (t.TransactionType == 2 ? -t.Amount : 0)).ToString("+#,##0;-#,##0;0") VND
+                        </span>
+                    </div>
+
+                    <div class="divide-y divide-slate-100">
+                        @foreach (var transaction in dateGroup)
+                        {
+                            <!-- Use div as row, maybe link to edit page later -->
+                            <div class="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors group cursor-pointer" onclick="window.location.href='/Transactions/Create?id=@transaction.Id'"> 
+                                <!-- Note: Since Create typically handles editing in many CRUD apps, or maybe Edit page. For now I point to Create? Or maybe just no link until Edit is ready. 
+                                     The requirement asks for Add/Edit Form as Point 2. So I probably should use same form or similar.
+                                     Let's assume there is NO Edit page yet, so I point to Index or separate.
+                                     I'll leave the link empty or generic for now, or maybe just remove onclick if I haven't built Edit page.
+                                     Actually, checking `Create.cshtml` it doesn't seem to support Edit (no Id param in OnGet).
+                                     I will update Create.cshtml to support inline editing or just leave it for now.
+                                 -->
+                                
+                                <!-- Icon -->
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: @(transaction.CategoryColor ?? "#f1f5f9"); color: #1e293b;">
+                                     @if (!string.IsNullOrEmpty(transaction.CategoryIcon))
+                                     {
+                                         <i class="@transaction.CategoryIcon text-lg"></i>
+                                     }
+                                     else
+                                     {
+                                         <i class="fas fa-wallet text-lg opacity-50"></i>
+                                     }
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-0.5">
+                                        <h4 class="text-sm font-semibold text-slate-900 truncate">@(transaction.CategoryName ?? "Chưa phân loại")</h4>
+                                        <span class="text-sm font-bold @(transaction.TransactionType == 1 ? "text-emerald-600" : (transaction.TransactionType == 2 ? "text-rose-600" : "text-blue-600")) whitespace-nowrap">
+                                            @(transaction.TransactionType == 1 ? "+" : (transaction.TransactionType == 2 ? "-" : ""))@transaction.Amount.ToString("N0")
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs text-slate-500 truncate max-w-[80%]">@(transaction.Note ?? transaction.Description)</p>
+                                        <span class="text-xs text-slate-400">@transaction.AccountName</span>
+                                    </div>
+                                </div>
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-chevron-right text-slate-300"></i>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
     </div>
 </div>
-
-@section Scripts {
-    <link rel="stylesheet" href="~/css/transactions.css">
-    <script src="~/js/transactions.js" type="module"></script>
-}

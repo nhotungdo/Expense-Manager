@@ -41,8 +41,8 @@
         </div>
     </div>
 
-    <!-- User AI Widget -->
-    <partial name="_UserAiWidget" />
+    <!-- AI Insight Widget -->
+    <partial name="_AiInsightWidget" />
 
     <!-- KPI Cards Grid -->
     <div class="kpi-grid">
@@ -219,27 +219,7 @@
             </div>
         </div>
 
-        <!-- Recent Transactions -->
-        <div class="chart-card transactions-card">
-            <div class="chart-header">
-                <div class="chart-title-section">
-                    <h3 class="chart-title">
-                        <i class="fas fa-receipt"></i>
-                        Hoạt động gần đây
-                    </h3>
-                    <p class="chart-subtitle">Giao dịch mới nhất</p>
-                </div>
-                <a href="/Transactions" class="chart-link">
-                    Xem tất cả <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            <div class="transactions-list" id="recentTransactions">
-                <div class="loading-state">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Đang tải giao dịch...</p>
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <!-- Quick Actions -->
@@ -319,6 +299,54 @@
             </div>
         </div>
 
+        <!-- AI Insights Panel -->
+        <div class="insights-card">
+            <div class="insights-header">
+                <div class="insights-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div style="flex: 1;">
+                    <h3 class="insights-title">Cố vấn tài chính AI</h3>
+                    <p class="insights-subtitle">Đề xuất cá nhân hóa</p>
+                </div>
+                <button class="chart-action-btn" onclick="generateNewAIInsights()" title="Tạo gợi ý mới">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="insights-body" id="aiInsights">
+                <div class="insight-item">
+                    <div class="insight-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Tiến triển tốt!</h4>
+                        <p>Bạn đang đi đúng hướng để đạt mục tiêu tiết kiệm vào tháng tới.</p>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Cảnh báo chi tiêu</h4>
+                        <p>Chi phí ăn uống cao hơn 15% so với bình thường. Hãy cân nhắc giảm để tiết kiệm 200.000 ₫.</p>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon info">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Mẹo thông minh</h4>
+                        <p>Hóa đơn tiện ích của bạn ổn định. Hãy cân nhắc thiết lập thanh toán tự động để không bỏ lỡ.</p>
+                    </div>
+                </div>
+            </div>
+            <a href="/AiAdvisor" class="insights-footer">
+                <span>Xem tất cả thông tin</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
     </div>
 </div>
 
