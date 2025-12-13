@@ -43,9 +43,14 @@ public class CreateModel : PageModel
     public SelectList? SavingsGoalList { get; set; }
     public List<CategorySummaryDto> Categories { get; set; } = new();
 
-    public async Task<IActionResult> OnGetAsync(long? id)
+    public async Task<IActionResult> OnGetAsync(long? id, long? goalId)
     {
         await LoadDropdownsAsync();
+
+        if (goalId.HasValue)
+        {
+            SavingsGoalId = goalId.Value;
+        }
         
         if (id.HasValue)
         {

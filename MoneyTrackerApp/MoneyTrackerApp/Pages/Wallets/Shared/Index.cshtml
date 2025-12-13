@@ -1,0 +1,77 @@
+@page
+@model MoneyTrackerApp.Pages.Wallets.Shared.IndexModel
+@{
+    ViewData["Title"] = "Ví Chia Sẻ";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-gray-800">Ví Chia Sẻ</h1>
+            <p class="text-muted">Quản lý các ví được chia sẻ với bạn</p>
+        </div>
+        <button class="btn btn-primary rounded-pill px-4" onclick="alert('Tính năng chia sẻ đang phát triển!')">
+            <i class="fas fa-plus me-2"></i> Chia sẻ ví mới
+        </button>
+    </div>
+
+    @if (Model.SharedWallets.Any())
+    {
+        <div class="row g-4">
+            @foreach (var wallet in Model.SharedWallets)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div class="icon-box rounded-3 bg-light text-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="@wallet.Icon fa-lg"></i>
+                                </div>
+                                <span class="badge bg-@GetPermissionColor(wallet.Permission) bg-opacity-10 text-@GetPermissionColor(wallet.Permission)">
+                                    @wallet.PermissionDisplay
+                                </span>
+                            </div>
+                            
+                            <h5 class="fw-bold mb-1">@wallet.AccountName</h5>
+                            <p class="text-muted small mb-3">Chia sẻ bởi: <strong>@wallet.SharedByUserName</strong></p>
+                            
+                            <h3 class="fw-bold text-primary mb-3">
+                                @wallet.CurrentBalance.ToString("N0") <small class="fs-6 text-muted">@wallet.Currency</small>
+                            </h3>
+                            
+                            <div class="d-flex gap-2 mt-4">
+                                <a href="/Wallets/Details?id=@wallet.Id" class="btn btn-outline-primary flex-grow-1 rounded-pill">Xem chi tiết</a>
+                                @if(wallet.Permission > 0) {
+                                    <a href="/Transactions/Create?accountId=@wallet.Id" class="btn btn-primary flex-grow-1 rounded-pill">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border border-dashed">
+            <div class="mb-4">
+                <i class="fas fa-share-alt fa-3x text-muted opacity-50"></i>
+            </div>
+            <h4 class="fw-bold text-gray-800">Chưa có ví nào được chia sẻ</h4>
+            <p class="text-muted max-w-md mx-auto">Khi người khác chia sẻ ví với bạn, danh sách sẽ xuất hiện tại đây.</p>
+        </div>
+    }
+</div>
+
+@functions {
+    string GetPermissionColor(int permission) {
+        return permission switch {
+            0 => "info", // View
+            1 => "warning", // Add
+            2 => "success", // Full
+            _ => "secondary"
+        };
+    }
+}

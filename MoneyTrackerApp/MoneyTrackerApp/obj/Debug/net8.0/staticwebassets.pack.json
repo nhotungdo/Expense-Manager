@@ -117,6 +117,14 @@
       "PackagePath": "staticwebassets\\js\\dashboard.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\debts.js",
+      "PackagePath": "staticwebassets\\js\\debts.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\groups.js",
+      "PackagePath": "staticwebassets\\js\\groups.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\header.js",
       "PackagePath": "staticwebassets\\js\\header.js"
     },

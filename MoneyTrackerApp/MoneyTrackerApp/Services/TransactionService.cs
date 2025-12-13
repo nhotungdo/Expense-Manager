@@ -141,6 +141,40 @@ public class TransactionService : ITransactionService
 
         _context.Transactions.Add(transaction);
 
+        // Handle Recurring Transaction
+        if (dto.IsRecurring && dto.RecurringInterval > 0)
+        {
+            var scheduledTransaction = new ScheduledTransaction
+            {
+                UserId = userId,
+                AccountId = dto.AccountId,
+                CategoryId = dto.CategoryId,
+                TransactionType = dto.TransactionType,
+                Amount = dto.Amount,
+                Frequency = dto.RecurringFrequency ?? "Monthly", // Default
+                Interval = dto.RecurringInterval.Value,
+                StartDate = DateOnly.FromDateTime(dto.TransactionDate),
+                EndDate = dto.RecurringEndDate.HasValue ? DateOnly.FromDateTime(dto.RecurringEndDate.Value) : null,
+                NextRunDate = DateOnly.FromDateTime(dto.TransactionDate).AddMonths(dto.RecurringInterval.Value), // Simple logic for now
+                Note = dto.Note,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            
+            // Adjust NextRunDate logic based on Frequency properly
+            if (scheduledTransaction.Frequency.Equals("Daily", StringComparison.OrdinalIgnoreCase))
+                scheduledTransaction.NextRunDate = scheduledTransaction.StartDate.AddDays(scheduledTransaction.Interval);
+            else if (scheduledTransaction.Frequency.Equals("Weekly", StringComparison.OrdinalIgnoreCase))
+                scheduledTransaction.NextRunDate = scheduledTransaction.StartDate.AddDays(7 * scheduledTransaction.Interval);
+            else if (scheduledTransaction.Frequency.Equals("Monthly", StringComparison.OrdinalIgnoreCase))
+                scheduledTransaction.NextRunDate = scheduledTransaction.StartDate.AddMonths(scheduledTransaction.Interval);
+            else if (scheduledTransaction.Frequency.Equals("Yearly", StringComparison.OrdinalIgnoreCase))
+                scheduledTransaction.NextRunDate = scheduledTransaction.StartDate.AddYears(scheduledTransaction.Interval);
+            
+             _context.ScheduledTransactions.Add(scheduledTransaction);
+        }
+
         // Update account balance
         if (transaction.TransactionType == 1) // Income
         {

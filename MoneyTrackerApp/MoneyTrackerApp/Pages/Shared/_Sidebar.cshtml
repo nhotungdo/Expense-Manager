@@ -37,10 +37,28 @@
             <span class="text-sm font-medium">Ví của tôi</span>
         </a>
 
+        <!-- Shared Wallets -->
+        <a href="/Wallets/Shared/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets/shared") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-share-alt w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets/shared") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Ví chia sẻ</span>
+        </a>
+
+        <!-- Bank Sync -->
+        <a href="/Wallets/BankSync" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets/banksync") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-university w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets/banksync") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Liên kết ngân hàng</span>
+        </a>
+
         <!-- Budgets -->
         <a href="/Budgets/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/budgets") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
             <i class="fas fa-chart-pie w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/budgets") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
             <span class="text-sm font-medium">Ngân sách</span>
+        </a>
+
+        <!-- Savings -->
+        <a href="/Savings/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/savings") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-piggy-bank w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/savings") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Sổ tiết kiệm</span>
         </a>
 
         <div class="my-4 px-3">
@@ -51,6 +69,12 @@
         <a href="/Reports" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/reports") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
             <i class="fas fa-chart-line w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/reports") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
             <span class="text-sm font-medium">Báo cáo</span>
+        </a>
+
+        <!-- Currencies -->
+        <a href="/Settings/Currencies" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/settings/currencies") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-globe w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/settings/currencies") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Tỷ giá & Tiền tệ</span>
         </a>
 
         <!-- Debts -->

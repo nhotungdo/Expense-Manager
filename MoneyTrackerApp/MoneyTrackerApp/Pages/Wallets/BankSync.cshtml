@@ -1,0 +1,83 @@
+@page
+@{
+    ViewData["Title"] = "Liên kết Ngân hàng";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold mb-3">Liên kết tài khoản ngân hàng</h1>
+                <p class="text-muted fs-5">Tự động đồng bộ giao dịch từ ngân hàng của bạn một cách an toàn.</p>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-5 bg-light p-5 d-flex flex-column justify-content-center align-items-center text-center">
+                            <i class="fas fa-university fa-5x text-primary mb-4"></i>
+                            <h4 class="fw-bold">An toàn & Bảo mật</h4>
+                            <p class="small text-muted mb-0">Chúng tôi sử dụng mã hóa cấp ngân hàng để bảo vệ dữ liệu của bạn. Thông tin đăng nhập không bao giờ được lưu trữ.</p>
+                        </div>
+                        <div class="col-md-7 p-5">
+                            <h5 class="fw-bold mb-4">Chọn ngân hàng của bạn</h5>
+                            
+                            <div class="d-grid gap-3">
+                                <button class="btn btn-outline-light text-dark border shadow-sm d-flex align-items-center p-3 rounded-3 text-start hover-bg-light transition-all">
+                                    <img src="https://companieslogo.com/img/orig/VCB.VN-0f4db2d1.png?t=1720244494" alt="Vietcombank" width="40" height="40" class="me-3 rounded-circle bg-white shadow-sm p-1">
+                                    <div>
+                                        <div class="fw-bold">Vietcombank</div>
+                                        <small class="text-muted">Ngân hàng TMCP Ngoại thương</small>
+                                    </div>
+                                    <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                                </button>
+                                
+                                <button class="btn btn-outline-light text-dark border shadow-sm d-flex align-items-center p-3 rounded-3 text-start hover-bg-light transition-all">
+                                    <img src="https://companieslogo.com/img/orig/TCB.VN-d64e83c7.png?t=1720244494" alt="Techcombank" width="40" height="40" class="me-3 rounded-circle bg-white shadow-sm p-1">
+                                    <div>
+                                        <div class="fw-bold">Techcombank</div>
+                                        <small class="text-muted">Ngân hàng TMCP Kỹ thương</small>
+                                    </div>
+                                    <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                                </button>
+                                
+                                <button class="btn btn-outline-light text-dark border shadow-sm d-flex align-items-center p-3 rounded-3 text-start hover-bg-light transition-all">
+                                    <img src="https://companieslogo.com/img/orig/MBB.VN-e80674ce.png?t=1720244492" alt="MB Bank" width="40" height="40" class="me-3 rounded-circle bg-white shadow-sm p-1">
+                                    <div>
+                                        <div class="fw-bold">MB Bank</div>
+                                        <small class="text-muted">Ngân hàng Quân đội</small>
+                                    </div>
+                                    <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                                </button>
+                                
+                                <button class="btn btn-outline-light text-dark border shadow-sm d-flex align-items-center p-3 rounded-3 text-start hover-bg-light transition-all">
+                                    <img src="https://companieslogo.com/img/orig/VPB.VN-8424dc4e.png?t=1720244494" alt="VPBank" width="40" height="40" class="me-3 rounded-circle bg-white shadow-sm p-1">
+                                    <div>
+                                        <div class="fw-bold">VPBank</div>
+                                        <small class="text-muted">Ngân hàng TMCP Việt Nam Thịnh Vượng</small>
+                                    </div>
+                                    <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="mt-4 text-center">
+                                <a href="#" class="text-decoration-none small text-primary fw-bold">Xem tất cả ngân hàng <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button class="btn btn-link text-muted" onclick="history.back()">Quay lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-bg-light:hover {
+        background-color: #f8f9fa !important;
+        transform: translateY(-2px);
+    }
+</style>

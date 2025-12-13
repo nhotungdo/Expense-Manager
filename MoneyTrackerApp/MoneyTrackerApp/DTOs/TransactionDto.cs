@@ -36,6 +36,12 @@ public class CreateTransactionDto
     // For receipt scanning
     public string? AttachmentUrl { get; set; }
     public string? OcrText { get; set; }
+
+    // For Recurring Transaction
+    public bool IsRecurring { get; set; }
+    public string? RecurringFrequency { get; set; }
+    public int? RecurringInterval { get; set; }
+    public DateTime? RecurringEndDate { get; set; }
 }
 
 /// <summary>

@@ -1,0 +1,110 @@
+@page
+@model MoneyTrackerApp.Pages.Transactions.ScheduledModel
+@{
+    ViewData["Title"] = "Giao dịch Định kỳ";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-gray-800">Giao dịch Định kỳ</h1>
+            <p class="text-muted">Quản lý các khoản thu chi tự động</p>
+        </div>
+        <a href="/Transactions/Create" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i> Tạo mới
+        </a>
+    </div>
+
+    @if (Model.ScheduledTransactions.Any())
+    {
+        <div class="row g-4">
+            @foreach (var item in Model.ScheduledTransactions)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow transition-all @(item.IsActive ? "" : "opacity-75")">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-box rounded-3 d-flex align-items-center justify-content-center text-white" 
+                                         style="width: 48px; height: 48px; background-color: @(item.CategoryColor ?? "#64748b")">
+                                        <i class="@(item.CategoryIcon ?? "fas fa-sync") fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-truncate" style="max-width: 150px;">@(item.Note ?? item.CategoryName ?? "Không tên")</h6>
+                                        <small class="text-muted">@item.AccountName</small>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <form method="post" asp-page-handler="Toggle" asp-route-id="@item.Id" asp-route-isActive="@(!item.IsActive)" class="d-inline">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" onchange="this.form.submit()" @(item.IsActive ? "checked" : "")>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="fw-bold @(item.TransactionType == 1 ? "text-success" : "text-danger")">
+                                    @(item.TransactionType == 1 ? "+" : "-") @item.Amount.ToString("N0") <small class="fs-6 text-muted">VND</small>
+                                </h4>
+                                <div class="d-flex align-items-center gap-2 text-sm text-muted mt-2">
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fas fa-redo me-1"></i> @GetFrequencyDisplay(item.Frequency, item.Interval)
+                                    </span>
+                                    <span>•</span>
+                                    <span>Lần tới: <strong>@item.NextRunDate.ToString("dd/MM/yyyy")</strong></span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <small class="text-muted">
+                                    @if(item.EndDate.HasValue) {
+                                        <span>Kết thúc: @item.EndDate.Value.ToString("dd/MM/yyyy")</span>
+                                    } else {
+                                        <span>Vô thời hạn</span>
+                                    }
+                                </small>
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" onsubmit="return confirm('Bạn có chắc chắn muốn xóa không?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border border-dashed">
+            <div class="mb-4">
+                <i class="fas fa-calendar-check fa-3x text-muted opacity-50"></i>
+            </div>
+            <h4 class="fw-bold text-gray-800">Chưa có giao dịch định kỳ nào</h4>
+            <p class="text-muted">Tạo giao dịch định kỳ để tự động hóa việc ghi chép chi tiêu của bạn.</p>
+            <a href="/Transactions/Create" class="btn btn-primary rounded-pill mt-2">Thêm giao dịch ngay</a>
+        </div>
+    }
+</div>
+
+@functions {
+    string GetFrequencyDisplay(string frequency, int interval) {
+        if (interval == 1) {
+            return frequency switch {
+                "Daily" => "Hàng ngày",
+                "Weekly" => "Hàng tuần",
+                "Monthly" => "Hàng tháng",
+                "Yearly" => "Hàng năm",
+                _ => frequency
+            };
+        } else {
+             return frequency switch {
+                "Daily" => $"Mỗi {interval} ngày",
+                "Weekly" => $"Mỗi {interval} tuần",
+                "Monthly" => $"Mỗi {interval} tháng",
+                "Yearly" => $"Mỗi {interval} năm",
+                _ => $"{frequency} ({interval})"
+            };
+        }
+    }
+}

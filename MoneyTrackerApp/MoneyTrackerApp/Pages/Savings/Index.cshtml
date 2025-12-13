@@ -1,0 +1,192 @@
+@page
+@using MoneyTrackerApp.Enums
+@model MoneyTrackerApp.Pages.Savings.IndexModel
+@{
+    ViewData["Title"] = "Sổ Tiết kiệm";
+}
+
+<div class="p-6 space-y-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Sổ Tiết kiệm</h1>
+            <p class="text-slate-500 text-sm">Theo dõi và quản lý các mục tiêu tài chính của bạn</p>
+        </div>
+        <a asp-page="./Create" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 transform active:scale-95">
+            <i class="fas fa-plus"></i>
+            <span>Mục tiêu mới</span>
+        </a>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Total Saved -->
+        <div class="bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 mb-2 opacity-90">
+                    <i class="fas fa-coins bg-white/20 p-1.5 rounded-lg"></i>
+                    <p class="text-sm font-medium">Tổng tích lũy</p>
+                </div>
+                <h3 class="text-3xl font-bold tracking-tight">@Model.TotalSaved.ToString("N0") <span class="text-lg opacity-80 font-normal">đ</span></h3>
+                 <p class="text-xs text-indigo-100 mt-2 opacity-80">Trên tổng @Model.TotalGoalsCount mục tiêu</p>
+            </div>
+            <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform duration-500">
+                <i class="fas fa-piggy-bank text-9xl"></i>
+            </div>
+        </div>
+
+        <!-- Completion Rate -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between relative overflow-hidden">
+             <div class="z-10">
+                 <p class="text-slate-500 text-sm font-medium mb-1">Tiến độ tổng thể</p>
+                 <div class="flex items-baseline gap-2">
+                     <h3 class="text-3xl font-bold text-slate-900">
+                         @(Model.TotalTarget > 0 ? (Model.TotalSaved / Model.TotalTarget * 100).ToString("F1") : "0")%
+                     </h3>
+                 </div>
+                 <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                     <i class="fas fa-check-circle text-emerald-500"></i>
+                     Đã hoàn thành @Model.CompletedGoalsCount mục tiêu
+                 </p>
+            </div>
+            <!-- Simple circular progress visualisation using border -->
+            <div class="relative w-20 h-20 rounded-full border-8 border-slate-100 flex items-center justify-center">
+                 <div class="absolute inset-0 rounded-full border-8 border-violet-500 border-t-transparent origin-center transform -rotate-45" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: rotate(@(Model.TotalTarget > 0 ? (Model.TotalSaved / Model.TotalTarget * 360) : 0)deg);"></div>
+                 <i class="fas fa-chart-pie text-2xl text-violet-500"></i>
+            </div>
+        </div>
+
+        <!-- Next Goal Info -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
+             <p class="text-slate-500 text-sm font-medium mb-3">Mục tiêu ưu tiên</p>
+             @if(Model.SavingsGoals.Any(g => g.Status == (int)SavingsGoalStatus.Active)) {
+                 var nextGoal = Model.SavingsGoals.Where(g => g.Status == (int)SavingsGoalStatus.Active).OrderBy(g => g.TargetDate).FirstOrDefault();
+                 if(nextGoal != null) {
+                    var percent = nextGoal.TargetAmount > 0 ? (nextGoal.CurrentAmount / nextGoal.TargetAmount * 100) : 0;
+                     <div class="flex items-start gap-4">
+                         <div class="w-12 h-12 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+                             <i class="@(nextGoal.Icon ?? "fas fa-bullseye") text-xl"></i>
+                         </div>
+                         <div class="flex-1 min-w-0">
+                             <h4 class="font-bold text-slate-900 truncate mb-1">@nextGoal.Name</h4>
+                             <div class="w-full bg-slate-100 rounded-full h-1.5 mb-2">
+                                <div class="bg-violet-500 h-full rounded-full" style="width: @Math.Min(percent, 100)%"></div>
+                             </div>
+                             <div class="flex justify-between items-center text-xs">
+                                 <span class="font-bold text-slate-700">@percent.ToString("F0")%</span>
+                                 @if(nextGoal.TargetDate.HasValue) {
+                                      <span class="text-slate-500">Còn @((nextGoal.TargetDate.Value.ToDateTime(TimeOnly.MinValue) - DateTime.Now).Days) ngày</span>
+                                 }
+                             </div>
+                         </div>
+                     </div>
+                 }
+             } else {
+                  <div class="h-full flex flex-col justify-center">
+                    <p class="text-slate-400 text-sm flex items-center gap-2">
+                        <i class="fas fa-check-double"></i> Tất cả mục tiêu đã hoàn thành!
+                    </p>
+                  </div>
+             }
+        </div>
+    </div>
+
+    <!-- Goals Grid -->
+    @if(Model.SavingsGoals.Count > 0)
+    {
+        <h2 class="text-lg font-bold text-slate-900 mt-8 mb-4">Danh sách mục tiêu</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var goal in Model.SavingsGoals)
+            {
+                var percent = goal.TargetAmount > 0 ? (goal.CurrentAmount / goal.TargetAmount * 100) : 100;
+                var daysLeft = goal.TargetDate.HasValue ? (goal.TargetDate.Value.ToDateTime(TimeOnly.MinValue) - DateTime.Now).Days : -1;
+                var isCompleted = goal.Status == (int)SavingsGoalStatus.Completed || percent >= 100;
+                
+                <div class="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col h-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <div class="dropdown dropdown-end">
+                              <!-- Simple Menu Button -->
+                              <button class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-colors">
+                                  <i class="fas fa-ellipsis-h"></i>
+                              </button>
+                        </div>
+                    </div>
+
+                    <!-- Icon & Title -->
+                    <div class="flex items-center gap-4 mb-5">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-sm transition-transform group-hover:scale-105" 
+                             style="background-color: @(goal.Color != null ? goal.Color + "20" : "#f5f3ff"); color: @(goal.Color ?? "#7c3aed")">
+                            <i class="@(goal.Icon ?? "fas fa-piggy-bank")"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg line-clamp-1" title="@goal.Name">@goal.Name</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                @if(isCompleted) {
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
+                                        <i class="fas fa-check"></i> Hoàn thành
+                                    </span>
+                                } else if(daysLeft >= 0) {
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-bold uppercase tracking-wider">
+                                        <i class="far fa-clock"></i> Còn @daysLeft ngày
+                                    </span>
+                                } else if (goal.TargetDate.HasValue) {
+                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">
+                                        <i class="fas fa-exclamation-triangle"></i> Quá hạn
+                                    </span>
+                                } else {
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider">
+                                        Vô thời hạn
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="space-y-2 mb-6 flex-1">
+                        <div class="flex justify-between items-end text-sm">
+                            <span class="text-slate-500 font-medium">Tiến độ</span>
+                            <span class="font-bold text-slate-900">@percent.ToString("F0")%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-1000 ease-out relative" 
+                                 style="width: @(Math.Min(percent, 100))%; background-color: @(goal.Color ?? "#7c3aed")">
+                                  <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-xs mt-1">
+                             <span class="font-bold text-slate-700 text-sm">@goal.CurrentAmount.ToString("N0")</span>
+                             <span class="text-slate-400">/ @goal.TargetAmount.ToString("N0")</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="pt-4 border-t border-slate-50 mt-auto flex gap-3">
+                        @if(!isCompleted) {
+                            <a asp-page="/Transactions/Create" asp-route-goalId="@goal.Id" class="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm hover:shadow">
+                                <i class="fas fa-plus-circle"></i> Nạp tiền
+                            </a>
+                        } else {
+                            <button class="flex-1 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl text-sm font-semibold cursor-default flex items-center justify-center gap-2">
+                                <i class="fas fa-medal"></i> Tuyệt vời!
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+            <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300 text-5xl">
+                <i class="fas fa-piggy-bank"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Bạn chưa có mục tiêu tiết kiệm nào</h3>
+            <p class="text-slate-500 mb-8 max-w-sm mx-auto">Việc đặt mục tiêu rõ ràng giúp bạn đạt được tự do tài chính nhanh hơn.</p>
+            <a asp-page="./Create" class="px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all font-semibold inline-flex items-center gap-3">
+                <i class="fas fa-magic"></i> Tạo mục tiêu đầu tiên
+            </a>
+        </div>
+    }
+</div>

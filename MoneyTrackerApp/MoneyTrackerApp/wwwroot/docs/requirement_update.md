@@ -1,102 +1,96 @@
+Kiểm tra các chức năng dưới đây đã hoàn thiện bao nhiêu phần trăm rồi của dự án.Các chức năng được chia từ cơ bản (Core) đến nâng cao (Advanced) dựa trên cấu trúc bảng và các trường dữ liệu.
 
-Dưới đây là cấu trúc Sidebar chuẩn cho mô hình SaaS/Fintech hiện đại:
+### 1. Nhóm Chức năng Cơ bản (Core Features)
 
-### 1\. Header (Thương hiệu)
+Đây là các chức năng nền tảng bắt buộc phải có để ứng dụng hoạt động.
 
-Nằm ở vị trí cao nhất, cố định.
+* **Quản lý Tài khoản & Xác thực người dùng (Auth):**
+    * Đăng ký/Đăng nhập (Hỗ trợ Google Login qua `GoogleId`).
+    * Quản lý hồ sơ cá nhân: Avatar, Ngày sinh, Địa chỉ, Giới tính.
+    * Cài đặt cá nhân hóa: Đổi ngôn ngữ, Đơn vị tiền tệ mặc định, Múi giờ, Giao diện Sáng/Tối (Light/Dark theme).
+    * Bảo mật: Xác thực 2 lớp (2FA), Khóa tài khoản khi đăng nhập sai nhiều lần.
+    * Quy trình Onboarding: Hướng dẫn người dùng mới thiết lập hồ sơ ban đầu (Thu nhập, chi tiêu, mục tiêu).
 
-  * **Logo & Tên ứng dụng:** Ví dụ: Icon cái ví cách điệu + chữ "MoneyTracker".
-  * **Nút thu gọn (Collapse):** Icon mũi tên `<<` hoặc icon Hamburger (3 gạch) để thu nhỏ sidebar chỉ còn icon (giúp mở rộng không gian làm việc trên màn hình nhỏ).
+* **Quản lý Ví/Tài khoản tiền (Wallet Management):**
+    * Tạo nhiều loại ví: Tiền mặt, Ngân hàng, Ví điện tử, Thẻ tín dụng, Tiết kiệm.
+    * Theo dõi số dư: Số dư ban đầu và Số dư hiện tại.
+    * Tùy chỉnh giao diện ví: Chọn Icon và Màu sắc để dễ nhận diện.
 
------
+* **Quản lý Danh mục (Categories):**
+    * Phân loại Thu/Chi.
+    * Hỗ trợ danh mục đa cấp (Danh mục cha - con).
+    * Danh mục mặc định của hệ thống & Danh mục riêng do người dùng tạo.
 
-### 2\. Menu Chính (General / Dashboard)
+* **Quản lý Giao dịch (Transactions):**
+    * Thêm mới giao dịch: Thu, Chi, Chuyển tiền giữa các ví (Transfer).
+    * Ghi chú, đính kèm ảnh hóa đơn (`AttachmentUrl`).
+    * Tự động cập nhật số dư ví khi có giao dịch phát sinh (Trigger `tr_Transactions_UpdateAccountBalance`).
 
-Nhóm các chức năng người dùng truy cập hàng ngày.
+### 2. Nhóm Chức năng Trung cấp (Intermediate Features)
 
-  * [Icon Dashboard 🏠] **Tổng quan:** Xem biểu đồ, chỉ số nhanh.
-  * [Icon Robot/Stars ✨] **Trợ lý AI:** (Tính năng "Gemini" của anh) - Chat với AI để hỏi về tài chính. *Nên làm nổi bật mục này (ví dụ text màu gradient) để user chú ý.*
-  * [Icon Ví 👛] **Ví của tôi:** Quản lý số dư, nạp/rút tiền.
-  * [Icon List 📝] **Sổ giao dịch:** Xem lịch sử chi tiêu chi tiết (Trang mà anh vừa hỏi thiết kế).
+Các chức năng giúp người dùng kiểm soát tài chính tốt hơn.
 
-### 3\. Quản lý Tài chính (Finance Tools)
+* **Quản lý Ngân sách (Budgets):**
+    * Thiết lập hạn mức chi tiêu theo Danh mục hoặc theo Ví.
+    * Chu kỳ ngân sách linh hoạt: Tuần, Tháng, Năm hoặc Tùy chỉnh ngày.
 
-Nhóm các công cụ chuyên sâu hơn.
+* **Sổ Tiết kiệm & Mục tiêu (Savings Goals):**
+    * Tạo mục tiêu tiết kiệm (Mua nhà, Mua xe...) với số tiền và ngày đích.
+    * Theo dõi tiến độ hoàn thành (Thanh trạng thái, màu sắc).
+    * Ghi nhận các giao dịch nạp tiền vào mục tiêu.
 
-  * [Icon Pie Chart 📊] **Ngân sách & Hạn mức:** Cài đặt giới hạn chi tiêu (Trang Budget).
-  * [Icon Tag 🏷️] **Danh mục:** Quản lý các loại chi tiêu (Ăn uống, Đi lại, Server...).
-  * [Icon File 📄] **Báo cáo & Xuất file:** Tải báo cáo tháng, quyết toán thuế.
+* **Giao dịch Định kỳ (Recurring/Scheduled):**
+    * Lên lịch tự động cho các khoản thu chi cố định (Tiền nhà, Tiền lương, Netflix...).
+    * Tần suất đa dạng: Hàng ngày, tuần, tháng, năm.
 
-### 4\. Khu vực Tài khoản & Gói cước (Account & Billing)
+* **Quản lý Nợ vay (Debts):**
+    * Ghi chép sổ nợ: "Tôi nợ ai" và "Ai nợ tôi".
+    * Tính lãi suất nợ (Interest Rate).
+    * Theo dõi lịch sử trả nợ từng phần.
 
-Đây là khu vực quan trọng để kiếm tiền (Monetization).
+* **Báo cáo & Thống kê (Reports):**
+    * Dashboard tổng quan: Tổng thu, tổng chi, số dư.
+    * Biểu đồ xu hướng dòng tiền theo tháng.
+    * Phân tích chi tiêu theo danh mục.
+    * Xuất báo cáo ra file (PDF/Excel).
 
-  * [Icon Credit Card 💳] **Gói dịch vụ (Subscription):**
-      * Xem gói đang dùng (Free/Pro).
-      * Lịch sử gia hạn.
-  * [Icon Settings ⚙️] **Cài đặt:** Đổi mật khẩu, cấu hình thông báo (Email/SMS), bật tắt theme Noel.
-  * [Icon Life Ring 🛟] **Trợ giúp & Support:** Link đến tài liệu hướng dẫn hoặc chat với Admin.
+### 3. Nhóm Chức năng Nâng cao (Advanced Features)
 
------
+Các chức năng tạo nên sự khác biệt, thông minh và mang tính cộng đồng.
 
-### 5\. Widget "Nâng cấp ngay" (The Upsell Card) - **Rất quan trọng**
+* **Công nghệ OCR (Quét hóa đơn):**
+    * Trích xuất thông tin tự động từ hình ảnh hóa đơn (trường `OcrText` trong bảng Transactions) giúp nhập liệu nhanh.
 
-Nếu người dùng đang dùng gói **Free**, anh nên chèn một thẻ nhỏ (Card) nằm ngay trong Sidebar, phía dưới các menu.
+* **Quản lý Đầu tư (Investments):**
+    * Theo dõi danh mục đầu tư đa dạng: Cổ phiếu, Crypto, Vàng, Quỹ.
+    * Ghi nhận giá mua và giá trị hiện tại (lời/lỗ).
 
-  * **Giao diện:** Một khung hình chữ nhật nhỏ, nền gradient đẹp mắt.
-  * **Nội dung:**
-      * Text: "Nâng cấp lên Pro".
-      * Sub-text: "Mở khóa AI & Không giới hạn".
-      * Nút bấm: [Nâng cấp] (Kêu gọi hành động).
-  * *Tác dụng:* Nhắc nhở người dùng liên tục về việc nâng cấp mà không quá phiền phức.
+* **Chi tiêu Nhóm (Group Expenses - Splitwise style):**
+    * Tạo nhóm chi tiêu (Du lịch, Ăn uống, Tiền nhà trọ).
+    * Thêm thành viên vào nhóm.
+    * Chia tiền hóa đơn: Ai trả tiền, chia cho những ai (Splits).
 
------
+* **Ví Chia sẻ (Shared Wallets):**
+    * Khác với chi tiêu nhóm, đây là chia sẻ quyền truy cập trực tiếp vào một ví cụ thể (Ví dụ: Ví gia đình).
+    * Phân quyền chi tiết: Chỉ xem, Được thêm giao dịch, hoặc Toàn quyền.
 
-### 6\. Footer Sidebar (User Profile)
+* **Kết nối Ngân hàng (Bank Sync):**
+    * Liên kết tài khoản ngân hàng thực tế để đồng bộ giao dịch tự động (thông qua Provider, AccessToken).
 
-Nằm cố định dưới cùng đáy màn hình.
+* **Đa tiền tệ (Multi-currency):**
+    * Hỗ trợ giao dịch với nhiều loại tiền tệ khác nhau.
+    * Cập nhật tỷ giá hối đoái tự động.
 
-  * **Avatar:** Ảnh đại diện (Có đội mũ Noel như đã bàn).
-  * **Tên & Email:** Hiển thị rút gọn (ví dụ: "Tuan Anh...").
-  * **Nút Đăng xuất (Logout):** Icon cửa thoát hiểm.
+* **Trợ lý ảo AI (AI Advisor):**
+    * Hệ thống gợi ý tài chính thông minh dựa trên dữ liệu chi tiêu của người dùng.
 
------
+* **Hệ thống Hội viên & Thanh toán (Subscription & Monetization):**
+    * Cung cấp các gói dịch vụ (Gói Miễn phí, Cơ bản, Chuyên nghiệp, Doanh nghiệp).
+    * Quản lý đăng ký định kỳ, tự động gia hạn.
+    * Tích hợp cổng thanh toán để mua gói nâng cấp.
 
-### Gợi ý Bố cục (Visual Hierarchy)
-
-```text
-+------------------------------+
-|  [LOGO] MONEY TRACKER    [<] |  <-- Header
-+------------------------------+
-|                              |
-|  TỔNG QUAN                   |  <-- Label nhóm (Text nhỏ, mờ)
-|  [🏠] Dashboard              |
-|  [✨] Trợ lý AI (Mới)        |
-|                              |
-|  TÀI CHÍNH                   |
-|  [👛] Ví của tôi             |
-|  [📝] Lịch sử giao dịch      |
-|  [📊] Ngân sách              |
-|                              |
-|  CÀI ĐẶT                     |
-|  [💳] Gói dịch vụ            |
-|  [⚙️] Cấu hình               |
-|                              |
-|  +------------------------+  |
-|  | 🚀 Go Pro              |  |
-|  | Mở khóa full tính năng |  |  <-- Upsell Widget
-|  | [Nâng cấp ngay]        |  |
-|  +------------------------+  |
-|                              |
-+------------------------------+
-|  [Avatar] Nguyen Van A       |  <-- Footer (User Profile)
-|           nguyen@...   [->]  |
-+------------------------------+
-```
-
-### Lưu ý kỹ thuật (Cho Dev):
-
-1.  **Active State:** Khi người dùng đang ở trang "Giao dịch", mục [Sổ giao dịch] ở sidebar phải sáng lên (đổi màu nền hoặc đậm chữ) để user biết mình đang ở đâu.
-2.  **Role-based:** Nếu người đăng nhập là **Admin**, Sidebar cần hiện thêm mục **"Quản trị hệ thống"** (Quản lý User, CMS...). Nếu là User thường thì ẩn đi.
-
+* **Hệ thống Thông báo (Notifications):**
+    * Cảnh báo tài chính (Vượt ngân sách, nhắc nợ).
+    * Thông báo đẩy (Push) và Email.
+    * Audit Log: Ghi lại lịch sử hoạt động để bảo mật và tra soát.
 

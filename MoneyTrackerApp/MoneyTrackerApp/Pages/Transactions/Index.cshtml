@@ -15,12 +15,17 @@
         </div>
         
         <!-- Time Filter (Simplified for now as Date Range Picker) -->
-        <form method="get" class="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-            <input type="date" asp-for="Filter.StartDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
-            <span class="text-slate-400">-</span>
-            <input type="date" asp-for="Filter.EndDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
-            <button type="submit" class="hidden">Filter</button>
-        </form>
+        <div class="flex items-center gap-2">
+            <a href="/Transactions/Scheduled" class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
+                <i class="fas fa-clock"></i> Định kỳ
+            </a>
+            <form method="get" class="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
+                <input type="date" asp-for="Filter.StartDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
+                <span class="text-slate-400">-</span>
+                <input type="date" asp-for="Filter.EndDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
+                <button type="submit" class="hidden">Filter</button>
+            </form>
+        </div>
     </div>
 
     <!-- 2. Summary Cards -->
