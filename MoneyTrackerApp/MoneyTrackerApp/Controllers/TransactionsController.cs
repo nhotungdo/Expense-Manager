@@ -69,6 +69,24 @@ namespace MoneyTrackerApp.Controllers
             }
         }
 
+        [HttpPost("transfer")]
+        public async Task<ActionResult<TransactionResponseDto>> TransferMoney([FromBody] TransferMoneyDto dto)
+        {
+            try
+            {
+                var transaction = await _transactionService.TransferMoneyAsync(GetUserId(), dto);
+                return Ok(transaction);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error processing transfer", details = ex.Message });
+            }
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult<TransactionResponseDto>> UpdateTransaction(long id, [FromBody] UpdateTransactionDto dto)
         {

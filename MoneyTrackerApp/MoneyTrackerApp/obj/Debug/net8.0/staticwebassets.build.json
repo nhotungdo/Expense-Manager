@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "XnjPinyADc7PduL5u79mDTxjbmr17Al3bkYzJzypGsc=",
+  "Hash": "+BftPuLouGbame9GJykSV+7v4KMkCh8WOJp26Yp6lcc=",
   "Source": "MoneyTrackerApp",
   "BasePath": "_content/MoneyTrackerApp",
   "Mode": "Default",
@@ -226,6 +226,25 @@
       "OriginalItemSpec": "wwwroot\\css\\debts.css"
     },
     {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\design-system.css",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "css/design-system.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\design-system.css"
+    },
+    {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\groups.css",
       "SourceId": "MoneyTrackerApp",
       "SourceType": "Discovered",
@@ -300,6 +319,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\main.css"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\micro-interactions.css",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "css/micro-interactions.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\micro-interactions.css"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\modern-pages.css",
@@ -642,6 +680,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\header.js"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\micro-interactions.js",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "js/micro-interactions.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\micro-interactions.js"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\onboarding-basic-settings.js",

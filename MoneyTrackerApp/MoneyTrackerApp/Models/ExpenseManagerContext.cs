@@ -17,8 +17,6 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
-    public virtual DbSet<AiSuggestion> AiSuggestions { get; set; }
-
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
 
     public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
@@ -89,6 +87,10 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<Payment> Payments { get; set; }
 
+    public virtual DbSet<AiSuggestion> AiSuggestions { get; set; }
+    
+    public virtual DbSet<UserOtp> UserOtps { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
@@ -114,19 +116,6 @@ public partial class ExpenseManagerContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
 
             entity.HasOne(d => d.User).WithMany(p => p.Accounts).HasForeignKey(d => d.UserId);
-        });
-
-        modelBuilder.Entity<AiSuggestion>(entity =>
-        {
-            entity.HasIndex(e => e.UserId, "IX_AiSuggestions_UserId");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Suggestion).HasMaxLength(1024);
-            entity.Property(e => e.SuggestionType)
-                .HasMaxLength(50)
-                .HasDefaultValue("Financial Advice");
-
-            entity.HasOne(d => d.User).WithMany(p => p.AiSuggestions).HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<AspNetRole>(entity =>
@@ -733,6 +722,31 @@ public partial class ExpenseManagerContext : DbContext
             entity.HasOne(d => d.Subscription).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.SubscriptionId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<AiSuggestion>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_AiSuggestions_UserId");
+            entity.HasIndex(e => e.CreatedAt, "IX_AiSuggestions_CreatedAt");
+
+            entity.Property(e => e.SuggestionType).HasMaxLength(50);
+            entity.Property(e => e.Suggestion).HasMaxLength(1024);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.IsRead).HasDefaultValue(false);
+
+            entity.HasOne(d => d.User).WithMany().HasForeignKey(d => d.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<UserOtp>(entity =>
+        {
+            entity.ToTable("UserOtps");
+            entity.HasIndex(e => e.UserId, "IX_UserOtps_UserId");
+            entity.Property(e => e.OtpCode).HasMaxLength(10).IsRequired();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.ExpiresAt).IsRequired();
+            entity.Property(e => e.IsUsed).HasDefaultValue(false);
+            
+            entity.HasOne(d => d.User).WithMany().HasForeignKey(d => d.UserId).OnDelete(DeleteBehavior.Cascade);
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1841,6 +1841,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "MoneyTrackerApp.Controllers.Api.OcrController",
+    "Method": "ScanReceipt",
+    "RelativePath": "api/Ocr/scan",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "MoneyTrackerApp.DTOs.OcrReceiptDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "MoneyTrackerApp.Controllers.OcrController",
     "Method": "Upload",
     "RelativePath": "api/Ocr/upload",
@@ -2993,5 +3009,31 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.TransactionsController",
+    "Method": "TransferMoney",
+    "RelativePath": "api/Transactions/transfer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MoneyTrackerApp.DTOs.TransferMoneyDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MoneyTrackerApp.DTOs.TransactionResponseDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   }
 ]

@@ -54,7 +54,7 @@
                     
                     if (status.isCompleted) {
                         // Onboarding completed, go to home
-                        window.location.href = '/Home';
+                        window.location.href = '/home';
                     } else {
                         // Continue onboarding
                         redirectToOnboardingStep(status.currentStep);
@@ -89,7 +89,7 @@
                 3: '/Onboarding/CreateWallet',
                 4: '/Onboarding/SetupCategories',
                 5: '/Onboarding/SavingsGoal',
-                6: '/Home'
+                6: '/home'
             };
 
             window.location.href = stepRoutes[step] || '/Onboarding/Welcome';

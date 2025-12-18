@@ -43,10 +43,11 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTracker
 // Register System Utility Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ICurrencyService, MoneyTrackerApp.Services.CurrencyService>();
-builder.Services.AddHttpClient(); // Add HttpClient for AI services
-builder.Services.AddScoped<MoneyTrackerApp.Services.IAiAdvisorService, MoneyTrackerApp.Services.AiAdvisorService>();
+builder.Services.AddHttpClient();
 
-// Register Onboarding Service
+// Register AI Services
+builder.Services.AddScoped<MoneyTrackerApp.Services.IGeminiAnalysisService, MoneyTrackerApp.Services.GeminiAnalysisService>();
+
 // Register Onboarding Service
 builder.Services.AddScoped<MoneyTrackerApp.Services.OnboardingService>();
 
@@ -71,7 +72,12 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayErrorHandler>();
 builder.Services.AddSingleton<MoneyTrackerApp.Services.VnPayMonitoringService>();
 
 // Register VNPay QR Payment Service (Only payment method supported)
+// Register VNPay QR Payment Service (Only payment method supported)
 builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayService>();
+
+// Register Communication Services
+builder.Services.AddScoped<MoneyTrackerApp.Services.IEmailService, MoneyTrackerApp.Services.EmailService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IOtpService, MoneyTrackerApp.Services.OtpService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");

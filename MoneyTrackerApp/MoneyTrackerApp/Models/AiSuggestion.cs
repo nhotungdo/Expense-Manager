@@ -1,19 +1,27 @@
 using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MoneyTrackerApp.Models;
-
-public partial class AiSuggestion
+namespace MoneyTrackerApp.Models
 {
-    public long Id { get; set; }
+    public class AiSuggestion
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public long UserId { get; set; }
+        public long UserId { get; set; }
 
-    public string? Suggestion { get; set; }
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; }
 
-    public string? SuggestionType { get; set; }
+        [StringLength(1024)]
+        public string Suggestion { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+        [StringLength(50)]
+        public string SuggestionType { get; set; }
 
-    public virtual User User { get; set; } = null!;
+        public bool IsRead { get; set; } = false;
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }

@@ -89,7 +89,7 @@
             '/transactions',
             '/Reports',
             '/Reports?search=',
-            '/Home'
+            '/home'
         ];
 
         // Build a target URL with query parameter

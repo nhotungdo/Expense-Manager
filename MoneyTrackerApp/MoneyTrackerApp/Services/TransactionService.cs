@@ -13,6 +13,7 @@ public interface ITransactionService
     Task<TransactionResponseDto?> GetTransactionByIdAsync(long transactionId, long userId);
     Task<List<TransactionResponseDto>> GetUserTransactionsAsync(long userId, TransactionFilterDto filter);
     Task<TransactionResponseDto> CreateTransactionAsync(long userId, CreateTransactionDto dto);
+    Task<TransactionResponseDto> TransferMoneyAsync(long userId, TransferMoneyDto dto);
     Task<TransactionResponseDto> UpdateTransactionAsync(long userId, UpdateTransactionDto dto);
     Task<bool> DeleteTransactionAsync(long transactionId, long userId);
     Task<decimal> GetAccountBalanceFromTransactionsAsync(long accountId);
@@ -59,7 +60,10 @@ public class TransactionService : ITransactionService
 
         // Apply filters
         if (filter.AccountId.HasValue)
-            query = query.Where(t => t.AccountId == filter.AccountId.Value);
+        {
+            // Include transactions where this account is the source OR the destination (PairedAccount)
+            query = query.Where(t => t.AccountId == filter.AccountId.Value || (t.PairedAccountId == filter.AccountId.Value && t.TransactionType == 3));
+        }
 
         if (filter.CategoryId.HasValue)
             query = query.Where(t => t.CategoryId == filter.CategoryId.Value);
@@ -90,7 +94,12 @@ public class TransactionService : ITransactionService
             .Take(filter.PageSize)
             .ToListAsync();
 
-        return transactions.Select(MapToResponseDto).ToList();
+        // Pass the filtered AccountId context if accessible, to map descriptions correctly?
+        // Actually MapToResponseDto doesn't know which account we are viewing it from.
+        // We can infer it if we pass the accountId of interest, but standard usage might be general list.
+        // For now, let's keep it simple or guess based on logic.
+        
+        return transactions.Select(t => MapToResponseDto(t, filter.AccountId)).ToList();
     }
 
     /// <summary>
@@ -116,6 +125,12 @@ public class TransactionService : ITransactionService
             if (pairedAccount == null)
                 throw new InvalidOperationException("Paired account not found or you don't have permission");
                 
+            // Check sufficient funds in source
+            if (account.CurrentBalance < dto.Amount)
+            {
+                 throw new InvalidOperationException($"Insufficient funds in source wallet '{account.Name}'. Available: {account.CurrentBalance}, Required: {dto.Amount}");
+            }
+
             // Update paired account balance for transfer
             pairedAccount.CurrentBalance += dto.Amount;
             pairedAccount.UpdatedAt = DateTime.UtcNow;
@@ -201,6 +216,43 @@ public class TransactionService : ITransactionService
             await _context.Entry(transaction).Reference(t => t.PairedAccount).LoadAsync();
 
         return MapToResponseDto(transaction);
+    }
+    
+    public async Task<TransactionResponseDto> TransferMoneyAsync(long userId, TransferMoneyDto dto)
+    {
+         // Basic validations
+         if (dto.SourceAccountId == dto.TargetAccountId)
+             throw new InvalidOperationException("Cannot transfer to the same wallet.");
+
+         // Validate OTP if needed (mock)
+         if (!string.IsNullOrEmpty(dto.OtpCode) && dto.OtpCode != "1234") // Simple mock
+             throw new InvalidOperationException("Invalid OTP code.");
+
+         // Daily Limit Check
+         var today = DateTime.UtcNow.Date;
+         var todaysTransfers = await _context.Transactions
+             .Where(t => t.UserId == userId && t.TransactionType == 3 && t.TransactionDate >= today)
+             .ToListAsync();
+         
+         if (todaysTransfers.Count >= 20)
+             throw new InvalidOperationException("Daily transfer limit reached (20 transactions).");
+             
+         var dailyTotal = todaysTransfers.Sum(t => t.Amount);
+         if (dailyTotal + dto.Amount > 100000000) // 100M limit
+             throw new InvalidOperationException("Daily transfer amount limit reached (100,000,000 VND).");
+
+         var createDto = new CreateTransactionDto
+         {
+             AccountId = dto.SourceAccountId,
+             PairedAccountId = dto.TargetAccountId,
+             Amount = dto.Amount,
+             Currency = "VND", // Default for now
+             TransactionDate = DateTime.UtcNow,
+             TransactionType = 3, // Transfer
+             Note = dto.Note ?? "Transfer"
+         };
+
+         return await CreateTransactionAsync(userId, createDto);
     }
 
     /// <summary>
@@ -380,16 +432,28 @@ public class TransactionService : ITransactionService
             .Take(count)
             .ToListAsync();
 
-        return transactions.Select(MapToResponseDto).ToList();
+        return transactions.Select(t => MapToResponseDto(t)).ToList();
     }
 
     // Helper Methods
 
-    private TransactionResponseDto MapToResponseDto(Transaction transaction)
+    private TransactionResponseDto MapToResponseDto(Transaction transaction, long? contextAccountId = null)
     {
         // Generate intelligent description: CategoryName > Note > Default based on type
         string description;
-        if (!string.IsNullOrWhiteSpace(transaction.Category?.Name))
+        bool isIncomingTransfer = transaction.TransactionType == 3 && transaction.PairedAccountId == contextAccountId;
+        // If contextAccountId is null, we can't easily determine direction if we just look at the list, 
+        // but for a general list we might assume standard display. 
+        // However, if the row is fetched because PairedAccountId matched, we should probably handle it.
+        // But since we selected the transaction row which has AccountId vs PairedAccountId, 
+        // the transaction row ITSELF has a main AccountId. 
+        // If we want to show it as "Incoming" we need to know if we are viewing it from the perspective of PairedAccount.
+        
+        if (contextAccountId.HasValue && transaction.PairedAccountId == contextAccountId && transaction.TransactionType == 3)
+        {
+             description = $"Nhận tiền từ {transaction.Account?.Name ?? "ví khác"}";
+        }
+        else if (!string.IsNullOrWhiteSpace(transaction.Category?.Name))
         {
             description = transaction.Category.Name;
         }

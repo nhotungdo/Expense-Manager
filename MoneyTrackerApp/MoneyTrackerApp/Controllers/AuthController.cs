@@ -39,6 +39,7 @@ namespace MoneyTrackerApp.Controllers
         {
             public string Email { get; set; } = string.Empty;
             public string Password { get; set; } = string.Empty;
+            public bool RememberMe { get; set; }
         }
 
         public class TokenResponse
@@ -53,6 +54,7 @@ namespace MoneyTrackerApp.Controllers
         {
             public string Email { get; set; } = string.Empty;
             public string Code { get; set; } = string.Empty;
+            public bool RememberMe { get; set; }
         }
 
         [HttpGet("google/start")]
@@ -135,7 +137,7 @@ namespace MoneyTrackerApp.Controllers
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddMinutes(60)
+                    Expires = DateTime.UtcNow.AddMinutes(60) // Google login default 60 mins (could ask user before but standard is session)
                 });
 
                 var url = $"/Auth/Login?accessToken={Uri.EscapeDataString(pair.access)}&refreshToken={Uri.EscapeDataString(pair.refresh)}&role={Uri.EscapeDataString(user.Role)}";
@@ -306,14 +308,11 @@ namespace MoneyTrackerApp.Controllers
                 await _db.SaveChangesAsync();
 
                 // Return 2FA required status
-                // If in Development, we might return the code for easier testing, but strict security says no.
-                // For this OJT task, I'll log it to console if I could, but I can't see console.
-                // The user needs to 'Test security'. 
                 return Ok(new { message = "2fa_required", email = user.Email });
             }
 
             // If no 2FA, issue token immediately
-            return await IssueTokenAndLog(user, "Login Success");
+            return await IssueTokenAndLog(user, "Login Success", req.RememberMe);
         }
 
         [HttpPost("verify-2fa")]
@@ -346,27 +345,29 @@ namespace MoneyTrackerApp.Controllers
             _db.AspNetUserTokens.Remove(token);
             await _db.SaveChangesAsync();
 
-            return await IssueTokenAndLog(user, "Login 2FA Success");
+            return await IssueTokenAndLog(user, "Login 2FA Success", req.RememberMe);
         }
 
-        private async Task<ActionResult<TokenResponse>> IssueTokenAndLog(User user, string auditAction)
+        private async Task<ActionResult<TokenResponse>> IssueTokenAndLog(User user, string auditAction, bool rememberMe = false)
         {
             var pair = await _jwtService.IssueAsync(user);
 
-            Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
+            var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(60)
-            });
+                Expires = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddMinutes(60)
+            };
+            
+            Response.Cookies.Append("AccessToken", pair.access, cookieOptions);
 
             // [Audit] Log Success
             _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
             {
                 UserId = user.Id,
                 Action = "Login",
-                Details = auditAction,
+                Details = auditAction + (rememberMe ? " (RememberMe)" : ""),
                 CreatedAt = DateTime.UtcNow,
                 IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
                 UserAgent = Request.Headers["User-Agent"].ToString()
@@ -484,6 +485,38 @@ namespace MoneyTrackerApp.Controllers
             return Ok();
         }
 
+        [HttpPost("send-otp")]
+        [Authorize]
+        public async Task<IActionResult> SendOtp()
+        {
+            try
+            {
+                var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!long.TryParse(userIdStr, out var userId)) return Unauthorized();
 
+                var otpService = HttpContext.RequestServices.GetService<MoneyTrackerApp.Services.IOtpService>();
+                if (otpService == null) return StatusCode(500, "OtpService not available");
+
+                await otpService.GenerateAndSendOtpAsync(userId);
+                
+                // Audit Log
+                _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
+                {
+                    UserId = userId,
+                    Action = "Generate OTP",
+                    Details = "OTP requested for transaction/verification",
+                    CreatedAt = DateTime.UtcNow,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    UserAgent = Request.Headers["User-Agent"].ToString()
+                });
+                await _db.SaveChangesAsync();
+
+                return Ok(new { message = "OTP sent successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
     }
 }

@@ -20,6 +20,18 @@ namespace MoneyTrackerApp.Pages.Auth
             _logger = logger;
         }
 
+        public IActionResult OnGet()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                 // Check if user has specific claims or db lookups if needed, 
+                 // but basic redirect is enough as per requirement 2.
+                 // Requirement 3 says redirect to /home.
+                 return Redirect("/home");
+            }
+            return Page();
+        }
+
         public async Task<IActionResult> OnPostAsync(string email, string password)
         {
             // Validate input
@@ -62,7 +74,7 @@ namespace MoneyTrackerApp.Pages.Auth
                 });
 
                 // Redirect based on role and onboarding status
-                var baseUrl = user.OnboardingCompleted ? "/Home" : "/Onboarding/Welcome";
+                var baseUrl = user.OnboardingCompleted ? "/home" : "/Onboarding/Welcome";
 
                 if (user.Role == "Admin")
                 {

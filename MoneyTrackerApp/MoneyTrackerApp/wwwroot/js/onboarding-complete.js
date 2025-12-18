@@ -53,7 +53,7 @@
         sessionStorage.removeItem('currencySymbol');
 
         // Navigate to home/dashboard
-        window.location.href = '/Home';
+        window.location.href = '/home';
     }
 
     function createConfetti() {

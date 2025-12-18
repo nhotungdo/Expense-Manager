@@ -420,15 +420,16 @@ namespace MoneyTrackerApp.Services
     }
 
     // Result classes
+    // Result classes
     public class PaymentTransactionResult
     {
         public bool Success { get; set; }
         public long PaymentTransactionId { get; set; }
-        public string PaymentUrl { get; set; }
-        public string SessionToken { get; set; }
+        public string? PaymentUrl { get; set; }
+        public string? SessionToken { get; set; }
         public decimal Amount { get; set; }
-        public string Currency { get; set; }
-        public string ErrorMessage { get; set; }
+        public string? Currency { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 
     public class PaymentCallbackResult
@@ -438,17 +439,17 @@ namespace MoneyTrackerApp.Services
         public int Status { get; set; }
         public long UserId { get; set; }
         public bool AlreadyProcessed { get; set; }
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 
     public class WebhookPayload
     {
-        public string EventType { get; set; }
-        public string SessionToken { get; set; }
-        public string TransactionId { get; set; }
-        public string Status { get; set; }
-        public string IpAddress { get; set; }
-        public string UserAgent { get; set; }
+        public string? EventType { get; set; }
+        public string? SessionToken { get; set; }
+        public string? TransactionId { get; set; }
+        public string? Status { get; set; }
+        public string? IpAddress { get; set; }
+        public string? UserAgent { get; set; }
         public DateTime Timestamp { get; set; }
     }
 }

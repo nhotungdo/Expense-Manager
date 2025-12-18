@@ -298,55 +298,6 @@
                 <canvas id="accountDistributionChart"></canvas>
             </div>
         </div>
-
-        <!-- AI Insights Panel -->
-        <div class="insights-card">
-            <div class="insights-header">
-                <div class="insights-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <div style="flex: 1;">
-                    <h3 class="insights-title">Cố vấn tài chính AI</h3>
-                    <p class="insights-subtitle">Đề xuất cá nhân hóa</p>
-                </div>
-                <button class="chart-action-btn" onclick="generateNewAIInsights()" title="Tạo gợi ý mới">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-            <div class="insights-body" id="aiInsights">
-                <div class="insight-item">
-                    <div class="insight-icon success">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="insight-content">
-                        <h4>Tiến triển tốt!</h4>
-                        <p>Bạn đang đi đúng hướng để đạt mục tiêu tiết kiệm vào tháng tới.</p>
-                    </div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="insight-content">
-                        <h4>Cảnh báo chi tiêu</h4>
-                        <p>Chi phí ăn uống cao hơn 15% so với bình thường. Hãy cân nhắc giảm để tiết kiệm 200.000 ₫.</p>
-                    </div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon info">
-                        <i class="fas fa-lightbulb"></i>
-                    </div>
-                    <div class="insight-content">
-                        <h4>Mẹo thông minh</h4>
-                        <p>Hóa đơn tiện ích của bạn ổn định. Hãy cân nhắc thiết lập thanh toán tự động để không bỏ lỡ.</p>
-                    </div>
-                </div>
-            </div>
-            <a href="/AiAdvisor" class="insights-footer">
-                <span>Xem tất cả thông tin</span>
-                <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
     </div>
 </div>
 
@@ -354,7 +305,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="~/js/charts-config.js"></script>
     <script src="~/js/dashboard.js"></script>
-    <style>
+<style>
         @@keyframes slideIn {
             from {
                 transform: translateX(400px);
@@ -410,5 +361,69 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        
+        .mark-read-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .mark-read-btn:hover {
+            color: #10b981;
+        }
     </style>
+    <script>
+        async function generateNewAIInsights() {
+            const btn = document.querySelector('button[onclick="generateNewAIInsights()"]');
+            const icon = btn.querySelector('i');
+            
+            // Loading state
+            btn.disabled = true;
+            icon.classList.add('fa-spin');
+            
+            try {
+                const response = await fetch('?handler=GenerateAiInsights', {
+                    method: 'POST',
+                    headers: { 
+                        'RequestVerificationToken': document.getElementsByName('__RequestVerificationToken')[0].value
+                    }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    location.reload(); // Simple reload to show new data
+                } else {
+                    alert('Có lỗi xảy ra khi phân tích dữ liệu.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Không thể kết nối đến server.');
+            } finally {
+                btn.disabled = false;
+                icon.classList.remove('fa-spin');
+            }
+        }
+
+        async function markAsRead(id, btnElement) {
+            try {
+                const response = await fetch(`?handler=MarkAsRead&id=${id}`, {
+                    method: 'POST',
+                    headers: { 
+                        'RequestVerificationToken': document.getElementsByName('__RequestVerificationToken')[0].value
+                    }
+                });
+                
+                if (response.ok) {
+                    // Remove the element from UI
+                    const item = btnElement.closest('.insight-item');
+                    item.style.opacity = '0';
+                    setTimeout(() => item.remove(), 300);
+                }
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        }
+    </script>
 }

@@ -1,0 +1,8 @@
+/* Micro Interactions CSS */
+.hover-scale {
+    transition: transform 0.2s;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}

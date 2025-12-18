@@ -41,6 +41,10 @@
       "PackagePath": "staticwebassets\\css\\debts.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\design-system.css",
+      "PackagePath": "staticwebassets\\css\\design-system.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\groups.css",
       "PackagePath": "staticwebassets\\css\\groups.css"
     },
@@ -55,6 +59,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\main.css",
       "PackagePath": "staticwebassets\\css\\main.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\micro-interactions.css",
+      "PackagePath": "staticwebassets\\css\\micro-interactions.css"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\modern-pages.css",
@@ -127,6 +135,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\header.js",
       "PackagePath": "staticwebassets\\js\\header.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\micro-interactions.js",
+      "PackagePath": "staticwebassets\\js\\micro-interactions.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\onboarding-basic-settings.js",

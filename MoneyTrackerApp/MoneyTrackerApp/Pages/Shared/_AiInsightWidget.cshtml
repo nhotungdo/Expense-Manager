@@ -1,29 +1,65 @@
-@* AI Insight Widget for Dashboard *@
-<div class="ai-insight-widget" id="aiInsightWidget">
-    <div class="ai-insight-header">
-        <div class="ai-insight-icon">
-            <i class="fas fa-lightbulb"></i>
+@model MoneyTrackerApp.Pages.DashboardModel
+
+<div class="ai-insight-section mb-6">
+@if (Model.LatestSuggestion != null)
+{
+    <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border-l-4 border-indigo-500 rounded-xl shadow-sm p-6 relative overflow-hidden insight-item">
+        <!-- Decoration -->
+        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-100 rounded-full opacity-50 blur-xl pointer-events-none"></div>
+        
+        <div class="flex justify-between items-start relative z-10">
+             <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                    <i class="fas fa-robot text-indigo-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-lg">Góc nhìn AI</h3>
+                    <p class="text-xs text-slate-500 mt-1">
+                        <i class="far fa-clock mr-1"></i>
+                        @Model.LatestSuggestion.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                    </p>
+                </div>
+             </div>
+             
+             <div class="flex gap-2">
+                <button onclick="generateNewAIInsights()" class="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors" title="Phân tích lại">
+                     <i class="fas fa-sync-alt"></i>
+                </button>
+                @if (!Model.LatestSuggestion.IsRead)
+                {
+                    <button class="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors" onclick="markAsRead(@Model.LatestSuggestion.Id, this)" title="Đánh dấu đã đọc">
+                        <i class="fas fa-check"></i>
+                    </button>
+                }
+             </div>
         </div>
-        <h3 class="ai-insight-title">Góc nhìn AI</h3>
-        <button class="ai-insight-refresh" onclick="refreshAiInsight()">
-            <i class="fas fa-sync-alt"></i>
+        
+        <div class="mt-4 text-slate-700 leading-relaxed whitespace-pre-line markdown-body">
+            @Model.LatestSuggestion.Suggestion
+        </div>
+        
+        @if (Model.LatestSuggestion.IsRead)
+        {
+             <div class="mt-4 flex justify-end">
+                <span class="text-xs text-slate-400 bg-white/50 px-2 py-1 rounded">Đã đọc</span>
+             </div>
+        }
+    </div>
+}
+else
+{
+    <div class="bg-white border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-indigo-300 transition-colors group">
+        <div class="w-16 h-16 bg-slate-50 group-hover:bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors">
+            <i class="fas fa-wand-magic-sparkles text-2xl text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-700 mb-2">Trợ lý tài chính AI</h3>
+        <p class="text-slate-500 mb-6 max-w-md mx-auto">
+            Sử dụng trí tuệ nhân tạo để phân tích thói quen chi tiêu và nhận lời khuyên tài chính cá nhân hóa cho bạn.
+        </p>
+        <button onclick="generateNewAIInsights()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all transform hover:scale-105 shadow-md hover:shadow-lg">
+            <i class="fas fa-bolt"></i>
+            <span>Phân tích ngay</span>
         </button>
     </div>
-    <div class="ai-insight-content">
-        <div class="ai-insight-loading">
-            <div class="spinner"></div>
-            <p>Đang phân tích dữ liệu của bạn...</p>
-        </div>
-        <div class="ai-insight-message" style="display: none;">
-            <p class="insight-text"></p>
-            <div class="ai-insight-actions">
-                <button class="btn-insight-action" onclick="openAiChat()">
-                    <i class="fas fa-comments"></i> Xem chi tiết
-                </button>
-                <button class="btn-insight-dismiss" onclick="dismissInsight()">
-                    <i class="fas fa-times"></i> Bỏ qua
-                </button>
-            </div>
-        </div>
-    </div>
+}
 </div>
