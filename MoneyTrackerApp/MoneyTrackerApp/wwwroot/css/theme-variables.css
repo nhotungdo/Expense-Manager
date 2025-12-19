@@ -1,0 +1,354 @@
+/**
+ * Theme Variables - Hệ thống màu sắc động cho Light/Dark theme
+ */
+
+:root {
+    /* Primary Colors - Deep Royal Blue */
+    --primary: #2563EB;
+    --primary-rgb: 37, 99, 235;
+    --primary-dark: #1E40AF;
+    --primary-light: #60A5FA;
+
+    /* Secondary Colors - Violet */
+    --secondary: #7C3AED;
+    --secondary-rgb: 124, 58, 237;
+    --secondary-dark: #6D28D9;
+    --secondary-light: #A78BFA;
+
+    /* Status Colors */
+    --success: #10B981;
+    /* Emerald Green */
+    --success-rgb: 16, 185, 129;
+    --success-light: #D1FAE5;
+    --danger: #F43F5E;
+    /* Rose Red */
+    --danger-rgb: 244, 63, 94;
+    --danger-light: #FFE4E6;
+    --warning: #F59E0B;
+    --warning-light: #FEF3C7;
+    --info: #3B82F6;
+    --info-light: #DBEAFE;
+
+    /* AI / Smart Features */
+    --ai-gradient-start: #6366f1;
+    --ai-gradient-end: #a855f7;
+    --ai-gradient: linear-gradient(135deg, var(--ai-gradient-start), var(--ai-gradient-end));
+
+    /* Neutral Colors - Light Theme */
+    --bg-primary: #ffffff;
+    --bg-secondary: #F3F4F6;
+    /* Gray-100 */
+    --bg-tertiary: #F9FAFB;
+    /* Gray-50 */
+    --bg-hover: #E5E7EB;
+    --bg-active: #D1D5DB;
+
+    /* Text Colors - Light Theme */
+    --text-primary: #1F2937;
+    /* Gray-800 */
+    --text-secondary: #4B5563;
+    /* Gray-600 */
+    --text-tertiary: #6B7280;
+    /* Gray-500 */
+    --text-muted: #9CA3AF;
+    --text-inverse: #ffffff;
+
+    /* Border Colors - Light Theme */
+    --border-color: #E5E7EB;
+    --border-color-dark: #D1D5DB;
+    --border-color-light: #F3F4F6;
+
+    /* Shadows - Light Theme (Soft Shadows for Bento) */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    /* Border Radius - Bento Style */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
+    --radius-2xl: 1.5rem;
+    --radius-bento: 1.25rem;
+    --radius-card: 1rem;
+    /* 16px */
+    --radius-2xl: 1.25rem;
+    /* 20px - For Cards */
+    --radius-full: 9999px;
+
+    /* Font Family */
+    --font-sans: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Z-Index */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    /* Backgrounds - Dark Theme */
+    --bg-primary: #111827;
+    /* Gray-900 */
+    --bg-secondary: #0F172A;
+    /* Slate-900 - Darker background */
+    --bg-tertiary: #1F2937;
+    /* Gray-800 */
+    --bg-hover: #374151;
+    --bg-active: #4B5563;
+
+    /* Text Colors - Dark Theme */
+    --text-primary: #F9FAFB;
+    /* Gray-50 */
+    --text-secondary: #D1D5DB;
+    /* Gray-300 */
+    --text-tertiary: #9CA3AF;
+    /* Gray-400 */
+    --text-muted: #6B7280;
+    --text-inverse: #111827;
+
+    /* Border Colors - Dark Theme */
+    --border-color: #1F2937;
+    --border-color-dark: #374151;
+    --border-color-light: #111827;
+
+    /* Shadows - Dark Theme */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+
+    /* Adjust status colors for dark theme */
+    --success-light: #065F46;
+    --danger-light: #991B1B;
+    --warning-light: #92400E;
+    --info-light: #1E40AF;
+}
+
+/* Compact Mode */
+.compact-mode {
+    --spacing-xs: 2px;
+    --spacing-sm: 4px;
+    --spacing-md: 8px;
+    --spacing-lg: 12px;
+    --spacing-xl: 16px;
+    --spacing-2xl: 24px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #000000;
+        --text-primary: #000000;
+    }
+
+    [data-theme="dark"] {
+        --border-color: #ffffff;
+        --text-primary: #ffffff;
+    }
+}
+
+/* Color Scheme Meta */
+:root {
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* Smooth theme transition */
+body {
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* Apply theme colors to common elements */
+body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.card,
+.modal-content,
+.dropdown-menu {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.border {
+    border-color: var(--border-color) !important;
+}
+
+/* Primary color utilities */
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.border-primary {
+    border-color: var(--primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-outline-primary {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Badge with primary color */
+.badge-primary {
+    background-color: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary);
+}
+
+/* Progress bar */
+.progress-bar {
+    background-color: var(--primary);
+}
+
+/* Links */
+a {
+    color: var(--primary);
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+/* Form controls in dark mode */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--bg-tertiary);
+    border-color: var(--primary);
+    color: var(--text-primary);
+}
+
+/* Sidebar in dark mode */
+[data-theme="dark"] .sidebar {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* Navbar in dark mode */
+[data-theme="dark"] .navbar {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* Table in dark mode */
+[data-theme="dark"] .table {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* {
+    background-color: var(--bg-tertiary);
+}
+
+/* List group in dark mode */
+[data-theme="dark"] .list-group-item {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .list-group-item:hover {
+    background-color: var(--bg-hover);
+}
+
+[data-theme="dark"] .list-group-item.active {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Alert in dark mode */
+[data-theme="dark"] .alert {
+    border-color: var(--border-color);
+}
+
+/* Toast in dark mode */
+[data-theme="dark"] .toast {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Dropdown in dark mode */
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--bg-hover);
+}
+
+/* Modal in dark mode */
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--border-color);
+}

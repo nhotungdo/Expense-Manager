@@ -39,6 +39,7 @@ public class SettingsController : ControllerBase
             DefaultCurrency = user.DefaultCurrency,
             Timezone = user.Timezone,
             Theme = user.Theme,
+            PrimaryColor = GetClaimValue(user, "PrimaryColor") ?? "#10b981",
             DateFormat = GetClaimValue(user, "DateFormat") ?? "DD/MM/YYYY",
             TimeFormat = GetClaimValue(user, "TimeFormat") ?? "24h",
             FirstDayOfWeek = int.TryParse(GetClaimValue(user, "FirstDayOfWeek"), out var fd) ? fd : 1,
@@ -75,6 +76,9 @@ public class SettingsController : ControllerBase
         if (!string.IsNullOrEmpty(dto.Theme))
             user.Theme = dto.Theme;
 
+        if (!string.IsNullOrEmpty(dto.PrimaryColor))
+            UpdateOrAddClaim(user, "PrimaryColor", dto.PrimaryColor);
+
         if (!string.IsNullOrEmpty(dto.DateFormat))
             UpdateOrAddClaim(user, "DateFormat", dto.DateFormat);
 
@@ -103,6 +107,7 @@ public class SettingsController : ControllerBase
             DefaultCurrency = user.DefaultCurrency,
             Timezone = user.Timezone,
             Theme = user.Theme,
+            PrimaryColor = GetClaimValue(user, "PrimaryColor") ?? "#10b981",
             DateFormat = GetClaimValue(user, "DateFormat") ?? "DD/MM/YYYY",
             TimeFormat = GetClaimValue(user, "TimeFormat") ?? "24h",
             FirstDayOfWeek = int.TryParse(GetClaimValue(user, "FirstDayOfWeek"), out var fd) ? fd : 1,
@@ -182,6 +187,29 @@ public class SettingsController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new { theme = user.Theme, message = "Theme updated successfully" });
+    }
+
+    /// <summary>
+    /// Update primary color
+    /// </summary>
+    [HttpPut("primary-color")]
+    public async Task<ActionResult> UpdatePrimaryColor([FromBody] UpdatePrimaryColorDto dto)
+    {
+        var userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _context.Users
+            .Include(u => u.AspNetUserClaims)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+            return NotFound(new { message = "User not found" });
+
+        // Store primary color in user claims
+        UpdateOrAddClaim(user, "PrimaryColor", dto.Color);
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { color = dto.Color, message = "Primary color updated successfully" });
     }
 
     /// <summary>

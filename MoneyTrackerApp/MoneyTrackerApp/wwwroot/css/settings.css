@@ -1,0 +1,220 @@
+/**
+ * Settings Page Styles
+ */
+
+/* Sticky Sidebar */
+.settings-sidebar {
+    position: sticky;
+    top: 80px;
+}
+
+/* List Group Items */
+.list-group-item {
+    transition: all var(--transition-base);
+    border-left: 3px solid transparent;
+}
+
+.list-group-item:hover {
+    background-color: var(--bg-hover);
+    transform: translateX(4px);
+}
+
+.list-group-item.active {
+    background-color: rgba(var(--primary-rgb), 0.1);
+    border-left-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Theme Options */
+.theme-option {
+    position: relative;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border: 2px solid var(--border-color);
+}
+
+.theme-option:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.theme-option.active,
+.theme-option.border-primary {
+    border-color: var(--primary);
+    border-width: 3px;
+    box-shadow: var(--shadow-md);
+}
+
+.theme-check {
+    transition: all var(--transition-fast);
+}
+
+/* Preview Window */
+.preview-window {
+    transition: transform var(--transition-base);
+}
+
+.theme-option:hover .preview-window {
+    transform: scale(1.05);
+}
+
+.preview-dot {
+    transition: transform var(--transition-fast);
+}
+
+.theme-option:hover .preview-dot {
+    transform: scale(1.2);
+}
+
+/* Color Preset Options */
+.color-preset-option {
+    position: relative;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border: 2px solid var(--border-color);
+}
+
+.color-preset-option:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.color-preset-option.active,
+.color-preset-option.border-primary {
+    border-color: var(--primary);
+    border-width: 3px;
+    box-shadow: var(--shadow-md);
+}
+
+.color-circle {
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.color-preset-option:hover .color-circle {
+    transform: scale(1.15);
+    box-shadow: var(--shadow-md);
+}
+
+.color-preset-check {
+    transition: all var(--transition-fast);
+}
+
+/* Color Picker */
+.form-control-color {
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.form-control-color:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+/* Color Preview Demo */
+.color-preview-demo {
+    padding: 20px;
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+/* Form Switches */
+.form-check-input {
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.form-check-label {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Cards */
+.settings-card {
+    transition: all var(--transition-base);
+}
+
+.settings-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* Danger Zone */
+.border-danger {
+    border-color: var(--danger) !important;
+}
+
+.bg-danger {
+    background-color: var(--danger) !important;
+}
+
+/* Toast Styling */
+.toast {
+    backdrop-filter: blur(10px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-sidebar {
+        position: static;
+        margin-bottom: 20px;
+    }
+    
+    .theme-option,
+    .color-preset-option {
+        margin-bottom: 12px;
+    }
+}
+
+/* Dark Mode Specific */
+[data-theme="dark"] .theme-option:hover {
+    background-color: var(--bg-hover);
+}
+
+[data-theme="dark"] .color-preset-option:hover {
+    background-color: var(--bg-hover);
+}
+
+[data-theme="dark"] .color-preview-demo {
+    background-color: var(--bg-tertiary);
+}
+
+/* Animation for theme change */
+@keyframes themeChange {
+    0% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.theme-changing {
+    animation: themeChange 0.5s ease-out;
+}
+
+/* Smooth color transition */
+* {
+    transition-property: background-color, border-color, color;
+    transition-duration: var(--transition-base);
+    transition-timing-function: ease-in-out;
+}
+
+/* Exclude specific elements from transition */
+.no-transition,
+.no-transition * {
+    transition: none !important;
+}

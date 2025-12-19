@@ -76,6 +76,8 @@ builder.Services.AddSingleton<MoneyTrackerApp.Services.VnPayMonitoringService>()
 builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayService>();
 
 // Register Communication Services
+// Map EmailSettings configuration
+builder.Services.Configure<MoneyTrackerApp.Configurations.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<MoneyTrackerApp.Services.IEmailService, MoneyTrackerApp.Services.EmailService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IOtpService, MoneyTrackerApp.Services.OtpService>();
 

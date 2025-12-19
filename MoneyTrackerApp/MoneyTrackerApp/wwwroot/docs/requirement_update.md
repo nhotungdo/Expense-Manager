@@ -1,102 +1,150 @@
-Đề xuất phong cách thiết kế **"Clean Bento Fintech"** kết hợp với một chút **Glassmorphism** (hiệu ứng kính mờ) để tạo điểm nhấn hiện đại.
+Dưới đây là **PROMPT CODE CHUẨN** dùng cho **AI sinh code tạo **trang UI Dashboard quản lý chi tiêu** với **biểu đồ tròn (donut chart)**
+(Phù hợp React + Chart.js / Recharts / Ant Design / Tailwind)
 
-Dưới đây là gợi ý chi tiết cho hệ thống UI:
+---
 
-### 1. Bảng màu (Color Palette)
+## 🎯 PROMPT TỔNG (KHUYẾN NGHỊ DÙNG NGUYÊN VĂN)
 
-Cần phân biệt rõ ràng giữa các trạng thái tài chính và tính năng AI.
+```text
+Bạn là Senior Frontend Developer.
 
-* **Màu chủ đạo (Primary):** `Deep Royal Blue` (#2563EB) hoặc `Violet` (#7C3AED). Màu này dùng cho các nút chính, thanh điều hướng và nhận diện thương hiệu.
-* **Màu dòng tiền (Functional):**
-* **Thu (Income):** `Emerald Green` (#10B981) - Tạo cảm giác tích cực, an toàn.
-* **Chi (Expense):** `Rose Red` (#F43F5E) - Màu đỏ dịu, không quá gắt để tránh gây stress cho người dùng, nhưng đủ để cảnh báo.
+Hãy tạo code giao diện Dashboard cho dự án Quản lý Chi tiêu cá nhân.
 
+Yêu cầu UI:
+- Phong cách hiện đại, dashboard analytics
+- Nền sáng, card bo góc, shadow nhẹ
+- Màu chủ đạo: tím – xanh – pastel (giống dashboard tài chính)
+- Responsive desktop first
 
-* **Màu AI/Smart Features:** `Gradient Purple to Blue` (ví dụ: từ #6366f1 đến #a855f7). Dùng cho các nút "Phân tích AI", "Gợi ý thông minh" hoặc các widget liên quan đến bảng `AiSuggestions`.
-* **Nền (Background):**
-* Light Mode: `#F3F4F6` (Xám rất nhạt) thay vì trắng tinh để đỡ mỏi mắt.
-* Dark Mode: `#111827` (Xám than chì) thay vì đen tuyền.
+Layout:
+- Trang Dashboard gồm grid 3 cột
+- Mỗi card chứa biểu đồ tròn (Donut Chart)
+- Trên mỗi card có:
+  + Tiêu đề (ví dụ: "Chi tiêu theo danh mục")
+  + Biểu đồ tròn
+  + Tổng số giao dịch (Total count)
+  + Chú thích màu (legend)
 
+Các card biểu đồ:
+1. Chi tiêu theo Danh mục
+   - Ăn uống
+   - Đi lại
+   - Giải trí
+   - Mua sắm
+   - Khác
 
+2. Thu nhập theo nguồn
+   - Lương
+   - Thưởng
+   - Freelance
 
-### 2. Typography & Iconography
+3. Giao dịch theo loại
+   - Thu
+   - Chi
 
-* **Font chữ:** Sử dụng các font Sans-serif hiện đại, tròn trịa và dễ đọc số liệu như **Inter**, **Nunito Sans**, hoặc **Be Vietnam Pro** (hỗ trợ tiếng Việt rất tốt).
-* **Số liệu:** Khi hiển thị số tiền (`Amount`), hãy dùng font **Monospace** hoặc thiết lập `font-feature-settings: 'tnum'` để các con số thẳng hàng nhau, dễ so sánh.
-* **Icon:** Dùng bộ icon **Rounded** hoặc **Duotone** (2 màu) để giao diện trông mềm mại hơn (ví dụ: thư viện *Phosphor Icons* hoặc *Heroicons*).
+4. Giao dịch theo ví
+   - Tiền mặt
+   - Ngân hàng
+   - Ví điện tử
 
-### 3. Cấu trúc Layout (Bento Grid)
+Dữ liệu:
+- Dữ liệu mock (hardcode)
+- Có tổng số giao dịch hiển thị bên cạnh biểu đồ
 
-Dữ liệu của bạn rất nhiều (Ví, Ngân sách, Nợ, Đầu tư...), hãy sử dụng bố cục dạng lưới **Bento Grid** (giống giao diện widget của iOS hoặc Windows 11).
+Kỹ thuật:
+- React functional component
+- Sử dụng Chart.js (react-chartjs-2) HOẶC Recharts
+- TailwindCSS để layout & style
+- Component hóa: Dashboard, ChartCard, DonutChart
 
-* **Các thẻ (Card):** Mỗi chức năng là một khối bo tròn (`border-radius: 16px` hoặc `20px`).
-* **Hiệu ứng:** Sử dụng đổ bóng nhẹ (`box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)`) để các khối nổi lên khỏi nền.
+Output:
+- Trả về code hoàn chỉnh
+- Có chú thích code rõ ràng
+- Không cần backend
+```
 
-### 4. Chi tiết từng trang chức năng
+---
 
-#### A. Dashboard (Trang chủ)
+## 🔧 PROMPT RIÊNG CHO BIỂU ĐỒ TRÒN (DONUT)
 
-Dựa trên `GetUserDashboardStats` và các View thống kê:
+```text
+Tạo component DonutChart bằng Chart.js:
 
-* **Header:** Lời chào + Avatar + Nút thông báo (có chấm đỏ nếu bảng `Notifications` có `IsRead=0`).
-* **Total Balance Card:** Hiển thị tổng tài sản to, rõ ràng. Nền dùng Gradient chủ đạo. Có nút ẩn/hiện số dư (hình con mắt).
-* **AI Insight Widget (Quan trọng):** Một thẻ đặc biệt có viền Gradient chuyển màu. Hiển thị text từ bảng `AiSuggestions`.
-* *Ví dụ:* "💡 Gemini nhận thấy bạn đã chi quá 20% cho 'Ăn uống' so với tháng trước."
+- Kiểu: Doughnut
+- Cắt rỗng giữa (cutout: 70%)
+- Hiển thị tổng số giao dịch ở chính giữa
+- Màu gradient pastel
+- Legend hiển thị phía dưới
+- Tooltip đẹp, có đơn vị tiền (VND)
 
+Input props:
+- labels
+- data
+- total
+```
 
-* **Quick Actions:** Các nút tròn to để thao tác nhanh: "Thêm giao dịch", "Quét hóa đơn (OCR)", "Chuyển tiền".
+---
 
-#### B. Trang Giao dịch (Transactions List)
+## 🧱 PROMPT TẠO CARD DASHBOARD
 
-* **Danh sách:** Group giao dịch theo Ngày (`TransactionDate`).
-* **Row Item:**
-* Bên trái: Icon danh mục (lấy `Icon` và `Color` từ bảng `Categories`) đặt trong hình tròn nền nhạt.
-* Giữa: Tên danh mục + Ghi chú (`Note`).
-* Bên phải: Số tiền. Màu xanh (+), màu đỏ (-).
+```text
+Tạo component Card Dashboard:
 
+- Nền trắng
+- Border radius 16px
+- Shadow nhẹ
+- Padding 20px
+- Tiêu đề bên trái
+- Tổng số bên phải
+- Biểu đồ nằm giữa card
+```
 
-* **Filter:** Thanh ngang trên cùng để lọc theo Ví (`AccountId`) hoặc Thời gian.
+---
 
-#### C. Trang Thêm Giao dịch (Add Transaction)
+## 🎨 PROMPT MÀU SẮC (OPTIONAL)
 
-* **Input Số tiền:** Phải thật to và rõ ràng, đặt ngay trên cùng.
-* **Bàn phím ảo (Mobile):** Nếu làm app mobile, hãy tự thiết kế bàn phím số riêng có nút "Lưu" tiện lợi.
-* **Category Selector:** Dạng lưới icon grid thay vì dropdown list để chọn nhanh hơn.
-* **OCR Button:** Nút camera nổi bật bên cạnh số tiền. Khi chụp xong, animation "quét" chạy qua ảnh và tự điền số liệu vào form.
+```text
+Sử dụng bảng màu:
+- Tím: #7C3AED
+- Xanh: #3B82F6
+- Xanh ngọc: #14B8A6
+- Vàng nhạt: #FACC15
+- Hồng pastel: #F472B6
+```
 
-#### D. Trang Ví & Ngân sách (Wallets & Budgets)
+---
 
-* **Ví:** Thiết kế mô phỏng thẻ ngân hàng thật (Bank Card UI). Hiển thị Logo ngân hàng/Ví ở góc. Nền thẻ lấy theo màu `Color` trong bảng `Accounts`.
-* **Thanh Ngân sách:** Dùng **Progress Bar**.
-* Màu xanh khi < 50%.
-* Màu vàng khi 50-80%.
-* Màu đỏ khi > 80% (Cảnh báo).
-* Hiển thị text: "Còn lại 500k / 2tr".
+## 📐 PROMPT GRID LAYOUT
 
+```text
+Dashboard sử dụng CSS Grid:
+- Desktop: 3 cột
+- Tablet: 2 cột
+- Mobile: 1 cột
+Khoảng cách giữa các card: 24px
+```
 
+---
 
-#### E. Trang Báo cáo (Reports)
+## ✅ KẾT QUẢ MONG MUỐN
 
-* **Biểu đồ:**
-* Dùng **Donut Chart** (Biểu đồ tròn rỗng giữa) cho cơ cấu chi tiêu.
-* Dùng **Spline Area Chart** (Biểu đồ đường cong có tô màu nền dưới) cho biến động số dư theo thời gian (dữ liệu từ `GetMonthlyTrends`).
+Sau khi dùng prompt này, AI sẽ sinh ra:
 
+* Trang Dashboard giống **analytics dashboard tài chính**
+* Biểu đồ tròn đúng kiểu như ảnh
+* Dễ mở rộng sang:
 
-* **Tương tác:** Khi rê chuột hoặc chạm vào biểu đồ, hiển thị Tooltip chi tiết số tiền.
+  * Biểu đồ cột
+  * So sánh tháng
+  * AI Analysis
 
-### 5. Yếu tố UX "Thông minh" (Smart Features)
+---
 
-Để làm nổi bật yếu tố AI Gemini:
+👉 Nếu anh muốn, em có thể:
 
-* **Skeleton Loading:** Khi đang chờ API Gemini phân tích, đừng dùng vòng xoay loading nhàm chán. Hãy dùng hiệu ứng **Shimmer** (ánh sáng chạy qua khung xám) tạo cảm giác dữ liệu đang được xử lý.
-* **Chat Interface:** Nếu có tính năng hỏi đáp với AI, giao diện nên giống iMessage hoặc ChatGPT nhưng nền tin nhắn của AI có màu gradient nhẹ để phân biệt với người dùng.
+* ✍️ Viết **code React + Chart.js hoàn chỉnh**
+* 🎨 Chuyển sang **Ant Design / MUI**
+* 🧠 Gắn **AI Gemini phân tích trực tiếp trên dashboard**
+* 🗂️ Tách component chuẩn MVC cho đồ án
 
-### 6. Animation (Hiệu ứng chuyển động)
-
-* **Micro-interactions:**
-* Khi bấm "Lưu giao dịch": Nút chuyển thành dấu tích xanh ✅.
-* Khi xóa danh mục: Hiệu ứng trượt sang trái (Swipe).
-
-
-* **Confetti:** Khi người dùng hoàn thành một `SavingsGoal` (Mục tiêu tiết kiệm), hãy bắn pháo giấy chúc mừng.
 

@@ -1,0 +1,248 @@
+/**
+ * Bento Grid System & Modern UI Utilities
+ */
+
+/* Grid Layouts */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+}
+
+.bento-col-span-12 {
+    grid-column: span 12;
+}
+
+.bento-col-span-8 {
+    grid-column: span 8;
+}
+
+.bento-col-span-6 {
+    grid-column: span 6;
+}
+
+.bento-col-span-4 {
+    grid-column: span 4;
+}
+
+.bento-col-span-3 {
+    grid-column: span 3;
+}
+
+/* Responsive breakpoints */
+@media (min-width: 768px) {
+    .md\:bento-col-span-4 {
+        grid-column: span 4;
+    }
+    
+    .md\:bento-col-span-6 {
+        grid-column: span 6;
+    }
+    
+    .md\:bento-col-span-8 {
+        grid-column: span 8;
+    }
+}
+
+@media (max-width: 1024px) {
+    .bento-col-span-8 {
+        grid-column: span 12;
+    }
+    
+    .bento-col-span-6 {
+        grid-column: span 6;
+    }
+    
+    .bento-col-span-4 {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 768px) {
+    .bento-grid {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .bento-col-span-8,
+    .bento-col-span-6,
+    .bento-col-span-4,
+    .md\:bento-col-span-4,
+    .md\:bento-col-span-6,
+    .md\:bento-col-span-8 {
+        grid-column: span 12;
+    }
+}
+
+/* Bento Card Style */
+.bento-card {
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-2xl);
+    /* 20px */
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    overflow: hidden;
+    position: relative;
+}
+
+.bento-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+}
+
+/* Glassmorphism Effect */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .glass-effect {
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* AI Widget Style */
+.ai-widget {
+    background: linear-gradient(to bottom right, var(--bg-primary), var(--info-light));
+    border: 2px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    position: relative;
+}
+
+.ai-widget::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: var(--ai-gradient);
+    z-index: -1;
+    border-radius: calc(var(--radius-2xl) + 2px);
+    opacity: 0.5;
+}
+
+[data-theme="dark"] .ai-widget {
+    background: linear-gradient(to bottom right, var(--bg-primary), rgba(99, 102, 241, 0.1));
+}
+
+/* Typography Utilities */
+.text-balance {
+    font-weight: 700;
+    font-size: 2.5rem;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+}
+
+.text-gradient {
+    background: var(--ai-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Micro-interactions */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    transition: transform var(--transition-fast);
+}
+
+.btn-icon:hover {
+    transform: scale(1.1);
+}
+
+.hover-slide-right {
+    transition: transform var(--transition-base);
+}
+
+.hover-slide-right:hover {
+    transform: translateX(4px);
+}
+
+/* Bank Card UI */
+.bank-card {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1.586;
+    /* Standard credit card ratio */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.bank-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-active);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-circle {
+    border-radius: 50%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}

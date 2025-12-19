@@ -18,13 +18,15 @@ namespace MoneyTrackerApp.Controllers
         private readonly ExpenseManagerContext _db;
         private readonly IConfiguration _config;
         private readonly MoneyTrackerApp.Services.JwtTokenService _jwtService;
+        private readonly MoneyTrackerApp.Services.IEmailService _emailService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, ILogger<AuthController> logger)
+        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.IEmailService emailService, ILogger<AuthController> logger)
         {
             _db = db;
             _config = config;
             _jwtService = jwtService;
+            _emailService = emailService;
             _logger = logger;
         }
 
@@ -194,6 +196,7 @@ namespace MoneyTrackerApp.Controllers
                 DefaultCurrency = "VND",
                 Timezone = "Asia/Ho_Chi_Minh",
                 Theme = "light",
+                EmailNotifications = true,
                 // Fix: GoogleId is required and unique in DB. 
                 // We generate a unique placeholder for local accounts.
                 GoogleId = $"local_{Guid.NewGuid()}"
@@ -213,6 +216,10 @@ namespace MoneyTrackerApp.Controllers
                     user.Role = "Admin";
                     await _db.SaveChangesAsync();
                 }
+
+                // [Notification] Send Welcome Email
+                await _emailService.SendEmailToUserAsync(user.Id, "Chào mừng đến với MoneyTrackerApp!", 
+                    $"<h3>Xin chào {user.FullName},</h3><p>Cảm ơn bạn đã đăng ký tài khoản tại MoneyTrackerApp. Bắt đầu quản lý tài chính của bạn ngay hôm nay!</p>");
             }
             catch (Exception ex)
             {
@@ -256,8 +263,58 @@ namespace MoneyTrackerApp.Controllers
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
             if (user == null) return Unauthorized(new { message = "Sai email hoặc mật khẩu" });
 
+            // 1. Check Lockout
+            if (user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow)
+            {
+                return Unauthorized(new { message = $"Tài khoản bị khóa. Vui lòng thử lại sau {Math.Ceiling((user.LockoutEnd.Value - DateTime.UtcNow).TotalMinutes)} phút." });
+            }
+
             var ok = user.PasswordHash != null && BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash);
-            if (!ok) return Unauthorized(new { message = "Sai email hoặc mật khẩu" });
+            if (!ok)
+            {
+                // Increment Failed Count
+                user.AccessFailedCount++;
+                
+                // Lockout if >= 5 attempts
+                if (user.AccessFailedCount >= 5)
+                {
+                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                    user.AccessFailedCount = 0; // Reset after locking
+
+                    await _db.SaveChangesAsync(); // Save lock status
+
+                    // Send Lockout Email
+                    await _emailService.SendEmailToUserAsync(user.Id, "Cảnh báo bảo mật: Tài khoản bị khóa tạm thời",
+                        $"<h3>Tài khoản của bạn đã bị khóa tạm thời</h3><p>Hệ thống phát hiện 5 lần đăng nhập thất bại liên tiếp vào lúc {DateTime.UtcNow.ToString("HH:mm dd/MM/yyyy")}.</p><p>Tài khoản sẽ được mở lại sau 15 phút.</p>");
+
+                    return Unauthorized(new { message = "Tài khoản đã bị khóa 15 phút do nhập sai quá nhiều lần." });
+                }
+
+                await _db.SaveChangesAsync();
+                return Unauthorized(new { message = "Sai email hoặc mật khẩu" });
+            }
+
+            // Reset failed count on success
+            if (user.AccessFailedCount > 0)
+            {
+                user.AccessFailedCount = 0;
+            }
+
+            // [Notification] Check New Device & Send Login Email
+            var currentUa = Request.Headers["User-Agent"].ToString();
+            var isNewDevice = !await _db.AuditLogs.AnyAsync(a => a.UserId == user.Id && a.Action == "Login" && a.UserAgent == currentUa);
+            
+            if (isNewDevice)
+            {
+                 await _emailService.SendEmailToUserAsync(user.Id, "Cảnh báo: Đăng nhập từ thiết bị mới",
+                     $"<h3>Phát hiện đăng nhập từ thiết bị mới</h3><p>Thời gian: {DateTime.UtcNow.ToString("HH:mm dd/MM/yyyy UTC")}</p><p>Thiết bị: {currentUa}</p><p>Nếu không phải bạn, vui lòng đổi mật khẩu ngay.</p>");
+            }
+            else 
+            {
+                // Standard Login Notification (Requirement: "Gửi email khi đăng nhập thành công")
+                 await _emailService.SendEmailToUserAsync(user.Id, "Thông báo đăng nhập thành công",
+                     $"<h3>Đăng nhập thành công</h3><p>Thời gian: {DateTime.UtcNow.ToString("HH:mm dd/MM/yyyy UTC")}</p><p>Kiểm tra hoạt động tài khoản của bạn.</p>");
+            }
 
             // [Security] Assign Admin Rights if email matches (Self-healing/Ensure)
             if (user.Email != null && user.Email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))

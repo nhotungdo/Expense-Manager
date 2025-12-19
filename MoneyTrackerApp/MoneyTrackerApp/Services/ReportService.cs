@@ -15,7 +15,18 @@ public interface IReportService
     Task<MonthlyTrendReportDto> GenerateMonthlyTrendReportAsync(long userId, int year);
     Task<CategoryBreakdownReportDto> GenerateCategoryBreakdownAsync(long userId, DateTime startDate, DateTime endDate);
     Task<DashboardOverviewDto> GetDashboardOverviewAsync(long userId);
+    Task<DashboardAnalyticsDto> GetDashboardAnalyticsAsync(long userId, int days);
     Task<string> ExportReportAsync(long userId, GenerateReportDto dto);
+    Task<object> GetPersonalWalletSummaryAsync(long userId);
+    Task<List<CategoryBreakdownItem>> GetExpenseBreakdownAsync(long userId, string period);
+    Task<List<CategoryBreakdownItem>> GetIncomeBreakdownAsync(long userId, string period);
+}
+
+public class CategoryBreakdownItem
+{
+    public string CategoryName { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public int TransactionCount { get; set; }
 }
 
 public class ReportService : IReportService
@@ -319,5 +330,215 @@ public class ReportService : IReportService
         // 4. Use System.Text.Json for JSON
 
         return filePath;
+    }
+
+    /// <summary>
+    /// Get Dashboard Analytics Data for Donut Charts
+    /// </summary>
+    public async Task<DashboardAnalyticsDto> GetDashboardAnalyticsAsync(long userId, int days)
+    {
+        var startDate = DateTime.UtcNow.AddDays(-days);
+        var endDate = DateTime.UtcNow;
+
+        var transactions = await _context.Transactions
+            .Include(t => t.Category)
+            .Include(t => t.Account)
+            .Where(t => t.UserId == userId && t.TransactionDate >= startDate && t.TransactionDate <= endDate)
+            .ToListAsync();
+
+        // Color palette
+        var colors = new[] { "#7C3AED", "#3B82F6", "#14B8A6", "#FACC15", "#F472B6", "#10B981", "#F59E0B", "#EF4444" };
+
+        // 1. Chi tiêu theo Danh mục (Expense Categories)
+        var categorySpending = transactions
+            .Where(t => t.TransactionType == 2) // Expense
+            .GroupBy(t => t.Category?.Name ?? "Khác")
+            .Select((g, index) => new CategorySpendingDto
+            {
+                Name = g.Key,
+                Value = g.Sum(t => t.Amount),
+                Count = g.Count(),
+                Color = colors[index % colors.Length]
+            })
+            .OrderByDescending(c => c.Value)
+            .Take(5)
+            .ToList();
+
+        // 2. Thu nhập theo Nguồn (Income Sources)
+        var incomeSource = transactions
+            .Where(t => t.TransactionType == 1) // Income
+            .GroupBy(t => t.Category?.Name ?? "Thu nhập khác")
+            .Select((g, index) => new IncomeSourceDto
+            {
+                Name = g.Key,
+                Value = g.Sum(t => t.Amount),
+                Count = g.Count(),
+                Color = new[] { "#10B981", "#14B8A6", "#3B82F6" }[index % 3]
+            })
+            .OrderByDescending(i => i.Value)
+            .ToList();
+
+        // 3. Giao dịch theo Loại (Transaction Types)
+        var transactionType = new List<TransactionTypeDto>
+        {
+            new TransactionTypeDto
+            {
+                Name = "Thu",
+                Value = transactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount),
+                Count = transactions.Count(t => t.TransactionType == 1),
+                Color = "#10B981"
+            },
+            new TransactionTypeDto
+            {
+                Name = "Chi",
+                Value = transactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount),
+                Count = transactions.Count(t => t.TransactionType == 2),
+                Color = "#F472B6"
+            }
+        };
+
+        // 4. Giao dịch theo Ví (Wallet Distribution)
+        var walletDistribution = transactions
+            .GroupBy(t => t.Account?.Name ?? "Không xác định")
+            .Select((g, index) => new WalletDistributionDto
+            {
+                Name = g.Key,
+                Value = g.Sum(t => t.Amount),
+                Count = g.Count(),
+                Color = colors[index % colors.Length]
+            })
+            .OrderByDescending(w => w.Value)
+            .ToList();
+
+        // Calculate totals
+        var totalIncome = transactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
+        var totalExpense = transactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
+        var balance = totalIncome - totalExpense;
+
+        return new DashboardAnalyticsDto
+        {
+            CategorySpending = categorySpending,
+            IncomeSource = incomeSource,
+            TransactionType = transactionType,
+            WalletDistribution = walletDistribution,
+            TotalIncome = totalIncome,
+            TotalExpense = totalExpense,
+            Balance = balance
+        };
+    }
+
+    public async Task<object> GetPersonalWalletSummaryAsync(long userId)
+    {
+        // Get all accounts for user
+        var accounts = await _context.Accounts
+            .Where(a => a.UserId == userId)
+            .ToListAsync();
+
+        var totalBalance = accounts.Sum(a => a.CurrentBalance);
+
+        // Get current month transactions
+        var now = DateTime.Now;
+        var startOfMonth = new DateTime(now.Year, now.Month, 1);
+        var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+        var monthlyTransactions = await _context.Transactions
+            .Where(t => t.UserId == userId && 
+                   t.TransactionDate >= startOfMonth && 
+                   t.TransactionDate <= endOfMonth)
+            .ToListAsync();
+
+        var monthlyIncome = monthlyTransactions
+            .Where(t => t.TransactionType == 1)
+            .Sum(t => t.Amount);
+
+        var monthlyExpense = monthlyTransactions
+            .Where(t => t.TransactionType == 2)
+            .Sum(t => t.Amount);
+
+        return new
+        {
+            totalBalance = totalBalance,
+            monthlyIncome = monthlyIncome,
+            monthlyExpense = monthlyExpense,
+            accountCount = accounts.Count
+        };
+    }
+
+    public async Task<List<CategoryBreakdownItem>> GetExpenseBreakdownAsync(long userId, string period)
+    {
+        var (startDate, endDate) = GetDateRangeFromPeriod(period);
+
+        var expenses = await _context.Transactions
+            .Include(t => t.Category)
+            .Where(t => t.UserId == userId && 
+                   t.TransactionType == 2 && // Expense
+                   t.TransactionDate >= startDate && 
+                   t.TransactionDate <= endDate)
+            .GroupBy(t => t.Category != null ? t.Category.Name : "Khác")
+            .Select(g => new CategoryBreakdownItem
+            {
+                CategoryName = g.Key,
+                Amount = g.Sum(t => t.Amount),
+                TransactionCount = g.Count()
+            })
+            .OrderByDescending(c => c.Amount)
+            .ToListAsync();
+
+        return expenses;
+    }
+
+    public async Task<List<CategoryBreakdownItem>> GetIncomeBreakdownAsync(long userId, string period)
+    {
+        var (startDate, endDate) = GetDateRangeFromPeriod(period);
+
+        var income = await _context.Transactions
+            .Include(t => t.Category)
+            .Where(t => t.UserId == userId && 
+                   t.TransactionType == 1 && // Income
+                   t.TransactionDate >= startDate && 
+                   t.TransactionDate <= endDate)
+            .GroupBy(t => t.Category != null ? t.Category.Name : "Khác")
+            .Select(g => new CategoryBreakdownItem
+            {
+                CategoryName = g.Key,
+                Amount = g.Sum(t => t.Amount),
+                TransactionCount = g.Count()
+            })
+            .OrderByDescending(c => c.Amount)
+            .ToListAsync();
+
+        return income;
+    }
+
+    private (DateTime startDate, DateTime endDate) GetDateRangeFromPeriod(string period)
+    {
+        var now = DateTime.Now;
+        DateTime startDate, endDate;
+
+        switch (period.ToLower())
+        {
+            case "week":
+                // Current week (Monday to Sunday)
+                var dayOfWeek = (int)now.DayOfWeek;
+                var daysToMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
+                startDate = now.Date.AddDays(-daysToMonday);
+                endDate = startDate.AddDays(6);
+                break;
+
+            case "year":
+                // Current year
+                startDate = new DateTime(now.Year, 1, 1);
+                endDate = new DateTime(now.Year, 12, 31);
+                break;
+
+            case "month":
+            default:
+                // Current month
+                startDate = new DateTime(now.Year, now.Month, 1);
+                endDate = startDate.AddMonths(1).AddDays(-1);
+                break;
+        }
+
+        return (startDate, endDate);
     }
 }

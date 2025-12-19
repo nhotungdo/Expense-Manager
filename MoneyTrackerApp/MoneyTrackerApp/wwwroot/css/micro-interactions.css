@@ -1,8 +1,78 @@
 /* Micro Interactions CSS */
-.hover-scale {
-    transition: transform 0.2s;
+
+/* Button Click Effect */
+.btn-press {
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.hover-scale:hover {
-    transform: scale(1.05);
+.btn-press:active {
+    transform: scale(0.95);
+}
+
+/* Input Focus Glow */
+.input-focus-glow:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2), 0 0 10px rgba(37, 99, 235, 0.1);
+    border-color: var(--primary);
+    transition: all 0.2s ease;
+}
+
+/* Link Animated Underline */
+.link-underline {
+    position: relative;
+    text-decoration: none;
+    color: var(--primary);
+}
+
+.link-underline::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary);
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+/* Icon Spin on Hover */
+.icon-spin-hover:hover .fa,
+.icon-spin-hover:hover .fas,
+.icon-spin-hover:hover .far {
+    animation: spin 1s ease-in-out;
+}
+
+/* Card Tilt Effect (Subtle 3D) */
+.card-tilt {
+    transition: transform 0.1s ease;
+    transform-style: preserve-3d;
+}
+
+/* Checkbox/Radio Pulse */
+.control-pulse:checked+label::before {
+    animation: pulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Switch Toggle Animation */
+.switch-toggle {
+    transition: background-color 0.3s ease;
+}
+
+.switch-toggle:checked {
+    background-color: var(--success);
+}
+
+.switch-handle {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.switch-toggle:checked .switch-handle {
+    transform: translateX(100%);
 }

@@ -1230,6 +1230,16 @@
   },
   {
     "ContainingType": "MoneyTrackerApp.Controllers.AuthController",
+    "Method": "SendOtp",
+    "RelativePath": "api/Auth/send-otp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.AuthController",
     "Method": "Verify2FA",
     "RelativePath": "api/Auth/verify-2fa",
     "HttpMethod": "POST",
@@ -2676,6 +2686,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SettingsController",
+    "Method": "UpdatePrimaryColor",
+    "RelativePath": "api/Settings/primary-color",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MoneyTrackerApp.DTOs.UpdatePrimaryColorDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

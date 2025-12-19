@@ -87,6 +87,7 @@ public class UserSettingsDto
     public string DefaultCurrency { get; set; } = "VND";
     public string Timezone { get; set; } = "Asia/Ho_Chi_Minh";
     public string Theme { get; set; } = "light";
+    public string PrimaryColor { get; set; } = "#10b981";
     public string DateFormat { get; set; } = "DD/MM/YYYY";
     public string TimeFormat { get; set; } = "24h";
     public int FirstDayOfWeek { get; set; } = 1; // 0=Sunday, 1=Monday
@@ -108,6 +109,10 @@ public class UpdateSettingsDto
 
     [StringLength(10)]
     public string? Theme { get; set; }
+
+    [StringLength(7)]
+    [RegularExpression(@"^#[0-9A-Fa-f]{6}$", ErrorMessage = "Invalid hex color format")]
+    public string? PrimaryColor { get; set; }
 
     [StringLength(20)]
     public string? DateFormat { get; set; }
@@ -156,6 +161,14 @@ public class UpdateNotificationPreferencesDto
     public bool NotificationsEnabled { get; set; }
     public bool EmailNotifications { get; set; }
     public bool PushNotifications { get; set; }
+}
+
+public class UpdatePrimaryColorDto
+{
+    [Required]
+    [StringLength(7)]
+    [RegularExpression(@"^#[0-9A-Fa-f]{6}$", ErrorMessage = "Invalid hex color format. Use format: #RRGGBB")]
+    public string Color { get; set; } = null!;
 }
 
 // ===================================

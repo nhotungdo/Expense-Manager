@@ -4,201 +4,203 @@
     ViewData["Title"] = "Giao dịch";
 }
 
-<!-- Main Content Area -->
-<div class="px-6 py-8">
+<!-- Bento Grid Transactions -->
+<div class="bento-grid">
     
     <!-- 1. Header & Time Filter -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div class="bento-col-span-12 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">Giao dịch</h1>
-            <p class="text-slate-500">Quản lý thu chi và lịch sử giao dịch</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="fas fa-receipt text-primary"></i> Giao dịch
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Quản lý thu chi và lịch sử giao dịch</p>
         </div>
         
-        <!-- Time Filter (Simplified for now as Date Range Picker) -->
         <div class="flex items-center gap-2">
-            <a href="/Transactions/Scheduled" class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
+            <a href="/Transactions/Scheduled" class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">
                 <i class="fas fa-clock"></i> Định kỳ
             </a>
-            <form method="get" class="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-                <input type="date" asp-for="Filter.StartDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
-                <span class="text-slate-400">-</span>
-                <input type="date" asp-for="Filter.EndDate" class="border-none text-sm font-medium text-slate-600 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
-                <button type="submit" class="hidden">Filter</button>
+            <form method="get" class="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <input type="date" asp-for="Filter.StartDate" class="border-none text-sm font-medium text-gray-600 dark:text-gray-300 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
+                <span class="text-gray-400">-</span>
+                <input type="date" asp-for="Filter.EndDate" class="border-none text-sm font-medium text-gray-600 dark:text-gray-300 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
             </form>
         </div>
     </div>
 
     <!-- 2. Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <!-- Total Income -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+    <!-- Total Income -->
+    <div class="bento-col-span-12 md:bento-col-span-4">
+        <div class="bento-card relative overflow-hidden group">
             <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                    <i class="fas fa-arrow-down"></i>
+                <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-arrow-down transform rotate-45"></i>
                 </div>
-                <span class="text-sm font-medium text-slate-500">Tổng thu</span>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng thu</span>
             </div>
-            <p class="text-2xl font-bold text-emerald-600">
-                +@Model.ViewModel.TotalIncome.ToString("N0") <span class="text-sm font-medium text-slate-400">VND</span>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                <span class="text-emerald-600 dark:text-emerald-400">+@Model.ViewModel.TotalIncome.ToString("N0")</span> <span class="text-sm font-medium text-gray-400">VND</span>
             </p>
         </div>
+    </div>
 
-        <!-- Total Expense -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+    <!-- Total Expense -->
+    <div class="bento-col-span-12 md:bento-col-span-4">
+        <div class="bento-card relative overflow-hidden group">
             <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
-                    <i class="fas fa-arrow-up"></i>
+                <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-arrow-up transform rotate-45"></i>
                 </div>
-                <span class="text-sm font-medium text-slate-500">Tổng chi</span>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng chi</span>
             </div>
-            <p class="text-2xl font-bold text-rose-600">
-                -@Model.ViewModel.TotalExpense.ToString("N0") <span class="text-sm font-medium text-slate-400">VND</span>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                <span class="text-rose-600 dark:text-rose-400">-@Model.ViewModel.TotalExpense.ToString("N0")</span> <span class="text-sm font-medium text-gray-400">VND</span>
             </p>
         </div>
+    </div>
 
-        <!-- Net Income -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+    <!-- Net Income -->
+    <div class="bento-col-span-12 md:bento-col-span-4">
+        <div class="bento-card relative overflow-hidden group">
             <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <span class="text-sm font-medium text-slate-500">Số dư ròng</span>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Số dư ròng</span>
             </div>
-            <p class="text-2xl font-bold @(Model.ViewModel.NetIncome >= 0 ? "text-slate-900" : "text-rose-600")">
-                @Model.ViewModel.NetIncome.ToString("N0") <span class="text-sm font-medium text-slate-400">VND</span>
+            <p class="text-2xl font-bold @(Model.ViewModel.NetIncome >= 0 ? "text-gray-900 dark:text-white" : "text-rose-600 dark:text-rose-400")">
+                @Model.ViewModel.NetIncome.ToString("N0") <span class="text-sm font-medium text-gray-400">VND</span>
             </p>
         </div>
     </div>
 
     <!-- 3. Search & Filter Bar -->
-    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6">
-        <form method="get" class="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <!-- Persist Date Range -->
-            <input type="hidden" asp-for="Filter.StartDate" />
-            <input type="hidden" asp-for="Filter.EndDate" />
+    <div class="bento-col-span-12">
+        <div class="bento-card p-4">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <input type="hidden" asp-for="Filter.StartDate" />
+                <input type="hidden" asp-for="Filter.EndDate" />
 
-            <!-- Search -->
-            <div class="md:col-span-4 relative">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input asp-for="Filter.SearchText" class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base" placeholder="Tìm theo ghi chú..." />
-            </div>
+                <!-- Search -->
+                <div class="md:col-span-4 relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input asp-for="Filter.SearchText" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all" placeholder="Tìm theo ghi chú..." />
+                </div>
 
-            <!-- Filter Type -->
-            <div class="md:col-span-2">
-                <select asp-for="Filter.TransactionType" class="w-full py-2 px-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base">
-                    <option value="">Tất cả loại</option>
-                    <option value="1">Thu nhập</option>
-                    <option value="2">Chi tiêu</option>
-                    <option value="3">Chuyển khoản</option>
-                </select>
-            </div>
+                <!-- Filter Type -->
+                <div class="md:col-span-2">
+                    <select asp-for="Filter.TransactionType" class="w-full py-2.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
+                        <option value="">Tất cả loại</option>
+                        <option value="1">Thu nhập</option>
+                        <option value="2">Chi tiêu</option>
+                        <option value="3">Chuyển khoản</option>
+                    </select>
+                </div>
 
-            <!-- Filter Wallet -->
-            <div class="md:col-span-2">
-                <select asp-for="Filter.AccountId" asp-items="Model.AccountList" class="w-full py-2 px-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base">
-                    <option value="">Tất cả ví</option>
-                </select>
-            </div>
+                <!-- Filter Wallet -->
+                <div class="md:col-span-2">
+                    <select asp-for="Filter.AccountId" asp-items="Model.AccountList" class="w-full py-2.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
+                        <option value="">Tất cả ví</option>
+                    </select>
+                </div>
 
-             <!-- Filter Category -->
-            <div class="md:col-span-2">
-                <select asp-for="Filter.CategoryId" asp-items="Model.CategoryList" class="w-full py-2 px-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base">
-                    <option value="">Tất cả danh mục</option>
-                </select>
-            </div>
+                 <!-- Filter Category -->
+                <div class="md:col-span-2">
+                    <select asp-for="Filter.CategoryId" asp-items="Model.CategoryList" class="w-full py-2.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
+                        <option value="">Tất cả danh mục</option>
+                    </select>
+                </div>
 
-            <!-- Submit Button -->
-            <div class="md:col-span-2 flex gap-2">
-                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl transition-colors text-sm md:text-base shadow-sm hover:shadow-md">
-                    Lọc
-                </button>
-                 <a asp-page="Create" class="flex items-center justify-center px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors shadow-sm hover:shadow-md">
-                    <i class="fas fa-plus"></i>
-                </a>
-            </div>
-        </form>
+                <!-- Action Buttons -->
+                <div class="md:col-span-2 flex gap-2">
+                    <button type="submit" class="flex-1 bg-primary hover:bg-primary-dark text-white font-medium py-2 rounded-xl transition-colors text-sm shadow-md hover:shadow-lg">
+                        Lọc
+                    </button>
+                     <a asp-page="Create" class="flex items-center justify-center px-4 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white rounded-xl transition-colors shadow-md hover:shadow-lg">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- 4. Transaction List -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        @if (!Model.ViewModel.Transactions.Any())
-        {
-            <div class="p-12 text-center">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-                    <i class="fas fa-receipt text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-medium text-slate-900 mb-1">Chưa có giao dịch</h3>
-                <p class="text-slate-500 mb-6">Không tìm thấy giao dịch nào trong khoảng thời gian này.</p>
-                <a asp-page="Create" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-sm hover:shadow-md">
-                    <i class="fas fa-plus"></i> Tạo giao dịch mới
-                </a>
-            </div>
-        }
-        else
-        {
-            <!-- Group by Date -->
-            @foreach (var dateGroup in Model.ViewModel.Transactions.GroupBy(t => t.TransactionDate.Date).OrderByDescending(g => g.Key))
+    <div class="bento-col-span-12">
+        <div class="bento-card p-0 overflow-hidden">
+            @if (!Model.ViewModel.Transactions.Any())
             {
-                <div class="border-b border-slate-100 last:border-none">
-                    <div class="bg-slate-50/50 px-6 py-3 flex items-center justify-between">
-                        <span class="text-sm font-semibold text-slate-700">
-                            @dateGroup.Key.ToString("dd/MM/yyyy")
-                            @if (dateGroup.Key == DateTime.Today)
-                            {
-                                <span class="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">Hôm nay</span>
-                            }
-                        </span>
-                        <span class="text-xs text-slate-500 font-medium">
-                            @dateGroup.Sum(t => t.TransactionType == 1 ? t.Amount : (t.TransactionType == 2 ? -t.Amount : 0)).ToString("+#,##0;-#,##0;0") VND
-                        </span>
+                <div class="p-16 text-center">
+                    <div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300 dark:text-gray-600">
+                        <i class="fas fa-receipt text-3xl"></i>
                     </div>
-
-                    <div class="divide-y divide-slate-100">
-                        @foreach (var transaction in dateGroup)
-                        {
-                            <!-- Use div as row, maybe link to edit page later -->
-                            <div class="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors group cursor-pointer" onclick="window.location.href='/Transactions/Create?id=@transaction.Id'"> 
-                                <!-- Note: Since Create typically handles editing in many CRUD apps, or maybe Edit page. For now I point to Create? Or maybe just no link until Edit is ready. 
-                                     The requirement asks for Add/Edit Form as Point 2. So I probably should use same form or similar.
-                                     Let's assume there is NO Edit page yet, so I point to Index or separate.
-                                     I'll leave the link empty or generic for now, or maybe just remove onclick if I haven't built Edit page.
-                                     Actually, checking `Create.cshtml` it doesn't seem to support Edit (no Id param in OnGet).
-                                     I will update Create.cshtml to support inline editing or just leave it for now.
-                                 -->
-                                
-                                <!-- Icon -->
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: @(transaction.CategoryColor ?? "#f1f5f9"); color: #1e293b;">
-                                     @if (!string.IsNullOrEmpty(transaction.CategoryIcon))
-                                     {
-                                         <i class="@transaction.CategoryIcon text-lg"></i>
-                                     }
-                                     else
-                                     {
-                                         <i class="fas fa-wallet text-lg opacity-50"></i>
-                                     }
-                                </div>
-
-                                <!-- Content -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between mb-0.5">
-                                        <h4 class="text-sm font-semibold text-slate-900 truncate">@(transaction.CategoryName ?? "Chưa phân loại")</h4>
-                                        <span class="text-sm font-bold @(transaction.TransactionType == 1 ? "text-emerald-600" : (transaction.TransactionType == 2 ? "text-rose-600" : "text-blue-600")) whitespace-nowrap">
-                                            @(transaction.TransactionType == 1 ? "+" : (transaction.TransactionType == 2 ? "-" : ""))@transaction.Amount.ToString("N0")
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-xs text-slate-500 truncate max-w-[80%]">@(transaction.Note ?? transaction.Description)</p>
-                                        <span class="text-xs text-slate-400">@transaction.AccountName</span>
-                                    </div>
-                                </div>
-                                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <i class="fas fa-chevron-right text-slate-300"></i>
-                                </div>
-                            </div>
-                        }
-                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Chưa có giao dịch</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-8">Không tìm thấy giao dịch nào trong khoảng thời gian này.</p>
+                    <a asp-page="Create" class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium transition-all shadow-md hover:shadow-lg">
+                        <i class="fas fa-plus"></i> Tạo giao dịch mới
+                    </a>
                 </div>
             }
-        }
+            else
+            {
+                <!-- Group by Date -->
+                @foreach (var dateGroup in Model.ViewModel.Transactions.GroupBy(t => t.TransactionDate.Date).OrderByDescending(g => g.Key))
+                {
+                    <div class="border-b border-gray-100 dark:border-gray-700 last:border-none">
+                        <div class="bg-gray-50/80 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between backdrop-blur-sm sticky top-0 z-10">
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                @dateGroup.Key.ToString("dd/MM/yyyy")
+                                @if (dateGroup.Key == DateTime.Today)
+                                {
+                                    <span class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full uppercase tracking-wide font-bold">Hôm nay</span>
+                                }
+                            </span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono font-medium">
+                                @dateGroup.Sum(t => t.TransactionType == 1 ? t.Amount : (t.TransactionType == 2 ? -t.Amount : 0)).ToString("+#,##0;-#,##0;0")
+                            </span>
+                        </div>
+
+                        <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                            @foreach (var transaction in dateGroup)
+                            {
+                                <div class="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group cursor-pointer relative" onclick="window.location.href='/Transactions/Create?id=@transaction.Id'">
+                                    
+                                    <!-- Icon -->
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-gray-100 dark:border-gray-700 transition-transform group-hover:scale-110" style="background-color: @(transaction.CategoryColor ?? "#f3f4f6"); color: #1e293b;">
+                                         @if (!string.IsNullOrEmpty(transaction.CategoryIcon))
+                                         {
+                                             <i class="@transaction.CategoryIcon text-xl"></i>
+                                         }
+                                         else
+                                         {
+                                             <i class="fas fa-wallet text-xl opacity-50"></i>
+                                         }
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate">@(transaction.CategoryName ?? "Chưa phân loại")</h4>
+                                            <span class="text-sm font-bold @(transaction.TransactionType == 1 ? "text-emerald-600 dark:text-emerald-400" : (transaction.TransactionType == 2 ? "text-rose-600 dark:text-rose-400" : "text-blue-600 dark:text-blue-400")) whitespace-nowrap font-mono">
+                                                @(transaction.TransactionType == 1 ? "+" : (transaction.TransactionType == 2 ? "-" : ""))@transaction.Amount.ToString("N0")
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[70%]">
+                                                @(transaction.Note ?? transaction.Description)
+                                            </p>
+                                            <span class="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">@transaction.AccountName</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="absolute right-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                                        <i class="fas fa-chevron-right text-gray-300 dark:text-gray-600"></i>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
     </div>
 </div>

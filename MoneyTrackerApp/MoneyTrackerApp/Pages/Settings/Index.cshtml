@@ -4,6 +4,10 @@
     ViewData["Title"] = "Cài đặt";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+}
+
 <div class="container py-4">
     <div class="row">
         <div class="col-md-3 mb-4">
@@ -61,30 +65,160 @@
 
                 <!-- Appearance -->
                 <div class="tab-pane fade" id="appearance">
+                    <!-- Theme Mode -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Giao diện</h5>
+                            <h5 class="mb-0">🌓 Chế độ hiển thị</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-md-4 mb-3">
-                                    <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'light')" id="theme-light">
-                                        <i class="bi bi-sun fs-1 text-warning"></i>
-                                        <div class="mt-2">Chế độ sáng</div>
+                            <div class="row text-center g-3">
+                                <div class="col-md-4">
+                                    <div class="theme-option p-4 border rounded-3 cursor-pointer position-relative" 
+                                         onclick="changeTheme('light')" 
+                                         id="theme-light"
+                                         data-theme="light">
+                                        <div class="theme-preview mb-3">
+                                            <div class="preview-window bg-light border rounded p-2">
+                                                <div class="d-flex gap-1 mb-2">
+                                                    <div class="preview-dot bg-danger rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                    <div class="preview-dot bg-warning rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                    <div class="preview-dot bg-success rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                </div>
+                                                <div class="bg-white rounded p-2 mb-1" style="height: 30px;"></div>
+                                                <div class="bg-white rounded p-2" style="height: 40px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="fs-1 mb-2">☀️</div>
+                                        <div class="fw-semibold">Chế độ sáng</div>
+                                        <small class="text-muted">Giao diện sáng, dễ nhìn ban ngày</small>
+                                        <div class="theme-check position-absolute top-0 end-0 m-2 d-none">
+                                            <i class="bi bi-check-circle-fill text-primary fs-4"></i>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'dark')" id="theme-dark">
-                                        <i class="bi bi-moon fs-1 text-secondary"></i>
-                                        <div class="mt-2">Chế độ tối</div>
+                                <div class="col-md-4">
+                                    <div class="theme-option p-4 border rounded-3 cursor-pointer position-relative" 
+                                         onclick="changeTheme('dark')" 
+                                         id="theme-dark"
+                                         data-theme="dark">
+                                        <div class="theme-preview mb-3">
+                                            <div class="preview-window bg-dark border rounded p-2">
+                                                <div class="d-flex gap-1 mb-2">
+                                                    <div class="preview-dot bg-danger rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                    <div class="preview-dot bg-warning rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                    <div class="preview-dot bg-success rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                </div>
+                                                <div class="bg-secondary rounded p-2 mb-1" style="height: 30px;"></div>
+                                                <div class="bg-secondary rounded p-2" style="height: 40px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="fs-1 mb-2">🌙</div>
+                                        <div class="fw-semibold">Chế độ tối</div>
+                                        <small class="text-muted">Giảm mỏi mắt ban đêm</small>
+                                        <div class="theme-check position-absolute top-0 end-0 m-2 d-none">
+                                            <i class="bi bi-check-circle-fill text-primary fs-4"></i>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="p-3 border rounded cursor-pointer theme-option" onclick="updateSetting('theme', 'auto')" id="theme-auto">
-                                        <i class="bi bi-display fs-1 text-primary"></i>
-                                        <div class="mt-2">Mặc định hệ thống</div>
+                                <div class="col-md-4">
+                                    <div class="theme-option p-4 border rounded-3 cursor-pointer position-relative" 
+                                         onclick="changeTheme('auto')" 
+                                         id="theme-auto"
+                                         data-theme="auto">
+                                        <div class="theme-preview mb-3">
+                                            <div class="preview-window border rounded p-2" style="background: linear-gradient(to right, #f8f9fa 50%, #212529 50%);">
+                                                <div class="d-flex gap-1 mb-2">
+                                                    <div class="preview-dot bg-danger rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                    <div class="preview-dot bg-warning rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                    <div class="preview-dot bg-success rounded-circle" style="width: 6px; height: 6px;"></div>
+                                                </div>
+                                                <div class="rounded p-2 mb-1" style="height: 30px; background: rgba(255,255,255,0.5);"></div>
+                                                <div class="rounded p-2" style="height: 40px; background: rgba(255,255,255,0.5);"></div>
+                                            </div>
+                                        </div>
+                                        <div class="fs-1 mb-2">🖥️</div>
+                                        <div class="fw-semibold">Tự động</div>
+                                        <small class="text-muted">Theo cài đặt hệ thống</small>
+                                        <div class="theme-check position-absolute top-0 end-0 m-2 d-none">
+                                            <i class="bi bi-check-circle-fill text-primary fs-4"></i>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Primary Color -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">🎨 Màu chủ đạo</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">Chọn màu chủ đạo cho giao diện của bạn</p>
+                            
+                            <!-- Preset Colors -->
+                            <div class="row g-3 mb-4" id="presetColors">
+                                <!-- Loaded via JS -->
+                            </div>
+
+                            <!-- Custom Color Picker -->
+                            <div class="border-top pt-4">
+                                <label class="form-label fw-semibold">Hoặc chọn màu tùy chỉnh</label>
+                                <div class="d-flex gap-3 align-items-center">
+                                    <input type="color" 
+                                           class="form-control form-control-color" 
+                                           id="customColorPicker" 
+                                           value="#10b981"
+                                           title="Chọn màu"
+                                           style="width: 80px; height: 50px;">
+                                    <div class="flex-grow-1">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="customColorInput" 
+                                               placeholder="#10b981"
+                                               pattern="^#[0-9A-Fa-f]{6}$">
+                                        <small class="text-muted">Nhập mã màu hex (ví dụ: #10b981)</small>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="applyCustomColor()">
+                                        <i class="bi bi-check-lg"></i> Áp dụng
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Color Preview -->
+                            <div class="border-top pt-4 mt-4">
+                                <label class="form-label fw-semibold mb-3">Xem trước</label>
+                                <div class="color-preview-demo">
+                                    <button class="btn btn-primary me-2 mb-2">Button Primary</button>
+                                    <button class="btn btn-outline-primary me-2 mb-2">Button Outline</button>
+                                    <div class="badge badge-primary me-2 mb-2">Badge</div>
+                                    <div class="progress mt-2" style="height: 8px;">
+                                        <div class="progress-bar" role="progressbar" style="width: 65%; background: var(--primary);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Options -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">⚙️ Tùy chọn khác</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="reducedMotion" onchange="toggleReducedMotion()">
+                                <label class="form-check-label" for="reducedMotion">
+                                    <strong>Giảm hiệu ứng chuyển động</strong>
+                                    <br><small class="text-muted">Tắt animations để cải thiện hiệu suất</small>
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="compactMode" onchange="toggleCompactMode()">
+                                <label class="form-check-label" for="compactMode">
+                                    <strong>Chế độ thu gọn</strong>
+                                    <br><small class="text-muted">Giảm khoảng cách giữa các phần tử</small>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -177,8 +311,138 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/theme-manager.js"></script>
     <script>
         let currentSettings = {};
+
+        // Theme Functions
+        function changeTheme(theme) {
+            window.themeManager.saveTheme(theme);
+            updateThemeUI(theme);
+            updateSetting('theme', theme);
+        }
+
+        function updateThemeUI(theme) {
+            // Remove all active states
+            document.querySelectorAll('.theme-option').forEach(el => {
+                el.classList.remove('border-primary', 'border-3', 'shadow-sm');
+                el.querySelector('.theme-check').classList.add('d-none');
+            });
+            
+            // Add active state to selected
+            const selected = document.getElementById(`theme-${theme}`);
+            if (selected) {
+                selected.classList.add('border-primary', 'border-3', 'shadow-sm');
+                selected.querySelector('.theme-check').classList.remove('d-none');
+            }
+        }
+
+        function loadPresetColors() {
+            const colors = window.themeManager.getPresetColors();
+            const container = document.getElementById('presetColors');
+            
+            colors.forEach(color => {
+                const col = document.createElement('div');
+                col.className = 'col-6 col-md-3';
+                col.innerHTML = `
+                    <div class="color-preset-option p-3 border rounded-3 cursor-pointer text-center position-relative"
+                         onclick="applyPresetColor('${color.value}')"
+                         data-color="${color.value}">
+                        <div class="color-circle mx-auto mb-2 rounded-circle border border-2" 
+                             style="width: 50px; height: 50px; background: ${color.value};"></div>
+                        <div class="fw-semibold small">${color.name}</div>
+                        <small class="text-muted">${color.description}</small>
+                        <div class="color-preset-check position-absolute top-0 end-0 m-2 d-none">
+                            <i class="bi bi-check-circle-fill text-white fs-5" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));"></i>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+            
+            // Highlight current color
+            updateColorUI(window.themeManager.getPrimaryColor());
+        }
+
+        function applyPresetColor(color) {
+            window.themeManager.savePrimaryColor(color);
+            updateColorUI(color);
+            document.getElementById('customColorPicker').value = color;
+            document.getElementById('customColorInput').value = color;
+        }
+
+        function applyCustomColor() {
+            const colorInput = document.getElementById('customColorInput');
+            const colorPicker = document.getElementById('customColorPicker');
+            
+            let color = colorInput.value.trim();
+            
+            // Validate hex color
+            if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
+                color = colorPicker.value;
+            }
+            
+            window.themeManager.savePrimaryColor(color);
+            updateColorUI(color);
+            
+            showToast('Màu chủ đạo đã được cập nhật!', 'success');
+        }
+
+        function updateColorUI(color) {
+            // Remove all active states
+            document.querySelectorAll('.color-preset-option').forEach(el => {
+                el.classList.remove('border-primary', 'border-3', 'shadow-sm');
+                el.querySelector('.color-preset-check').classList.add('d-none');
+            });
+            
+            // Add active state to selected
+            const selected = document.querySelector(`[data-color="${color}"]`);
+            if (selected) {
+                selected.classList.add('border-primary', 'border-3', 'shadow-sm');
+                selected.querySelector('.color-preset-check').classList.remove('d-none');
+            }
+        }
+
+        function toggleReducedMotion() {
+            const enabled = document.getElementById('reducedMotion').checked;
+            if (enabled) {
+                document.documentElement.style.setProperty('--transition-fast', '0ms');
+                document.documentElement.style.setProperty('--transition-base', '0ms');
+                document.documentElement.style.setProperty('--transition-slow', '0ms');
+            } else {
+                document.documentElement.style.setProperty('--transition-fast', '150ms cubic-bezier(0.4, 0, 0.2, 1)');
+                document.documentElement.style.setProperty('--transition-base', '300ms cubic-bezier(0.4, 0, 0.2, 1)');
+                document.documentElement.style.setProperty('--transition-slow', '500ms cubic-bezier(0.4, 0, 0.2, 1)');
+            }
+            localStorage.setItem('reducedMotion', enabled);
+            showToast(enabled ? 'Đã tắt hiệu ứng chuyển động' : 'Đã bật hiệu ứng chuyển động', 'success');
+        }
+
+        function toggleCompactMode() {
+            const enabled = document.getElementById('compactMode').checked;
+            document.documentElement.classList.toggle('compact-mode', enabled);
+            localStorage.setItem('compactMode', enabled);
+            showToast(enabled ? 'Đã bật chế độ thu gọn' : 'Đã tắt chế độ thu gọn', 'success');
+        }
+
+        // Sync color picker and input
+        document.addEventListener('DOMContentLoaded', () => {
+            const colorPicker = document.getElementById('customColorPicker');
+            const colorInput = document.getElementById('customColorInput');
+            
+            if (colorPicker && colorInput) {
+                colorPicker.addEventListener('input', (e) => {
+                    colorInput.value = e.target.value;
+                });
+                
+                colorInput.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                        colorPicker.value = value;
+                    }
+                });
+            }
+        });
 
         async function loadOptions() {
             try {
@@ -253,9 +517,24 @@
                     document.getElementById('emailNotifications').checked = currentSettings.emailNotifications;
                     document.getElementById('pushNotifications').checked = currentSettings.pushNotifications;
 
-                    // Highlight theme
-                    document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('border-primary', 'bg-light'));
-                    document.getElementById(`theme-${currentSettings.theme}`).classList.add('border-primary', 'bg-light');
+                    // Update theme UI
+                    updateThemeUI(currentSettings.theme || 'light');
+                    
+                    // Update primary color if different from current
+                    if (currentSettings.primaryColor && currentSettings.primaryColor !== window.themeManager.getPrimaryColor()) {
+                        window.themeManager.applyPrimaryColor(currentSettings.primaryColor);
+                        localStorage.setItem('primaryColor', currentSettings.primaryColor);
+                    }
+                    
+                    // Load saved preferences
+                    const reducedMotion = localStorage.getItem('reducedMotion') === 'true';
+                    const compactMode = localStorage.getItem('compactMode') === 'true';
+                    
+                    document.getElementById('reducedMotion').checked = reducedMotion;
+                    document.getElementById('compactMode').checked = compactMode;
+                    
+                    if (reducedMotion) toggleReducedMotion();
+                    if (compactMode) toggleCompactMode();
                 }
             } catch (error) {
                 console.error('Error loading settings:', error);
@@ -293,10 +572,6 @@
 
                 if (response.ok) {
                     showToast(`${key} cập nhật thành công!`, 'success');
-                    if (key === 'theme') {
-                        document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('border-primary', 'bg-light'));
-                        document.getElementById(`theme-${value}`).classList.add('border-primary', 'bg-light');
-                    }
                 } else {
                     showToast(`Không thể cập nhật ${key}.`, 'danger');
                     loadSettings(); // Revert
@@ -362,11 +637,77 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await loadOptions();
             await loadSettings();
+            loadPresetColors();
+            
+            // Set initial color picker values
+            const currentColor = window.themeManager.getPrimaryColor();
+            document.getElementById('customColorPicker').value = currentColor;
+            document.getElementById('customColorInput').value = currentColor;
         });
     </script>
     
     <style>
-        .cursor-pointer { cursor: pointer; }
-        .theme-option:hover { background-color: #f8f9fa; }
+        .cursor-pointer { 
+            cursor: pointer; 
+        }
+        
+        .theme-option {
+            transition: all 0.3s ease;
+        }
+        
+        .theme-option:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .color-preset-option {
+            transition: all 0.3s ease;
+        }
+        
+        .color-preset-option:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .color-circle {
+            transition: transform 0.3s ease;
+        }
+        
+        .color-preset-option:hover .color-circle {
+            transform: scale(1.1);
+        }
+        
+        .preview-window {
+            transition: all 0.3s ease;
+        }
+        
+        .theme-option:hover .preview-window {
+            transform: scale(1.05);
+        }
+        
+        /* Compact Mode */
+        .compact-mode .card {
+            padding: 16px !important;
+        }
+        
+        .compact-mode .mb-3 {
+            margin-bottom: 12px !important;
+        }
+        
+        .compact-mode .mb-4 {
+            margin-bottom: 16px !important;
+        }
+        
+        .compact-mode .py-3 {
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
+        }
+        
+        [data-theme="dark"] .theme-option:hover,
+        [data-theme="dark"] .color-preset-option:hover {
+            background-color: #1e293b;
+        }
     </style>
 }

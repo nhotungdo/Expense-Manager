@@ -115,7 +115,7 @@
               "RelativeDocumentMoniker": "MoneyTrackerApp\\Program.cs",
               "ToolTip": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\Program.cs",
               "RelativeToolTip": "MoneyTrackerApp\\Program.cs",
-              "ViewState": "AgIAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-18T15:47:07.231Z",
               "EditorCaption": ""
@@ -130,8 +130,7 @@
               "RelativeToolTip": "MoneyTrackerApp\\Pages\\Dashboard.cshtml.cs",
               "ViewState": "AgIAAB0AAAAAAAAAAADgvzcAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:42:55.822Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-18T14:42:55.822Z"
             },
             {
               "$type": "Document",
@@ -143,8 +142,7 @@
               "RelativeToolTip": "MoneyTrackerApp\\Models\\ExpenseManagerContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-13T13:10:57.224Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-13T13:10:57.224Z"
             },
             {
               "$type": "Document",

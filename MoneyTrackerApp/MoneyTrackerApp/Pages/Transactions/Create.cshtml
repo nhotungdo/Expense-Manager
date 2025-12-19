@@ -5,173 +5,175 @@
 }
 
 <div class="max-w-2xl mx-auto px-4 py-8">
-    <div class="flex items-center gap-3 mb-6">
-        <a asp-page="/Transactions/Index" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors text-slate-500">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-6">
+        <a asp-page="/Transactions/Index" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400 shadow-sm">
             <i class="fas fa-arrow-left"></i>
         </a>
-        <h1 class="text-2xl font-bold text-slate-900">@(Model.IsEditMode ? "Sửa giao dịch" : "Giao dịch mới")</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">@(Model.IsEditMode ? "Sửa giao dịch" : "Giao dịch mới")</h1>
     </div>
 
-    <form method="post" class="space-y-6">
-        <div asp-validation-summary="ModelOnly" class="bg-red-50 text-red-600 p-4 rounded-xl text-sm"></div>
-        <input type="hidden" asp-for="Id" />
-        
-        <!-- 1. Type Switcher (Tabs) -->
-        <div class="bg-slate-100 p-1 rounded-xl flex">
-            <label class="flex-1 relative cursor-pointer group">
-                <input type="radio" asp-for="Transaction.TransactionType" value="2" class="peer sr-only" onchange="toggleType(2)" />
-                <div class="text-center py-2.5 rounded-lg text-sm font-medium text-slate-600 transition-all duration-200 peer-checked:bg-white peer-checked:text-rose-600 peer-checked:shadow-sm">
-                    Chi tiêu
-                </div>
-            </label>
-            <label class="flex-1 relative cursor-pointer group">
-                <input type="radio" asp-for="Transaction.TransactionType" value="1" class="peer sr-only" onchange="toggleType(1)" />
-                <div class="text-center py-2.5 rounded-lg text-sm font-medium text-slate-600 transition-all duration-200 peer-checked:bg-white peer-checked:text-emerald-600 peer-checked:shadow-sm">
-                    Thu nhập
-                </div>
-            </label>
-            <label class="flex-1 relative cursor-pointer group">
-                <input type="radio" asp-for="Transaction.TransactionType" value="3" class="peer sr-only" onchange="toggleType(3)" />
-                <div class="text-center py-2.5 rounded-lg text-sm font-medium text-slate-600 transition-all duration-200 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm">
-                    Chuyển tiền
-                </div>
-            </label>
-        </div>
-
-        <!-- 2. Amount Input -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Số tiền @(Model.Transaction.Currency ?? "VND")</label>
-            <div class="relative inline-block w-full max-w-xs">
-                <!-- Using type="number" simpler for now -->
-                <input asp-for="Transaction.Amount" type="number" step="0.01" class="block w-full text-center text-4xl font-bold text-slate-900 border-none focus:ring-0 p-0 placeholder-slate-200" placeholder="0" />
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full ml-2">
-                    <span class="text-sm font-medium text-slate-400"></span>
-                </div>
-            </div>
-            <input type="hidden" asp-for="Transaction.Currency" value="VND" />
-            <span asp-validation-for="Transaction.Amount" class="text-xs text-rose-500 block mt-2"></span>
-        </div>
-
-        <!-- 3. Category (Grid) -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" id="categorySelection">
-            <label class="block text-sm font-semibold text-slate-700 mb-4">Danh mục</label>
+    <!-- Main Card -->
+    <div class="bento-card relative">
+        <form method="post" class="space-y-6">
+            <div asp-validation-summary="ModelOnly" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm border border-red-100 dark:border-red-900/50"></div>
+            <input type="hidden" asp-for="Id" />
             
-            <!-- Hidden Input for Form Submission -->
-            <input type="hidden" asp-for="Transaction.CategoryId" id="selectedCategoryId" />
-            
-            <div class="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-60 overflow-y-auto px-1" id="categoryGrid">
-                <!-- Javascript will populate this based on type -->
-            </div>
-             <span asp-validation-for="Transaction.CategoryId" class="text-xs text-rose-500 block mt-2"></span>
-             
-             <!-- Suggestion placeholder -->
-             <div id="aiSuggestion" class="mt-3 hidden bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-xs flex items-center gap-2">
-                 <i class="fas fa-magic"></i> Maybe: <span class="font-bold underline cursor-pointer" id="aiSuggestionText">Food & Drink</span>
-             </div>
-        </div>
-
-        <!-- 4. Details -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <!-- Date -->
-            <div>
-                 <label class="block text-sm font-medium text-slate-700 mb-1">Thời gian</label>
-                 <input asp-for="Transaction.TransactionDate" type="date" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm" />
-            </div>
-
-            <!-- Wallet (Source) -->
-            <div>
-                 <label class="block text-sm font-medium text-slate-700 mb-1" id="accountLabel">Ví nguồn</label>
-                 <select asp-for="Transaction.AccountId" asp-items="Model.AccountList" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                 </select>
-                 <span asp-validation-for="Transaction.AccountId" class="text-xs text-rose-500 mt-1 block"></span>
+            <!-- 1. Type Switcher (Tabs) -->
+            <div class="bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl flex">
+                <label class="flex-1 relative cursor-pointer group">
+                    <input type="radio" asp-for="Transaction.TransactionType" value="2" class="peer sr-only" onchange="toggleType(2)" />
+                    <div class="text-center py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-400 transition-all duration-200 peer-checked:bg-white dark:peer-checked:bg-gray-700 peer-checked:text-rose-600 dark:peer-checked:text-rose-400 peer-checked:shadow-sm">
+                        Chi tiêu
+                    </div>
+                </label>
+                <label class="flex-1 relative cursor-pointer group">
+                    <input type="radio" asp-for="Transaction.TransactionType" value="1" class="peer sr-only" onchange="toggleType(1)" />
+                    <div class="text-center py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-400 transition-all duration-200 peer-checked:bg-white dark:peer-checked:bg-gray-700 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 peer-checked:shadow-sm">
+                        Thu nhập
+                    </div>
+                </label>
+                <label class="flex-1 relative cursor-pointer group">
+                    <input type="radio" asp-for="Transaction.TransactionType" value="3" class="peer sr-only" onchange="toggleType(3)" />
+                    <div class="text-center py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-400 transition-all duration-200 peer-checked:bg-white dark:peer-checked:bg-gray-700 peer-checked:text-blue-600 dark:peer-checked:text-blue-400 peer-checked:shadow-sm">
+                        Chuyển tiền
+                    </div>
+                </label>
             </div>
 
-             <!-- Wallet (Destination) for Transfer -->
-            <div id="pairedAccountGroup" class="hidden">
-                 <label class="block text-sm font-medium text-slate-700 mb-1">Đến ví</label>
-                 <select asp-for="Transaction.PairedAccountId" asp-items="Model.AccountList" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                     <option value="">-- Chọn ví đích --</option>
-                 </select>
+            <!-- 2. Amount Input -->
+            <div class="py-8 text-center border-b border-gray-100 dark:border-gray-700">
+                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Số tiền @(Model.Transaction.Currency ?? "VND")</label>
+                <div class="relative inline-block w-full max-w-sm">
+                    <input asp-for="Transaction.Amount" type="number" step="0.01" class="block w-full text-center text-5xl font-bold text-gray-900 dark:text-white border-none focus:ring-0 p-0 placeholder-gray-200 dark:placeholder-gray-700 bg-transparent" placeholder="0" />
+                </div>
+                <input type="hidden" asp-for="Transaction.Currency" value="VND" />
+                <span asp-validation-for="Transaction.Amount" class="text-xs text-rose-500 block mt-2"></span>
             </div>
 
-            <!-- Note -->
-            <div>
-                 <label class="block text-sm font-medium text-slate-700 mb-1">Ghi chú</label>
-                 <textarea asp-for="Transaction.Note" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="Nhập ghi chú..."></textarea>
+            <!-- 3. Category (Grid) -->
+            <div id="categorySelection" class="space-y-3">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Danh mục</label>
+                
+                <input type="hidden" asp-for="Transaction.CategoryId" id="selectedCategoryId" />
+                
+                <div class="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-60 overflow-y-auto px-1 custom-scrollbar" id="categoryGrid">
+                    <!-- Javascript will populate this -->
+                </div>
+                 <span asp-validation-for="Transaction.CategoryId" class="text-xs text-rose-500 block"></span>
+                 
+                 <!-- Suggestion placeholder -->
+                 <div id="aiSuggestion" class="hidden bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg text-xs flex items-center gap-2 border border-blue-100 dark:border-blue-800">
+                     <i class="fas fa-magic"></i> AI Gợi ý: <span class="font-bold underline cursor-pointer" id="aiSuggestionText">Food & Drink</span>
+                 </div>
             </div>
-            
-             <!-- Attachments / Advanced Placeholders -->
-             <div class="flex items-center gap-3 pt-2">
-                 <button type="button" class="flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-medium text-slate-600 transition-colors">
-                     <i class="fas fa-camera"></i> Thêm ảnh
-                 </button>
-                  <button type="button" id="btnScanOcr" class="flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-medium text-slate-600 transition-colors" onclick="document.getElementById('ocrFileInput').click()">
-                     <i class="fas fa-expand"></i> Quét hóa đơn
-                 </button>
-                 <input type="file" id="ocrFileInput" class="hidden" accept="image/*" onchange="handleOcrFile(this)" />
-             </div>
-        </div>
 
-        <!-- Advanced Options -->
-        <details class="group bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <summary class="flex items-center justify-between p-4 cursor-pointer list-none hover:bg-slate-50 transition-colors">
-                <span class="text-sm font-medium text-slate-700">Tùy chọn nâng cao (Tiết kiệm, Nợ...)</span>
-                <span class="transition-transform group-open:rotate-180">
-                    <i class="fas fa-chevron-down text-slate-400"></i>
-                </span>
-            </summary>
-            <div class="p-4 border-t border-slate-100 space-y-4">
-                 <!-- Savings Goal -->
-                 <div>
-                     <label class="block text-sm font-medium text-slate-700 mb-1">Đóng góp cho Mục tiêu tiết kiệm</label>
-                     <select asp-for="SavingsGoalId" asp-items="Model.SavingsGoalList" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                         <option value="">-- Không chọn --</option>
+            <!-- 4. Details Section -->
+            <div class="space-y-4 pt-4">
+                <!-- Date -->
+                <div>
+                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Thời gian</label>
+                     <input asp-for="Transaction.TransactionDate" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all" />
+                </div>
+
+                <!-- Wallet (Source) -->
+                <div>
+                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" id="accountLabel">Ví nguồn</label>
+                     <select asp-for="Transaction.AccountId" asp-items="Model.AccountList" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
                      </select>
-                     <p class="text-xs text-slate-500 mt-1">Chọn nếu giao dịch này đóng góp cho mục tiêu tiết kiệm.</p>
+                     <span asp-validation-for="Transaction.AccountId" class="text-xs text-rose-500 mt-1 block"></span>
+                </div>
+
+                 <!-- Wallet (Destination) for Transfer -->
+                <div id="pairedAccountGroup" class="hidden">
+                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Đến ví</label>
+                     <select asp-for="Transaction.PairedAccountId" asp-items="Model.AccountList" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
+                         <option value="">-- Chọn ví đích --</option>
+                     </select>
+                </div>
+
+                <!-- Note -->
+                <div>
+                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ghi chú</label>
+                     <textarea asp-for="Transaction.Note" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all" placeholder="Nhập ghi chú..."></textarea>
+                </div>
+                
+                 <!-- Attachments / Advanced Placeholders -->
+                 <div class="flex items-center gap-3 pt-2">
+                     <button type="button" class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                         <i class="fas fa-camera"></i> Thêm ảnh
+                     </button>
+                      <button type="button" id="btnScanOcr" class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 transition-colors" onclick="document.getElementById('ocrFileInput').click()">
+                         <i class="fas fa-expand"></i> Quét hóa đơn
+                     </button>
+                     <input type="file" id="ocrFileInput" class="hidden" accept="image/*" onchange="handleOcrFile(this)" />
                  </div>
                  
-                 <!-- Recurring Transaction -->
-                 <div class="border-t border-slate-100 pt-4 mt-4">
-                     <div class="flex items-center gap-2 mb-3">
-                        <input asp-for="Transaction.IsRecurring" type="checkbox" id="isRecurring" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" onchange="toggleRecurring()" />
-                        <label for="isRecurring" class="text-sm font-medium text-slate-700 select-none">Lặp lại giao dịch này</label>
+                 <!-- OCR Preview Container (Hidden by default) -->
+                 <div id="ocrPreviewContainer" class="hidden mt-4 relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 max-h-60 ocr-scan-container">
+                     <img id="ocrPreviewImage" class="w-full h-full object-cover" />
+                     <div class="ocr-scan-line"></div>
+                     <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-medium backdrop-blur-[2px]" id="ocrOverlay">
+                         <i class="fas fa-magic mr-2 animate-bounce"></i> Đang phân tích...
                      </div>
-                     
-                     <div id="recurringOptions" class="hidden pl-6 space-y-3">
-                         <div class="grid grid-cols-2 gap-3">
-                             <div>
-                                 <label class="block text-xs font-medium text-slate-500 mb-1">Tần suất</label>
-                                 <select asp-for="Transaction.RecurringFrequency" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm">
-                                     <option value="Daily">Hàng ngày</option>
-                                     <option value="Weekly">Hàng tuần</option>
-                                     <option value="Monthly" selected>Hàng tháng</option>
-                                     <option value="Yearly">Hàng năm</option>
-                                 </select>
-                             </div>
-                             <div>
-                                 <label class="block text-xs font-medium text-slate-500 mb-1">Mỗi (khoảng)</label>
-                                 <input asp-for="Transaction.RecurringInterval" type="number" min="1" value="1" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" />
-                             </div>
-                         </div>
-                         <div>
-                              <label class="block text-xs font-medium text-slate-500 mb-1">Kết thúc vào (Tùy chọn)</label>
-                              <input asp-for="Transaction.RecurringEndDate" type="date" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" />
-                         </div>
-                     </div>
-                 </div>
-
-                 <!-- Placeholder for Debt/Group -->
-                 <div class="p-3 bg-slate-50 rounded-xl text-xs text-slate-500 text-center mt-4">
-                     Tính năng Nợ và Chi tiêu nhóm đang được phát triển.
                  </div>
             </div>
-        </details>
 
-        <!-- Submit -->
-        <button type="submit" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all transform active:scale-95">
-            @(Model.IsEditMode ? "Lưu thay đổi" : "Tạo giao dịch")
-        </button>
-    </form>
+            <!-- Advanced Options -->
+            <details class="group rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50/50 dark:bg-gray-800/20">
+                <summary class="flex items-center justify-between p-4 cursor-pointer list-none hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tùy chọn nâng cao</span>
+                    <span class="transition-transform group-open:rotate-180">
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </span>
+                </summary>
+                <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                     <!-- Savings Goal -->
+                     <div>
+                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Đóng góp cho Mục tiêu tiết kiệm</label>
+                         <select asp-for="SavingsGoalId" asp-items="Model.SavingsGoalList" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm">
+                             <option value="">-- Không chọn --</option>
+                         </select>
+                     </div>
+                     
+                     <!-- Recurring Transaction -->
+                     <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                         <div class="flex items-center gap-2 mb-3">
+                            <input asp-for="Transaction.IsRecurring" type="checkbox" id="isRecurring" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary bg-white dark:bg-gray-800" onchange="toggleRecurring()" />
+                            <label for="isRecurring" class="text-sm font-medium text-gray-700 dark:text-gray-300 select-none">Lặp lại giao dịch này</label>
+                         </div>
+                         
+                         <div id="recurringOptions" class="hidden pl-6 space-y-3">
+                             <div class="grid grid-cols-2 gap-3">
+                                 <div>
+                                     <label class="block text-xs font-medium text-gray-500 mb-1">Tần suất</label>
+                                     <select asp-for="Transaction.RecurringFrequency" class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm">
+                                         <option value="Daily">Hàng ngày</option>
+                                         <option value="Weekly">Hàng tuần</option>
+                                         <option value="Monthly" selected>Hàng tháng</option>
+                                         <option value="Yearly">Hàng năm</option>
+                                     </select>
+                                 </div>
+                                 <div>
+                                     <label class="block text-xs font-medium text-gray-500 mb-1">Mỗi (khoảng)</label>
+                                     <input asp-for="Transaction.RecurringInterval" type="number" min="1" value="1" class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm" />
+                                 </div>
+                             </div>
+                             <div>
+                                  <label class="block text-xs font-medium text-gray-500 mb-1">Kết thúc vào (Tùy chọn)</label>
+                                  <input asp-for="Transaction.RecurringEndDate" type="date" class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm" />
+                             </div>
+                         </div>
+                     </div>
+                </div>
+            </details>
+
+            <!-- Submit -->
+            <button type="submit" class="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all transform active:scale-95">
+                @(Model.IsEditMode ? "Lưu thay đổi" : "Tạo giao dịch")
+            </button>
+        </form>
+    </div>
 </div>
 
 @section Scripts {
@@ -185,18 +187,25 @@
             
             const file = input.files[0];
             const btn = document.getElementById('btnScanOcr');
+            const previewContainer = document.getElementById('ocrPreviewContainer');
+            const previewImage = document.getElementById('ocrPreviewImage');
             const originalText = btn.innerHTML;
             
-            // Show loading
+            // Show loading state
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang quét...';
             btn.disabled = true;
             
             try {
-                // Convert to Base64
+                // Convert to Base64 and Show Preview
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async function() {
                     const base64 = reader.result;
+                    
+                    // Show preview with scan animation
+                    previewImage.src = base64;
+                    previewContainer.classList.remove('hidden');
+                    previewContainer.classList.add('ocr-scanning');
                     
                     // Call API
                     const response = await fetch('/api/Ocr/scan', {
@@ -211,6 +220,10 @@
                     
                     const result = await response.json();
                     
+                    // Stop animation
+                    previewContainer.classList.remove('ocr-scanning');
+                    document.getElementById('ocrOverlay').classList.add('hidden');
+                    
                     // Populate form
                     if (result.amount) {
                         document.querySelector('input[name="Transaction.Amount"]').value = result.amount;
@@ -219,7 +232,6 @@
                         document.querySelector('textarea[name="Transaction.Note"]').value = result.merchantName + "\n" + (result.rawText || "");
                     }
                     if (result.date) {
-                         // Format date to yyyy-MM-dd
                          const d = new Date(result.date);
                          const yyyy = d.getFullYear();
                          const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -232,6 +244,8 @@
                     setTimeout(() => {
                         btn.innerHTML = originalText;
                         btn.disabled = false;
+                        // Optional: hide preview after success
+                        // previewContainer.classList.add('hidden'); 
                     }, 2000);
                 };
             } catch (error) {
@@ -239,6 +253,7 @@
                 alert('Có lỗi xảy ra khi quét hóa đơn. Vui lòng thử lại.');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
+                previewContainer.classList.add('hidden');
             }
         }
 
@@ -280,14 +295,14 @@
                 const currentId = document.getElementById('selectedCategoryId').value;
                 const isSelected = c.id == currentId;
                 const div = document.createElement('div');
-                div.className = `flex flex-col items-center gap-1 p-2 rounded-xl cursor-pointer hover:bg-slate-50 transition-all border-2 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-transparent'}`;
+                div.className = `flex flex-col items-center gap-1 p-2 rounded-2xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border-2 ${isSelected ? 'border-primary bg-blue-50 dark:bg-blue-900/20' : 'border-transparent'}`;
                 div.onclick = () => selectCategory(c.id, div);
                 
                 div.innerHTML = `
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background-color: \${c.color ? c.color + '20' : '#f1f5f9'}; color: \${c.color || '#64748b'}">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm" style="background-color: \${c.color ? c.color + '20' : '#f3f4f6'}; color: \${c.color || '#64748b'}">
                         \${c.icon ? `<i class="\${c.icon}"></i>` : '<i class="fas fa-tag"></i>'}
                     </div>
-                    <span class="text-[10px] text-center font-medium text-slate-600 leading-tight truncate w-full">\${c.name}</span>
+                    <span class="text-[10px] text-center font-medium text-gray-600 dark:text-gray-400 leading-tight truncate w-full">\${c.name}</span>
                 `;
                 grid.appendChild(div);
             });
@@ -299,11 +314,11 @@
             // Visual feedback
             const siblings = element.parentElement.children;
             for(let sib of siblings) {
-                sib.classList.remove('border-blue-500', 'bg-blue-50');
+                sib.classList.remove('border-primary', 'bg-blue-50', 'dark:bg-blue-900/20');
                 sib.classList.add('border-transparent');
             }
             element.classList.remove('border-transparent');
-            element.classList.add('border-blue-500', 'bg-blue-50');
+            element.classList.add('border-primary', 'bg-blue-50', 'dark:bg-blue-900/20');
         }
 
         // Init
