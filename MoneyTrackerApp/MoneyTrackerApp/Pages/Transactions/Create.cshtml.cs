@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MoneyTrackerApp.DTOs;
 using MoneyTrackerApp.Services;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace MoneyTrackerApp.Pages.Transactions;
 
@@ -15,17 +16,20 @@ public class CreateModel : PageModel
     private readonly IAccountService _accountService;
     private readonly ICategoryService _categoryService;
     private readonly ISavingsGoalService _savingsGoalService;
+    private readonly ILogger<CreateModel> _logger;
 
     public CreateModel(
         ITransactionService transactionService,
         IAccountService accountService,
         ICategoryService categoryService,
-        ISavingsGoalService savingsGoalService)
+        ISavingsGoalService savingsGoalService,
+        ILogger<CreateModel> logger)
     {
         _transactionService = transactionService;
         _accountService = accountService;
         _categoryService = categoryService;
         _savingsGoalService = savingsGoalService;
+        _logger = logger;
     }
 
     [BindProperty]
@@ -97,6 +101,7 @@ public class CreateModel : PageModel
             var idValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!long.TryParse(idValue, out var userId))
             {
+                _logger.LogWarning("User ID missing in OnPostAsync");
                 return Unauthorized();
             }
             if (Id.HasValue)
@@ -132,6 +137,7 @@ public class CreateModel : PageModel
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error processing transaction");
             ModelState.AddModelError(string.Empty, ex.Message);
             await LoadDropdownsAsync();
             return Page();
@@ -143,15 +149,27 @@ public class CreateModel : PageModel
         var idValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!long.TryParse(idValue, out var userId))
         {
-            userId = 0;
+            _logger.LogWarning("User ID missing or invalid in LoadDropdownsAsync");
+            AccountList = new SelectList(Enumerable.Empty<AccountSummaryDto>(), "Id", "Name");
+            SavingsGoalList = new SelectList(Enumerable.Empty<SavingsGoalResponseDto>(), "Id", "Name");
+            return;
         }
         
-        var accounts = await _accountService.GetAccountSummariesAsync(userId);
-        AccountList = new SelectList(accounts ?? Enumerable.Empty<AccountSummaryDto>(), "Id", "Name");
+        try
+        {
+            var accounts = await _accountService.GetAccountSummariesAsync(userId);
+            AccountList = new SelectList(accounts ?? Enumerable.Empty<AccountSummaryDto>(), "Id", "Name");
 
-        var savingsGoals = await _savingsGoalService.GetUserSavingsGoalsAsync(userId, activeOnly: true);
-        SavingsGoalList = new SelectList(savingsGoals ?? Enumerable.Empty<SavingsGoalResponseDto>(), "Id", "Name");
+            var savingsGoals = await _savingsGoalService.GetUserSavingsGoalsAsync(userId, activeOnly: true);
+            SavingsGoalList = new SelectList(savingsGoals ?? Enumerable.Empty<SavingsGoalResponseDto>(), "Id", "Name");
 
-        Categories = await _categoryService.GetCategorySummariesAsync(userId) ?? new List<CategorySummaryDto>();
+            Categories = await _categoryService.GetCategorySummariesAsync(userId) ?? new List<CategorySummaryDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load dropdowns");
+            AccountList = new SelectList(Enumerable.Empty<AccountSummaryDto>(), "Id", "Name");
+            SavingsGoalList = new SelectList(Enumerable.Empty<SavingsGoalResponseDto>(), "Id", "Name");
+        }
     }
 }

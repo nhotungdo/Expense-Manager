@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using MoneyTrackerApp.Services;
 using MoneyTrackerApp.DTOs;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace MoneyTrackerApp.Controllers;
 
@@ -20,19 +21,22 @@ public class AccountsController : ControllerBase
     private readonly IBankConnectionService _bankConnectionService;
     private readonly INetWorthService _netWorthService;
     private readonly IWebHostEnvironment _env;
+    private readonly ILogger<AccountsController> _logger;
 
     public AccountsController(
         IAccountService accountService,
         ISharedAccountService sharedAccountService,
         IBankConnectionService bankConnectionService,
         INetWorthService netWorthService,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env,
+        ILogger<AccountsController> logger)
     {
         _accountService = accountService;
         _sharedAccountService = sharedAccountService;
         _bankConnectionService = bankConnectionService;
         _netWorthService = netWorthService;
         _env = env;
+        _logger = logger;
     }
 
     // Helper to get current user ID from JWT claims
@@ -60,8 +64,14 @@ public class AccountsController : ControllerBase
             var accounts = await _accountService.GetUserAccountsAsync(userId, includeInactive);
             return Ok(accounts);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning(ex, "Unauthorized access to GetAllAccounts");
+            return Unauthorized(new { error = ex.Message });
+        }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error in GetAllAccounts");
             return StatusCode(StatusCodes.Status500InternalServerError,
                 new { error = "Failed to retrieve accounts", details = ex.Message });
         }
@@ -71,21 +81,24 @@ public class AccountsController : ControllerBase
     /// Get account summaries (minimal info for dashboard)
     /// </summary>
     [HttpGet("summaries")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<AccountSummaryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<AccountSummaryDto>>> GetAccountSummaries()
     {
         try
         {
-            if (!_env.IsDevelopment() && (User?.Identity?.IsAuthenticated != true))
-                return Unauthorized();
             var userId = GetUserId();
             var summaries = await _accountService.GetAccountSummariesAsync(userId);
             return Ok(summaries);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+             _logger.LogWarning(ex, "Unauthorized access to GetAccountSummaries");
+             return Unauthorized(new { error = ex.Message });
+        }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error in GetAccountSummaries");
             return StatusCode(StatusCodes.Status500InternalServerError,
                 new { error = "Failed to retrieve account summaries", details = ex.Message });
         }

@@ -1,4 +1,4 @@
-// Welcome Slider JavaScript
+// Welcome Slider JavaScript - Màn hình chào mừng
 (function () {
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
@@ -8,11 +8,11 @@
     const btnStart = document.getElementById('btnStart');
     const totalSlides = slides.length;
 
-    // Initialize
+    // Khởi tạo
     function init() {
         showSlide(0);
 
-        // Check for tokens in URL (from Login redirect)
+        // Kiểm tra token trong URL (từ Login redirect)
         const params = new URLSearchParams(location.search);
         const accessToken = params.get('accessToken');
         const refreshToken = params.get('refreshToken');
@@ -20,7 +20,7 @@
         if (accessToken && refreshToken) {
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
-            // Clean URL
+            // Làm sạch URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
@@ -33,7 +33,7 @@
             indicator.addEventListener('click', () => showSlide(index));
         });
 
-        // Swipe support for mobile
+        // Hỗ trợ vuốt cho mobile
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -54,23 +54,23 @@
     }
 
     function showSlide(index) {
-        // Remove active class from all slides
+        // Xóa class active khỏi tất cả slides
         slides.forEach(slide => {
             slide.classList.remove('active', 'prev');
         });
 
-        // Remove active class from all indicators
+        // Xóa class active khỏi tất cả indicators
         indicators.forEach(indicator => {
             indicator.classList.remove('active');
         });
 
-        // Add active class to current slide and indicator
+        // Thêm class active cho slide và indicator hiện tại
         slides[index].classList.add('active');
         indicators[index].classList.add('active');
 
         currentSlide = index;
 
-        // Show/hide buttons based on slide
+        // Hiển thị/ẩn nút dựa trên slide
         if (index === totalSlides - 1) {
             btnNext.classList.add('hidden');
             btnStart.classList.remove('hidden');
@@ -98,7 +98,7 @@
     }
 
     async function goToNextStep() {
-        // Update onboarding step
+        // Cập nhật bước onboarding
         try {
             await fetch('/api/onboarding/step', {
                 method: 'PUT',
@@ -110,10 +110,10 @@
                 })
             });
         } catch (error) {
-            console.error('Error updating step:', error);
+            console.error('Lỗi khi cập nhật bước:', error);
         }
 
-        // Navigate to next page
+        // Chuyển đến trang tiếp theo
         window.location.href = '/Onboarding/BasicSettings';
     }
 
@@ -124,7 +124,7 @@
         return null;
     }
 
-    // Initialize when DOM is ready
+    // Khởi tạo khi DOM sẵn sàng
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

@@ -1,0 +1,242 @@
+<!-- Deposit Modal -->
+<div class="modal fade" id="depositModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-success">
+                    <i class="fas fa-arrow-down me-2"></i>Deposit Money
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="depositForm">
+                    <div class="mb-4 text-center">
+                        <label class="form-label text-muted small text-uppercase fw-bold ls-1">Amount</label>
+                        <div class="input-group input-group-lg border-bottom border-2 border-success-subtle">
+                            <span class="input-group-text bg-transparent border-0 text-success fw-bold fs-3">VND</span>
+                            <input type="number" class="form-control bg-transparent border-0 fw-bold fs-1 text-center text-success" 
+                                   placeholder="0" required min="1000" step="1000">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">To Wallet</label>
+                        <select class="form-select form-select-lg bg-light border-0" required>
+                            <option value="" selected disabled>Select a wallet</option>
+                            @if (Model.Wallets != null)
+                            {
+                                foreach (var wallet in Model.Wallets)
+                                {
+                                    <option value="@wallet.Id">@wallet.Name (@wallet.CurrentBalance.ToString("N0") @wallet.Currency)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Note</label>
+                        <textarea class="form-control bg-light border-0" rows="2" placeholder="Deposit source..."></textarea>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success btn-lg rounded-3 fw-bold shadow-sm">
+                            Confirm Deposit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div class="modal fade" id="withdrawModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">
+                    <i class="fas fa-arrow-up me-2"></i>Withdraw Money
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="withdrawForm">
+                    <div class="mb-4 text-center">
+                        <label class="form-label text-muted small text-uppercase fw-bold ls-1">Amount</label>
+                        <div class="input-group input-group-lg border-bottom border-2 border-danger-subtle">
+                            <span class="input-group-text bg-transparent border-0 text-danger fw-bold fs-3">VND</span>
+                            <input type="number" class="form-control bg-transparent border-0 fw-bold fs-1 text-center text-danger" 
+                                   placeholder="0" required min="1000" step="1000">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">From Wallet</label>
+                        <select class="form-select form-select-lg bg-light border-0" required>
+                            <option value="" selected disabled>Select a wallet</option>
+                            @if (Model.Wallets != null)
+                            {
+                                foreach (var wallet in Model.Wallets)
+                                {
+                                    <option value="@wallet.Id">@wallet.Name (@wallet.CurrentBalance.ToString("N0") @wallet.Currency)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Note</label>
+                        <textarea class="form-control bg-light border-0" rows="2" placeholder="Withdrawal reason..."></textarea>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-danger btn-lg rounded-3 fw-bold shadow-sm">
+                            Confirm Withdraw
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transfer Modal -->
+<div class="modal fade" id="transferModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary">
+                    <i class="fas fa-exchange-alt me-2"></i>Transfer Money
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="transferForm">
+                    <div class="mb-4 text-center">
+                        <label class="form-label text-muted small text-uppercase fw-bold ls-1">Amount</label>
+                        <div class="input-group input-group-lg border-bottom border-2 border-primary-subtle">
+                            <span class="input-group-text bg-transparent border-0 text-primary fw-bold fs-3">VND</span>
+                            <input type="number" class="form-control bg-transparent border-0 fw-bold fs-1 text-center text-primary" 
+                                   placeholder="0" required min="1000" step="1000">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">From</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="fas fa-wallet text-secondary"></i></span>
+                                <select class="form-select form-select-lg bg-light border-0" required>
+                                    <option value="" selected disabled>Source Wallet</option>
+                                    @if (Model.Wallets != null)
+                                    {
+                                        foreach (var wallet in Model.Wallets)
+                                        {
+                                            <option value="@wallet.Id">@wallet.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center my-n2">
+                            <div class="badge bg-white text-primary border rounded-circle p-2 shadow-sm position-relative z-1">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">To</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="fas fa-wallet text-secondary"></i></span>
+                                <select class="form-select form-select-lg bg-light border-0" required>
+                                    <option value="" selected disabled>Target Wallet</option>
+                                    @if (Model.Wallets != null)
+                                    {
+                                        foreach (var wallet in Model.Wallets)
+                                        {
+                                            <option value="@wallet.Id">@wallet.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Note</label>
+                        <textarea class="form-control bg-light border-0" rows="2" placeholder="Transfer description..."></textarea>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold shadow-sm">
+                            Transfer Now
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Account Modal -->
+<div class="modal fade" id="addAccountModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fas fa-plus-circle me-2 text-primary"></i>Add New Account
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAccountForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Account Name</label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0" placeholder="e.g. Cash, Chase Bank" required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Type</label>
+                            <select class="form-select form-select-lg bg-light border-0" required>
+                                <option value="Cash">Cash</option>
+                                <option value="BankAccount">Bank Account</option>
+                                <option value="CreditCard">Credit Card</option>
+                                <option value="EWallet">E-Wallet</option>
+                                <option value="Investment">Investment</option>
+                                <option value="Savings">Savings</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Currency</label>
+                            <select class="form-select form-select-lg bg-light border-0" required>
+                                <option value="VND">VND</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="JPY">JPY</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Initial Balance</label>
+                        <div class="input-group input-group-lg">
+                            <input type="number" class="form-control bg-light border-0" placeholder="0" required>
+                            <span class="input-group-text bg-light border-0 fw-bold text-muted">VND</span>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" id="includeInTotal" checked>
+                        <label class="form-check-label" for="includeInTotal">Include in Total Balance</label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark btn-lg rounded-3 fw-bold shadow-sm">
+                            Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

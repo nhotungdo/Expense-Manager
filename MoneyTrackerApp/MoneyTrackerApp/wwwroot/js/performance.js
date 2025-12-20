@@ -47,7 +47,7 @@ function debounce(func, wait = 300) {
 // Throttle Function
 function throttle(func, limit = 100) {
     let inThrottle;
-    return function(...args) {
+    return function (...args) {
         if (!inThrottle) {
             func.apply(this, args);
             inThrottle = true;
@@ -66,7 +66,7 @@ function rafThrottle(callback) {
         callback.apply(context, lastArgs);
     };
 
-    const throttled = function(...args) {
+    const throttled = function (...args) {
         lastArgs = args;
         if (requestId === null) {
             requestId = requestAnimationFrame(later(this));
@@ -126,7 +126,7 @@ function preloadResources(urls) {
     urls.forEach(url => {
         const link = document.createElement('link');
         link.rel = 'preload';
-        
+
         if (url.endsWith('.js')) {
             link.as = 'script';
         } else if (url.endsWith('.css')) {
@@ -137,7 +137,7 @@ function preloadResources(urls) {
             link.as = 'font';
             link.crossOrigin = 'anonymous';
         }
-        
+
         link.href = url;
         document.head.appendChild(link);
     });
@@ -225,7 +225,7 @@ function getNetworkInfo() {
 function shouldLoadHighQuality() {
     const networkInfo = getNetworkInfo();
     if (!networkInfo) return true;
-    
+
     // Load high quality only on fast connections
     return networkInfo.effectiveType === '4g' && !networkInfo.saveData;
 }
@@ -235,7 +235,7 @@ function checkMemoryUsage() {
     if ('memory' in performance) {
         const memory = performance.memory;
         const usedMemoryPercent = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
-        
+
         if (usedMemoryPercent > 90) {
             console.warn('High memory usage detected:', usedMemoryPercent.toFixed(2) + '%');
             // Trigger cleanup if needed
@@ -277,12 +277,16 @@ function initPerformanceMonitoring() {
 
     // Log page load time
     window.addEventListener('load', () => {
-        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-        console.log('Page Load Time:', loadTime + 'ms');
-        
-        // Check if under 2s requirement
-        if (loadTime > 2000) {
-            console.warn('Page load time exceeds 2s target:', loadTime + 'ms');
+        const perfData = performance.getEntriesByType("navigation")[0];
+        const loadTime = perfData ? (perfData.loadEventEnd - perfData.startTime) : (Date.now() - performance.timeOrigin);
+
+        if (loadTime >= 0) {
+            console.log('Page Load Time:', Math.round(loadTime) + 'ms');
+
+            // Check if under 2s requirement
+            if (loadTime > 2000) {
+                console.warn('Page load time exceeds 2s target:', Math.round(loadTime) + 'ms');
+            }
         }
     });
 

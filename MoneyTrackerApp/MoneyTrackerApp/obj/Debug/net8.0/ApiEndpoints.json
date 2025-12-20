@@ -1467,6 +1467,74 @@
     ]
   },
   {
+    "ContainingType": "MoneyTrackerApp.Controllers.DashboardController",
+    "Method": "GetAnalyticsData",
+    "RelativePath": "api/Dashboard/analytics",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "days",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "MoneyTrackerApp.DTOs.DashboardAnalyticsDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.DashboardController",
+    "Method": "GetExpenseBreakdown",
+    "RelativePath": "api/Dashboard/expense-breakdown",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "period",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.DashboardController",
+    "Method": "GetIncomeBreakdown",
+    "RelativePath": "api/Dashboard/income-breakdown",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "period",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.DashboardController",
+    "Method": "GetPersonalWalletSummary",
+    "RelativePath": "api/Dashboard/personal-wallet",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "MoneyTrackerApp.Controllers.GroupExpenseController",
     "Method": "GetUserGroups",
     "RelativePath": "api/GroupExpense",
@@ -2107,6 +2175,16 @@
   },
   {
     "ContainingType": "MoneyTrackerApp.Controllers.ReportController",
+    "Method": "GetAiAnalysis",
+    "RelativePath": "api/Report/ai-analysis",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.ReportController",
     "Method": "GetCashFlowReport",
     "RelativePath": "api/Report/cashflow",
     "HttpMethod": "GET",
@@ -2321,6 +2399,16 @@
         "IsRequired": false
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.ReportController",
+    "Method": "GetReportPermissions",
+    "RelativePath": "api/Report/permissions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -3032,6 +3120,22 @@
         "Name": "id",
         "Type": "System.Int64",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.TransactionsController",
+    "Method": "GetRecentTransactions",
+    "RelativePath": "api/Transactions/recent",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "limit",
+        "Type": "System.Int32",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

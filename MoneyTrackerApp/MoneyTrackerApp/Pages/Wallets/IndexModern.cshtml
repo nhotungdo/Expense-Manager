@@ -1,0 +1,233 @@
+@page
+@model MoneyTrackerApp.Pages.Wallets.IndexModel
+@{
+    ViewData["Title"] = "My Wallet";
+}
+
+<!-- My Wallet Page - Ultra Modern Design -->
+<div class="wallet-page-modern">
+    <!-- Hero Section -->
+    <div class="wallet-hero">
+        <div class="wallet-hero-content">
+            <div class="wallet-breadcrumb">
+                <i class="fas fa-home"></i>
+                <i class="fas fa-chevron-right"></i>
+                <span>My Wallet</span>
+            </div>
+            <h1 class="wallet-hero-title">Financial Dashboard</h1>
+            <p class="wallet-hero-subtitle">Manage your accounts and track your financial health</p>
+        </div>
+        <div class="hero-decoration">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+            <div class="floating-shape shape-3"></div>
+        </div>
+    </div>
+
+    <!-- Balance Showcase Card -->
+    <div class="balance-showcase">
+        <div class="balance-showcase-card">
+            <div class="balance-showcase-bg"></div>
+            <div class="balance-showcase-content">
+                <div class="balance-main-info">
+                    <div>
+                        <span class="balance-label-modern">
+                            <i class="fas fa-coins"></i> Total Balance
+                        </span>
+                        <h2 class="balance-amount-modern" id="totalBalance">
+                            <span>@Model.TotalBalance.ToString("N0")</span>
+                            <span class="balance-currency-modern">VND</span>
+                        </h2>
+                        <div class="balance-change-modern positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12.5% from last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions-modern">
+                        <button class="action-btn-modern" data-bs-toggle="modal" data-bs-target="#depositModal">
+                            <div class="action-icon-modern">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <span class="action-label-modern">Deposit</span>
+                        </button>
+                        <button class="action-btn-modern" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                            <div class="action-icon-modern">
+                                <i class="fas fa-minus"></i>
+                            </div>
+                            <span class="action-label-modern">Withdraw</span>
+                        </button>
+                        <button class="action-btn-modern" data-bs-toggle="modal" data-bs-target="#transferModal">
+                            <div class="action-icon-modern">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <span class="action-label-modern">Transfer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Balance Distribution Chart -->
+                <div class="balance-chart-modern">
+                    <h6 class="chart-title-modern">Balance Distribution</h6>
+                    <div class="chart-canvas-modern">
+                        <canvas id="balanceDistributionChart"></canvas>
+                    </div>
+                    <div id="chartLegend" class="chart-legend-wallet"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Dashboard -->
+    <div class="analytics-dashboard">
+        <div class="analytics-grid-wallet">
+            <!-- Transaction Type Breakdown -->
+            <div class="analytics-card-wallet">
+                <div class="analytics-header-wallet">
+                    <div class="header-left-wallet">
+                        <div class="icon-badge-wallet primary">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div>
+                            <h3 class="analytics-title-wallet">Transaction Types</h3>
+                            <p class="analytics-subtitle-wallet">Income vs Expenses</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <select class="select-modern" id="transactionTypePeriod">
+                            <option value="week">7 Days</option>
+                            <option value="month" selected>30 Days</option>
+                            <option value="year">12 Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="analytics-card-body">
+                    <div class="chart-wrapper-wallet">
+                        <canvas id="transactionTypeChart"></canvas>
+                    </div>
+                    <div class="stats-summary-wallet">
+                        <div class="stat-item-wallet income">
+                            <span class="stat-label-wallet">Income</span>
+                            <span class="stat-value-wallet" id="incomeAmount">0</span>
+                        </div>
+                        <div class="stat-item-wallet expense">
+                            <span class="stat-label-wallet">Expenses</span>
+                            <span class="stat-value-wallet" id="expenseAmount">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="analytics-card-wallet">
+                <div class="analytics-header-wallet">
+                    <div class="header-left-wallet">
+                        <div class="icon-badge-wallet secondary">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <h3 class="analytics-title-wallet">Expense Categories</h3>
+                            <p class="analytics-subtitle-wallet">Spending breakdown</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <select class="select-modern" id="categoryPeriod">
+                            <option value="week">7 Days</option>
+                            <option value="month" selected>30 Days</option>
+                            <option value="year">12 Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="analytics-card-body">
+                    <div class="chart-wrapper-wallet">
+                        <canvas id="categoryBreakdownChart"></canvas>
+                    </div>
+                    <div class="category-list-modern" id="categoryList">
+                        <!-- Dynamic category items -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accounts Section Modern -->
+    <div class="accounts-section-modern">
+        <div class="section-header-modern">
+            <h2 class="section-title-modern">
+                <i class="fas fa-credit-card"></i> My Accounts
+            </h2>
+            <button class="btn-add-modern" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                <i class="fas fa-plus"></i> Add Account
+            </button>
+        </div>
+
+        <div class="accounts-grid-modern">
+            @if (Model.Wallets != null && Model.Wallets.Any())
+            {
+                foreach (var wallet in Model.Wallets)
+                {
+                    <div class="account-card-modern" data-account-id="@wallet.Id">
+                        <div class="account-header-modern">
+                            <div class="account-icon-modern">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <button class="account-menu-modern">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                        <div class="account-info-modern">
+                            <h6 class="account-name-modern">@wallet.Name</h6>
+                            <p class="account-type-modern">@wallet.AccountType</p>
+                        </div>
+                        <div class="account-balance-modern">
+                            <span class="balance-label-account">Balance</span>
+                            <span class="balance-value-account">@wallet.CurrentBalance.ToString("N0") VND</span>
+                        </div>
+                        <div class="account-footer-modern">
+                            <span class="account-status-modern active">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        </div>
+                    </div>
+                }
+            }
+            
+            <!-- Add New Account Card -->
+            <div class="account-card-modern add-new" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                <div class="add-icon-modern">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h6 class="add-title-modern">Add New Account</h6>
+                <p class="add-description-modern">Link a bank account or wallet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <div class="transactions-section-modern">
+        <div class="section-header-modern">
+            <h2 class="section-title-modern">
+                <i class="fas fa-history"></i> Recent Transactions
+            </h2>
+            <a href="/Transactions" class="btn-add-modern">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="transactions-list-modern" id="recentTransactions">
+            <!-- Dynamic transaction items -->
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+@await Html.PartialAsync("_WalletModals")
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/wallet-modern.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="~/js/wallet-page.js" asp-append-version="true"></script>
+}

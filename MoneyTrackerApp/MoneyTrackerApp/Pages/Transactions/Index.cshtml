@@ -4,92 +4,160 @@
     ViewData["Title"] = "Giao dịch";
 }
 
-<!-- Bento Grid Transactions -->
-<div class="bento-grid">
-    
-    <!-- 1. Header & Time Filter -->
-    <div class="bento-col-span-12 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="fas fa-receipt text-primary"></i> Giao dịch
-            </h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-1">Quản lý thu chi và lịch sử giao dịch</p>
-        </div>
-        
-        <div class="flex items-center gap-2">
-            <a href="/Transactions/Scheduled" class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">
-                <i class="fas fa-clock"></i> Định kỳ
-            </a>
-            <form method="get" class="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                <input type="date" asp-for="Filter.StartDate" class="border-none text-sm font-medium text-gray-600 dark:text-gray-300 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
-                <span class="text-gray-400">-</span>
-                <input type="date" asp-for="Filter.EndDate" class="border-none text-sm font-medium text-gray-600 dark:text-gray-300 focus:ring-0 rounded-lg bg-transparent" onchange="this.form.submit()">
-            </form>
-        </div>
-    </div>
-
-    <!-- 2. Summary Cards -->
-    <!-- Total Income -->
-    <div class="bento-col-span-12 md:bento-col-span-4">
-        <div class="bento-card relative overflow-hidden group">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                    <i class="fas fa-arrow-down transform rotate-45"></i>
-                </div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng thu</span>
+<!-- Transactions Page - Redesigned -->
+<div class="transactions-page">
+    <div class="bento-grid">
+        <!-- Header Section -->
+        <div class="page-header bento-col-span-12">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-receipt"></i> Giao dịch
+                </h1>
+                <p class="page-subtitle">Theo dõi và quản lý tất cả các giao dịch tài chính của bạn</p>
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                <span class="text-emerald-600 dark:text-emerald-400">+@Model.ViewModel.TotalIncome.ToString("N0")</span> <span class="text-sm font-medium text-gray-400">VND</span>
-            </p>
-        </div>
-    </div>
-
-    <!-- Total Expense -->
-    <div class="bento-col-span-12 md:bento-col-span-4">
-        <div class="bento-card relative overflow-hidden group">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
-                    <i class="fas fa-arrow-up transform rotate-45"></i>
-                </div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng chi</span>
+            <div class="header-actions">
+                <button class="btn-export" id="exportBtn">
+                    <i class="fas fa-download"></i> Xuất báo cáo
+                </button>
+                <a href="/Transactions/Create" class="btn-primary">
+                    <i class="fas fa-plus"></i> Giao dịch mới
+                </a>
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                <span class="text-rose-600 dark:text-rose-400">-@Model.ViewModel.TotalExpense.ToString("N0")</span> <span class="text-sm font-medium text-gray-400">VND</span>
-            </p>
         </div>
-    </div>
 
-    <!-- Net Income -->
-    <div class="bento-col-span-12 md:bento-col-span-4">
-        <div class="bento-card relative overflow-hidden group">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                    <i class="fas fa-wallet"></i>
-                </div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Số dư ròng</span>
+        <!-- Summary Cards -->
+        <div class="summary-card income bento-col-span-4">
+            <div class="card-icon">
+                <i class="fas fa-arrow-down"></i>
             </div>
-            <p class="text-2xl font-bold @(Model.ViewModel.NetIncome >= 0 ? "text-gray-900 dark:text-white" : "text-rose-600 dark:text-rose-400")">
-                @Model.ViewModel.NetIncome.ToString("N0") <span class="text-sm font-medium text-gray-400">VND</span>
-            </p>
+            <div class="card-content">
+                <span class="card-label">Tổng thu nhập</span>
+                <h3 class="card-value" id="totalIncome">
+                    +@Model.ViewModel.TotalIncome.ToString("N0") <span class="currency">VND</span>
+                </h3>
+                <span class="card-change positive">
+                    <i class="fas fa-arrow-up"></i> 8.2% so với kỳ trước
+                </span>
+            </div>
         </div>
-    </div>
 
-    <!-- 3. Search & Filter Bar -->
-    <div class="bento-col-span-12">
-        <div class="bento-card p-4">
-            <form method="get" class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                <input type="hidden" asp-for="Filter.StartDate" />
-                <input type="hidden" asp-for="Filter.EndDate" />
+        <div class="summary-card expense bento-col-span-4">
+            <div class="card-icon">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="card-content">
+                <span class="card-label">Tổng chi tiêu</span>
+                <h3 class="card-value" id="totalExpense">
+                    -@Model.ViewModel.TotalExpense.ToString("N0") <span class="currency">VND</span>
+                </h3>
+                <span class="card-change negative">
+                    <i class="fas fa-arrow-down"></i> 3.5% so với kỳ trước
+                </span>
+            </div>
+        </div>
 
-                <!-- Search -->
-                <div class="md:col-span-4 relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input asp-for="Filter.SearchText" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all" placeholder="Tìm theo ghi chú..." />
+        <div class="summary-card balance bento-col-span-4">
+            <div class="card-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="card-content">
+                <span class="card-label">Số dư ròng</span>
+                <h3 class="card-value @(Model.ViewModel.NetIncome >= 0 ? "positive" : "negative")" id="netBalance">
+                    @Model.ViewModel.NetIncome.ToString("N0") <span class="currency">VND</span>
+                </h3>
+                <span class="card-change">
+                    Tỷ lệ tiết kiệm: <strong id="savingsRate">0%</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- Analysis Section & Filters -->
+        <!-- Transaction Type Distribution -->
+        <div class="analysis-card bento-col-span-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-pie"></i> Phân bổ giao dịch
+                </h5>
+                <div class="card-actions">
+                    <select class="period-select" id="distributionPeriod">
+                        <option value="month">Tháng này</option>
+                        <option value="week">Tuần này</option>
+                        <option value="year">Năm nay</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="transactionDistributionChart"></canvas>
+            </div>
+            <div class="chart-stats">
+                <div class="stat-item">
+                    <span class="stat-dot income"></span>
+                    <span class="stat-label">Thu nhập</span>
+                    <span class="stat-value" id="incomePercentage">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-dot expense"></span>
+                    <span class="stat-label">Chi tiêu</span>
+                    <span class="stat-value" id="expensePercentage">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-dot investment"></span>
+                    <span class="stat-label">Đầu tư</span>
+                    <span class="stat-value" id="investmentPercentage">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense by Category -->
+        <div class="analysis-card bento-col-span-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-layer-group"></i> Chi tiêu theo danh mục
+                </h5>
+                <div class="card-actions">
+                    <select class="period-select" id="categoryPeriod">
+                        <option value="month">Tháng này</option>
+                        <option value="week">Tuần này</option>
+                        <option value="year">Năm nay</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="categoryExpenseChart"></canvas>
+            </div>
+            <div class="category-breakdown" id="categoryBreakdown">
+                <!-- Dynamic category items -->
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section bento-col-span-4">
+            <div class="filters-header">
+                <h5 class="filters-title">
+                    <i class="fas fa-filter"></i> Lọc giao dịch
+                </h5>
+                <button class="btn-reset" id="resetFilters">
+                    <i class="fas fa-redo"></i> Đặt lại
+                </button>
+            </div>
+
+            <form method="get" class="filters-form" id="filtersForm">
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="far fa-calendar"></i> Khoảng thời gian
+                    </label>
+                    <div class="date-range-inputs">
+                        <input type="date" asp-for="Filter.StartDate" class="filter-input" id="startDate" />
+                        <span class="date-separator">đến</span>
+                        <input type="date" asp-for="Filter.EndDate" class="filter-input" id="endDate" />
+                    </div>
                 </div>
 
-                <!-- Filter Type -->
-                <div class="md:col-span-2">
-                    <select asp-for="Filter.TransactionType" class="w-full py-2.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="fas fa-tag"></i> Loại giao dịch
+                    </label>
+                    <select asp-for="Filter.TransactionType" class="filter-select" id="transactionType">
                         <option value="">Tất cả loại</option>
                         <option value="1">Thu nhập</option>
                         <option value="2">Chi tiêu</option>
@@ -97,110 +165,217 @@
                     </select>
                 </div>
 
-                <!-- Filter Wallet -->
-                <div class="md:col-span-2">
-                    <select asp-for="Filter.AccountId" asp-items="Model.AccountList" class="w-full py-2.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
-                        <option value="">Tất cả ví</option>
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="fas fa-wallet"></i> Tài khoản
+                    </label>
+                    <select asp-for="Filter.AccountId" asp-items="Model.AccountList" class="filter-select" id="accountFilter">
+                        <option value="">Tất cả tài khoản</option>
                     </select>
                 </div>
 
-                 <!-- Filter Category -->
-                <div class="md:col-span-2">
-                    <select asp-for="Filter.CategoryId" asp-items="Model.CategoryList" class="w-full py-2.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm transition-all">
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="fas fa-folder"></i> Danh mục
+                    </label>
+                    <select asp-for="Filter.CategoryId" asp-items="Model.CategoryList" class="filter-select" id="categoryFilter">
                         <option value="">Tất cả danh mục</option>
                     </select>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="md:col-span-2 flex gap-2">
-                    <button type="submit" class="flex-1 bg-primary hover:bg-primary-dark text-white font-medium py-2 rounded-xl transition-colors text-sm shadow-md hover:shadow-lg">
-                        Lọc
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="fas fa-dollar-sign"></i> Khoảng số tiền
+                    </label>
+                    <div class="amount-range-inputs">
+                        <input type="number" class="filter-input" placeholder="Tối thiểu" id="minAmount" />
+                        <span class="amount-separator">-</span>
+                        <input type="number" class="filter-input" placeholder="Tối đa" id="maxAmount" />
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </label>
+                    <input asp-for="Filter.SearchText" type="text" class="filter-input" placeholder="Tìm theo ghi chú..." id="searchText" />
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn-apply-filter">
+                        <i class="fas fa-check"></i> Áp dụng bộ lọc
                     </button>
-                     <a asp-page="Create" class="flex items-center justify-center px-4 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white rounded-xl transition-colors shadow-md hover:shadow-lg">
-                        <i class="fas fa-plus"></i>
-                    </a>
                 </div>
             </form>
         </div>
-    </div>
 
-    <!-- 4. Transaction List -->
-    <div class="bento-col-span-12">
-        <div class="bento-card p-0 overflow-hidden">
+        <!-- Transactions List -->
+        <div class="transactions-list-section bento-col-span-12">
+            <div class="list-header">
+                <h5 class="list-title">Lịch sử giao dịch</h5>
+                <div class="list-controls">
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button class="toggle-btn" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                    </div>
+                    <select class="sort-select" id="sortBy">
+                        <option value="date-desc">Mới nhất</option>
+                        <option value="date-asc">Cũ nhất</option>
+                        <option value="amount-desc">Số tiền cao nhất</option>
+                        <option value="amount-asc">Số tiền thấp nhất</option>
+                    </select>
+                </div>
+            </div>
+
             @if (!Model.ViewModel.Transactions.Any())
             {
-                <div class="p-16 text-center">
-                    <div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300 dark:text-gray-600">
-                        <i class="fas fa-receipt text-3xl"></i>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-receipt"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Chưa có giao dịch</h3>
-                    <p class="text-gray-500 dark:text-gray-400 mb-8">Không tìm thấy giao dịch nào trong khoảng thời gian này.</p>
-                    <a asp-page="Create" class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium transition-all shadow-md hover:shadow-lg">
-                        <i class="fas fa-plus"></i> Tạo giao dịch mới
+                    <h3 class="empty-title">Không tìm thấy giao dịch</h3>
+                    <p class="empty-description">Không có giao dịch nào phù hợp với bộ lọc hiện tại. Hãy thử điều chỉnh tiêu chí tìm kiếm.</p>
+                    <a href="/Transactions/Create" class="btn-primary">
+                        <i class="fas fa-plus"></i> Tạo giao dịch đầu tiên
                     </a>
                 </div>
             }
             else
             {
-                <!-- Group by Date -->
-                @foreach (var dateGroup in Model.ViewModel.Transactions.GroupBy(t => t.TransactionDate.Date).OrderByDescending(g => g.Key))
-                {
-                    <div class="border-b border-gray-100 dark:border-gray-700 last:border-none">
-                        <div class="bg-gray-50/80 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between backdrop-blur-sm sticky top-0 z-10">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                @dateGroup.Key.ToString("dd/MM/yyyy")
-                                @if (dateGroup.Key == DateTime.Today)
+                <div class="transactions-container" id="transactionsContainer">
+                    @foreach (var dateGroup in Model.ViewModel.Transactions.GroupBy(t => t.TransactionDate.Date).OrderByDescending(g => g.Key))
+                    {
+                        <div class="transaction-date-group">
+                            <div class="date-header">
+                                <span class="date-label">
+                                    @dateGroup.Key.ToString("dddd, MMMM dd, yyyy")
+                                    @if (dateGroup.Key == DateTime.Today)
+                                    {
+                                        <span class="today-badge">Hôm nay</span>
+                                    }
+                                </span>
+                                <span class="date-total">
+                                    @dateGroup.Sum(t => t.TransactionType == 1 ? t.Amount : (t.TransactionType == 2 ? -t.Amount : 0)).ToString("+#,##0;-#,##0;0") VND
+                                </span>
+                            </div>
+
+                            <div class="transactions-list">
+                                @foreach (var transaction in dateGroup)
                                 {
-                                    <span class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full uppercase tracking-wide font-bold">Hôm nay</span>
-                                }
-                            </span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono font-medium">
-                                @dateGroup.Sum(t => t.TransactionType == 1 ? t.Amount : (t.TransactionType == 2 ? -t.Amount : 0)).ToString("+#,##0;-#,##0;0")
-                            </span>
-                        </div>
-
-                        <div class="divide-y divide-gray-100 dark:divide-gray-800">
-                            @foreach (var transaction in dateGroup)
-                            {
-                                <div class="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group cursor-pointer relative" onclick="window.location.href='/Transactions/Create?id=@transaction.Id'">
-                                    
-                                    <!-- Icon -->
-                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-gray-100 dark:border-gray-700 transition-transform group-hover:scale-110" style="background-color: @(transaction.CategoryColor ?? "#f3f4f6"); color: #1e293b;">
-                                         @if (!string.IsNullOrEmpty(transaction.CategoryIcon))
-                                         {
-                                             <i class="@transaction.CategoryIcon text-xl"></i>
-                                         }
-                                         else
-                                         {
-                                             <i class="fas fa-wallet text-xl opacity-50"></i>
-                                         }
-                                    </div>
-
-                                    <!-- Content -->
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate">@(transaction.CategoryName ?? "Chưa phân loại")</h4>
-                                            <span class="text-sm font-bold @(transaction.TransactionType == 1 ? "text-emerald-600 dark:text-emerald-400" : (transaction.TransactionType == 2 ? "text-rose-600 dark:text-rose-400" : "text-blue-600 dark:text-blue-400")) whitespace-nowrap font-mono">
-                                                @(transaction.TransactionType == 1 ? "+" : (transaction.TransactionType == 2 ? "-" : ""))@transaction.Amount.ToString("N0")
+                                    <div class="transaction-item @(transaction.TransactionType == 1 ? "income" : transaction.TransactionType == 2 ? "expense" : "transfer")" 
+                                         data-transaction-id="@transaction.Id">
+                                        <div class="transaction-icon" style="background-color: @(transaction.CategoryColor ?? "#6366f1")20;">
+                                            <i class="@(transaction.CategoryIcon ?? "fas fa-wallet")" style="color: @(transaction.CategoryColor ?? "#6366f1");"></i>
+                                        </div>
+                                        <div class="transaction-details">
+                                            <h6 class="transaction-title">@(transaction.CategoryName ?? "Chưa phân loại")</h6>
+                                            <p class="transaction-note">@(transaction.Note ?? transaction.Description)</p>
+                                            <div class="transaction-meta">
+                                                <span class="meta-item">
+                                                    <i class="far fa-clock"></i> @transaction.TransactionDate.ToString("HH:mm")
+                                                </span>
+                                                <span class="meta-item">
+                                                    <i class="fas fa-wallet"></i> @transaction.AccountName
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="transaction-amount @(transaction.TransactionType == 1 ? "positive" : transaction.TransactionType == 2 ? "negative" : "neutral")">
+                                            <span class="amount-value">
+                                                @(transaction.TransactionType == 1 ? "+" : transaction.TransactionType == 2 ? "-" : "")@transaction.Amount.ToString("N0")
                                             </span>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[70%]">
-                                                @(transaction.Note ?? transaction.Description)
-                                            </p>
-                                            <span class="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">@transaction.AccountName</span>
+                                            <span class="amount-currency">VND</span>
                                         </div>
                                     </div>
-                                    
-                                    <div class="absolute right-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                                        <i class="fas fa-chevron-right text-gray-300 dark:text-gray-600"></i>
-                                    </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-section">
+                    <div class="pagination-info">
+                        Hiển thị <strong>@Model.ViewModel.Transactions.Count</strong> giao dịch
                     </div>
-                }
+                    <div class="pagination-controls">
+                        <button class="page-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
             }
         </div>
     </div>
 </div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xuất báo cáo giao dịch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="option-group">
+                        <label class="option-label">Kỳ báo cáo</label>
+                        <select class="form-select" id="exportPeriod">
+                            <option value="current">Bộ lọc hiện tại</option>
+                            <option value="month">Tháng này</option>
+                            <option value="quarter">Quý này</option>
+                            <option value="year">Năm nay</option>
+                            <option value="custom">Tùy chỉnh</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="option-label">Định dạng file</label>
+                        <div class="format-buttons">
+                            <button class="format-btn active" data-format="pdf">
+                                <i class="far fa-file-pdf"></i> PDF
+                            </button>
+                            <button class="format-btn" data-format="excel">
+                                <i class="far fa-file-excel"></i> Excel
+                            </button>
+                            <button class="format-btn" data-format="csv">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </button>
+                        </div>
+                    </div>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked> Bao gồm biểu đồ và phân tích
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked> Bao gồm phân tích danh mục
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn-primary" id="confirmExport">
+                    <i class="fas fa-download"></i> Xuất báo cáo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transactions-page.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/transactions.js" asp-append-version="true"></script>
+}

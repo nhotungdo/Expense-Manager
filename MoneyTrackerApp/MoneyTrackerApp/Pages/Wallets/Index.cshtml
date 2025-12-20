@@ -4,230 +4,205 @@
     ViewData["Title"] = "Ví của tôi";
 }
 
-<div class="bento-grid">
-    <!-- Overview Section -->
-    <div class="bento-col-span-12 md:bento-col-span-8">
-        <div class="bento-card p-0 relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700 text-white min-h-[280px] flex flex-col justify-between shadow-xl shadow-indigo-500/30 border-0 group">
-            <!-- Decorations -->
-            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors duration-700"></div>
-            <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-purple-500/30 rounded-full blur-3xl group-hover:bg-purple-500/40 transition-colors duration-700"></div>
-            
-            <div class="relative z-10 p-8 flex flex-col h-full justify-between">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h6 class="text-indigo-100 font-medium tracking-wide uppercase text-sm mb-1">Tổng số dư</h6>
-                        <h1 class="text-4xl md:text-5xl font-bold mb-2 tracking-tight">@Model.TotalBalance.ToString("N0") <span class="text-2xl opacity-80">@Model.DefaultCurrency</span></h1>
-                        <div class="mt-4">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/10 text-sm font-medium">
-                                <i class="fas fa-check-circle text-emerald-300"></i> Đang hoạt động
-                            </span>
+<!-- My Wallet Page - Redesigned -->
+<div class="wallet-page">
+    <div class="bento-grid">
+        <!-- Header Section -->
+        <div class="page-header bento-col-span-12">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-wallet"></i> Ví của tôi
+                </h1>
+                <p class="page-subtitle">Quản lý tài khoản và theo dõi số dư của bạn</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-filter" id="periodFilter">
+                    <i class="far fa-calendar"></i>
+                    <span id="selectedPeriod">Tháng này</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Balance Overview Card -->
+        <div class="balance-overview-card bento-col-span-8">
+            <div class="balance-gradient-bg"></div>
+            <div class="balance-content">
+                <div class="balance-main">
+                    <div class="balance-info">
+                        <span class="balance-label">
+                            <i class="fas fa-coins"></i> Tổng số dư
+                        </span>
+                        <h2 class="balance-amount" id="totalBalance">
+                            @Model.TotalBalance.ToString("N0") <span class="currency">VND</span>
+                        </h2>
+                        <div class="balance-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12.5% so với tháng trước</span>
                         </div>
                     </div>
-                    <div class="flex gap-3">
-                        <button class="px-5 py-2.5 bg-white text-indigo-700 font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-indigo-50 transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2" data-bs-toggle="modal" data-bs-target="#topUpModal">
-                            <i class="fas fa-plus"></i> Nạp tiền
+                    
+                    <div class="quick-actions">
+                        <button class="action-btn deposit" data-bs-toggle="modal" data-bs-target="#depositModal">
+                            <div class="action-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <span>Nạp tiền</span>
                         </button>
-                        <button class="px-5 py-2.5 bg-indigo-800/50 hover:bg-indigo-800/70 text-white font-medium rounded-xl border border-white/10 backdrop-blur-sm transition-all flex items-center gap-2" data-bs-toggle="modal" data-bs-target="#withdrawModal">
-                            <i class="fas fa-arrow-down"></i> Rút tiền
+                        <button class="action-btn withdraw" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                            <div class="action-icon">
+                                <i class="fas fa-minus"></i>
+                            </div>
+                            <span>Rút tiền</span>
+                        </button>
+                        <button class="action-btn transfer" data-bs-toggle="modal" data-bs-target="#transferModal">
+                            <div class="action-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <span>Chuyển khoản</span>
                         </button>
                     </div>
                 </div>
-                
-                <div class="mt-8 pt-6 border-t border-white/10">
-                    <div class="flex justify-between items-end mb-2">
-                        <div>
-                             <span class="text-indigo-200 text-sm block mb-1">Hạn mức chi tiêu tháng này</span>
-                             <span class="font-bold text-lg">@Model.CurrentSubscription.Limit.ToString("N0") @Model.CurrentSubscription.Currency</span>
-                        </div>
-                        <button class="p-2 text-white/70 hover:text-white transition-colors" data-bs-toggle="modal" data-bs-target="#limitModal">
-                            <i class="fas fa-cog"></i>
-                        </button>
+
+                <!-- Balance Distribution Chart -->
+                <div class="balance-chart-section">
+                    <h6 class="chart-title">Phân bổ số dư</h6>
+                    <div class="chart-container">
+                        <canvas id="balanceDistributionChart"></canvas>
                     </div>
-                    <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-                        <div class="bg-white h-1.5 rounded-full" style="width: 45%"></div>
-                    </div>
+                    <div id="chartLegend" class="chart-legend"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Subscription Section -->
-    <div class="bento-col-span-12 md:bento-col-span-4">
-        <div class="bento-card h-full flex flex-col justify-between relative overflow-hidden">
-             <div class="flex justify-between items-center mb-6">
-                <h6 class="text-gray-500 dark:text-gray-400 font-bold text-sm uppercase tracking-wider">Gói hiện tại</h6>
-                <span class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg border border-indigo-100 dark:border-indigo-800">PRO</span>
+        <!-- Accounts Section -->
+        <div class="accounts-section bento-col-span-4">
+            <div class="section-header">
+                <h5 class="section-title">
+                    <i class="fas fa-credit-card"></i> Tài khoản của tôi
+                </h5>
+                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                    <i class="fas fa-plus"></i> Thêm tài khoản
+                </button>
             </div>
-            
-            @if (Model.CurrentSubscription != null)
-            {
-                <div class="text-center py-4 flex-grow flex flex-col justify-center">
-                    <div class="w-16 h-16 mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-crown text-3xl text-amber-500"></i>
-                    </div>
-                    <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-1">@Model.CurrentSubscription.PackageName</h4>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Tự động gia hạn: @(Model.CurrentSubscription.AutoRenew ? "Bật" : "Tắt")</p>
-                    
-                    <div class="flex justify-between text-sm mb-2 px-2">
-                        <span class="text-gray-500 dark:text-gray-400">Hết hạn trong</span>
-                        <span class="font-bold text-gray-900 dark:text-white">@Model.CurrentSubscription.DaysRemaining ngày</span>
-                    </div>
-                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mb-6">
-                        <div class="bg-indigo-600 h-2 rounded-full" style="width: 75%"></div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3 mt-auto">
-                        <button class="w-full py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm font-semibold rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-colors">Đổi gói</button>
-                        <button class="w-full py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-sm font-semibold rounded-xl transition-colors">Hủy gia hạn</button>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-6 flex-grow flex flex-col justify-center items-center">
-                    <div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-4">
-                        <i class="fas fa-box-open text-3xl text-gray-300 dark:text-gray-600"></i>
-                    </div>
-                    <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-[200px]">Bạn chưa đăng ký gói dịch vụ nào</p>
-                     <button class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 transition-all">Nâng cấp ngay</button>
-                </div>
-            }
-        </div>
-    </div>
 
-    <!-- Payment Methods -->
-    <div class="bento-col-span-12">
-         <div class="flex justify-between items-center mb-4 mt-2">
-            <h5 class="font-bold text-gray-900 dark:text-white text-lg">Ví & Thẻ</h5>
-            <button class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white font-medium rounded-xl transition-colors text-sm shadow-sm">
-                <i class="fas fa-plus"></i> <span class="hidden sm:inline">Thêm mới</span>
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @if (Model.Wallets.Any())
-            {
-                foreach (var wallet in Model.Wallets)
+            <div class="accounts-grid">
+                @if (Model.Wallets != null && Model.Wallets.Any())
                 {
-                    <div class="bento-card p-5 group hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors relative cursor-pointer">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 transition-colors">
-                                <i class="fas fa-wallet text-xl"></i>
+                    foreach (var wallet in Model.Wallets)
+                    {
+                        <div class="account-card" data-account-id="@wallet.Id">
+                            <div class="account-header">
+                                <div class="account-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="account-menu">
+                                    <button class="menu-btn">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="dropdown relative">
-                                <button class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-2" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <!-- Using BS dropdown for now, simpler than custom Tailwind JS -->
-                                <ul class="dropdown-menu absolute right-0 mt-2 py-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 hidden z-50">
-                                    <li><a class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" href="#">Đặt làm mặc định</a></li>
-                                    <li><hr class="border-gray-100 dark:border-gray-700 my-1"></li>
-                                    <li><a class="block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20" href="#">Xóa</a></li>
-                                </ul>
+                            <div class="account-info">
+                                <h6 class="account-name">@wallet.Name</h6>
+                                <p class="account-type">@wallet.AccountType</p>
                             </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <h6 class="font-bold text-lg text-gray-900 dark:text-white mb-1">@wallet.Name</h6>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wider">**** **** **** @(wallet.Id % 10000)</p>
-                        </div>
-                        
-                        <div class="flex justify-between items-end border-t border-gray-100 dark:border-gray-700 pt-4">
-                            <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-lg uppercase tracking-wider">Mặc định</span>
-                            <div class="text-right">
-                                <span class="text-xs text-gray-400 uppercase mb-0.5 block">Hết hạn</span>
-                                <span class="text-sm font-bold text-gray-700 dark:text-gray-300 font-mono">12/28</span>
+                            <div class="account-balance">
+                                <span class="balance-label">Số dư</span>
+                                <span class="balance-value">@wallet.CurrentBalance.ToString("N0") VND</span>
+                            </div>
+                            <div class="account-footer">
+                                <span class="account-status active">
+                                    <i class="fas fa-check-circle"></i> Hoạt động
+                                </span>
                             </div>
                         </div>
-                    </div>
+                    }
                 }
-            }
-            
-            <div class="bento-card border-2 border-dashed border-gray-200 dark:border-gray-700 bg-transparent hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all cursor-pointer flex flex-col items-center justify-center min-h-[220px] group text-center">
-                 <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-3">
-                     <i class="fas fa-plus text-xl"></i>
-                 </div>
-                 <h6 class="font-bold text-gray-900 dark:text-white">Liên kết thẻ mới</h6>
-                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Visa, Mastercard hoặc Ví điện tử</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Transaction History -->
-    <div class="bento-col-span-12">
-        <div class="bento-card p-6">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <h5 class="font-bold text-lg text-gray-900 dark:text-white">Lịch sử giao dịch ví</h5>
                 
-                <div class="flex gap-3 w-full md:w-auto">
-                    <select class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:text-white" onchange="loadTransactions(this.value)">
-                        <option value="All">Tất cả</option>
-                        <option value="Topup">Nạp tiền</option>
-                        <option value="Payment">Thanh toán gói</option>
-                        <option value="Refund">Hoàn tiền</option>
-                    </select>
-                    
-                    <div class="relative w-full md:w-auto">
-                        <i class="far fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" class="pl-10 pr-4 py-2 w-full md:w-40 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:text-white" placeholder="Thời gian">
+                <!-- Add New Account Card -->
+                <div class="account-card add-new" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                    <div class="add-icon">
+                        <i class="fas fa-plus"></i>
                     </div>
+                    <h6>Thêm tài khoản mới</h6>
+                    <p>Liên kết tài khoản ngân hàng hoặc ví</p>
                 </div>
             </div>
+        </div>
 
-            <div id="transaction-table-container">
-                <partial name="_WalletTransactions" model="Model.RecentTransactions" />
+        <!-- Transaction Analysis Cards -->
+        <!-- Transaction Type Breakdown -->
+        <div class="analysis-card bento-col-span-6">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-pie"></i> Loại giao dịch
+                </h5>
+                <select class="period-select" id="transactionTypePeriod">
+                    <option value="month">Tháng này</option>
+                    <option value="week">Tuần này</option>
+                    <option value="year">Năm nay</option>
+                </select>
             </div>
-            
-            <div class="flex justify-center mt-6">
-                <!-- Pagination can be customized later, using simple buttons for now -->
-                <nav class="flex gap-2">
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500 disabled:opacity-50"><i class="fas fa-chevron-left"></i></button>
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-600 text-white font-medium shadow-sm">1</button>
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">2</button>
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">3</button>
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500"><i class="fas fa-chevron-right"></i></button>
-                </nav>
+            <div class="chart-wrapper">
+                <canvas id="transactionTypeChart"></canvas>
+            </div>
+            <div class="stats-summary">
+                <div class="stat-item income">
+                    <span class="stat-label">Thu nhập</span>
+                    <span class="stat-value" id="incomeAmount">0</span>
+                </div>
+                <div class="stat-item expense">
+                    <span class="stat-label">Chi tiêu</span>
+                    <span class="stat-value" id="expenseAmount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="analysis-card bento-col-span-6">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-layer-group"></i> Chi tiêu theo danh mục
+                </h5>
+                <select class="period-select" id="categoryPeriod">
+                    <option value="month">Tháng này</option>
+                    <option value="week">Tuần này</option>
+                    <option value="year">Năm nay</option>
+                </select>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="categoryBreakdownChart"></canvas>
+            </div>
+            <div class="category-list" id="categoryList">
+                <!-- Dynamic category items -->
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="transactions-section bento-col-span-12">
+            <div class="section-header">
+                <h5 class="section-title">
+                    <i class="fas fa-history"></i> Giao dịch gần đây
+                </h5>
+                <a href="/Transactions" class="btn-view-all">
+                    Xem tất cả <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="transactions-list" id="recentTransactions">
+                <!-- Dynamic transaction items -->
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modals -->
-<div class="modal fade" id="topUpModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
-            <div class="modal-header border-0 pb-0 bg-white dark:bg-gray-800">
-                <h5 class="modal-title font-bold text-gray-900 dark:text-white">Nạp tiền vào ví</h5>
-                <button type="button" class="btn-close dark:filter dark:invert" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body bg-white dark:bg-gray-800 p-6">
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Nhập số tiền</label>
-                    <div class="relative">
-                        <input type="text" class="w-full text-3xl font-bold border-0 border-b-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 focus:ring-0 px-0 py-2 bg-transparent text-gray-900 dark:text-white placeholder-gray-300" placeholder="0">
-                        <span class="absolute right-0 bottom-3 text-gray-400 font-bold">VND</span>
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Nguồn tiền</label>
-                    <select class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
-                        <option>Thẻ ngân hàng (**** 4242)</option>
-                        <option>Momo Wallet</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer border-0 pt-0 px-6 pb-6 bg-white dark:bg-gray-800">
-                <button type="button" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-indigo-500/30">Xác nhận nạp tiền</button>
-            </div>
-        </div>
-    </div>
-</div>
+@await Html.PartialAsync("_WalletModals")
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/wallet-page.css" asp-append-version="true" />
+}
 
 @section Scripts {
-    <script>
-        function loadTransactions(filterType) {
-             console.log("Filtering by: " + filterType);
-             // Implement AJAX fetch if needed
-        }
-    </script>
+    <script src="~/js/wallet-page.js" asp-append-version="true"></script>
 }

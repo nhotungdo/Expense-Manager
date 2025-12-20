@@ -26,6 +26,32 @@ public class GenerateReportDto
 }
 
 /// <summary>
+/// DTO for export report request with enhanced filtering
+/// </summary>
+public class ExportReportRequestDto
+{
+    [Required]
+    [Range(1, 6)]
+    public int ReportType { get; set; }
+
+    [Required]
+    public DateTime StartDate { get; set; }
+
+    [Required]
+    public DateTime EndDate { get; set; }
+
+    [Required]
+    [Range(1, 4)]
+    public int FileFormat { get; set; } // 1=PDF, 2=Excel, 3=CSV, 4=JSON
+
+    public List<long>? AccountIds { get; set; }
+    public List<long>? CategoryIds { get; set; }
+    public int? TransactionType { get; set; } // 1=Income, 2=Expense
+    public decimal? MinAmount { get; set; }
+    public decimal? MaxAmount { get; set; }
+}
+
+/// <summary>
 /// DTO for cash flow report
 /// </summary>
 public class CashFlowReportDto

@@ -47,11 +47,16 @@
                 cachedAccounts = await res.json();
                 renderAccountOptions(transSelect);
             } else {
-                transSelect.innerHTML = '<option value="">Không thể tải ví</option>';
+                console.error('Failed to load accounts. Status:', res.status);
+                if (res.status === 401) {
+                    transSelect.innerHTML = '<option value="">Phiên hết hạn - Vui lòng đăng nhập lại</option>';
+                } else {
+                    transSelect.innerHTML = `<option value="">Lỗi tải dữ liệu (${res.status})</option>`;
+                }
             }
         } catch (err) {
             console.error('Error loading accounts:', err);
-            transSelect.innerHTML = '<option value="">Lỗi kết nối</option>';
+            transSelect.innerHTML = '<option value="">Lỗi kết nối mạng</option>';
         }
     }
 
@@ -65,7 +70,12 @@
         const currentVal = selectElement.value;
 
         selectElement.innerHTML = '<option value="">Chọn ví...</option>' +
-            cachedAccounts.map(a => `<option value="${a.id}">${a.name} (${formatCurrencySimple(a.currentBalance)})</option>`).join('');
+            cachedAccounts.map(a => {
+                const id = a.id || a.Id;
+                const name = a.name || a.Name;
+                const balance = a.currentBalance !== undefined ? a.currentBalance : a.CurrentBalance;
+                return `<option value="${id}">${name} (${formatCurrencySimple(balance)})</option>`;
+            }).join('');
 
         if (currentVal) {
             selectElement.value = currentVal;

@@ -258,8 +258,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/IndexModern.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xJbmRleE1vZGVybi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/Shared/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xTaGFyZWRcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/_WalletModals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xfV2FsbGV0TW9kYWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/_WalletTransactions.cshtml]

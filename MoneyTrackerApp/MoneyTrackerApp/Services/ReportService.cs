@@ -51,6 +51,7 @@ public class ReportService : IReportService
     public async Task<CashFlowReportDto> GenerateCashFlowReportAsync(long userId, DateTime startDate, DateTime endDate)
     {
         var transactions = await _context.Transactions
+            .AsNoTracking()
             .Include(t => t.Category)
             .Where(t => t.UserId == userId && t.TransactionDate >= startDate && t.TransactionDate <= endDate)
             .ToListAsync();
@@ -103,6 +104,7 @@ public class ReportService : IReportService
     public async Task<MonthlyTrendReportDto> GenerateMonthlyTrendReportAsync(long userId, int year)
     {
         var transactions = await _context.Transactions
+            .AsNoTracking()
             .Where(t => t.UserId == userId && t.TransactionDate.Year == year)
             .ToListAsync();
 
@@ -147,6 +149,7 @@ public class ReportService : IReportService
     public async Task<CategoryBreakdownReportDto> GenerateCategoryBreakdownAsync(long userId, DateTime startDate, DateTime endDate)
     {
         var transactions = await _context.Transactions
+            .AsNoTracking()
             .Include(t => t.Category)
             .Where(t => t.UserId == userId && t.TransactionDate >= startDate && t.TransactionDate <= endDate)
             .ToListAsync();
@@ -203,12 +206,14 @@ public class ReportService : IReportService
 
         // Get current balance
         var accounts = await _context.Accounts
+            .AsNoTracking()
             .Where(a => a.UserId == userId && a.IsActive && a.IncludeInTotal)
             .ToListAsync();
         var currentBalance = accounts.Sum(a => a.CurrentBalance);
 
         // Get transactions for the last 6 months (for chart)
         var sixMonthTransactions = await _context.Transactions
+            .AsNoTracking()
             .Where(t => t.UserId == userId 
                 && t.TransactionDate >= startOfSixMonthsAgo 
                 && t.TransactionDate <= endOfCurrentMonth
@@ -341,6 +346,7 @@ public class ReportService : IReportService
         var endDate = DateTime.UtcNow;
 
         var transactions = await _context.Transactions
+            .AsNoTracking()
             .Include(t => t.Category)
             .Include(t => t.Account)
             .Where(t => t.UserId == userId && t.TransactionDate >= startDate && t.TransactionDate <= endDate)
@@ -431,6 +437,7 @@ public class ReportService : IReportService
     {
         // Get all accounts for user
         var accounts = await _context.Accounts
+            .AsNoTracking()
             .Where(a => a.UserId == userId)
             .ToListAsync();
 
@@ -442,6 +449,7 @@ public class ReportService : IReportService
         var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
         var monthlyTransactions = await _context.Transactions
+            .AsNoTracking()
             .Where(t => t.UserId == userId && 
                    t.TransactionDate >= startOfMonth && 
                    t.TransactionDate <= endOfMonth)
@@ -469,6 +477,7 @@ public class ReportService : IReportService
         var (startDate, endDate) = GetDateRangeFromPeriod(period);
 
         var expenses = await _context.Transactions
+            .AsNoTracking()
             .Include(t => t.Category)
             .Where(t => t.UserId == userId && 
                    t.TransactionType == 2 && // Expense
@@ -492,6 +501,7 @@ public class ReportService : IReportService
         var (startDate, endDate) = GetDateRangeFromPeriod(period);
 
         var income = await _context.Transactions
+            .AsNoTracking()
             .Include(t => t.Category)
             .Where(t => t.UserId == userId && 
                    t.TransactionType == 1 && // Income
