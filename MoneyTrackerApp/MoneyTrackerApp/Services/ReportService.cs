@@ -70,7 +70,7 @@ public class ReportService : IReportService
             TotalExpense = totalExpense,
             NetCashFlow = totalIncome - totalExpense,
             IncomeItems = incomeTransactions
-                .GroupBy(t => t.Category?.Name ?? "Other")
+                .GroupBy(t => t.Category?.Name ?? "Khác")
                 .Select(g => new CashFlowItemDto
                 {
                     CategoryName = g.Key,
@@ -78,7 +78,7 @@ public class ReportService : IReportService
                     Percentage = totalIncome > 0 ? (g.Sum(t => t.Amount) / totalIncome) * 100 : 0
                 }).ToList(),
             ExpenseItems = expenseTransactions
-                .GroupBy(t => t.Category?.Name ?? "Other")
+                .GroupBy(t => t.Category?.Name ?? "Khác")
                 .Select(g => new CashFlowItemDto
                 {
                     CategoryName = g.Key,
@@ -132,9 +132,9 @@ public class ReportService : IReportService
         // Simple trend analysis
         var firstHalf = monthlyData.Take(6).Sum(m => m.NetIncome);
         var secondHalf = monthlyData.Skip(6).Sum(m => m.NetIncome);
-        string trend = "Stable";
-        if (secondHalf > firstHalf * 1.1m) trend = "Increasing";
-        else if (secondHalf < firstHalf * 0.9m) trend = "Decreasing";
+        string trend = "Ổn định";
+        if (secondHalf > firstHalf * 1.1m) trend = "Tăng";
+        else if (secondHalf < firstHalf * 0.9m) trend = "Giảm";
 
         return new MonthlyTrendReportDto
         {
@@ -169,7 +169,7 @@ public class ReportService : IReportService
                 .GroupBy(t => t.Category)
                 .Select(g => new CategoryBreakdownItemDto
                 {
-                    CategoryName = g.Key?.Name ?? "Other",
+                    CategoryName = g.Key?.Name ?? "Khác",
                     CategoryIcon = g.Key?.Icon,
                     CategoryColor = g.Key?.Color,
                     Amount = g.Sum(t => t.Amount),
@@ -182,7 +182,7 @@ public class ReportService : IReportService
                 .GroupBy(t => t.Category)
                 .Select(g => new CategoryBreakdownItemDto
                 {
-                    CategoryName = g.Key?.Name ?? "Other",
+                    CategoryName = g.Key?.Name ?? "Khác",
                     CategoryIcon = g.Key?.Icon,
                     CategoryColor = g.Key?.Color,
                     Amount = g.Sum(t => t.Amount),
@@ -254,7 +254,7 @@ public class ReportService : IReportService
         // Expense pie chart (top 3 categories in current month)
         var expensePieChart = currentMonthTransactions
             .Where(t => t.TransactionType == 2)
-            .GroupBy(t => new { CategoryName = t.Category?.Name ?? "Other", Color = t.Category?.Color ?? "#999999" })
+            .GroupBy(t => new { CategoryName = t.Category?.Name ?? "Khác", Color = t.Category?.Color ?? "#999999" })
             .Select(g => new CategoryPieChartDto
             {
                 Label = g.Key.CategoryName,

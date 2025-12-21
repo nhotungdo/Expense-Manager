@@ -89,6 +89,10 @@
       "PackagePath": "staticwebassets\\css\\reports-modern.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\reports.css",
+      "PackagePath": "staticwebassets\\css\\reports.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\service-packages.css",
       "PackagePath": "staticwebassets\\css\\service-packages.css"
     },
@@ -105,12 +109,8 @@
       "PackagePath": "staticwebassets\\css\\theme-variables.css"
     },
     {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\transactions-modern.css",
-      "PackagePath": "staticwebassets\\css\\transactions-modern.css"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\transactions-page.css",
-      "PackagePath": "staticwebassets\\css\\transactions-page.css"
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\trading.css",
+      "PackagePath": "staticwebassets\\css\\trading.css"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallet-modern.css",
@@ -221,8 +221,8 @@
       "PackagePath": "staticwebassets\\js\\theme-manager.js"
     },
     {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\transactions.js",
-      "PackagePath": "staticwebassets\\js\\transactions.js"
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\trading.js",
+      "PackagePath": "staticwebassets\\js\\trading.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\vnpay-checkout.js",

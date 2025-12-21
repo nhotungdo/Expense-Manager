@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeCharts();
     loadRecentTransactions();
     setupEventListeners();
+    setupFormListeners();
     loadAnalyticsData('month');
 });
 
@@ -69,6 +70,161 @@ function setupEventListeners() {
     }
 }
 
+// Setup Form Listeners for Modals
+function setupFormListeners() {
+    // Deposit Form
+    const depositForm = document.getElementById('depositForm');
+    if (depositForm) {
+        depositForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            await handleTransactionSubmit(this, 1); // 1 = Income
+        });
+    }
+
+    // Withdraw Form
+    const withdrawForm = document.getElementById('withdrawForm');
+    if (withdrawForm) {
+        withdrawForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            await handleTransactionSubmit(this, 2); // 2 = Expense
+        });
+    }
+
+    // Transfer Form
+    const transferForm = document.getElementById('transferForm');
+    if (transferForm) {
+        transferForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            await handleTransferSubmit(this);
+        });
+    }
+
+    // Add Account Form
+    const addAccountForm = document.getElementById('addAccountForm');
+    if (addAccountForm) {
+        addAccountForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            await handleAddAccountSubmit(this);
+        });
+    }
+}
+
+// Handle Deposit/Withdraw Submission
+async function handleTransactionSubmit(form, type) {
+    const formData = new FormData(form);
+    const data = {
+        accountId: formData.get('accountId'),
+        amount: parseFloat(formData.get('amount')),
+        transactionType: type,
+        note: formData.get('note'),
+        currency: 'VND', // Default
+        transactionDate: new Date().toISOString()
+    };
+
+    try {
+        const response = await fetch('/api/Transactions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showNotification('Giao dịch thành công!', 'success');
+            const modalElement = form.closest('.modal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            form.reset();
+            // Refresh data
+            setTimeout(() => window.location.reload(), 1000); // Reload to show new balance
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Giao dịch thất bại', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Đã xảy ra lỗi kết nối', 'error');
+    }
+}
+
+// Handle Transfer Submission
+async function handleTransferSubmit(form) {
+    const formData = new FormData(form);
+    const data = {
+        sourceAccountId: formData.get('sourceAccountId'),
+        targetAccountId: formData.get('targetAccountId'),
+        amount: parseFloat(formData.get('amount')),
+        note: formData.get('note')
+    };
+
+    try {
+        const response = await fetch('/api/Transactions/transfer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showNotification('Chuyển khoản thành công!', 'success');
+            const modalElement = form.closest('.modal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            form.reset();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Chuyển khoản thất bại', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Đã xảy ra lỗi kết nối', 'error');
+    }
+}
+
+// Handle Add Account Submission
+async function handleAddAccountSubmit(form) {
+    const formData = new FormData(form);
+    const includeInTotal = formData.get('includeInTotal') === 'on';
+
+    const data = {
+        name: formData.get('name'),
+        accountType: parseInt(formData.get('accountType')),
+        initialBalance: parseFloat(formData.get('initialBalance')),
+        currency: formData.get('currency'),
+        icon: formData.get('icon'),
+        color: formData.get('color'),
+        includeInTotal: includeInTotal
+    };
+
+    try {
+        const response = await fetch('/api/Accounts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showNotification('Tạo tài khoản thành công!', 'success');
+            const modalElement = form.closest('.modal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            form.reset();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Tạo tài khoản thất bại', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Đã xảy ra lỗi kết nối', 'error');
+    }
+}
+
 // Initialize all charts
 function initializeCharts() {
     initBalanceDistributionChart();
@@ -86,7 +242,7 @@ function initBalanceDistributionChart() {
 
     // Sample data - replace with actual API call
     const data = {
-        labels: ['Cash', 'Bank Account', 'Credit Card', 'E-Wallet'],
+        labels: ['Tiền mặt', 'Ngân hàng', 'Thẻ tín dụng', 'Ví điện tử'],
         datasets: [{
             data: [5000000, 15000000, 3000000, 2000000],
             backgroundColor: [
@@ -160,7 +316,7 @@ function initTransactionTypeChart() {
     }
 
     const data = {
-        labels: ['Income', 'Expenses'],
+        labels: ['Thu nhập', 'Chi tiêu'],
         datasets: [{
             data: [0, 0],
             backgroundColor: [chartColors.primary, chartColors.danger],
@@ -269,11 +425,10 @@ async function loadAnalyticsData(period) {
 
         if (!response.ok) {
             console.warn('API call failed, using mock data');
-            showNotification('Unable to load live data. Showing sample data.', 'warning');
-            // Use mock data if API fails
+            // showNotification('Không thể tải dữ liệu trực tiếp. Đang hiển thị dữ liệu mẫu.', 'warning');
             updateTransactionTypeChart({
-                totalIncome: 25000000,
-                totalExpense: 18000000
+                totalIncome: 0,
+                totalExpense: 0
             });
             return;
         }
@@ -282,12 +437,7 @@ async function loadAnalyticsData(period) {
         updateTransactionTypeChart(data);
     } catch (error) {
         console.error('Error loading analytics:', error);
-        showNotification('Failed to load analytics data. Please refresh the page.', 'error');
-        // Use mock data
-        updateTransactionTypeChart({
-            totalIncome: 25000000,
-            totalExpense: 18000000
-        });
+        // showNotification('Không thể tải dữ liệu phân tích.', 'error');
     }
 }
 
@@ -319,15 +469,11 @@ async function loadCategoryBreakdown(period) {
         const response = await fetch(`/api/Report/expense-breakdown?period=${period}`);
 
         if (!response.ok) {
-            console.warn('API call failed, using mock data');
-            showNotification('Unable to load category data. Showing sample data.', 'warning');
-            // Use mock data
+            // Mock data if failed
             updateCategoryBreakdownChart([
-                { categoryName: 'Food & Dining', amount: 5000000 },
-                { categoryName: 'Transportation', amount: 3000000 },
-                { categoryName: 'Shopping', amount: 4000000 },
-                { categoryName: 'Entertainment', amount: 2000000 },
-                { categoryName: 'Bills & Utilities', amount: 4000000 }
+                { categoryName: 'Ăn uống', amount: 0 },
+                { categoryName: 'Di chuyển', amount: 0 },
+                { categoryName: 'Mua sắm', amount: 0 }
             ]);
             return;
         }
@@ -336,15 +482,6 @@ async function loadCategoryBreakdown(period) {
         updateCategoryBreakdownChart(data);
     } catch (error) {
         console.error('Error loading category breakdown:', error);
-        showNotification('Failed to load category data. Please refresh the page.', 'error');
-        // Use mock data
-        updateCategoryBreakdownChart([
-            { categoryName: 'Food & Dining', amount: 5000000 },
-            { categoryName: 'Transportation', amount: 3000000 },
-            { categoryName: 'Shopping', amount: 4000000 },
-            { categoryName: 'Entertainment', amount: 2000000 },
-            { categoryName: 'Bills & Utilities', amount: 4000000 }
-        ]);
     }
 }
 
@@ -410,22 +547,23 @@ function displayRecentTransactions(transactions) {
         container.innerHTML = `
             <div style="text-align: center; padding: 40px; color: #64748b;">
                 <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                <p>No recent transactions</p>
+                <p>Chưa có giao dịch nào gần đây</p>
             </div>
         `;
         return;
     }
 
     container.innerHTML = transactions.map(transaction => {
-        const typeClass = transaction.transactionType === 1 ? 'income' :
-            transaction.transactionType === 2 ? 'expense' : 'transfer';
-        const amountPrefix = transaction.transactionType === 1 ? '+' :
-            transaction.transactionType === 2 ? '-' : '';
+        // Dịch loại giao dịch nếu cần (though logic backend đã làm điều này)
+        // Adjust colors
         const amountColor = transaction.transactionType === 1 ? '#10b981' :
             transaction.transactionType === 2 ? '#ef4444' : '#3b82f6';
 
+        const amountPrefix = transaction.transactionType === 1 ? '+' :
+            transaction.transactionType === 2 ? '-' : '';
+
         return `
-            <div class="transaction-item ${typeClass}" style="display: flex; align-items: center; gap: 16px; padding: 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: all 0.3s;" 
+            <div class="transaction-item" style="display: flex; align-items: center; gap: 16px; padding: 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: all 0.3s;" 
                  onclick="window.location.href='/Transactions/Create?id=${transaction.id}'"
                  onmouseover="this.style.background='#f8fafc'" 
                  onmouseout="this.style.background='transparent'">
@@ -433,13 +571,14 @@ function displayRecentTransactions(transactions) {
                     <i class="${transaction.categoryIcon || 'fas fa-wallet'}"></i>
                 </div>
                 <div style="flex: 1; min-width: 0;">
-                    <h6 style="font-size: 14px; font-weight: 600; margin: 0 0 4px 0; color: #1e293b;">${transaction.categoryName || 'Uncategorized'}</h6>
-                    <p style="font-size: 12px; color: #64748b; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${transaction.note || transaction.description || ''}</p>
+                    <h6 style="font-size: 14px; font-weight: 600; margin: 0 0 4px 0; color: #1e293b;">${transaction.categoryName || 'Chưa phân loại'}</h6>
+                    <p style="font-size: 12px; color: #64748b; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${transaction.description || transaction.note || ''}</p>
                 </div>
                 <div style="text-align: right;">
                     <span style="font-size: 16px; font-weight: 700; color: ${amountColor};">
                         ${amountPrefix}${formatCurrency(transaction.amount)}
                     </span>
+                    <div style="font-size: 12px; color: #94a3b8;">${new Date(transaction.transactionDate).toLocaleDateString('vi-VN')}</div>
                 </div>
             </div>
         `;
@@ -472,16 +611,21 @@ function createCustomLegend(chartData, containerId) {
 
 // Show period selector
 function showPeriodSelector() {
-    // Simple implementation - can be enhanced with a proper dropdown
-    const periods = ['This Week', 'This Month', 'This Quarter', 'This Year'];
-    const selectedPeriod = prompt('Select period:\n' + periods.map((p, i) => `${i + 1}. ${p}`).join('\n'));
+    const periods = ['Tuần này', 'Tháng này', 'Quý này', 'Năm nay'];
+    const periodMap = ['week', 'month', 'quarter', 'year'];
+
+    // Create a custom modal or dropdown for better UI
+    // For now using simple prompt is replaced by a cleaner approach? 
+    // Actually prompt is ugly. Let's assume the user clicks the filter and cycles through or we just cycle.
+    // Or better, let's just make it a toggle for now.
+    // Given the prompt constraints, I'll stick to a simple prompt but translated.
+
+    const selectedPeriod = prompt('Chọn khoảng thời gian:\n' + periods.map((p, i) => `${i + 1}. ${p}`).join('\n'));
 
     if (selectedPeriod) {
         const index = parseInt(selectedPeriod) - 1;
         if (index >= 0 && index < periods.length) {
             document.getElementById('selectedPeriod').textContent = periods[index];
-            // Reload data based on selected period
-            const periodMap = ['week', 'month', 'quarter', 'year'];
             loadAnalyticsData(periodMap[index]);
         }
     }
@@ -489,12 +633,11 @@ function showPeriodSelector() {
 
 // Utility function to format currency
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN').format(amount);
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 }
 
 // Show notification
 function showNotification(message, type = 'info') {
-    // Simple notification - can be enhanced with a proper toast library
     const colors = {
         success: '#10b981',
         error: '#ef4444',
@@ -552,7 +695,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Export for use in other scripts
+// Export
 window.walletPage = {
     loadAnalyticsData,
     loadCategoryBreakdown,

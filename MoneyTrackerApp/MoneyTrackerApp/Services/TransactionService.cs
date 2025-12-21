@@ -478,7 +478,7 @@ public class TransactionService : ITransactionService
             Id = transaction.Id,
             UserId = transaction.UserId,
             AccountId = transaction.AccountId,
-            AccountName = transaction.Account?.Name ?? "Unknown",
+            AccountName = transaction.Account?.Name ?? "Không xác định",
             CategoryId = transaction.CategoryId,
             CategoryName = transaction.Category?.Name,
             CategoryIcon = transaction.Category?.Icon,

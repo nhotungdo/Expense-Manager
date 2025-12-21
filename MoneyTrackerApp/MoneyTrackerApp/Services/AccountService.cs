@@ -327,13 +327,13 @@ public class AccountService : IAccountService
     {
         return accountType switch
         {
-            0 => "Cash",
-            1 => "Bank Account",
-            2 => "eWallet",
-            3 => "Credit Card",
-            4 => "Savings Account",
-            5 => "Investment",
-            _ => "Unknown"
+            0 => "Tiền mặt",
+            1 => "Tài khoản ngân hàng",
+            2 => "Ví điện tử",
+            3 => "Thẻ tín dụng",
+            4 => "Tài khoản tiết kiệm",
+            5 => "Đầu tư",
+            _ => "Không xác định"
         };
     }
 }

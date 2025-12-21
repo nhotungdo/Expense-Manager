@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "K880ZLSUfrH7gBkYDMCbhEdcwzHDSbDR68vj4GE6M18=",
+  "Hash": "FMLL6EnI6SAbRbd9PJKw6Fzvv8FCutIreLU3nY9xYvU=",
   "Source": "MoneyTrackerApp",
   "BasePath": "_content/MoneyTrackerApp",
   "Mode": "Default",
@@ -454,6 +454,25 @@
       "OriginalItemSpec": "wwwroot\\css\\reports-modern.css"
     },
     {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\reports.css",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "css/reports.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\reports.css"
+    },
+    {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\service-packages.css",
       "SourceId": "MoneyTrackerApp",
       "SourceType": "Discovered",
@@ -530,12 +549,12 @@
       "OriginalItemSpec": "wwwroot\\css\\theme-variables.css"
     },
     {
-      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\transactions-modern.css",
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\trading.css",
       "SourceId": "MoneyTrackerApp",
       "SourceType": "Discovered",
       "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
       "BasePath": "_content/MoneyTrackerApp",
-      "RelativePath": "css/transactions-modern.css",
+      "RelativePath": "css/trading.css",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -546,26 +565,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\css\\transactions-modern.css"
-    },
-    {
-      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\transactions-page.css",
-      "SourceId": "MoneyTrackerApp",
-      "SourceType": "Discovered",
-      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
-      "BasePath": "_content/MoneyTrackerApp",
-      "RelativePath": "css/transactions-page.css",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\css\\transactions-page.css"
+      "OriginalItemSpec": "wwwroot\\css\\trading.css"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallet-modern.css",
@@ -1081,12 +1081,12 @@
       "OriginalItemSpec": "wwwroot\\js\\theme-manager.js"
     },
     {
-      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\transactions.js",
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\trading.js",
       "SourceId": "MoneyTrackerApp",
       "SourceType": "Discovered",
       "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
       "BasePath": "_content/MoneyTrackerApp",
-      "RelativePath": "js/transactions.js",
+      "RelativePath": "js/trading.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -1097,7 +1097,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\js\\transactions.js"
+      "OriginalItemSpec": "wwwroot\\js\\trading.js"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\vnpay-checkout.js",

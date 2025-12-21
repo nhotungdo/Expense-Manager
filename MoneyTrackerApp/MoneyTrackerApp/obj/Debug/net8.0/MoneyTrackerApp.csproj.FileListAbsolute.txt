@@ -139,3 +139,12 @@ F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\ob
 F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\obj\Debug\net8.0\MoneyTrackerApp.pdb
 F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\obj\Debug\net8.0\MoneyTrackerApp.genruntimeconfig.cache
 F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\obj\Debug\net8.0\ref\MoneyTrackerApp.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\ClosedXML.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\ClosedXML.Parser.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\ExcelNumberFormat.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\HtmlAgilityPack.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\RBush.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\SixLabors.Fonts.dll
+F:\OJT-Review\MoneyTrackerApp\Expense-Manager\MoneyTrackerApp\MoneyTrackerApp\bin\Debug\net8.0\System.IO.Packaging.dll

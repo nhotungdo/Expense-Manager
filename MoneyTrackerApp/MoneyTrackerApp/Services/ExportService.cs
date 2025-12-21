@@ -2,6 +2,8 @@ using MoneyTrackerApp.Models;
 using MoneyTrackerApp.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using System.IO;
+using ClosedXML.Excel;
 
 namespace MoneyTrackerApp.Services;
 
@@ -36,18 +38,73 @@ public class ExportService : IExportService
         _context = context;
     }
 
+
     /// <summary>
-    /// Export transactions to Excel (Fallback to CSV for now as ClosedXML is not installed)
+    /// Export transactions to Excel using ClosedXML
     /// </summary>
     public async Task<byte[]> ExportTransactionsToExcelAsync(long userId, DateTime? startDate, DateTime? endDate, List<long>? accountIds = null)
     {
-        // Note: In a real environment with NuGet access, we would use ClosedXML here.
-        // For now, we'll return CSV content which Excel can open.
-        return await ExportTransactionsToCsvAsync(userId, startDate, endDate, accountIds);
+        var query = _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .Where(t => t.UserId == userId);
+
+        if (startDate.HasValue)
+            query = query.Where(t => t.TransactionDate >= startDate.Value);
+
+        if (endDate.HasValue)
+            query = query.Where(t => t.TransactionDate <= endDate.Value);
+
+        if (accountIds != null && accountIds.Any())
+            query = query.Where(t => accountIds.Contains(t.AccountId));
+
+        var transactions = await query
+            .OrderByDescending(t => t.TransactionDate)
+            .ToListAsync();
+
+        using (var workbook = new ClosedXML.Excel.XLWorkbook())
+        {
+            var worksheet = workbook.Worksheets.Add("Transactions");
+
+            // Headers
+            worksheet.Cell(1, 1).Value = "Date";
+            worksheet.Cell(1, 2).Value = "Type";
+            worksheet.Cell(1, 3).Value = "Category";
+            worksheet.Cell(1, 4).Value = "Account";
+            worksheet.Cell(1, 5).Value = "Amount";
+            worksheet.Cell(1, 6).Value = "Currency";
+            worksheet.Cell(1, 7).Value = "Note";
+
+            var headerRow = worksheet.Row(1);
+            headerRow.Style.Font.Bold = true;
+            headerRow.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+
+            // Data
+            int row = 2;
+            foreach (var t in transactions)
+            {
+                worksheet.Cell(row, 1).Value = t.TransactionDate;
+                worksheet.Cell(row, 2).Value = t.TransactionType == 1 ? "Income" : "Expense";
+                worksheet.Cell(row, 3).Value = t.Category?.Name ?? "N/A";
+                worksheet.Cell(row, 4).Value = t.Account?.Name ?? "N/A";
+                worksheet.Cell(row, 5).Value = t.Amount;
+                worksheet.Cell(row, 6).Value = t.Currency;
+                worksheet.Cell(row, 7).Value = t.Note;
+                row++;
+            }
+
+            worksheet.Columns().AdjustToContents();
+
+            using (var stream = new System.IO.MemoryStream())
+            {
+                workbook.SaveAs(stream);
+                return stream.ToArray();
+            }
+        }
     }
 
     /// <summary>
-    /// Export transactions to PDF (Fallback to HTML for now as iText is not installed)
+    /// Export transactions to HTML for Printer-friendly view (PDF substitute)
     /// </summary>
     public async Task<byte[]> ExportTransactionsToPdfAsync(long userId, DateTime? startDate, DateTime? endDate, List<long>? accountIds = null)
     {
@@ -69,30 +126,68 @@ public class ExportService : IExportService
             .OrderByDescending(t => t.TransactionDate)
             .ToListAsync();
 
-        var html = new StringBuilder();
-        html.Append("<html><head><style>table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid black; padding: 8px; text-align: left; } th { background-color: #f2f2f2; }</style></head><body>");
-        html.Append("<h1>Báo cáo giao dịch</h1>");
-        html.Append($"<p>Giai đoạn: {startDate?.ToString("dd/MM/yyyy") ?? "Tất cả"} - {endDate?.ToString("dd/MM/yyyy") ?? "Tất cả"}</p>");
-        html.Append("<table>");
-        html.Append("<tr><th>Ngày</th><th>Loại</th><th>Danh mục</th><th>Tài khoản</th><th>Số tiền</th><th>Tiền tệ</th></tr>");
+        var sb = new StringBuilder();
+        sb.Append(@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Transaction Report</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+        h1 { color: #2c3e50; }
+        .meta { color: #7f8c8d; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; }
+        tr:nth-child(even) { background-color: #fcfcfc; }
+        .amount { font-family: 'Consolas', monospace; font-weight: 600; }
+        .income { color: #27ae60; }
+        .expense { color: #c0392b; }
+        .total-box { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: right; }
+        @media print {
+            body { padding: 0; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div style='display: flex; justify-content: space-between; align-items: center;'>
+        <h1>Transaction Report</h1>
+        <button onclick='window.print()' style='padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;'>Print to PDF</button>
+    </div>
+");
+        sb.Append($"<div class='meta'>Period: {startDate:d} - {endDate:d}</div>");
+        sb.Append("<table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Account</th><th>Amount</th><th>Note</th></tr></thead><tbody>");
 
-        foreach (var transaction in transactions)
+        foreach (var t in transactions)
         {
-            html.Append("<tr>");
-            html.Append($"<td>{transaction.TransactionDate:dd/MM/yyyy}</td>");
-            html.Append($"<td>{(transaction.TransactionType == 1 ? "Thu nhập" : "Chi tiêu")}</td>");
-            html.Append($"<td>{transaction.Category?.Name ?? "N/A"}</td>");
-            html.Append($"<td>{transaction.Account?.Name ?? "N/A"}</td>");
-            html.Append($"<td>{transaction.Amount:N2}</td>");
-            html.Append($"<td>{transaction.Currency}</td>");
-            html.Append("</tr>");
+            var typeClass = t.TransactionType == 1 ? "income" : "expense";
+            var sign = t.TransactionType == 1 ? "+" : "-";
+            sb.Append($"<tr>");
+            sb.Append($"<td>{t.TransactionDate:d}</td>");
+            sb.Append($"<td>{(t.TransactionType == 1 ? "Income" : "Expense")}</td>");
+            sb.Append($"<td>{t.Category?.Name ?? "-"}</td>");
+            sb.Append($"<td>{t.Account?.Name ?? "-"}</td>");
+            sb.Append($"<td class='amount {typeClass}'>{sign}{t.Amount:N0} {t.Currency}</td>");
+            sb.Append($"<td>{t.Note}</td>");
+            sb.Append("</tr>");
         }
 
-        html.Append("</table>");
-        html.Append($"<h3>Tổng tiền: {transactions.Sum(t => t.Amount):N2}</h3>");
-        html.Append("</body></html>");
+        sb.Append("</tbody></table>");
+        
+        var totalIncome = transactions.Where(t => t.TransactionType == 1).Sum(t => t.Amount);
+        var totalExpense = transactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
+        
+        sb.Append("<div class='total-box'>");
+        sb.Append($"<p>Total Income: <span class='amount income'>+{totalIncome:N0}</span></p>");
+        sb.Append($"<p>Total Expense: <span class='amount expense'>-{totalExpense:N0}</span></p>");
+        sb.Append($"<h3>Net: <span class='amount'>{(totalIncome - totalExpense):N0}</span></h3>");
+        sb.Append("</div>");
+        
+        sb.Append("</body></html>");
 
-        return Encoding.UTF8.GetBytes(html.ToString());
+        return Encoding.UTF8.GetBytes(sb.ToString());
     }
 
     /// <summary>
@@ -119,28 +214,34 @@ public class ExportService : IExportService
             .ToListAsync();
 
         var csv = new StringBuilder();
-        
-        // Headers
-        csv.AppendLine("Ngày,Loại,Danh mục,Tài khoản,Số tiền,Tiền tệ,Ghi chú");
+        csv.AppendLine("Date,Type,Category,Account,Amount,Currency,Note");
 
-        // Data
-        foreach (var transaction in transactions)
+        foreach (var t in transactions)
         {
-            csv.AppendLine($"{transaction.TransactionDate:dd/MM/yyyy}," +
-                          $"{(transaction.TransactionType == 1 ? "Thu nhập" : "Chi tiêu")}," +
-                          $"\"{transaction.Category?.Name ?? "N/A"}\"," +
-                          $"\"{transaction.Account?.Name ?? "N/A"}\"," +
-                          $"{transaction.Amount}," +
-                          $"{transaction.Currency}," +
-                          $"\"{transaction.Note?.Replace("\"", "\"\"") ?? ""}\"");
+            var line = string.Join(",", 
+                t.TransactionDate.ToString("yyyy-MM-dd"),
+                t.TransactionType == 1 ? "Income" : "Expense",
+                EscapeCsv(t.Category?.Name ?? ""),
+                EscapeCsv(t.Account?.Name ?? ""),
+                t.Amount,
+                t.Currency,
+                EscapeCsv(t.Note ?? "")
+            );
+            csv.AppendLine(line);
         }
 
         return Encoding.UTF8.GetBytes(csv.ToString());
     }
 
-    /// <summary>
-    /// Export cash flow report to Excel (Fallback to CSV)
-    /// </summary>
+    private string EscapeCsv(string field)
+    {
+        if (field.Contains(",") || field.Contains("\"") || field.Contains("\n"))
+        {
+            return $"\"{field.Replace("\"", "\"\"")}\"";
+        }
+        return field;
+    }
+
     public async Task<byte[]> ExportCashFlowReportToExcelAsync(long userId, int year, int month)
     {
         var startDate = new DateTime(year, month, 1);
@@ -251,9 +352,6 @@ public class ExportService : IExportService
         return Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(data, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
     }
 
-    /// <summary>
-    /// Export category report to Excel (Fallback to CSV)
-    /// </summary>
     public async Task<byte[]> ExportCategoryReportToExcelAsync(long userId, DateTime? startDate, DateTime? endDate)
     {
         var data = await GetCategoryDataAsync(userId, startDate, endDate);
@@ -360,6 +458,7 @@ public class ExportService : IExportService
         var data = await GetMonthlyTrendsDataAsync(userId, year);
         return Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(data, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
     }
+
 
     // Helper methods to fetch data
     private async Task<CashFlowData> GetCashFlowDataAsync(long userId, DateTime startDate, DateTime endDate)

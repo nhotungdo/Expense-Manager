@@ -103,7 +103,13 @@
             <div class="chart-header">
                 <h3 class="chart-title">Hiệu suất danh mục</h3>
                 <div class="chart-controls">
+                    <div class="last-updated-text me-3 text-muted small" id="lastUpdatedTime">
+                        <i class="fas fa-clock"></i> Cập nhật: --:--
+                    </div>
                     <div class="time-range-selector">
+                        <button class="range-btn btn-sm" onclick="zoomChart('in')" title="Phóng to"><i class="fas fa-search-plus"></i></button>
+                        <button class="range-btn btn-sm" onclick="zoomChart('out')" title="Thu nhỏ"><i class="fas fa-search-minus"></i></button>
+                        <div class="vr mx-2"></div>
                         <button class="range-btn" data-range="1M">1T</button>
                         <button class="range-btn" data-range="3M">3T</button>
                         <button class="range-btn active" data-range="6M">6T</button>
@@ -117,12 +123,49 @@
             </div>
         </div>
 
-        <div class="allocation-card">
+    <div class="allocation-card">
             <h3 class="chart-title">Phân bổ tài sản</h3>
             <div class="allocation-chart-container">
                 <canvas id="allocationChart"></canvas>
             </div>
             <div class="allocation-legend" id="allocationLegend"></div>
+        </div>
+
+        <div class="transaction-analysis-card">
+            <div class="chart-header">
+                <h3 class="chart-title">Phân tích Giao dịch</h3>
+                <div class="chart-controls">
+                    <div class="time-range-selector" id="transactionTimeFilter">
+                        <button class="range-btn" data-range="day">Ngày</button>
+                        <button class="range-btn active" data-range="week">Tuần</button>
+                        <button class="range-btn" data-range="month">Tháng</button>
+                        <button class="range-btn" data-range="year">Năm</button>
+                    </div>
+                    <button class="btn-icon-sm" onclick="downloadChart('transactionChart')" title="Tải biểu đồ">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="analysis-content-grid">
+                <!-- Left: Chart -->
+                <div class="chart-wrapper">
+                     <div class="chart-container-sm">
+                        <canvas id="transactionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: Stats & Details -->
+                <div class="analysis-stats">
+                    <div class="stats-list" id="transactionStatsList">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div id="transactionChartDetails" class="interaction-hint">
+                         <p class="small text-muted"><i class="fas fa-mouse-pointer me-1"></i> Di chuột để xem chi tiết</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
