@@ -1,715 +1,411 @@
-// Onboarding Module - Consolidated
-// Xử lý tất cả các bước onboarding: Welcome, BasicSettings, CreateWallet, SetupCategories, SavingsGoal, Complete
-
-const OnboardingModule = (function () {
+const OnboardingApp = (function () {
     'use strict';
 
-    // ============================================
-    // BƯỚC WELCOME
-    // ============================================
-    const Welcome = {
-        init() {
-            if (!document.getElementById('slidesWrapper')) return;
+    // State
+    const state = {
+        currentStep: 0, // 0=Welcome, 1=Settings, 2=Wallet, 3=Category, 4=Goal, 5=Complete
+        profile: { currency: 'VND', language: 'vi', theme: 'light' },
+        wallet: { name: 'Ví tiền mặt', accountType: 0, initialBalance: 0, color: '#4CAF50', icon: '💵' },
+        categorySetup: { template: 'Student', customCategories: [] },
+        savingsGoal: null
+    };
 
-            let currentSlide = 0;
-            const slides = document.querySelectorAll('.slide');
-            const indicators = document.querySelectorAll('.indicator');
-            const btnNext = document.getElementById('btnNext');
-            const btnSkip = document.getElementById('btnSkip');
-            const btnStart = document.getElementById('btnStart');
-            const totalSlides = slides.length;
+    // DOM Elements
+    const elements = {
+        app: document.getElementById('onboardingApp'),
+        progressBar: document.getElementById('progressBarContainer'),
+        progressFill: document.getElementById('progressFill'),
+        views: {
+            welcome: document.getElementById('view-welcome'),
+            step1: document.getElementById('view-step1'),
+            step2: document.getElementById('view-step2'),
+            step3: document.getElementById('view-step3'),
+            step4: document.getElementById('view-step4'),
+            complete: document.getElementById('view-complete')
+        },
+        forms: {
+            step1: document.getElementById('formStep1'),
+            step2: document.getElementById('formStep2'),
+            step3: document.getElementById('formStep3'),
+            step4: document.getElementById('formStep4')
+        },
+        toast: document.getElementById('toast'),
+        summary: {
+            wallet: document.getElementById('summaryWallet'),
+            categories: document.getElementById('summaryCategories')
+        }
+    };
 
-            const showSlide = (index) => {
-                slides.forEach(slide => slide.classList.remove('active', 'prev'));
-                indicators.forEach(indicator => indicator.classList.remove('active'));
-                slides[index].classList.add('active');
-                indicators[index].classList.add('active');
-                currentSlide = index;
+    // Helpers
+    const showToast = (msg, type = 'error') => {
+        elements.toast.textContent = msg;
+        elements.toast.className = `toast-message visible ${type}`;
+        setTimeout(() => {
+            elements.toast.className = 'toast-message hidden';
+        }, 3000);
+    };
 
-                if (index === totalSlides - 1) {
-                    btnNext.classList.add('hidden');
-                    btnStart.classList.remove('hidden');
-                } else {
-                    btnNext.classList.remove('hidden');
-                    btnStart.classList.add('hidden');
+    const updateProgress = (step) => {
+        // Steps 1-4 mapped to 25%, 50%, 75%, 100%
+        // Step 0 (Welcome) and 5 (Complete) hide progress bar
+        if (step === 0 || step === 5) {
+            elements.progressBar.classList.add('hidden');
+        } else {
+            elements.progressBar.classList.remove('hidden');
+            const pct = ((step) / 4) * 100; // 1->25, 2->50, 3->75, 4->100
+            elements.progressFill.style.width = `${pct}%`;
+        }
+    };
+
+    const showView = (viewName) => {
+        // Hide all
+        Object.values(elements.views).forEach(el => el.classList.add('hidden'));
+        Object.values(elements.views).forEach(el => el.classList.remove('active'));
+
+        // Show target
+        const target = elements.views[viewName];
+        if (target) {
+            target.classList.remove('hidden');
+            // Small delay for animation class if needed, but strict show/hide is fine
+            // target.classList.add('active'); 
+        }
+
+        // Map view to state step
+        const stepMap = { 'welcome': 0, 'step1': 1, 'step2': 2, 'step3': 3, 'step4': 4, 'complete': 5 };
+        const step = stepMap[viewName];
+        updateProgress(step);
+    };
+
+    // API
+    const api = {
+        getStatus: async () => {
+            const res = await fetch('/api/onboarding/status');
+            if (res.ok) return await res.json();
+            return null;
+        },
+        updateStep: async (step, data) => {
+            await fetch('/api/onboarding/step', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ step, stepData: JSON.stringify(data) })
+            });
+        },
+        getTemplates: async (template) => {
+            const res = await fetch(`/api/onboarding/templates/${template}`);
+            if (res.ok) return await res.json();
+            return [];
+        },
+        calculateSavings: async (amount, date) => {
+            const res = await fetch('/api/onboarding/calculate-savings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ targetAmount: amount, targetDate: date })
+            });
+            if (res.ok) return await res.json();
+            return null;
+        },
+        complete: async (data) => {
+            const res = await fetch('/api/onboarding/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            // Returns { success, accessToken, refreshToken, message } possibly handled by controller returning Ok/BadRequest
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Error completing onboarding');
+            }
+            return await res.json();
+        }
+    };
+
+    // Logic for Steps
+    const initWelcome = () => {
+        const slides = document.querySelectorAll('.slide');
+        const indicators = document.querySelectorAll('.indicator');
+        let curSlide = 0;
+
+        const updateSlide = (idx) => {
+            slides.forEach((s, i) => {
+                s.classList.toggle('active', i === idx);
+            });
+            indicators.forEach((ind, i) => {
+                ind.classList.toggle('active', i === idx);
+            });
+
+            const isLast = idx === slides.length - 1;
+            document.getElementById('btnNextSlide').classList.toggle('hidden', isLast);
+            document.getElementById('btnStartOnboarding').classList.toggle('hidden', !isLast);
+        };
+
+        document.getElementById('btnNextSlide').onclick = () => {
+            if (curSlide < slides.length - 1) updateSlide(++curSlide);
+        };
+        document.getElementById('btnSkipWelcome').onclick = () => {
+            showView('step1');
+        };
+        document.getElementById('btnStartOnboarding').onclick = () => {
+            // Can save step 1 start to API?
+            showView('step1');
+        };
+        indicators.forEach((ind, i) => {
+            ind.onclick = () => { curSlide = i; updateSlide(i); };
+        });
+    };
+
+    const initStep1 = () => {
+        // Theme Selection
+        const themes = document.querySelectorAll('.theme-option');
+        themes.forEach(t => {
+            t.onclick = () => {
+                themes.forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+                state.profile.theme = t.dataset.theme;
+            };
+        });
+
+        elements.forms.step1.onsubmit = async (e) => {
+            e.preventDefault();
+            state.profile.currency = document.getElementById('currency').value;
+            state.profile.language = document.getElementById('language').value;
+
+            // Save & Next
+            try {
+                await api.updateStep(1, state.profile);
+                showView('step2');
+            } catch (err) {
+                showToast('Không thể lưu bước này');
+            }
+        };
+    };
+
+    const initStep2 = () => {
+        // Wallet Types
+        const types = document.querySelectorAll('.wallet-type-card');
+        types.forEach(t => {
+            t.onclick = () => {
+                types.forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+                state.wallet.accountType = parseInt(t.dataset.type);
+                state.wallet.icon = t.querySelector('.type-icon').textContent;
+            };
+        });
+
+        // Colors
+        const colors = document.querySelectorAll('.color-option');
+        colors.forEach(c => {
+            c.onclick = () => {
+                colors.forEach(x => x.classList.remove('selected'));
+                c.classList.add('selected');
+                state.wallet.color = c.dataset.color;
+            };
+        });
+
+        elements.forms.step2.onsubmit = async (e) => {
+            e.preventDefault();
+            state.wallet.name = document.getElementById('walletName').value;
+            state.wallet.initialBalance = parseFloat(document.getElementById('initialBalance').value) || 0;
+
+            try {
+                await api.updateStep(2, state.wallet);
+                showView('step3');
+            } catch (err) {
+                showToast('Không thể lưu bước này');
+            }
+        };
+    };
+
+    const initStep3 = () => {
+        const templates = document.querySelectorAll('.template-card');
+        const preview = document.getElementById('categoryPreview');
+
+        const loadPreview = async (tpl) => {
+            preview.innerHTML = '<div class="preview-loading">Đang tải...</div>';
+            state.categorySetup.template = tpl;
+            const cats = await api.getTemplates(tpl);
+
+            preview.innerHTML = '';
+            cats.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'category-item';
+                div.innerHTML = `
+                    <div class="category-icon" style="background-color:${c.color}">${c.icon || '🏷️'}</div>
+                    <div class="category-info">
+                        <div class="category-name">${c.name}</div>
+                        <div class="category-type">${c.type === 0 ? 'Chi tiêu' : 'Thu nhập'}</div>
+                    </div>
+                `;
+                preview.appendChild(div);
+            });
+        };
+
+        templates.forEach(t => {
+            t.onclick = () => {
+                templates.forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+                loadPreview(t.dataset.template);
+            };
+        });
+
+        // Initial Load
+        loadPreview('Student');
+
+        elements.forms.step3.onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                await api.updateStep(3, state.categorySetup);
+                showView('step4');
+            } catch (err) {
+                showToast('Không thể lưu bước này');
+            }
+        };
+    };
+
+    const initStep4 = () => {
+        const calcCard = document.getElementById('goalCalcCard');
+        const monthlySpan = document.getElementById('monthlySavings');
+
+        const doCalc = async () => {
+            const amt = parseFloat(document.getElementById('targetAmount').value);
+            const date = document.getElementById('targetDate').value;
+            if (amt > 0 && date) {
+                const res = await api.calculateSavings(amt, date);
+                if (res) {
+                    calcCard.classList.remove('hidden');
+                    // Format currency
+                    const fmt = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: state.profile.currency || 'VND' }).format(res.monthlyAmount);
+                    monthlySpan.textContent = fmt;
                 }
-            };
+            } else {
+                calcCard.classList.add('hidden');
+            }
+        };
 
-            const nextSlide = () => {
-                if (currentSlide < totalSlides - 1) {
-                    slides[currentSlide].classList.add('prev');
-                    showSlide(currentSlide + 1);
+        document.getElementById('targetAmount').oninput = doCalc;
+        document.getElementById('targetDate').onchange = doCalc;
+
+        const finish = async (skipGoal) => {
+            if (!skipGoal) {
+                const name = document.getElementById('goalName').value;
+                const amt = parseFloat(document.getElementById('targetAmount').value);
+                const date = document.getElementById('targetDate').value;
+
+                if (name && amt > 0 && date) {
+                    state.savingsGoal = {
+                        name, targetAmount: amt, targetDate: date,
+                        icon: '🎯', color: '#2196F3'
+                    };
                 }
-            };
-
-            const prevSlide = () => {
-                if (currentSlide > 0) showSlide(currentSlide - 1);
-            };
-
-            const goToNextStep = async () => {
-                try {
-                    await fetch('/api/onboarding/step', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ step: 2 })
-                    });
-                } catch (error) {
-                    console.error('Lỗi cập nhật bước:', error);
-                }
-                window.location.href = '/Onboarding/BasicSettings';
-            };
-
-            // Kiểm tra token trong URL
-            const params = new URLSearchParams(location.search);
-            const accessToken = params.get('accessToken');
-            const refreshToken = params.get('refreshToken');
-            if (accessToken && refreshToken) {
-                localStorage.setItem('accessToken', accessToken);
-                localStorage.setItem('refreshToken', refreshToken);
-                window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // Event listeners
-            btnNext.addEventListener('click', nextSlide);
-            btnSkip.addEventListener('click', goToNextStep);
-            btnStart.addEventListener('click', goToNextStep);
-            indicators.forEach((indicator, index) => {
-                indicator.addEventListener('click', () => showSlide(index));
-            });
+            // Calls Complete API
+            const payload = {
+                profile: state.profile,
+                wallet: state.wallet,
+                categorySetup: state.categorySetup,
+                savingsGoal: state.savingsGoal
+            };
 
-            // Hỗ trợ vuốt
-            let touchStartX = 0;
-            const slidesWrapper = document.getElementById('slidesWrapper');
-            slidesWrapper.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            });
-            slidesWrapper.addEventListener('touchend', e => {
-                const touchEndX = e.changedTouches[0].screenX;
-                if (touchEndX < touchStartX - 50) nextSlide();
-                if (touchEndX > touchStartX + 50) prevSlide();
-            });
+            try {
+                const res = await api.complete(payload);
+                // Token handling if needed
+                if (res.accessToken) {
+                    // Though cookies are set HttpOnly, sometimes client logic needs refresh
+                }
 
-            showSlide(0);
-        }
+                // Show Summary
+                elements.summary.wallet.textContent = `${state.wallet.name} (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: state.profile.currency }).format(state.wallet.initialBalance)})`;
+                elements.summary.categories.textContent = `${state.categorySetup.template}`;
+
+                showView('complete');
+            } catch (err) {
+                showToast(err.message || 'Lỗi khi hoàn tất');
+            }
+        };
+
+        elements.forms.step4.onsubmit = (e) => {
+            e.preventDefault();
+            finish(false);
+        };
+
+        document.getElementById('skipGoal').onclick = () => finish(true);
     };
 
-    // ============================================
-    // BƯỚC CÀI ĐẶT CƠ BẢN
-    // ============================================
-    const BasicSettings = {
-        init() {
-            const form = document.getElementById('basicSettingsForm');
-            if (!form) return;
+    const init = async () => {
+        initWelcome();
+        initStep1();
+        initStep2();
+        initStep3();
+        initStep4();
 
-            const themeOptions = document.querySelectorAll('.theme-option');
-            const errorMessage = document.getElementById('errorMessage');
-            const currencySelect = document.getElementById('currency');
+        // Check loaded status
+        try {
+            const status = await api.getStatus();
+            if (status) {
+                // Populate state from backend
+                if (status.profile) state.profile = status.profile;
+                if (status.wallet) state.wallet = status.wallet;
+                if (status.categorySetup) state.categorySetup = status.categorySetup;
+                if (status.savingsGoal) state.savingsGoal = status.savingsGoal;
 
-            const updateCurrencySymbol = () => {
-                const symbols = { 'VND': '₫', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥' };
-                sessionStorage.setItem('currencySymbol', symbols[currencySelect.value] || '₫');
-            };
+                // Sync UI elements with loaded state could be added here (e.g. setting input values)
+                // For simplicity, we just ensure the data is ready for the next steps.
+                // ideally we should also pre-fill the forms if the user goes 'Back'.
 
-            const loadSavedData = () => {
-                const saved = sessionStorage.getItem('onboarding_profile');
-                if (saved) {
-                    try {
-                        const data = JSON.parse(saved);
-                        document.getElementById('currency').value = data.currency || 'VND';
-                        document.getElementById('language').value = data.language || 'vi';
-                        const themeInput = document.querySelector(`input[name="theme"][value="${data.theme || 'light'}"]`);
-                        if (themeInput) {
-                            themeInput.checked = true;
-                            themeInput.closest('.theme-option').classList.add('active');
-                        }
-                    } catch (error) {
-                        console.error('Lỗi tải dữ liệu đã lưu:', error);
+                // Pre-fill forms based on loaded state
+                if (state.profile) {
+                    document.getElementById('currency').value = state.profile.currency || 'VND';
+                    document.getElementById('language').value = state.profile.language || 'vi';
+                    const themeOpt = document.querySelector(`.theme-option[data-theme="${state.profile.theme}"]`);
+                    if (themeOpt) themeOpt.click();
+                }
+
+                if (state.wallet) {
+                    document.getElementById('walletName').value = state.wallet.name || 'Ví tiền mặt';
+                    document.getElementById('initialBalance').value = state.wallet.initialBalance || 0;
+                    const typeCard = document.querySelector(`.wallet-type-card[data-type="${state.wallet.accountType}"]`);
+                    if (typeCard) typeCard.click();
+                    const colorOpt = document.querySelector(`.color-option[data-color="${state.wallet.color}"]`);
+                    if (colorOpt) colorOpt.click();
+                }
+
+                if (state.categorySetup) {
+                    const tpl = state.categorySetup.template || 'Student';
+                    const tplCard = document.querySelector(`.template-card[data-template="${tpl}"]`);
+                    if (tplCard) tplCard.click();
+                }
+
+                if (state.savingsGoal) {
+                    document.getElementById('goalName').value = state.savingsGoal.name || '';
+                    document.getElementById('targetAmount').value = state.savingsGoal.targetAmount || '';
+                    if (state.savingsGoal.targetDate) {
+                        document.getElementById('targetDate').value = state.savingsGoal.targetDate.split('T')[0];
+                        // Trigger calc
+                        document.getElementById('targetAmount').dispatchEvent(new Event('input'));
                     }
                 }
-            };
 
-            const showError = (message) => {
-                errorMessage.textContent = message;
-                errorMessage.classList.remove('hidden');
-                setTimeout(() => errorMessage.classList.add('hidden'), 5000);
-            };
-
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                const formData = {
-                    currency: document.getElementById('currency').value,
-                    language: document.getElementById('language').value,
-                    theme: document.querySelector('input[name="theme"]:checked').value
-                };
-
-                sessionStorage.setItem('onboarding_profile', JSON.stringify(formData));
-
-                try {
-                    await fetch('/api/onboarding/step', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ step: 3, stepData: JSON.stringify(formData) })
-                    });
-                    window.location.href = '/Onboarding/CreateWallet';
-                } catch (error) {
-                    console.error('Lỗi lưu cài đặt:', error);
-                    showError('Không thể lưu cài đặt. Vui lòng thử lại.');
-                }
-            };
-
-            themeOptions.forEach(option => {
-                option.addEventListener('click', function () {
-                    themeOptions.forEach(opt => opt.classList.remove('active'));
-                    this.classList.add('active');
-                    this.querySelector('input[type="radio"]').checked = true;
-                });
-            });
-
-            currencySelect.addEventListener('change', updateCurrencySymbol);
-            form.addEventListener('submit', handleSubmit);
-            loadSavedData();
-        }
-    };
-
-    // ============================================
-    // BƯỚC TẠO VÍ
-    // ============================================
-    const CreateWallet = {
-        init() {
-            const form = document.getElementById('createWalletForm');
-            if (!form) return;
-
-            const walletTypeCards = document.querySelectorAll('.wallet-type-card');
-            const colorOptions = document.querySelectorAll('.color-option');
-            const errorMessage = document.getElementById('errorMessage');
-            const currencySymbol = document.getElementById('currencySymbol');
-
-            const updateCurrencySymbol = () => {
-                const symbol = sessionStorage.getItem('currencySymbol') || '₫';
-                currencySymbol.textContent = symbol;
-            };
-
-            const getWalletIcon = (type) => {
-                const icons = { 0: '💵', 1: '🏦', 2: '💳', 3: '💰' };
-                return icons[type] || '💰';
-            };
-
-            const loadSavedData = () => {
-                const saved = sessionStorage.getItem('onboarding_wallet');
-                if (saved) {
-                    try {
-                        const data = JSON.parse(saved);
-                        document.getElementById('walletName').value = data.name || 'Ví tiền mặt';
-                        document.getElementById('initialBalance').value = data.initialBalance || 0;
-                        document.getElementById('walletType').value = data.accountType || 0;
-                        document.getElementById('walletColor').value = data.color || '#4CAF50';
-
-                        const typeCard = document.querySelector(`.wallet-type-card[data-type="${data.accountType || 0}"]`);
-                        if (typeCard) {
-                            walletTypeCards.forEach(c => c.classList.remove('active'));
-                            typeCard.classList.add('active');
-                        }
-
-                        const colorOption = document.querySelector(`.color-option[data-color="${data.color || '#4CAF50'}"]`);
-                        if (colorOption) {
-                            colorOptions.forEach(opt => {
-                                opt.classList.remove('selected');
-                                opt.querySelector('.check-mark').style.opacity = '0';
-                            });
-                            colorOption.classList.add('selected');
-                            colorOption.querySelector('.check-mark').style.opacity = '1';
-                        }
-                    } catch (error) {
-                        console.error('Lỗi tải dữ liệu đã lưu:', error);
-                    }
-                }
-            };
-
-            const showError = (message) => {
-                errorMessage.textContent = message;
-                errorMessage.classList.remove('hidden');
-                setTimeout(() => errorMessage.classList.add('hidden'), 5000);
-            };
-
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                const walletName = document.getElementById('walletName').value.trim();
-                const initialBalance = parseFloat(document.getElementById('initialBalance').value) || 0;
-
-                if (!walletName) {
-                    showError('Vui lòng nhập tên ví');
-                    return;
-                }
-                if (initialBalance < 0) {
-                    showError('Số dư ban đầu không thể âm');
+                if (status.isCompleted) {
+                    showView('complete');
                     return;
                 }
 
-                const formData = {
-                    name: walletName,
-                    accountType: parseInt(document.getElementById('walletType').value),
-                    initialBalance: initialBalance,
-                    icon: getWalletIcon(parseInt(document.getElementById('walletType').value)),
-                    color: document.getElementById('walletColor').value
-                };
-
-                sessionStorage.setItem('onboarding_wallet', JSON.stringify(formData));
-
-                try {
-                    await fetch('/api/onboarding/step', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ step: 4, stepData: JSON.stringify(formData) })
-                    });
-                    window.location.href = '/Onboarding/SetupCategories';
-                } catch (error) {
-                    console.error('Lỗi lưu ví:', error);
-                    showError('Không thể lưu ví. Vui lòng thử lại.');
-                }
-            };
-
-            walletTypeCards.forEach(card => {
-                card.addEventListener('click', function () {
-                    walletTypeCards.forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById('walletType').value = this.dataset.type;
-                });
-            });
-
-            colorOptions.forEach(option => {
-                option.addEventListener('click', function () {
-                    colorOptions.forEach(opt => {
-                        opt.classList.remove('selected');
-                        opt.querySelector('.check-mark').style.opacity = '0';
-                    });
-                    this.classList.add('selected');
-                    this.querySelector('.check-mark').style.opacity = '1';
-                    document.getElementById('walletColor').value = this.dataset.color;
-                });
-            });
-
-            const balanceInput = document.getElementById('initialBalance');
-            balanceInput.addEventListener('input', function () {
-                if (this.value < 0) this.value = 0;
-            });
-
-            form.addEventListener('submit', handleSubmit);
-            updateCurrencySymbol();
-            loadSavedData();
+                // Determine step to show based on what is missing or saved CurrentStep
+                // Map API CurrentStep to View
+                // 0=Welcome, 1=Settings, 2=Wallet, 3=Categories, 4=Goal
+                // The API stores CurrentStep.
+                const viewMap = { 0: 'welcome', 1: 'step1', 2: 'step2', 3: 'step3', 4: 'step4', 5: 'complete' };
+                // Default to Welcome if 0
+                const nextView = viewMap[status.currentStep] || 'welcome';
+                showView(nextView);
+            }
+        } catch (e) {
+            console.error(e);
+            showView('welcome');
         }
     };
 
-    // ============================================
-    // BƯỚC THIẾT LẬP DANH MỤC
-    // ============================================
-    const SetupCategories = {
-        init() {
-            const form = document.getElementById('setupCategoriesForm');
-            if (!form) return;
-
-            const templateCards = document.querySelectorAll('.template-card');
-            const categoryPreviewList = document.getElementById('categoryPreviewList');
-            const previewLoading = document.querySelector('.preview-loading');
-            const errorMessage = document.getElementById('errorMessage');
-            let currentTemplate = 'Student';
-
-            const displayCategories = (categories) => {
-                categoryPreviewList.innerHTML = '';
-                categories.forEach(category => {
-                    const categoryItem = document.createElement('div');
-                    categoryItem.className = 'category-item';
-                    categoryItem.innerHTML = `
-                        <div class="category-icon" style="background-color: ${category.color}">
-                            ${category.icon}
-                        </div>
-                        <div class="category-info">
-                            <div class="category-name">${category.name}</div>
-                            <div class="category-type">${category.type === 0 ? 'Chi tiêu' : 'Thu nhập'}</div>
-                        </div>
-                    `;
-                    categoryPreviewList.appendChild(categoryItem);
-                });
-                previewLoading.classList.add('hidden');
-                categoryPreviewList.classList.remove('hidden');
-            };
-
-            const loadCategoryPreview = async (template) => {
-                previewLoading.classList.remove('hidden');
-                categoryPreviewList.classList.add('hidden');
-
-                try {
-                    const response = await fetch(`/api/onboarding/templates/${template}`);
-                    if (!response.ok) throw new Error('Không thể tải danh mục');
-                    const categories = await response.json();
-                    displayCategories(categories);
-                } catch (error) {
-                    console.error('Lỗi tải danh mục:', error);
-                    showError('Không thể tải xem trước danh mục');
-                }
-            };
-
-            const showError = (message) => {
-                errorMessage.textContent = message;
-                errorMessage.classList.remove('hidden');
-                setTimeout(() => errorMessage.classList.add('hidden'), 5000);
-            };
-
-            const loadSavedData = () => {
-                const saved = sessionStorage.getItem('onboarding_categories');
-                if (saved) {
-                    try {
-                        const data = JSON.parse(saved);
-                        currentTemplate = data.template || 'Student';
-                        document.getElementById('selectedTemplate').value = currentTemplate;
-                        const templateCard = document.querySelector(`.template-card[data-template="${currentTemplate}"]`);
-                        if (templateCard) {
-                            templateCards.forEach(c => c.classList.remove('active'));
-                            templateCard.classList.add('active');
-                        }
-                    } catch (error) {
-                        console.error('Lỗi tải dữ liệu đã lưu:', error);
-                    }
-                }
-            };
-
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                const formData = {
-                    template: currentTemplate,
-                    customCategories: []
-                };
-
-                sessionStorage.setItem('onboarding_categories', JSON.stringify(formData));
-
-                try {
-                    await fetch('/api/onboarding/step', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ step: 5, stepData: JSON.stringify(formData) })
-                    });
-                    window.location.href = '/Onboarding/SavingsGoal';
-                } catch (error) {
-                    console.error('Lỗi lưu danh mục:', error);
-                    showError('Không thể lưu danh mục. Vui lòng thử lại.');
-                }
-            };
-
-            templateCards.forEach(card => {
-                card.addEventListener('click', function () {
-                    templateCards.forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    currentTemplate = this.dataset.template;
-                    document.getElementById('selectedTemplate').value = currentTemplate;
-                    loadCategoryPreview(currentTemplate);
-                });
-            });
-
-            form.addEventListener('submit', handleSubmit);
-            loadSavedData();
-            loadCategoryPreview(currentTemplate);
-        }
-    };
-
-    // ============================================
-    // BƯỚC MỤC TIÊU TIẾT KIỆM
-    // ============================================
-    const SavingsGoal = {
-        init() {
-            const form = document.getElementById('savingsGoalForm');
-            if (!form) return;
-
-            const colorOptions = document.querySelectorAll('.color-option');
-            const errorMessage = document.getElementById('errorMessage');
-            const calculationCard = document.getElementById('calculationCard');
-            const monthlyAmountDisplay = document.getElementById('monthlyAmount');
-            const currencySymbol = document.getElementById('currencySymbol');
-            const btnSkip = document.getElementById('btnSkip');
-
-            const updateCurrencySymbol = () => {
-                const symbol = sessionStorage.getItem('currencySymbol') || '₫';
-                currencySymbol.textContent = symbol;
-            };
-
-            const formatNumber = (num) => {
-                return new Intl.NumberFormat('vi-VN', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                }).format(num);
-            };
-
-            const calculateMonthly = async () => {
-                const targetAmount = parseFloat(document.getElementById('targetAmount').value);
-                const targetDate = document.getElementById('targetDate').value;
-
-                if (!targetAmount || !targetDate || targetAmount <= 0) {
-                    calculationCard.classList.add('hidden');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/api/onboarding/calculate-savings', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ targetAmount, targetDate })
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        const symbol = sessionStorage.getItem('currencySymbol') || '₫';
-                        monthlyAmountDisplay.textContent = `${formatNumber(result.monthlyAmount)} ${symbol}`;
-                        calculationCard.classList.remove('hidden');
-                    }
-                } catch (error) {
-                    console.error('Lỗi tính toán số tiền hàng tháng:', error);
-                }
-            };
-
-            const showError = (message) => {
-                errorMessage.textContent = message;
-                errorMessage.classList.remove('hidden');
-                setTimeout(() => errorMessage.classList.add('hidden'), 5000);
-            };
-
-            const completeOnboarding = async (savingsGoal) => {
-                try {
-                    const profile = JSON.parse(sessionStorage.getItem('onboarding_profile') || '{}');
-                    const wallet = JSON.parse(sessionStorage.getItem('onboarding_wallet') || '{}');
-                    const categories = JSON.parse(sessionStorage.getItem('onboarding_categories') || '{}');
-
-                    const completeData = {
-                        profile: {
-                            currency: profile.currency || 'VND',
-                            language: profile.language || 'vi',
-                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                            theme: profile.theme || 'light'
-                        },
-                        wallet: {
-                            name: wallet.name || 'Ví tiền mặt',
-                            accountType: wallet.accountType || 0,
-                            initialBalance: wallet.initialBalance || 0,
-                            icon: wallet.icon || '💰',
-                            color: wallet.color || '#4CAF50'
-                        },
-                        categorySetup: {
-                            template: categories.template || 'Student',
-                            customCategories: categories.customCategories || []
-                        },
-                        savingsGoal: savingsGoal
-                    };
-
-                    const response = await fetch('/api/onboarding/complete', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(completeData)
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        console.error('Lỗi server:', errorData);
-                        throw new Error(errorData.message || 'Không thể hoàn tất onboarding');
-                    }
-
-                    const result = await response.json();
-                    if (result.accessToken) {
-                        localStorage.setItem('accessToken', result.accessToken);
-                        if (result.refreshToken) localStorage.setItem('refreshToken', result.refreshToken);
-                    }
-
-                    // Xóa session storage
-                    ['onboarding_profile', 'onboarding_wallet', 'onboarding_categories', 'currencySymbol'].forEach(key => {
-                        sessionStorage.removeItem(key);
-                    });
-
-                    window.location.href = '/Onboarding/Complete';
-                } catch (error) {
-                    console.error('Lỗi hoàn tất onboarding:', error);
-                    showError(error.message || 'Không thể hoàn tất thiết lập. Vui lòng thử lại.');
-                }
-            };
-
-            const loadSavedData = () => {
-                const saved = sessionStorage.getItem('onboarding_savings');
-                if (saved) {
-                    try {
-                        const data = JSON.parse(saved);
-                        if (data.name) document.getElementById('goalName').value = data.name;
-                        if (data.targetAmount) document.getElementById('targetAmount').value = data.targetAmount;
-                        if (data.targetDate) document.getElementById('targetDate').value = data.targetDate;
-                        if (data.color) {
-                            document.getElementById('goalColor').value = data.color;
-                            const colorOption = document.querySelector(`.color-option[data-color="${data.color}"]`);
-                            if (colorOption) {
-                                colorOptions.forEach(opt => {
-                                    opt.classList.remove('selected');
-                                    opt.querySelector('.check-mark').style.opacity = '0';
-                                });
-                                colorOption.classList.add('selected');
-                                colorOption.querySelector('.check-mark').style.opacity = '1';
-                            }
-                        }
-                        calculateMonthly();
-                    } catch (error) {
-                        console.error('Lỗi tải dữ liệu đã lưu:', error);
-                    }
-                }
-            };
-
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                const goalName = document.getElementById('goalName').value.trim();
-                const targetAmount = parseFloat(document.getElementById('targetAmount').value);
-                const targetDate = document.getElementById('targetDate').value;
-
-                let savingsGoal = null;
-
-                if (goalName && targetAmount && targetDate) {
-                    if (targetAmount <= 0) {
-                        showError('Số tiền mục tiêu phải lớn hơn 0');
-                        return;
-                    }
-
-                    const selectedDate = new Date(targetDate);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    if (selectedDate <= today) {
-                        showError('Ngày mục tiêu phải trong tương lai');
-                        return;
-                    }
-
-                    savingsGoal = {
-                        name: goalName,
-                        targetAmount: targetAmount,
-                        targetDate: targetDate,
-                        icon: '🎯',
-                        color: document.getElementById('goalColor').value
-                    };
-                }
-
-                await completeOnboarding(savingsGoal);
-            };
-
-            colorOptions.forEach(option => {
-                option.addEventListener('click', function () {
-                    colorOptions.forEach(opt => {
-                        opt.classList.remove('selected');
-                        opt.querySelector('.check-mark').style.opacity = '0';
-                    });
-                    this.classList.add('selected');
-                    this.querySelector('.check-mark').style.opacity = '1';
-                    document.getElementById('goalColor').value = this.dataset.color;
-                });
-            });
-
-            const targetAmount = document.getElementById('targetAmount');
-            const targetDate = document.getElementById('targetDate');
-            targetAmount.addEventListener('input', calculateMonthly);
-            targetDate.addEventListener('change', calculateMonthly);
-            btnSkip.addEventListener('click', () => completeOnboarding(null));
-            form.addEventListener('submit', handleSubmit);
-
-            // Đặt ngày tối thiểu là hôm nay
-            const today = new Date().toISOString().split('T')[0];
-            targetDate.setAttribute('min', today);
-
-            updateCurrencySymbol();
-            loadSavedData();
-        }
-    };
-
-    // ============================================
-    // BƯỚC HOÀN TẤT
-    // ============================================
-    const Complete = {
-        init() {
-            const btnGoToDashboard = document.getElementById('btnGoToDashboard');
-            if (!btnGoToDashboard) return;
-
-            const displaySummary = () => {
-                try {
-                    const wallet = JSON.parse(sessionStorage.getItem('onboarding_wallet') || '{}');
-                    const categories = JSON.parse(sessionStorage.getItem('onboarding_categories') || '{}');
-                    const savings = sessionStorage.getItem('onboarding_savings');
-
-                    document.getElementById('walletName').textContent = wallet.name || 'Ví tiền mặt';
-
-                    const categoryCounts = {
-                        'Student': 8, 'Family': 8, 'Business': 8,
-                        'Freelancer': 6, 'Minimal': 6
-                    };
-                    const categoryCount = categoryCounts[categories.template] || 6;
-                    document.getElementById('categoryCount').textContent = categoryCount;
-                    document.getElementById('goalCount').textContent = savings ? 1 : 0;
-                } catch (error) {
-                    console.error('Lỗi hiển thị tóm tắt:', error);
-                }
-            };
-
-            const goToDashboard = () => {
-                ['onboarding_profile', 'onboarding_wallet', 'onboarding_categories', 'onboarding_savings', 'currencySymbol'].forEach(key => {
-                    sessionStorage.removeItem(key);
-                });
-                window.location.href = '/home';
-            };
-
-            const createConfetti = () => {
-                const colors = ['#667eea', '#764ba2', '#4CAF50', '#FF5722', '#2196F3', '#FF9800'];
-                const confettiCount = 50;
-
-                for (let i = 0; i < confettiCount; i++) {
-                    setTimeout(() => {
-                        const confetti = document.createElement('div');
-                        Object.assign(confetti.style, {
-                            position: 'fixed',
-                            width: '10px',
-                            height: '10px',
-                            backgroundColor: colors[Math.floor(Math.random() * colors.length)],
-                            left: Math.random() * 100 + '%',
-                            top: '-10px',
-                            opacity: '1',
-                            borderRadius: '50%',
-                            pointerEvents: 'none',
-                            zIndex: '9999',
-                            transition: 'all 3s ease-out'
-                        });
-
-                        document.body.appendChild(confetti);
-
-                        setTimeout(() => {
-                            confetti.style.top = '100vh';
-                            confetti.style.opacity = '0';
-                            confetti.style.transform = `rotate(${Math.random() * 360}deg) translateX(${(Math.random() - 0.5) * 200}px)`;
-                        }, 10);
-
-                        setTimeout(() => confetti.remove(), 3000);
-                    }, i * 50);
-                }
-            };
-
-            btnGoToDashboard.addEventListener('click', goToDashboard);
-            displaySummary();
-            createConfetti();
-        }
-    };
-
-    // ============================================
-    // TỰ ĐỘNG KHỞI TẠO
-    // ============================================
-    const init = () => {
-        Welcome.init();
-        BasicSettings.init();
-        CreateWallet.init();
-        SetupCategories.init();
-        SavingsGoal.init();
-        Complete.init();
-    };
-
-    // Khởi tạo khi DOM sẵn sàng
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-
-    return { Welcome, BasicSettings, CreateWallet, SetupCategories, SavingsGoal, Complete };
+    return { init, showView };
 })();
+
+document.addEventListener('DOMContentLoaded', OnboardingApp.init);

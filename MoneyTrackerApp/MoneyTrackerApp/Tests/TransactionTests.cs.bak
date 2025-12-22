@@ -1,0 +1,97 @@
+using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MoneyTrackerApp.DTOs;
+using MoneyTrackerApp.Models;
+using MoneyTrackerApp.Services;
+using System.Collections.Generic;
+
+namespace MoneyTrackerApp.Tests
+{
+    public class TransactionTests
+    {
+        // This is a manual test script logic since we don't have a Test Project setup.
+        // It mocks the usage of TransactionService.
+
+        public static async Task RunTests()
+        {
+            var options = new DbContextOptionsBuilder<ExpenseManagerContext>()
+                .UseInMemoryDatabase(databaseName: "Test_Transactions")
+                .Options;
+
+            using (var context = new ExpenseManagerContext(options))
+            {
+                try
+                {
+                    var service = new TransactionService(context);
+
+                    // Setup User and Account
+                    var user = new User { Id = 1, UserName = "testUser" };
+                    var account = new Account { Id = 1, UserId = 1, Name = "Test Wallet", CurrentBalance = 1000 };
+                    var category = new Category { Id = 1, UserId = 1, Name = "Food", Type = 2 };
+                    
+                    context.Users.Add(user);
+                    context.Accounts.Add(account);
+                    context.Categories.Add(category);
+                    await context.SaveChangesAsync();
+
+                    // Test Case 1: Create Valid Transaction
+                    var validDto = new CreateTransactionDto
+                    {
+                        AccountId = 1,
+                        CategoryId = 1,
+                        Amount = 100,
+                        TransactionType = 2,
+                        Currency = "VND",
+                        TransactionDate = DateTime.UtcNow,
+                        Note = "Lunch"
+                    };
+
+                    try
+                    {
+                        var result = await service.CreateTransactionAsync(1, validDto);
+                        Console.WriteLine("Test 1 Passed: Transaction Created");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Test 1 Failed: {ex.Message}");
+                        Console.WriteLine(ex.StackTrace);
+                    }
+
+                    // Test Case 2: Create Transaction with Invalid Category (Access Denied)
+                    var otherUserCategory = new Category { Id = 2, UserId = 99, Name = "Other", Type = 2 };
+                    context.Categories.Add(otherUserCategory);
+                    await context.SaveChangesAsync();
+
+                    var invalidCatDto = new CreateTransactionDto
+                    {
+                        AccountId = 1,
+                        CategoryId = 2, // Belongs to user 99
+                        Amount = 50,
+                        TransactionType = 2,
+                        Currency = "VND",
+                        TransactionDate = DateTime.UtcNow
+                    };
+
+                    try
+                    {
+                        await service.CreateTransactionAsync(1, invalidCatDto);
+                        Console.WriteLine("Test 2 Failed: Should have thrown Access Denied");
+                    }
+                    catch (InvalidOperationException ex) when (ex.Message.Contains("Access denied"))
+                    {
+                         Console.WriteLine("Test 2 Passed: Caught Access Denied");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Test 2 Failed: Wrong exception {ex.Message}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("CRITICAL TEST ERROR: " + ex.ToString());
+                }
+            }
+        }
+    }
+}

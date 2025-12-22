@@ -23,10 +23,12 @@ public interface ITransactionService
 public class TransactionService : ITransactionService
 {
     private readonly ExpenseManagerContext _context;
+    private readonly IBudgetService _budgetService;
 
-    public TransactionService(ExpenseManagerContext context)
+    public TransactionService(ExpenseManagerContext context, IBudgetService budgetService)
     {
         _context = context;
+        _budgetService = budgetService;
     }
 
     /// <summary>
@@ -137,6 +139,23 @@ public class TransactionService : ITransactionService
             _context.Accounts.Update(pairedAccount);
         }
 
+        // Validate Category if provided
+        if (dto.CategoryId.HasValue)
+        {
+            var category = await _context.Categories.FindAsync(dto.CategoryId.Value);
+
+            if (category == null)
+            {
+                throw new InvalidOperationException($"Category not found. ID: {dto.CategoryId}, UserID: {userId}.");
+            }
+
+            // Allow if category belongs to user OR is a system category (UserId is null)
+            if (category.UserId != null && category.UserId != userId)
+            {
+                throw new InvalidOperationException("Access denied to this category.");
+            }
+        }
+
         var transaction = new Transaction
         {
             UserId = userId,
@@ -207,7 +226,15 @@ public class TransactionService : ITransactionService
         account.UpdatedAt = DateTime.UtcNow;
         _context.Accounts.Update(account);
 
-        await _context.SaveChangesAsync();
+        try 
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException dbEx)
+        {
+            // Capture inner exception for details
+            throw new Exception($"Database update failed: {dbEx.InnerException?.Message ?? dbEx.Message}", dbEx);
+        }
 
         // Reload with includes
         await _context.Entry(transaction).Reference(t => t.Account).LoadAsync();
@@ -215,7 +242,9 @@ public class TransactionService : ITransactionService
         if (transaction.PairedAccountId.HasValue)
             await _context.Entry(transaction).Reference(t => t.PairedAccount).LoadAsync();
 
-        return MapToResponseDto(transaction);
+        var response = MapToResponseDto(transaction);
+        response.WarningMessage = await CheckBudgetWarningsAsync(userId, transaction);
+        return response;
     }
     
     public async Task<TransactionResponseDto> TransferMoneyAsync(long userId, TransferMoneyDto dto)
@@ -334,7 +363,9 @@ public class TransactionService : ITransactionService
         _context.Transactions.Update(transaction);
         await _context.SaveChangesAsync();
 
-        return MapToResponseDto(transaction);
+        var response = MapToResponseDto(transaction);
+        response.WarningMessage = await CheckBudgetWarningsAsync(userId, transaction);
+        return response;
     }
 
     /// <summary>
@@ -433,6 +464,40 @@ public class TransactionService : ITransactionService
             .ToListAsync();
 
         return transactions.Select(t => MapToResponseDto(t)).ToList();
+    }
+
+    /// <summary>
+    /// Check if the transaction exceeds any budget and return a warning message
+    /// </summary>
+    private async Task<string?> CheckBudgetWarningsAsync(long userId, Transaction transaction)
+    {
+        // Only check for Expense transactions
+        if (transaction.TransactionType != 2) return null;
+
+        // Get all budgets for the user
+        // Note: This calculates 'Spent' for each budget which includes the current transaction if called after SaveChanges
+        var budgets = await _budgetService.GetUserBudgetsAsync(userId);
+        
+        // Find budgets that this transaction falls into (Date range + Category/Account match)
+        var applicableBudgets = budgets.Where(b => 
+            transaction.TransactionDate >= b.StartDate && 
+            transaction.TransactionDate <= b.EndDate &&
+            (
+                (b.CategoryId.HasValue && b.CategoryId == transaction.CategoryId) ||
+                (b.AccountId.HasValue && b.AccountId == transaction.AccountId)
+            )
+        ).ToList();
+
+        foreach (var budget in applicableBudgets)
+        {
+            if (budget.IsOverBudget)
+            {
+                var budgetName = !string.IsNullOrEmpty(budget.CategoryName) ? budget.CategoryName : budget.AccountName;
+                return $"Cảnh báo: Bạn đã vượt quá ngân sách '{budgetName}' ({budget.Spent:N0}/{budget.Amount:N0} VND)";
+            }
+        }
+
+        return null;
     }
 
     // Helper Methods

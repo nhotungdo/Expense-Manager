@@ -1,327 +1,513 @@
 @page
 @model MoneyTrackerApp.Pages.Groups.IndexModel
 @{
-    ViewData["Title"] = "Nhóm chi tiêu";
+    ViewData["Title"] = "Chi Tiêu Nhóm | Money Tracker";
 }
 
-<div class="groups-page modern-page">
-    <!-- Page Header -->
-    <div class="page-header-modern">
-        <div class="header-content">
-            <div>
-                <h1 class="page-title">
-                    <i class="fas fa-users"></i>
-                    Nhóm chi tiêu
-                </h1>
-                <p class="page-subtitle">Quản lý chi tiêu chung và chia hóa đơn</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-outline" onclick="showJoinGroup()">
-                    <i class="fas fa-user-plus"></i>
-                    Tham gia nhóm
-                </button>
-                <button class="btn btn-primary" onclick="showCreateGroupModal()">
+<div id="group-spending-app" class="group-app-container" v-cloak>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+        
+        <!-- Loading State -->
+        <div v-if="isLoading" class="loading-state">
+            <div class="spinner-grow text-primary mb-3" role="status"></div>
+            <p class="text-muted fw-medium animate-pulse">Đang đồng bộ dữ liệu nhóm...</p>
+        </div>
+
+        <!-- VIEW: DASHBOARD -->
+        <div v-else-if="currentView === 'dashboard'" class="dashboard-view fade-in">
+            
+            <!-- Dashboard Header -->
+            <header class="d-flex justify-content-between align-items-end mb-5">
+                <div>
+                    <h5 class="text-uppercase text-muted fw-bold small mb-1 ls-1">Hòa hợp tài chính</h5>
+                    <h1 class="display-5 fw-bold text-dark mb-0">Chi Tiêu Nhóm</h1>
+                </div>
+                <button class="btn btn-primary btn-lg rounded-pill shadow-lg hover-lift d-flex align-items-center gap-2 px-4" @@click="showCreateGroupModal">
                     <i class="fas fa-plus"></i>
-                    Tạo nhóm mới
+                    <span>Tạo Nhóm Mới</span>
                 </button>
-            </div>
-        </div>
-    </div>
+            </header>
 
-    <!-- Groups Overview -->
-    <div class="groups-overview">
-        <div class="overview-stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Tổng số nhóm</p>
-                <h3 class="stat-value" id="totalGroups">0</h3>
-            </div>
-        </div>
-
-        <div class="overview-stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-receipt"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Tổng chi tiêu</p>
-                <h3 class="stat-value" id="totalExpenses">0 ₫</h3>
-            </div>
-        </div>
-
-        <div class="overview-stat-card">
-            <div class="stat-icon balance">
-                <i class="fas fa-balance-scale"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Số dư của bạn</p>
-                <h3 class="stat-value" id="myBalance">0 ₫</h3>
-            </div>
-        </div>
-
-        <div class="overview-stat-card">
-            <div class="stat-icon pending">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Chờ thanh toán</p>
-                <h3 class="stat-value warning" id="pendingPayments">0 ₫</h3>
-            </div>
-        </div>
-    </div>
-
-    <!-- Groups Grid -->
-    <div class="groups-section">
-        <div class="section-header-inline">
-            <h3 class="section-title">
-                <i class="fas fa-layer-group"></i>
-                Nhóm của bạn
-            </h3>
-            <div class="groups-view-toggle">
-                <button class="view-btn active" data-view="grid" onclick="switchView('grid')">
-                    <i class="fas fa-th"></i>
-                </button>
-                <button class="view-btn" data-view="list" onclick="switchView('list')">
-                    <i class="fas fa-list"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="groups-grid" id="groupsList">
-            <div class="loading-state">
-                <div class="spinner"></div>
-                <p>Đang tải nhóm...</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Create Group Modal -->
-<div class="modal fade" id="createGroupModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tạo nhóm mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="groupForm">
-                    <input type="hidden" id="groupId">
-
-                    <div class="form-group">
-                        <label>Tên nhóm *</label>
-                        <input type="text" class="form-control" id="groupName" placeholder="VD: Du lịch Đà Lạt, Ăn trưa văn phòng..." required maxlength="100">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Mô tả</label>
-                        <textarea class="form-control" id="groupDescription" rows="3" placeholder="Mô tả ngắn về nhóm..."></textarea>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Biểu tượng</label>
-                            <select class="form-select" id="groupIcon" style="font-size: 1.2rem;">
-                                <option value="🏠">🏠 Nhà</option>
-                                <option value="✈️">✈️ Du lịch</option>
-                                <option value="🍕">🍕 Ăn uống</option>
-                                <option value="🎉">🎉 Tiệc tùng</option>
-                                <option value="🏖️">🏖️ Nghỉ mát</option>
-                                <option value="💼">💼 Công việc</option>
-                                <option value="🎓">🎓 Giáo dục</option>
-                                <option value="⚽">⚽ Thể thao</option>
-                                <option value="🎁">🎁 Quà tặng</option>
-                                <option value="🛒">🛒 Mua sắm</option>
-                            </select>
+            <!-- Stats Overview (Bento Grid Top) -->
+            <div class="row g-4 mb-5">
+                <!-- Total Balance -->
+                <div class="col-md-5">
+                    <div class="stat-card bg-gradient-primary text-white h-100 rounded-5 p-4 position-relative overflow-hidden shadow-lg">
+                        <div class="position-relative z-10">
+                            <p class="mb-1 opacity-75 fw-medium">Tổng số dư</p>
+                            <h2 class="display-4 fw-bold mb-1">
+                                {{ formatCurrency(Math.abs(totalBalance)) }}
+                            </h2>
+                            <div class="badge bg-white bg-opacity-25 backdrop-blur rounded-pill fw-normal px-3 py-1">
+                                {{ totalBalance >= 0 ? 'Bạn được nợ tổng cộng' : 'Bạn nợ tổng cộng' }}
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label>Màu sắc</label>
-                            <input type="color" class="form-control" id="groupColor" value="#4f46e5" style="height: 48px; padding: 4px;">
-                        </div>
-                    </div>
-
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="groupIsPublic" checked>
-                        <label class="form-check-label" for="groupIsPublic">
-                            Nhóm công khai (Mọi người có thể tìm thấy)
-                        </label>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" onclick="saveGroup()">Tạo nhóm</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Group Details Modal -->
-<div class="modal fade" id="groupDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="group-header-info">
-                    <div class="group-icon-large" id="groupIconLarge">👥</div>
-                    <div>
-                        <h5 class="modal-title" id="groupNameTitle">Tên nhóm</h5>
-                        <p class="group-description" id="groupDescriptionText"></p>
+                        <!-- Decorative Circles -->
+                        <div class="circle-decoration opacity-10 position-absolute top-0 end-0 translate-middle-y me-n5 mt-n5" style="width: 200px; height: 200px; background: white; border-radius: 50%;"></div>
+                        <div class="circle-decoration opacity-10 position-absolute bottom-0 start-0 translate-middle-x ms-n4 mb-n4" style="width: 150px; height: 150px; background: white; border-radius: 50%;"></div>
                     </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <!-- Owed / Owes Split -->
+                <div class="col-md-7">
+                    <div class="row g-4 h-100">
+                        <div class="col-6">
+                            <div class="stat-card bg-white h-100 rounded-5 p-4 shadow-sm border-0 d-flex flex-column justify-content-between">
+                                <div class="icon-box bg-success-subtle text-success rounded-circle mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="fas fa-arrow-down-left"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-bold text-uppercase mb-1">Bạn được nợ</p>
+                                    <h3 class="text-dark fw-bold mb-0">{{ formatCurrency(totalReceivables) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card bg-white h-100 rounded-5 p-4 shadow-sm border-0 d-flex flex-column justify-content-between">
+                                <div class="icon-box bg-danger-subtle text-danger rounded-circle mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="fas fa-arrow-up-right"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-bold text-uppercase mb-1">Bạn đang nợ</p>
+                                    <h3 class="text-dark fw-bold mb-0">{{ formatCurrency(totalPayables) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <!-- Group Tabs -->
-                <div class="group-tabs">
-                    <button class="group-tab active" data-tab="transactions" onclick="switchGroupTab('transactions')">
-                        <i class="fas fa-receipt"></i>
-                        Giao dịch
-                    </button>
-                    <button class="group-tab" data-tab="balances" onclick="switchGroupTab('balances')">
-                        <i class="fas fa-balance-scale"></i>
-                        Số dư
-                    </button>
-                    <button class="group-tab" data-tab="members" onclick="switchGroupTab('members')">
-                        <i class="fas fa-users"></i>
-                        Thành viên
-                    </button>
-                    <button class="group-tab" data-tab="chat" onclick="switchGroupTab('chat')">
-                        <i class="fas fa-comments"></i>
-                        Trò chuyện
-                    </button>
+
+            <div class="row g-4">
+                <!-- Groups Grid -->
+                <div class="col-lg-8">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0">Nhóm của bạn</h4>
+                        <div class="search-wrapper position-relative" style="width: 250px;">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" v-model="searchQuery" class="form-control rounded-pill border-0 bg-white shadow-sm ps-5" placeholder="Tìm kiếm...">
+                        </div>
+                    </div>
+
+                    <div v-if="filteredGroups.length === 0" class="empty-state text-center py-5">
+                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
+                            <i class="fas fa-users-slash fa-2x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">Không tìm thấy nhóm nào</h5>
+                        <p class="text-muted small">Tạo một nhóm để bắt đầu chia sẻ chi phí!</p>
+                    </div>
+
+                    <div class="groups-grid">
+                        <div v-for="group in filteredGroups" :key="group.id" 
+                             class="group-card card border-0 shadow-sm rounded-4 p-3 mb-3 cursor-pointer hover-card transition-all bg-white"
+                             @@click="navigateToGroup(group)">
+                            <div class="d-flex align-items-center">
+                                <div class="group-avatar bg-gradient-light text-primary rounded-4 d-flex align-items-center justify-content-center me-4 shadow-sm" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h5 class="fw-bold text-dark mb-1 text-truncate">{{ group.name }}</h5>
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <i class="fas fa-user-friends me-2"></i>
+                                        <span>{{ group.memberCount || 0 }} thành viên</span>
+                                        <span class="mx-2">&bull;</span>
+                                        <span class="text-truncate">{{ group.description || 'Không có mô tả' }}</span>
+                                    </div>
+                                </div>
+                                <div class="text-end ps-3">
+                                    <div class="badge rounded-pill px-3 py-2 fw-medium fs-7"
+                                         :class="getGroupBalance(group.id) > 0 ? 'bg-success-subtle text-success' : (getGroupBalance(group.id) < 0 ? 'bg-danger-subtle text-danger' : 'bg-secondary-subtle text-secondary')">
+                                        {{ getGroupBalance(group.id) === 0 ? 'Đã xong' : (getGroupBalance(group.id) > 0 ? 'nợ bạn ' : 'bạn nợ ') + formatCurrency(Math.abs(getGroupBalance(group.id))) }}
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Tab Content -->
-                <div class="group-tab-content">
-                    <!-- Transactions Tab -->
-                    <div class="tab-pane active" id="transactionsTab">
-                        <div class="tab-header">
-                            <h4>Danh sách giao dịch</h4>
-                            <button class="btn btn-primary btn-sm" onclick="showAddTransactionModal()">
-                                <i class="fas fa-plus"></i>
-                                Thêm chi tiêu
-                            </button>
-                        </div>
-                        <div id="transactionsList">
-                            <div class="loading-state">
-                                <div class="spinner"></div>
-                                <p>Đang tải...</p>
-                            </div>
+                <!-- Right Sidebar: Activity & Charts -->
+                <div class="col-lg-4">
+                    <!-- Charts Widget -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white" v-show="categories.length > 0">
+                        <h5 class="fw-bold mb-4">Phân bổ chi tiêu</h5>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="categoryChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Balances Tab -->
-                    <div class="tab-pane" id="balancesTab" style="display: none;">
-                        <div class="balances-container">
-                            <div class="balances-section">
-                                <h4>Số dư thành viên</h4>
-                                <div id="memberBalancesList"></div>
+                    <div class="activity-panel bg-white rounded-5 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold mb-4">Hoạt động gần đây</h5>
+                        <div class="activity-list">
+                            <div v-if="recentActivities.length === 0" class="text-muted text-center py-4 small">
+                                Chưa có hoạt động nào.
                             </div>
-                            <div class="settlements-section">
-                                <h4>Đề xuất thanh toán</h4>
-                                <div id="settlementsList"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Members Tab -->
-                    <div class="tab-pane" id="membersTab" style="display: none;">
-                        <div class="tab-header">
-                            <h4>Thành viên nhóm</h4>
-                            <button class="btn btn-outline btn-sm" onclick="showInviteMember()">
-                                <i class="fas fa-user-plus"></i>
-                                Mời thành viên
-                            </button>
-                        </div>
-                        <div id="membersList"></div>
-                    </div>
-
-                    <!-- Chat Tab -->
-                    <div class="tab-pane" id="chatTab" style="display: none;">
-                        <div class="chat-container">
-                            <div class="chat-messages" id="chatMessages">
-                                <!-- Messages populated by JS -->
-                            </div>
-                            <div class="chat-input-container">
-                                <input type="text" class="form-control" id="chatInput" placeholder="Nhập tin nhắn...">
-                                <button class="btn btn-primary" onclick="sendMessage()">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
+                            <div v-for="(tx, i) in recentActivities" :key="i" class="activity-item d-flex gap-3 mb-4">
+                                <div class="activity-icon mt-1">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 36px; height: 36px;">
+                                        <i class="fas fa-receipt small"></i>
+                                    </div>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="mb-1 text-dark small text-truncate">
+                                        <span class="fw-bold">{{ tx.paidByUserName }}</span> đã thêm <span class="fw-bold">"{{ tx.description }}"</span>
+                                    </p>
+                                    <div class="d-flex align-items-center gap-2 small text-muted">
+                                        <span class="fw-bold text-dark">{{ formatCurrency(tx.amount) }}</span>
+                                        <span>&bull;</span>
+                                        <span>{{ formatTimeAgo(tx.transactionDate) }}</span>
+                                    </div>
+                                    <div class="badge bg-light text-secondary border mt-1 tiny-badge">{{ tx.groupName }}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Add Transaction Modal -->
-<div class="modal fade" id="addTransactionModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Thêm chi tiêu</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <!-- VIEW: GROUP DETAILS -->
+        <div v-else-if="currentView === 'groupDetails'" class="details-view fade-in">
+            <!-- Navigation Header -->
+            <div class="d-flex align-items-center mb-4">
+                <button class="btn btn-white btn-icon rounded-circle shadow-sm me-3" @@click="backToDashboard">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="flex-grow-1">
+                    <h2 class="fw-bold mb-0 text-dark">{{ selectedGroup?.name }}</h2>
+                    <p class="text-muted mb-0 small">{{ selectedGroup?.members?.length }} thành viên</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-white btn-icon rounded-circle shadow-sm" @@click="showAddMemberModal" title="Thêm thành viên">
+                         <i class="fas fa-user-plus text-primary"></i>
+                    </button>
+                    <button class="btn btn-outline-primary rounded-pill px-4" @@click="showSettleUpModal">
+                        <i class="fas fa-hand-holding-usd me-2"></i>Thanh toán nợ
+                    </button>
+                    <button class="btn btn-primary rounded-pill px-4" @@click="showAddExpenseModal">
+                        <i class="fas fa-plus me-2"></i>Thêm chi tiêu
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="transactionForm">
-                    <input type="hidden" id="transactionGroupId">
 
-                    <div class="form-group">
-                        <label>Mô tả *</label>
-                        <input type="text" class="form-control" id="transactionDescription" placeholder="Mua gì?" required>
+            <div class="row g-4">
+                <!-- Main Spending Feed -->
+                <div class="col-lg-8">
+                    <!-- Your Balance in this Group -->
+                    <div class="balance-banner p-4 rounded-4 mb-4 text-white d-flex align-items-center justify-content-between shadow-lg"
+                         :class="currentUserBalance >= 0 ? 'bg-gradient-success' : 'bg-gradient-danger'">
+                        <div>
+                            <p class="mb-1 opacity-75 fw-medium">Số dư của bạn trong {{ selectedGroup?.name }}</p>
+                            <h2 class="mb-0 fw-bold">{{ currentUserBalance > 0 ? '+' : '' }}{{ formatCurrency(currentUserBalance) }}</h2>
+                        </div>
+                        <div class="text-end opacity-75">
+                            <i class="fas fa-wallet fa-3x"></i>
+                        </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Số tiền *</label>
-                            <div class="input-with-icon">
-                                <span class="currency-symbol">₫</span>
-                                <input type="number" class="form-control amount-input" id="transactionAmount" required min="0" step="0.01">
+                    <!-- Expenses List -->
+                    <div class="card border-0 shadow-sm rounded-4 bg-white">
+                         <div class="card-header bg-transparent border-0 p-4 pb-0">
+                            <h5 class="fw-bold">Chi tiêu</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div v-if="groupTransactions.length === 0" class="text-center py-5 text-muted">
+                                <div class="mb-3">
+                                    <i class="fas fa-receipt fa-3x opacity-25"></i>
+                                </div>
+                                <p>Chưa có chi tiêu nào.</p>
+                            </div>
+
+                            <div v-for="(tx, index) in groupTransactions" :key="tx.id" class="transaction-item mb-4 animate-slide-up" :style="{ animationDelay: index * 0.05 + 's' }">
+                                <div class="d-flex gap-3">
+                                    <div class="date-box text-center rounded-3 bg-light p-2" style="width: 60px; height: 60px;">
+                                        <div class="fw-bold fs-5 text-dark">{{ new Date(tx.transactionDate).getDate() }}</div>
+                                        <div class="small text-uppercase text-muted" style="font-size: 0.7rem;">{{ new Date(tx.transactionDate).getMonth() + 1 }}</div>
+                                    </div>
+                                    <div class="flex-grow-1 card border-0 bg-light rounded-3 p-3 position-relative hover-shadow transition-fast">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-1">{{ tx.description }}</h6>
+                                                <div class="small text-muted mb-1">
+                                                    <span class="text-primary fw-bold">{{ tx.paidByUserName }}</span> đã trả <span class="fw-bold text-dark">{{ formatCurrency(tx.amount) }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                               <div class="fw-bold text-dark">{{ formatCurrency(tx.amount) }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 pt-2 border-top border-secondary-subtle d-flex justify-content-between align-items-center">
+                                            <div class="small text-muted">
+                                                {{ tx.splits.length }} người tham gia
+                                            </div>
+                                            <div class="small fw-bold" :class="getUserSplit(tx) > 0 ? 'text-success' : (getUserSplit(tx) < 0 ? 'text-danger' : 'text-muted')">
+                                                {{ getUserSplit(tx) > 0 ? 'Bạn cho vay ' : (getUserSplit(tx) < 0 ? 'Bạn vay ' : 'Không tham gia') }}
+                                                <span v-if="getUserSplit(tx) !== 0">{{ formatCurrency(Math.abs(getUserSplit(tx))) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="form-group">
-                            <label>Đơn vị</label>
-                            <select class="form-select" id="transactionCurrency">
-                                <option value="VND">VND</option>
-                                <option value="USD">USD</option>
-                                <option value="EUR">EUR</option>
-                            </select>
+                <!-- Right Sidebar: Balances & Debts -->
+                <div class="col-lg-4">
+                    <!-- Members -->
+                    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                        <div class="card-header bg-transparent border-0 p-4 pb-2">
+                             <h6 class="fw-bold text-uppercase text-muted small ls-1">Thành viên</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                <div v-for="member in selectedGroup?.members" :key="member.userId" class="list-group-item border-0 px-4 py-3 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                            {{ member.userName.charAt(0).toUpperCase() }}
+                                        </div>
+                                        <span class="fw-medium text-dark">{{ member.userName }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Ngày chi</label>
-                        <input type="date" class="form-control" id="transactionDate" required>
+                    <!-- Suggested Settlements -->
+                    <div class="card border-0 shadow-sm rounded-4 bg-white">
+                        <div class="card-header bg-transparent border-0 p-4 pb-2">
+                             <h6 class="fw-bold text-uppercase text-muted small ls-1">Gợi ý thanh toán</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div v-if="settlements.length === 0" class="text-muted small text-center py-2">
+                                <i class="fas fa-check-circle text-success mb-2 fs-4"></i>
+                                <p class="mb-0">Mọi người đã thanh toán xong!</p>
+                            </div>
+                            <div v-for="(s, i) in settlements" :key="i" class="d-flex align-items-center mb-3 p-3 bg-light rounded-3">
+                                <div class="d-flex flex-column flex-grow-1 line-height-sm">
+                                    <span class="fs-6 fw-bold text-dark mb-1">{{ s.fromUserName }}</span>
+                                    <span class="text-muted small">nợ {{ s.toUserName }}</span>
+                                </div>
+                                <div class="fw-bold text-dark fs-6">{{ formatCurrency(s.amount) }}</div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Cách chia tiền</label>
-                        <select class="form-select" id="splitMethod" onchange="toggleCustomSplit()">
-                            <option value="1">Chia đều cho tất cả</option>
-                            <option value="2">Tùy chỉnh (Theo số tiền)</option>
-                            <option value="3">Tùy chỉnh (Theo phần trăm)</option>
-                        </select>
-                    </div>
-
-                    <div id="customSplitsContainer" style="display: none;">
-                        <!-- Custom splits populated by JS -->
-                    </div>
-                </form>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" onclick="saveTransaction()">Thêm</button>
+        </div>
+
+    </main>
+
+    <!-- FLOATING MODALS -->
+    
+    <!-- Create Group Modal -->
+    <div class="modal fade" id="createGroupModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+         <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-5">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">Tạo Nhóm Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label text-uppercase text-muted small fw-bold">Tên nhóm</label>
+                        <input type="text" v-model="newGroup.name" class="form-control form-control-lg bg-light border-0" placeholder="VD: Du lịch hè 2024">
+                    </div>
+                    <div class="mb-4">
+                         <label class="form-label text-uppercase text-muted small fw-bold">Mô tả (Tùy chọn)</label>
+                         <textarea v-model="newGroup.description" class="form-control bg-light border-0" rows="2" placeholder="Nhóm này dùng để làm gì?"></textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-uppercase text-muted small fw-bold">Thêm bạn bè</label>
+                        <div class="friend-selector px-2 py-3 bg-light rounded-3" style="max-height: 200px; overflow-y: auto;">
+                            <div v-if="friends.length === 0" class="text-center text-muted small py-3">
+                                Bạn chưa có bạn bè nào.
+                                <a href="/Contacts" class="d-block mt-2">Đến Danh bạ</a>
+                            </div>
+                            <div v-for="friend in friends" :key="friend.friendId" class="form-check custom-checkbox mb-2">
+                                <input class="form-check-input" type="checkbox" :value="friend.friendId" v-model="newGroup.selectedFriendIds" :id="'f-'+friend.friendId">
+                                <label class="form-check-label w-100 d-flex align-items-center" :for="'f-'+friend.friendId">
+                                    <span class="avatar-xs bg-white border rounded-circle me-2 d-flex align-items-center justify-content-center fw-bold" style="width: 24px; height: 24px; font-size: 10px;">
+                                        {{ friend.friendName[0] }}
+                                    </span>
+                                    <span>{{ friend.friendName }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" @@click="createGroup" :disabled="!newGroup.name">Tạo nhóm</button>
+                </div>
             </div>
         </div>
     </div>
+    
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-5">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">Thêm thành viên mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                     <p class="text-muted small mb-3">Chọn bạn bè để thêm vào nhóm <strong>{{ selectedGroup?.name }}</strong>:</p>
+                     <div class="friend-selector px-2 py-3 bg-light rounded-3" style="max-height: 200px; overflow-y: auto;">
+                        <div v-if="availableFriendsToAdd.length === 0" class="text-center text-muted small py-3">
+                            Không còn bạn bè nào để thêm.
+                        </div>
+                        <div v-for="friend in availableFriendsToAdd" :key="friend.friendId" class="form-check custom-checkbox mb-2">
+                            <input class="form-check-input" type="checkbox" :value="friend.friendId" v-model="selectedMembersToAdd" :id="'add-f-'+friend.friendId">
+                            <label class="form-check-label w-100 d-flex align-items-center" :for="'add-f-'+friend.friendId">
+                                <span class="avatar-xs bg-white border rounded-circle me-2 d-flex align-items-center justify-content-center fw-bold" style="width: 24px; height: 24px; font-size: 10px;">
+                                    {{ friend.friendName[0] }}
+                                </span>
+                                <span>{{ friend.friendName }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" @@click="addMembersToGroup" :disabled="selectedMembersToAdd.length === 0">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add Expense Modal -->
+    <div class="modal fade" id="addExpenseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-5">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">Thêm chi tiêu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <transition name="fade" mode="out-in">
+                        <!-- Step 1: Basics -->
+                        <div key="basics">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control border-0 bg-light fw-bold" id="descInput" v-model="expenseForm.description" placeholder="Mô tả">
+                                <label for="descInput">Mô tả</label>
+                            </div>
+                            <div class="input-group mb-4">
+                                <span class="input-group-text bg-light border-0 fw-bold fs-4">₫</span>
+                                <input type="number" class="form-control form-control-lg border-0 bg-light fs-4 fw-bold" v-model.number="expenseForm.amount" placeholder="0">
+                            </div>
+                            
+                            <div class="d-flex gap-2 mb-4 overflow-x-auto pb-2">
+                                <div class="flex-shrink-0">
+                                    <span class="small text-muted d-block mb-1">Người trả</span>
+                                    <select v-model="expenseForm.paidByUserId" class="form-select form-select-sm border-0 bg-light fw-medium" style="width: 140px;">
+                                        <option v-for="m in selectedGroup?.members" :key="m.userId" :value="m.userId">
+                                            {{ m.userId == window.currentUserId ? 'Bạn' : m.userName }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="vr mx-2"></div>
+                                <div class="flex-grow-1">
+                                    <span class="small text-muted d-block mb-1">Cách chia</span>
+                                    <div class="btn-group btn-group-sm w-100 bg-light rounded p-1">
+                                        <button class="btn btn-sm rounded" :class="expenseForm.splitType === 'equal' ? 'btn-white shadow-sm text-dark' : 'text-muted'" @@click="expenseForm.splitType = 'equal'">Đều</button>
+                                        <button class="btn btn-sm rounded" :class="expenseForm.splitType === 'amount' ? 'btn-white shadow-sm text-dark' : 'text-muted'" @@click="expenseForm.splitType = 'amount'">Số tiền</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Split Details Area -->
+                            <div class="p-3 bg-light rounded-3">
+                                <div v-if="expenseForm.splitType === 'equal'">
+                                    <p class="small text-muted mb-2">Chọn người chia tiền:</p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <div v-for="m in selectedGroup?.members" :key="m.userId" 
+                                             class="user-chip cursor-pointer border rounded-pill px-3 py-1 small transition-all"
+                                             :class="expenseForm.selectedMemberIds.includes(m.userId) ? 'bg-primary text-white border-primary' : 'bg-white text-muted'"
+                                             @@click="toggleMemberSelection(m.userId)">
+                                            {{ m.userName }}
+                                        </div>
+                                    </div>
+                                    <div v-if="expenseForm.amount > 0 && expenseForm.selectedMemberIds.length > 0" class="mt-3 text-center small text-primary fw-bold">
+                                        {{ formatCurrency(expenseForm.amount / expenseForm.selectedMemberIds.length) }} / người
+                                    </div>
+                                </div>
+
+                                <div v-else class="manual-split-list">
+                                    <div v-for="m in selectedGroup?.members" :key="m.userId" class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="small fw-medium">{{ m.userName }}</span>
+                                        <input type="number" v-model.number="expenseForm.manualSplits[m.userId]" class="form-control form-control-sm text-end border-0 bg-white" placeholder="0" style="width: 100px;">
+                                    </div>
+                                    <div class="text-end small pt-2 border-top" :class="manualSplitTotal == expenseForm.amount ? 'text-success' : 'text-danger'">
+                                        Tổng: {{ formatCurrency(manualSplitTotal) }} / {{ formatCurrency(expenseForm.amount) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </transition>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 w-50" @@click="saveExpense">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settle Up Modal -->
+    <div class="modal fade" id="settleUpModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-5">
+                 <div class="modal-header border-0 p-4">
+                    <h5 class="modal-title fw-bold">Ghi nhận thanh toán</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <div class="py-4 text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-4">
+                            <div class="text-center">
+                                <div class="small text-muted mb-1 text-uppercase fw-bold">Người trả</div>
+                                <select v-model="settleUpForm.payerId" class="form-select border-0 bg-light fw-bold text-center" style="width: 120px;">
+                                    <option v-for="m in selectedGroup?.members" :value="m.userId">{{ m.userName }}</option>
+                                </select>
+                            </div>
+                            <i class="fas fa-arrow-right text-muted animated-arrow"></i>
+                             <div class="text-center">
+                                <div class="small text-muted mb-1 text-uppercase fw-bold">Người nhận</div>
+                                <select v-model="settleUpForm.payeeId" class="form-select border-0 bg-light fw-bold text-center" style="width: 120px;">
+                                    <option v-for="m in selectedGroup?.members" :value="m.userId">{{ m.userName }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group justify-content-center">
+                             <input type="number" v-model.number="settleUpForm.amount" class="form-control form-control-lg border-bottom border-0 rounded-0 text-center fs-2 fw-bold text-success" placeholder="0" style="max-width: 200px; background: transparent;">
+                        </div>
+                        <div class="small text-muted mt-1">VND</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" @@click="saveSettlement">Ghi nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/groups.css" asp-append-version="true" />
+}
 
 @section Scripts {
-    <link rel="stylesheet" href="~/css/groups.css">
-    <script src="~/js/groups.js"></script>
+    <script>
+        window.currentUserId = '@Model.CurrentUserId';
+    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/groups.js" asp-append-version="true"></script>
 }

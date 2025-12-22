@@ -23,7 +23,8 @@ public partial class Category
 
     public bool IsDefault { get; set; }
 
-    public bool IsActive { get; set; }
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IsActive { get; set; } = true;
 
     public DateTime? CreatedAt { get; set; }
 

@@ -165,11 +165,15 @@
             let errorMsg = 'Lỗi không xác định';
 
             if (res.ok) {
-                handleSuccess();
+                const data = await res.json();
+                handleSuccess(data);
             } else {
                 if (contentType && contentType.indexOf("application/json") !== -1) {
                     const errData = await res.json();
                     errorMsg = errData.message || JSON.stringify(errData);
+                    if (errData.details) {
+                        errorMsg += ` (${errData.details})`;
+                    }
                 } else {
                     errorMsg = await res.text();
                 }
@@ -183,7 +187,7 @@
             btn.innerHTML = originalText;
         }
 
-        function handleSuccess() {
+        function handleSuccess(data) {
             // Close modal
             if (quickAddModal) {
                 quickAddModal.hide();
@@ -200,6 +204,14 @@
 
             // Show success message
             showToast('Giao dịch đã được lưu thành công!', 'success');
+
+            // Show Budget Warning if any
+            if (data && data.warningMessage) {
+                // Slight delay to make sure it's seen matching the user's attention shift
+                setTimeout(() => {
+                    showToast(data.warningMessage, 'warning');
+                }, 800);
+            }
 
             // Trigger global data refresh events if they exist
             if (typeof loadPersonalWalletData === 'function') loadPersonalWalletData();

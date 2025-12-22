@@ -33,7 +33,7 @@ namespace MoneyTrackerApp.Middleware
                         !path.StartsWith("/images/") &&
                         !path.Equals("/favicon.ico"))
                     {
-                        context.Response.Redirect("/Onboarding/Welcome");
+                        context.Response.Redirect("/Onboarding/Index");
                         return;
                     }
                 }

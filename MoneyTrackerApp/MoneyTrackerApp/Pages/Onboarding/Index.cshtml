@@ -16,137 +16,252 @@
     <link rel="stylesheet" href="~/css/onboarding.css" />
 </head>
 <body class="onboarding-page">
-    <div class="onboarding-container">
-        <!-- Progress Bar -->
-        <div class="progress-bar-container">
+    <div class="onboarding-container" id="onboardingApp">
+        <!-- Progress Bar (Hidden on Welcome/Complete) -->
+        <div class="progress-bar-container hidden" id="progressBarContainer">
             <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 25%;"></div>
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
             </div>
-            <div class="progress-steps">
-                <div class="step active" data-step="1">
-                    <div class="step-circle">1</div>
-                    <span>Thông tin</span>
+        </div>
+
+        <!-- VIEW: WELCOME -->
+        <div id="view-welcome" class="view-section active">
+            <div class="slider-container">
+                <div class="slides-wrapper" id="slidesWrapper">
+                    <div class="slide active">
+                        <div class="slide-illustration"><div class="illustration-icon">📊</div></div>
+                        <h2 class="slide-title">Theo dõi chi tiêu</h2>
+                        <p class="slide-description">Ghi chép và phân loại thu chi dễ dàng.</p>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-illustration"><div class="illustration-icon">💰</div></div>
+                        <h2 class="slide-title">Quản lý ví</h2>
+                        <p class="slide-description">Theo dõi số dư nhiều tài khoản cùng lúc.</p>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-illustration"><div class="illustration-icon">🎯</div></div>
+                        <h2 class="slide-title">Mục tiêu tài chính</h2>
+                        <p class="slide-description">Đặt mục tiêu và theo dõi tiến độ tiết kiệm.</p>
+                    </div>
                 </div>
-                <div class="step" data-step="2">
-                    <div class="step-circle">2</div>
-                    <span>Thu nhập</span>
+                
+                <div class="slide-indicators">
+                    <span class="indicator active" data-slide="0"></span>
+                    <span class="indicator" data-slide="1"></span>
+                    <span class="indicator" data-slide="2"></span>
                 </div>
-                <div class="step" data-step="3">
-                    <div class="step-circle">3</div>
-                    <span>Chi tiêu</span>
-                </div>
-                <div class="step" data-step="4">
-                    <div class="step-circle">4</div>
-                    <span>Mục tiêu</span>
+
+                <div class="slide-navigation">
+                    <button type="button" class="btn-skip" id="btnSkipWelcome">Bỏ qua</button>
+                    <button type="button" class="btn-next" id="btnNextSlide">Tiếp theo</button>
+                    <button type="button" class="btn-start hidden" id="btnStartOnboarding">Bắt đầu ngay</button>
                 </div>
             </div>
         </div>
 
-        <!-- Step Content -->
-        <div class="onboarding-content">
-            <!-- Step 1: Personal Information -->
-            <div class="step-content active" id="step1">
+        <!-- VIEW: BASIC SETTINGS (Step 1) -->
+        <div id="view-step1" class="view-section hidden">
+            <div class="onboarding-content">
                 <div class="step-header">
-                    <h2>Thông tin cá nhân</h2>
-                    <p>Hãy cho chúng tôi biết thêm về bạn</p>
+                    <span class="step-number">Bước 1 / 4</span>
+                    <h2 class="step-title">Cài đặt cơ bản</h2>
+                    <p class="step-description">Cá nhân hóa trải nghiệm của bạn</p>
                 </div>
-                <form class="onboarding-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Họ *</label>
-                            <input type="text" class="form-control" id="firstName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Tên *</label>
-                            <input type="text" class="form-control" id="lastName" required>
-                        </div>
-                    </div>
-
+                <form id="formStep1">
                     <div class="form-group">
-                        <label>Giới tính</label>
-                        <div class="gender-selector">
-                            <button type="button" class="gender-btn" data-gender="Male">
-                                <i class="fas fa-mars"></i>
-                                Nam
-                            </button>
-                            <button type="button" class="gender-btn" data-gender="Female">
-                                <i class="fas fa-venus"></i>
-                                Nữ
-                            </button>
-                            <button type="button" class="gender-btn" data-gender="Other">
-                                <i class="fas fa-genderless"></i>
-                                Khác
-                            </button>
-                        </div>
-                        <input type="hidden" id="gender">
+                        <label class="form-label">Tiền tệ chính</label>
+                        <select id="currency" class="form-select" required>
+                            <option value="VND" selected>Việt Nam Đồng (₫)</option>
+                            <option value="USD">Đô la Mỹ ($)</option>
+                            <option value="EUR">Euro (€)</option>
+                        </select>
                     </div>
-
                     <div class="form-group">
-                        <label>Ngày sinh</label>
-                        <input type="date" class="form-control" id="dateOfBirth">
+                        <label class="form-label">Ngôn ngữ</label>
+                        <select id="language" class="form-select" required>
+                            <option value="vi" selected>Tiếng Việt</option>
+                            <option value="en">Tiếng Anh</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label class="form-label">Giao diện</label>
+                        <div class="theme-selector">
+                            <div class="theme-option active" data-theme="light">
+                                <span class="theme-name">☀️ Sáng</span>
+                            </div>
+                            <div class="theme-option" data-theme="dark">
+                                <span class="theme-name">🌙 Tối</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="theme" value="light">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="app.showView('welcome')">Quay lại</button>
+                        <button type="submit" class="btn-primary">Tiếp theo</button>
                     </div>
                 </form>
             </div>
+        </div>
 
-            <!-- Step 2: Income Setup -->
-            <div class="step-content" id="step2">
+        <!-- VIEW: CREATE WALLET (Step 2) -->
+        <div id="view-step2" class="view-section hidden">
+            <div class="onboarding-content">
                 <div class="step-header">
-                    <h2>Thiết lập thu nhập</h2>
-                    <p>Bạn có những nguồn thu nhập nào?</p>
+                    <span class="step-number">Bước 2 / 4</span>
+                    <h2 class="step-title">Tạo ví đầu tiên</h2>
+                    <p class="step-description">Nơi khởi đầu hành trình tài chính</p>
                 </div>
-                <div class="income-list" id="incomeList">
-                    <button class="add-income-btn" onclick="addIncomeSource()">
-                        <i class="fas fa-plus"></i>
-                        Thêm nguồn thu nhập
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 3: Expense Setup -->
-            <div class="step-content" id="step3">
-                <div class="step-header">
-                    <h2>Chi tiêu hàng tháng</h2>
-                    <p>Ước tính chi tiêu trung bình của bạn</p>
-                </div>
-                <div class="expense-categories" id="expenseCategories">
-                    <!-- Will be populated by JS -->
-                </div>
-            </div>
-
-            <!-- Step 4: Financial Goals -->
-            <div class="step-content" id="step4">
-                <div class="step-header">
-                    <h2>Mục tiêu tài chính</h2>
-                    <p>Bạn muốn đạt được điều gì?</p>
-                </div>
-                <div class="goals-list" id="goalsList">
-                    <button class="add-goal-btn" onclick="addGoal()">
-                        <i class="fas fa-plus"></i>
-                        Thêm mục tiêu
-                    </button>
-                </div>
+                <form id="formStep2">
+                    <div class="form-group">
+                        <label class="form-label">Tên ví</label>
+                        <input type="text" id="walletName" class="form-input" value="Ví tiền mặt" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Loại ví</label>
+                        <div class="wallet-type-grid">
+                            <div class="wallet-type-card active" data-type="0"><div class="type-icon">💵</div><span>Tiền mặt</span></div>
+                            <div class="wallet-type-card" data-type="1"><div class="type-icon">🏦</div><span>Ngân hàng</span></div>
+                            <div class="wallet-type-card" data-type="2"><div class="type-icon">💳</div><span>Thẻ tín dụng</span></div>
+                        </div>
+                        <input type="hidden" id="walletType" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số dư ban đầu</label>
+                        <input type="number" id="initialBalance" class="form-input" value="0" min="0" required>
+                    </div>
+                     <div class="form-group">
+                        <label class="form-label">Màu sắc</label>
+                        <div class="color-picker">
+                            <!-- Colors generated by JS or static -->
+                            <div class="color-option selected" data-color="#4CAF50" style="background:#4CAF50"></div>
+                            <div class="color-option" data-color="#2196F3" style="background:#2196F3"></div>
+                            <div class="color-option" data-color="#FF9800" style="background:#FF9800"></div>
+                            <div class="color-option" data-color="#F44336" style="background:#F44336"></div>
+                        </div>
+                        <input type="hidden" id="walletColor" value="#4CAF50">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="app.showView('step1')">Quay lại</button>
+                        <button type="submit" class="btn-primary">Tiếp theo</button>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <!-- Navigation Buttons -->
-        <div class="onboarding-footer">
-            <button class="btn btn-outline" id="prevBtn" onclick="previousStep()" style="display: none;">
-                <i class="fas fa-arrow-left"></i>
-                Quay lại
-            </button>
-            <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
-                Tiếp theo
-                <i class="fas fa-arrow-right"></i>
-            </button>
-            <button class="btn btn-success" id="finishBtn" onclick="finishOnboarding()" style="display: none;">
-                <i class="fas fa-check"></i>
-                Hoàn thành
-            </button>
+        <!-- VIEW: CATEGORIES (Step 3) -->
+        <div id="view-step3" class="view-section hidden">
+            <div class="onboarding-content">
+                <div class="step-header">
+                    <span class="step-number">Bước 3 / 4</span>
+                    <h2 class="step-title">Thiết lập danh mục</h2>
+                    <p class="step-description">Chọn mẫu danh mục phù hợp với bạn</p>
+                </div>
+                <form id="formStep3">
+                    <div class="template-grid">
+                        <div class="template-card active" data-template="Student">
+                            <div class="template-icon">🎓</div>
+                            <div class="template-name">Sinh viên</div>
+                        </div>
+                        <div class="template-card" data-template="Family">
+                            <div class="template-icon">🏠</div>
+                            <div class="template-name">Gia đình</div>
+                        </div>
+                         <div class="template-card" data-template="Business">
+                            <div class="template-icon">💼</div>
+                            <div class="template-name">Kinh doanh</div>
+                        </div>
+                        <div class="template-card" data-template="Freelancer">
+                            <div class="template-icon">💻</div>
+                            <div class="template-name">Freelancer</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="categoryTemplate" value="Student">
+                    
+                    <div class="category-preview-container" id="categoryPreview">
+                        <!-- Loaded via JS -->
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="app.showView('step2')">Quay lại</button>
+                        <button type="submit" class="btn-primary">Tiếp theo</button>
+                    </div>
+                </form>
+            </div>
         </div>
+
+        <!-- VIEW: SAVINGS GOAL (Step 4) -->
+        <div id="view-step4" class="view-section hidden">
+             <div class="onboarding-content">
+                <div class="step-header">
+                    <span class="step-number">Bước 4 / 4</span>
+                    <h2 class="step-title">Mục tiêu tiết kiệm</h2>
+                    <p class="step-description">Bạn có muốn đặt mục tiêu tiết kiệm không?</p>
+                </div>
+                <form id="formStep4">
+                    <div class="form-group">
+                        <label class="form-label">Tên mục tiêu</label>
+                        <input type="text" id="goalName" class="form-input" placeholder="Mua xe, Du lịch...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số tiền mục tiêu</label>
+                        <input type="number" id="targetAmount" class="form-input" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngày hoàn thành</label>
+                        <input type="date" id="targetDate" class="form-input">
+                    </div>
+                    
+                    <div class="calculation-card hidden" id="goalCalcCard">
+                        <div class="calc-label">Cần tiết kiệm mỗi tháng</div>
+                        <div class="calc-amount" id="monthlySavings">0 ₫</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="app.showView('step3')">Quay lại</button>
+                         <button type="button" class="btn-text" id="skipGoal">Bỏ qua bước này</button>
+                        <button type="submit" class="btn-primary">Hoàn tất</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- VIEW: COMPLETE -->
+        <div id="view-complete" class="view-section hidden">
+            <div class="onboarding-content centered">
+                <div class="success-animation">
+                    <div class="checkmark-circle">
+                         <div class="checkmark"></div>
+                    </div>
+                </div>
+                <h2 class="completion-title">Tuyệt vời!</h2>
+                <p class="completion-text">Tài khoản của bạn đã được thiết lập thành công. Hãy bắt đầu quản lý tài chính ngay hôm nay.</p>
+                
+                <div class="setup-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon">💼</div>
+                        <div class="summary-label">Ví chính</div>
+                        <div class="summary-value" id="summaryWallet">--</div>
+                    </div>
+                    <div class="summary-card">
+                         <div class="summary-icon">📋</div>
+                        <div class="summary-label">Danh mục</div>
+                        <div class="summary-value" id="summaryCategories">--</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary btn-large" onclick="window.location.href='/Home'">
+                    Đến Bảng điều khiển
+                </button>
+            </div>
+        </div>
+        
+         <!-- Error Message Toast -->
+        <div id="toast" class="toast-message hidden"></div>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- We will implement logic in onboarding.js to handle this SPA -->
     <script src="~/js/onboarding.js"></script>
 </body>
 </html>

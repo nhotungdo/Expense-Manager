@@ -107,28 +107,30 @@ public class CreateGroupTransactionDto
     [Required(ErrorMessage = "Group ID is required")]
     public long GroupId { get; set; }
 
-    [Required(ErrorMessage = "Amount is required")]
-    [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
-    public decimal Amount { get; set; }
-
-    [Required(ErrorMessage = "Currency is required")]
-    [StringLength(3, MinimumLength = 3, ErrorMessage = "Currency code must be 3 characters")]
-    public string Currency { get; set; } = null!;
-
     [Required(ErrorMessage = "Description is required")]
     [StringLength(500, ErrorMessage = "Description must be less than 500 characters")]
     public string Description { get; set; } = null!;
 
+    [Required(ErrorMessage = "Amount is required")]
+    [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
+    public decimal Amount { get; set; }
+
+    [Required(ErrorMessage = "Payer is required")]
+    public long PaidByUserId { get; set; }
+
     public DateTime TransactionDate { get; set; }
 
-    [StringLength(100, ErrorMessage = "Category must be less than 100 characters")]
+    // Optional fields to maintain compatibility with DB
+    public string Currency { get; set; } = "VND";
     public string? Category { get; set; }
 
-    [Required(ErrorMessage = "Split method is required")]
-    [Range(1, 3, ErrorMessage = "Invalid split method (1=Equal, 2=ByAmount, 3=ByPercentage)")]
-    public int SplitMethod { get; set; }
+    public List<SplitDetailDto> Splits { get; set; } = new();
+}
 
-    public List<GroupTransactionSplitDto>? CustomSplits { get; set; }
+public class SplitDetailDto
+{
+    public long UserId { get; set; }
+    public decimal Amount { get; set; }
 }
 
 /// <summary>

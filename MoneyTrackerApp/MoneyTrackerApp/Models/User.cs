@@ -124,4 +124,12 @@ public partial class User
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
     public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
+
+    public virtual ICollection<Friendship> FriendshipRequesters { get; set; } = new List<Friendship>();
+
+    public virtual ICollection<Friendship> FriendshipReceivers { get; set; } = new List<Friendship>();
+
+    public virtual ICollection<Message> SentMessages { get; set; } = new List<Message>();
+
+    public virtual ICollection<Message> ReceivedMessages { get; set; } = new List<Message>();
 }

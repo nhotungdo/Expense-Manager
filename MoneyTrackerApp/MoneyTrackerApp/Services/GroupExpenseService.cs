@@ -274,21 +274,28 @@ public class GroupExpenseService : IGroupExpenseService
     }
 
     /// <summary>
-    /// Create a group transaction with automatic splitting
+    /// Create a group transaction with explicit splits
     /// </summary>
     public async Task<GroupTransactionResponseDto> CreateGroupTransactionAsync(long userId, CreateGroupTransactionDto dto)
     {
-        // Verify user is a member
+        // Verify creator is a member
         var isMember = await _context.GroupMembers
             .AnyAsync(gm => gm.GroupId == dto.GroupId && gm.UserId == userId);
 
         if (!isMember)
             throw new InvalidOperationException("You are not a member of this group");
 
+        // Verify payer is a member
+        var isPayerMember = await _context.GroupMembers
+            .AnyAsync(gm => gm.GroupId == dto.GroupId && gm.UserId == dto.PaidByUserId);
+
+        if (!isPayerMember)
+            throw new InvalidOperationException("Payer is not a member of this group");
+
         var transaction = new GroupTransaction
         {
             GroupId = dto.GroupId,
-            PaidByUserId = userId,
+            PaidByUserId = dto.PaidByUserId,
             Amount = dto.Amount,
             Currency = dto.Currency,
             Description = dto.Description,
@@ -301,39 +308,18 @@ public class GroupExpenseService : IGroupExpenseService
         _context.GroupTransactions.Add(transaction);
         await _context.SaveChangesAsync();
 
-        // Create splits based on method
-        var members = await _context.GroupMembers
-            .Where(gm => gm.GroupId == dto.GroupId)
-            .ToListAsync();
-
+        // Create splits
         var splits = new List<GroupTransactionSplit>();
-
-        if (dto.SplitMethod == 1) // Equal split
+        foreach (var item in dto.Splits)
         {
-            var splitAmount = dto.Amount / members.Count;
-            foreach (var member in members)
+            splits.Add(new GroupTransactionSplit
             {
-                splits.Add(new GroupTransactionSplit
-                {
-                    GroupTransactionId = transaction.Id,
-                    UserId = member.UserId,
-                    Amount = splitAmount,
-                    IsPaid = member.UserId == userId
-                });
-            }
-        }
-        else if (dto.SplitMethod == 2 && dto.CustomSplits != null) // Custom amounts
-        {
-            foreach (var customSplit in dto.CustomSplits)
-            {
-                splits.Add(new GroupTransactionSplit
-                {
-                    GroupTransactionId = transaction.Id,
-                    UserId = customSplit.UserId,
-                    Amount = customSplit.Amount,
-                    IsPaid = customSplit.UserId == userId
-                });
-            }
+                GroupTransactionId = transaction.Id,
+                UserId = item.UserId,
+                Amount = item.Amount,
+                // If the person who owes is also the one who paid, they have "paid" their share (it's their own expense)
+                IsPaid = (item.UserId == dto.PaidByUserId)
+            });
         }
 
         _context.GroupTransactionSplits.AddRange(splits);

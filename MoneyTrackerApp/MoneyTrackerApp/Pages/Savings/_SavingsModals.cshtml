@@ -1,0 +1,192 @@
+@model MoneyTrackerApp.Pages.Savings.IndexModel
+
+<!-- Create Goal Modal -->
+<div class="modal fade" id="createGoalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fas fa-bullseye me-2 text-primary"></i>Tạo mục tiêu tiết kiệm mới
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createGoalForm" method="post" asp-page-handler="Create">
+                    <!-- Name & Amount -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tên mục tiêu</label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0" 
+                               asp-for="NewGoal.Name" placeholder="Ví dụ: Mua xe máy, Du lịch..." required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mục tiêu (VND)</label>
+                            <input type="number" class="form-control bg-light border-0" 
+                                   asp-for="NewGoal.TargetAmount" placeholder="0" required min="0">
+                        </div>
+                         <div class="col-md-6">
+                            <label class="form-label fw-semibold">Đã có sẵn (VND)</label>
+                            <input type="number" class="form-control bg-light border-0" 
+                                   asp-for="NewGoal.InitialAmount" placeholder="0" min="0">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Ngày hoàn thành (Tuỳ chọn)</label>
+                        <input type="date" class="form-control bg-light border-0" asp-for="NewGoal.TargetDate">
+                    </div>
+
+                    <!-- Appearance -->
+                    <div class="row mb-4">
+                        <div class="col-12 mb-2">
+                             <label class="form-label fw-semibold">Biểu tượng</label>
+                             <input type="hidden" id="selectedIcon" asp-for="NewGoal.Icon">
+                             <div class="icon-selector custom-scrollbar">
+                                 @{
+                                     var icons = new[] { "fas fa-piggy-bank", "fas fa-car", "fas fa-home", "fas fa-plane", "fas fa-laptop", "fas fa-mobile-alt", "fas fa-graduation-cap", "fas fa-ring", "fas fa-baby", "fas fa-heart", "fas fa-star", "fas fa-gamepad", "fas fa-camera", "fas fa-bicycle", "fas fa-gift" };
+                                     foreach(var icon in icons)
+                                     {
+                                         <div class="icon-option @(Model.NewGoal.Icon == icon ? "selected" : "")" onclick="selectIcon('@icon', this)">
+                                             <i class="@icon"></i>
+                                         </div>
+                                     }
+                                 }
+                             </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <label class="form-label fw-semibold">Màu sắc</label>
+                            <input type="hidden" id="selectedColor" asp-for="NewGoal.Color">
+                            <div class="color-selector">
+                                @{
+                                    var colors = new[] { "#8b5cf6", "#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#ec4899", "#6366f1" };
+                                    foreach(var color in colors)
+                                    {
+                                         <div class="color-option @(Model.NewGoal.Color == color ? "selected" : "")" 
+                                              style="background-color: @color;" 
+                                              onclick="selectColor('@color', this)"></div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold shadow-sm">
+                            <i class="fas fa-plus me-2"></i> Tạo mục tiêu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Goal Modal -->
+<div class="modal fade" id="editGoalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fas fa-edit me-2 text-primary"></i>Chỉnh sửa mục tiêu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editGoalForm" method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="editGoalId" name="EditId" />
+                    
+                    <!-- Name & Amount -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tên mục tiêu</label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0" 
+                               id="editGoalName" name="NewGoal.Name" placeholder="Ví dụ: Mua xe máy, Du lịch..." required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mục tiêu (VND)</label>
+                            <input type="number" class="form-control bg-light border-0" 
+                                   id="editTargetAmount" name="NewGoal.TargetAmount" placeholder="0" required min="0">
+                        </div>
+                         <div class="col-md-6">
+                            <label class="form-label fw-semibold">Đã có sẵn (VND)</label>
+                            <input type="number" class="form-control bg-light border-0" 
+                                   id="editCurrentAmount" name="NewGoal.InitialAmount" placeholder="0" min="0">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Ngày hoàn thành</label>
+                        <input type="date" class="form-control bg-light border-0" id="editTargetDate" name="NewGoal.TargetDate">
+                    </div>
+
+                    <!-- Appearance -->
+                    <div class="row mb-4">
+                        <div class="col-12 mb-2">
+                             <label class="form-label fw-semibold">Biểu tượng</label>
+                             <input type="hidden" id="editSelectedIcon" name="NewGoal.Icon">
+                             <div class="icon-selector custom-scrollbar" id="editIconContainer">
+                                 <!-- JS will duplicate icons here or we render them again -->
+                                 @{
+                                     var icons = new[] { "fas fa-piggy-bank", "fas fa-car", "fas fa-home", "fas fa-plane", "fas fa-laptop", "fas fa-mobile-alt", "fas fa-graduation-cap", "fas fa-ring", "fas fa-baby", "fas fa-heart", "fas fa-star", "fas fa-gamepad", "fas fa-camera", "fas fa-bicycle", "fas fa-gift" };
+                                     foreach(var icon in icons)
+                                     {
+                                         <div class="icon-option" onclick="selectEditIcon('@icon', this)" data-icon="@icon">
+                                             <i class="@icon"></i>
+                                         </div>
+                                     }
+                                 }
+                             </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <label class="form-label fw-semibold">Màu sắc</label>
+                            <input type="hidden" id="editSelectedColor" name="NewGoal.Color">
+                            <div class="color-selector" id="editColorContainer">
+                                @{
+                                    var colors = new[] { "#8b5cf6", "#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#ec4899", "#6366f1" };
+                                    foreach(var color in colors)
+                                    {
+                                         <div class="color-option" 
+                                              style="background-color: @color;" 
+                                              onclick="selectEditColor('@color', this)" 
+                                              data-color="@color"></div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold shadow-sm">
+                            <i class="fas fa-save me-2"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteGoalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 text-red-500 text-2xl">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-2">Xóa mục tiêu này?</h4>
+                <p class="text-secondary mb-4">Hành động này không thể hoàn tác. Toàn bộ lịch sử tiết kiệm của mục tiêu này cũng sẽ bị xóa.</p>
+                
+                <form method="post" asp-page-handler="Delete">
+                    <input type="hidden" id="deleteGoalId" name="id" />
+                    <div class="d-flex gap-3 justify-content-center">
+                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Hủy bỏ</button>
+                        <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">Xóa vĩnh viễn</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

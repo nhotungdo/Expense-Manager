@@ -93,9 +93,14 @@ namespace MoneyTrackerApp.Controllers
                 
                 return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
             }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error creating transaction", details = ex.Message });
+                // In development/debugging, it's helpful to return the actual error
+                return StatusCode(500, new { message = $"Error creating transaction: {ex.Message}", details = ex.ToString() });
             }
         }
 

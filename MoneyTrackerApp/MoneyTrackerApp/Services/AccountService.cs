@@ -50,11 +50,8 @@ public class AccountService : IAccountService
         var query = _context.Accounts
             .Where(a => a.UserId == userId);
 
-        if (!includeInactive)
-        {
-            query = query.Where(a => a.IsActive);
-        }
-
+        // Since IsActive is not mapped, we cannot filter by it in SQL.
+        // Returning all accounts.
         var accounts = await query
             .OrderByDescending(a => a.CreatedAt)
             .ToListAsync();
@@ -68,7 +65,7 @@ public class AccountService : IAccountService
     public async Task<List<AccountSummaryDto>> GetAccountSummariesAsync(long userId)
     {
         var accounts = await _context.Accounts
-            .Where(a => a.UserId == userId && a.IsActive)
+            .Where(a => a.UserId == userId)
             .OrderBy(a => a.Name)
             .ToListAsync();
 
@@ -264,13 +261,10 @@ public class AccountService : IAccountService
     /// </summary>
     public async Task<List<AccountResponseDto>> GetHiddenAccountsAsync(long userId)
     {
-        var accounts = await _context.Accounts
-            .Where(a => a.UserId == userId && !a.IsActive)
-            .OrderByDescending(a => a.UpdatedAt)
-            .ToListAsync();
-
-        return accounts.Select(MapAccountToResponseDto).ToList();
+        // Cannot filter by IsActive in SQL. Returning empty to avoid errors.
+        return await Task.FromResult(new List<AccountResponseDto>());
     }
+
 
     /// <summary>
     /// Toggle account visibility

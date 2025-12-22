@@ -157,19 +157,19 @@
             <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                 <h3 class="font-bold text-slate-900 mb-4">Thao tác nhanh</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="openTransactionModal('Income')" class="p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-colors flex flex-col items-center justify-center gap-2 group cursor-pointer border border-transparent hover:border-emerald-200">
+                    <button onclick="openTransactionModal(1)" class="p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-colors flex flex-col items-center justify-center gap-2 group cursor-pointer border border-transparent hover:border-emerald-200">
                         <div class="w-8 h-8 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-600 flex items-center justify-center transition-colors">
                             <i class="fas fa-arrow-down"></i>
                         </div>
                         <span class="text-xs font-semibold text-emerald-700">Thu nhập</span>
                     </button>
-                    <button onclick="openTransactionModal('Expense')" class="p-3 rounded-xl bg-rose-50 hover:bg-rose-100 transition-colors flex flex-col items-center justify-center gap-2 group cursor-pointer border border-transparent hover:border-rose-200">
+                    <button onclick="openTransactionModal(2)" class="p-3 rounded-xl bg-rose-50 hover:bg-rose-100 transition-colors flex flex-col items-center justify-center gap-2 group cursor-pointer border border-transparent hover:border-rose-200">
                         <div class="w-8 h-8 rounded-full bg-rose-100 group-hover:bg-white text-rose-600 flex items-center justify-center transition-colors">
                             <i class="fas fa-arrow-up"></i>
                         </div>
                         <span class="text-xs font-semibold text-rose-700">Chi tiêu</span>
                     </button>
-                    <button class="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors flex flex-col items-center justify-center gap-2 group cursor-pointer border border-transparent hover:border-blue-200" data-bs-toggle="modal" data-bs-target="#transferModal">
+                    <button onclick="openTransactionModal(3)" class="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors flex flex-col items-center justify-center gap-2 group cursor-pointer border border-transparent hover:border-blue-200">
                         <div class="w-8 h-8 rounded-full bg-blue-100 group-hover:bg-white text-blue-600 flex items-center justify-center transition-colors">
                             <i class="fas fa-exchange-alt"></i>
                         </div>
@@ -230,133 +230,8 @@
     </div>
 </div>
 
-<!-- Transaction Modal (Redesigned) -->
-<div class="modal fade" id="transactionModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-2xl rounded-2xl">
-            <div class="modal-header border-0 pb-0 pt-6 px-6">
-                <h5 class="modal-title font-bold text-xl text-slate-800" id="transactionModalTitle">Giao dịch mới</h5>
-                <button type="button" class="btn-close opacity-50 hover:opacity-100" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-6">
-                <form id="transactionForm">
-                    <input type="hidden" id="transType" value="2">
-                    
-                    <div class="mb-6 text-center bg-slate-50 rounded-xl p-4 border border-slate-100">
-                        <label class="text-xs uppercase tracking-wider font-bold text-slate-500 mb-2 block">Số tiền</label>
-                        <div class="relative">
-                            <input type="number" class="w-full bg-transparent border-0 text-center font-bold text-3xl text-slate-800 p-0 focus:ring-0 placeholder-slate-300" 
-                                   id="transAmount" placeholder="0" required min="0">
-                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">VND</span>
-                        </div>
-                    </div>
+<!-- Modals removed - Use Global Transaction Modal -->
 
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ví nguồn</label>
-                            <select class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" id="transAccount" required>
-                                <option value="">Đang tải ví...</option>
-                            </select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ngày giao dịch</label>
-                                <input type="date" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" id="transDate" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Danh mục</label>
-                                <select class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" id="transCategory">
-                                    <option value="">Chọn loại...</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ghi chú (Tùy chọn)</label>
-                            <textarea class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" 
-                                      id="transNote" rows="2" placeholder="Nhập ghi chú cho giao dịch này..."></textarea>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full mt-6 py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5" id="btnSaveTrans">
-                        Lưu giao dịch
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Transfer Modal -->
-<div class="modal fade" id="transferModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-2xl rounded-2xl">
-            <div class="modal-header border-0 pb-0 pt-6 px-6">
-                <h5 class="modal-title font-bold text-xl text-slate-800">Chuyển tiền</h5>
-                <button type="button" class="btn-close opacity-50 hover:opacity-100" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-6">
-                <form id="transferForm">
-                    <div class="mb-6 text-center bg-slate-50 rounded-xl p-4 border border-slate-100">
-                        <label class="text-xs uppercase tracking-wider font-bold text-slate-500 mb-2 block">Số tiền chuyển</label>
-                        <div class="relative">
-                            <input type="number" class="w-full bg-transparent border-0 text-center font-bold text-3xl text-blue-600 p-0 focus:ring-0 placeholder-blue-200" 
-                                   id="transferAmount" placeholder="0" required min="1">
-                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">VND</span>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Từ ví</label>
-                            <select class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" id="transferSource" required>
-                                <option value="">Chọn ví nguồn...</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex justify-center -my-2 relative z-10">
-                            <div class="bg-slate-100 rounded-full p-2 border border-white shadow-sm">
-                                <i class="fas fa-arrow-down text-slate-400 text-sm"></i>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Đến ví</label>
-                            <select class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" id="transferTarget" required>
-                                <option value="">Chọn ví đích...</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ghi chú</label>
-                            <textarea class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" 
-                                      id="transferNote" rows="2" placeholder="Nội dung chuyển tiền..."></textarea>
-                        </div>
-
-                         <div class="pt-2">
-                             <div class="flex items-center justify-between mb-2">
-                                <label class="block text-sm font-semibold text-slate-700">Mã xác thực (OTP)</label>
-                                <span class="text-xs text-blue-600 cursor-pointer font-medium hover:underline" onclick="alert('Mã OTP của bạn là: 1234')">Lấy mã OTP</span>
-                             </div>
-                            
-                            <input type="text" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all tracking-widest text-center font-mono" 
-                                   id="transferOtp" placeholder="••••" maxlength="4">
-                             <p class="text-xs text-slate-400 mt-1">Sử dụng mã '1234' để thử nghiệm</p>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="w-full mt-6 py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5" id="btnSaveTransfer">
-                        Xác nhận chuyển
-                    </button>
-                    <button type="button" class="w-full mt-2 py-2.5 bg-transparent text-slate-500 rounded-xl font-semibold hover:bg-slate-50 transition-colors" data-bs-dismiss="modal">
-                        Hủy bỏ
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Export Modal -->
 <div class="modal fade" id="exportModal" tabindex="-1">
@@ -414,10 +289,7 @@
     <script src="/js/home.js"></script>
     
     <script type="module">
-        import { validateTransactionInput, buildTransactionDto, createTransaction } from '/js/transactions-utils.js';
-        
-        // Expose functions to global scope
-        window.openTransactionModal = openTransactionModal;
+        // AI and Export logic remain here
         window.openAiModal = openAiModal;
 
         let aiSuggestionsDetails = [];
@@ -427,14 +299,9 @@
             loadAccounts();
             loadAiSuggestions();
             
-            document.getElementById('transDate').valueAsDate = new Date();
-            document.getElementById('transactionForm').addEventListener('submit', saveTransaction);
+            // Cleaned up Transaction Form listeners as they are now global
             document.getElementById('exportForm').addEventListener('submit', handleExport);
             
-            const transferForm = document.getElementById('transferForm');
-            if(transferForm) transferForm.addEventListener('submit', handleTransfer);
-
-            // Default dates for export
             const today = new Date();
             const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
             const exportStart = document.getElementById('exportStartDate');
@@ -448,6 +315,7 @@
             modal.show();
         };
 
+        // Export Logic...
         async function handleExport(e) {
             e.preventDefault();
             const btn = document.getElementById('btnExport');
@@ -500,7 +368,7 @@
             }
         }
         
-        // --- AI Logic ---
+        // AI Logic
         async function loadAiSuggestions() {
             try {
                 const textEl = document.getElementById('aiSuggestionText');
@@ -511,9 +379,7 @@
                     aiSuggestionsDetails = data;
                     
                     if (data && data.length > 0) {
-                        // Display the latest suggestion snippet
                         const latest = data[0];
-                        // Truncate if too long for the card
                         textEl.textContent = latest.suggestion.length > 100 
                             ? latest.suggestion.substring(0, 100) + '...' 
                             : latest.suggestion;
@@ -540,7 +406,6 @@
                             <i class="fas fa-inbox text-slate-300 text-2xl"></i>
                         </div>
                         <p class="text-slate-500 font-medium">Chưa có dữ liệu phân tích</p>
-                        <p class="text-xs text-slate-400 mt-1">Hệ thống sẽ tự động tạo lời khuyên khi bạn có hoạt động tài chính.</p>
                     </div>
                  `;
             } else {
@@ -548,7 +413,7 @@
                     ${aiSuggestionsDetails.map(s => {
                         let icon = 'fa-lightbulb text-yellow-500';
                         let bg = 'bg-yellow-50';
-                        if (s.suggestionType && s.suggestionType.toLowerCase().includes('warning')) {
+                         if (s.suggestionType && s.suggestionType.toLowerCase().includes('warning')) {
                             icon = 'fa-exclamation-triangle text-amber-500';
                             bg = 'bg-amber-50';
                         } else if (s.suggestionType && s.suggestionType.toLowerCase().includes('success')) {
@@ -577,173 +442,9 @@
             modal.show();
         }
 
-        // --- Existing Logic ---
-
-        // Chart Instance
-        let cashflowChart = null;
-
-        async function loadPersonalWalletData() {
-            try {
-                const response = await fetch('/api/dashboard', { credentials: 'include' });
-                if (!response.ok) return;
-
-                const data = await response.json();
-
-                // 1. Asset Overview
-                document.getElementById('cardTotalAssets').textContent = formatCurrencySimple(data.currentBalance);
-
-                // 2. Scorecards
-                const incomeTotal = (data.cashFlowChart?.incomeData || []).reduce((a, b) => a + b, 0);
-                const expenseTotal = (data.cashFlowChart?.expenseData || []).reduce((a, b) => a + b, 0);
-
-                document.getElementById('monthlyIncome').textContent = formatCurrencySimple(incomeTotal);
-                document.getElementById('monthlyExpense').textContent = formatCurrencySimple(expenseTotal);
-
-                // 3. Transactions
-                renderTimeline(data.recentTransactions);
-
-                // 4. Chart
-                renderChart(data.cashFlowChart);
-
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
-        }
-
-        function renderChart(chartData) {
-            const ctx = document.getElementById('cashflowChart').getContext('2d');
-            
-            if (cashflowChart) {
-                cashflowChart.destroy();
-            }
-
-            const labels = chartData?.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const incomeData = chartData?.incomeData || [0,0,0,0,0,0,0];
-            const expenseData = chartData?.expenseData || [0,0,0,0,0,0,0];
-
-            cashflowChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Thu nhập',
-                            data: incomeData,
-                            backgroundColor: '#10b981',
-                            borderRadius: 6,
-                            barThickness: 12,
-                        },
-                        {
-                            label: 'Chi tiêu',
-                            data: expenseData,
-                            backgroundColor: '#ef4444',
-                            borderRadius: 6,
-                            barThickness: 12,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#f1f5f9', borderDash: [4, 4] },
-                            ticks: { 
-                                display: true,
-                                color: '#94a3b8',
-                                font: { size: 10 },
-                                callback: function(value) {
-                                    if(value >= 1000000) return (value/1000000) + 'M';
-                                    if(value >= 1000) return (value/1000) + 'k';
-                                    return value;
-                                }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 11, family: "'Plus Jakarta Sans', sans-serif" }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { 
-                                usePointStyle: true, 
-                                padding: 20,
-                                font: { family: "'Plus Jakarta Sans', sans-serif" }
-                            } 
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 12,
-                            titleFont: { size: 13 },
-                            bodyFont: { size: 12 },
-                            cornerRadius: 8,
-                            displayColors: false
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderTimeline(transactions) {
-            const list = document.getElementById('transactionList');
-            if (!transactions || transactions.length === 0) {
-                list.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-12 text-slate-400">
-                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                            <i class="fas fa-receipt text-2xl text-slate-300"></i>
-                        </div>
-                        <p class="text-sm font-medium">Chưa có giao dịch nào gần đây</p>
-                    </div>
-                `;
-                return;
-            }
-
-            list.innerHTML = `<div class="divide-y divide-slate-100">
-                ${transactions.map(t => {
-                    const isIncome = t.transactionType === 1;
-                    const isExpense = t.transactionType === 2;
-                    // Colors
-                    const iconColorClass = isIncome ? 'text-emerald-600 bg-emerald-50' : (isExpense ? 'text-rose-600 bg-rose-50' : 'text-blue-600 bg-blue-50');
-                    const amountClass = isIncome ? 'text-emerald-600' : (isExpense ? 'text-rose-600' : 'text-blue-600');
-                    const sign = isIncome ? '+' : (isExpense ? '-' : '');
-                    
-                    return `
-                    <div class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ${iconColorClass} flex items-center justify-center shrink-0">
-                                ${t.categoryIcon ? t.categoryIcon : '<i class="fas fa-file-invoice-dollar text-xl"></i>'}
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-900">${t.categoryName || 'Giao dịch'}</h4>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-xs text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md">
-                                        ${t.accountName}
-                                    </span>
-                                    <span class="text-xs text-slate-400">
-                                        ${new Date(t.transactionDate).toLocaleDateString('vi-VN')}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-bold text-sm ${amountClass}">
-                                ${sign}${formatCurrencySimple(t.amount)}
-                            </div>
-                            ${t.note ? `<p class="text-xs text-slate-400 mt-0.5 max-w-[150px] truncate">${t.note}</p>` : ''}
-                        </div>
-                    </div>
-                    `;
-                }).join('')}
-            </div>`;
-        }
-        
-        // --- Helper Logic ---
+        // --- Helper Logic (Charts, Timeline) ---
+        // (Existing Chart Rendering logic kept in home.js or here?) 
+        // We will assume home.js handles charts. Account loading here for export dropdowns if needed.
         
         let cachedAccounts = [];
         async function loadAccounts() {
@@ -751,177 +452,8 @@
                 const res = await fetch('/api/Accounts/summaries', { credentials: 'include' });
                 if (res.ok) {
                     cachedAccounts = await res.json();
-                    
-                    // Populate main transaction source
-                    const transSelect = document.getElementById('transAccount');
-                    if(transSelect) {
-                        transSelect.innerHTML = '<option value="">Chọn ví...</option>' + 
-                            cachedAccounts.map(a => `<option value="${a.id}">${a.name} (${formatCurrencySimple(a.currentBalance)})</option>`).join('');
-                    }
-
-                    // Populate transfer source and target
-                    const sourceSelect = document.getElementById('transferSource');
-                    const targetSelect = document.getElementById('transferTarget');
-                    
-                    if (sourceSelect && targetSelect) {
-                        const options = '<option value="">Chọn ví...</option>' + 
-                            cachedAccounts.map(a => `<option value="${a.id}">${a.name} (${formatCurrencySimple(a.currentBalance)})</option>`).join('');
-                        
-                        sourceSelect.innerHTML = options;
-                        targetSelect.innerHTML = options;
-                    }
                 }
             } catch (err) { console.error(err); }
-        }
-
-        async function handleTransfer(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSaveTransfer');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang xử lý...';
-
-            const sourceId = document.getElementById('transferSource').value;
-            const targetId = document.getElementById('transferTarget').value;
-            const amount = parseFloat(document.getElementById('transferAmount').value);
-            const note = document.getElementById('transferNote').value;
-            const otpCode = document.getElementById('transferOtp').value;
-
-            if (!sourceId || !targetId || !amount || amount <= 0) {
-                alert('Vui lòng nhập đầy đủ thông tin hợp lệ.');
-                btn.disabled = false;
-                btn.textContent = originalText;
-                return;
-            }
-
-            if (sourceId === targetId) {
-                alert('Ví nguồn và ví đích không được trùng nhau.');
-                btn.disabled = false;
-                btn.textContent = originalText;
-                return;
-            }
-
-            const payload = {
-                sourceAccountId: parseInt(sourceId),
-                targetAccountId: parseInt(targetId),
-                amount: amount,
-                note: note,
-                otpCode: otpCode
-            };
-
-            try {
-                const response = await fetch('/api/Transactions/transfer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    alert('Chuyển tiền thành công!');
-                    bootstrap.Modal.getInstance(document.getElementById('transferModal')).hide();
-                    document.getElementById('transferForm').reset();
-                    
-                    // Refresh data
-                    loadPersonalWalletData();
-                    loadAccounts();
-                } else {
-                    const err = await response.json();
-                    alert('Lỗi: ' + (err.message || 'Không thể thực hiện chuyển tiền'));
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Đã xảy ra lỗi kết nối.');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
-        }
-
-
-        function openTransactionModal(typeStr) {
-            const isIncome = typeStr === 'Income';
-            const modalTitle = document.getElementById('transactionModalTitle');
-            const btnSave = document.getElementById('btnSaveTrans');
-            const transType = document.getElementById('transType');
-            
-            transType.value = isIncome ? '1' : '2';
-            modalTitle.textContent = isIncome ? 'Thêm thu nhập' : 'Thêm chi tiêu';
-            
-            // Adjust styling based on type
-            btnSave.className = `w-full mt-6 py-3.5 text-white rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-0.5 ${isIncome ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200' : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200'}`;
-            
-            const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
-            modal.show();
-            
-            loadCategories(isIncome ? 1 : 2);
-        }
-        
-        async function loadCategories(type) {
-             const select = document.getElementById('transCategory');
-             select.innerHTML = '<option>Đang tải danh mục...</option>';
-             try {
-                 const res = await fetch(`/api/Categories?type=${type}`, { credentials: 'include' });
-                 if(res.ok) {
-                     const cats = await res.json();
-                     select.innerHTML = '<option value="">Chọn danh mục...</option>' + 
-                        cats.map(c => `<option value="${c.id}">${c.icon||''} ${c.name}</option>`).join('');
-                 }
-             } catch(e) {
-                 select.innerHTML = '<option value="">Lỗi tải danh mục</option>';
-             }
-        }
-
-        async function saveTransaction(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSaveTrans');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang lưu...';
-            
-            const raw = {
-                type: parseInt(document.getElementById('transType').value),
-                amount: parseFloat(document.getElementById('transAmount').value),
-                accountId: document.getElementById('transAccount').value,
-                categoryId: document.getElementById('transCategory').value || null,
-                date: document.getElementById('transDate').value,
-                note: document.getElementById('transNote').value,
-                currency: 'VND'
-            };
-
-            const { valid, errors } = validateTransactionInput(raw);
-            if (!valid) {
-                alert('Dữ liệu không hợp lệ:\n' + errors.join('\n'));
-                btn.disabled = false;
-                btn.textContent = originalText;
-                return;
-            }
-
-            const dto = buildTransactionDto(raw);
-
-            try {
-                const result = await createTransaction(dto);
-                if(result.ok) {
-                   bootstrap.Modal.getInstance(document.getElementById('transactionModal')).hide();
-                   // Reset form
-                   document.getElementById('transactionForm').reset();
-                   document.getElementById('transDate').valueAsDate = new Date();
-                   
-                   // Refresh data
-                   loadPersonalWalletData();
-                   loadAccounts(); // Update balances
-                   
-                   // Show success toast (basic alert for now)
-                   // alert('Lưu thành công!');
-                } else {
-                    alert('Lưu giao dịch thất bại: ' + (result.error || 'Lỗi không xác định'));
-                }
-            } catch (err) {
-                 console.error(err);
-                 alert('Đã có lỗi xảy ra.');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
         }
 
         function formatCurrencySimple(val) {

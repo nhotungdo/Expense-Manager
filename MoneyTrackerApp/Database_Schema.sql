@@ -811,6 +811,29 @@ CREATE NONCLUSTERED INDEX [IX_PaymentTransactions_RequestTimestamp] ON [PaymentT
 GO
 
 -- =============================================
+-- 30. FRIENDSHIPS TABLE
+-- =============================================
+CREATE TABLE [Friendships] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [RequesterId] bigint NOT NULL, -- Người gửi lời mời
+    [ReceiverId] bigint NOT NULL,  -- Người nhận lời mời
+    [Status] int NOT NULL DEFAULT 0, -- 0: Pending (Chờ), 1: Accepted (Bạn bè), 2: Blocked (Chặn)
+    [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
+    [UpdatedAt] datetime2 NULL,
+    CONSTRAINT [PK_Friendships] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Friendships_Users_Requester] FOREIGN KEY ([RequesterId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
+    CONSTRAINT [FK_Friendships_Users_Receiver] FOREIGN KEY ([ReceiverId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
+    -- Đảm bảo không có record trùng lặp giữa 2 người
+    CONSTRAINT [UK_Friendships_Pair] UNIQUE ([RequesterId], [ReceiverId])
+);
+GO
+
+-- Index để query nhanh danh sách bạn bè
+CREATE INDEX [IX_Friendships_RequesterId_Status] ON [Friendships] ([RequesterId], [Status]);
+CREATE INDEX [IX_Friendships_ReceiverId_Status] ON [Friendships] ([ReceiverId], [Status]);
+GO
+
+-- =============================================
 -- VIEWS
 -- =============================================
 CREATE VIEW [vw_UserTransactionSummary] AS
@@ -998,6 +1021,7 @@ IF OBJECT_ID('tr_ServicePackages_UpdatedAt', 'TR') IS NOT NULL DROP TRIGGER [tr_
 IF OBJECT_ID('tr_Subscriptions_UpdatedAt', 'TR') IS NOT NULL DROP TRIGGER [tr_Subscriptions_UpdatedAt];
 IF OBJECT_ID('tr_Payments_UpdatedAt', 'TR') IS NOT NULL DROP TRIGGER [tr_Payments_UpdatedAt];
 IF OBJECT_ID('tr_PaymentTransactions_UpdatedAt', 'TR') IS NOT NULL DROP TRIGGER [tr_PaymentTransactions_UpdatedAt];
+IF OBJECT_ID('tr_Friendships_UpdatedAt', 'TR') IS NOT NULL DROP TRIGGER [tr_Friendships_UpdatedAt];
 GO
 
 -- Create UpdatedAt Triggers
@@ -1015,6 +1039,7 @@ CREATE TRIGGER [tr_ServicePackages_UpdatedAt] ON [ServicePackages] AFTER UPDATE 
 CREATE TRIGGER [tr_Subscriptions_UpdatedAt] ON [Subscriptions] AFTER UPDATE AS BEGIN SET NOCOUNT ON; UPDATE [Subscriptions] SET [UpdatedAt] = GETUTCDATE() FROM [Subscriptions] s INNER JOIN inserted i ON s.[Id] = i.[Id]; END; GO
 CREATE TRIGGER [tr_Payments_UpdatedAt] ON [Payments] AFTER UPDATE AS BEGIN SET NOCOUNT ON; UPDATE [Payments] SET [UpdatedAt] = GETUTCDATE() FROM [Payments] p INNER JOIN inserted i ON p.[Id] = i.[Id]; END; GO
 CREATE TRIGGER [tr_PaymentTransactions_UpdatedAt] ON [PaymentTransactions] AFTER UPDATE AS BEGIN SET NOCOUNT ON; UPDATE [PaymentTransactions] SET [UpdatedAt] = GETUTCDATE() FROM [PaymentTransactions] pt INNER JOIN inserted i ON pt.[Id] = i.[Id]; END; GO
+CREATE TRIGGER [tr_Friendships_UpdatedAt] ON [Friendships] AFTER UPDATE AS BEGIN SET NOCOUNT ON; UPDATE [Friendships] SET [UpdatedAt] = GETUTCDATE() FROM [Friendships] f INNER JOIN inserted i ON f.[Id] = i.[Id]; END; GO
 
 -- Logic Triggers
 CREATE TRIGGER [tr_Transactions_UpdateAccountBalance] ON [Transactions]
@@ -1081,3 +1106,174 @@ BEGIN
     SET IDENTITY_INSERT ServicePackages OFF;
 END
 GO
+
+
+-- =============================================
+-- MERGED FROM: AddMessagesTable.sql
+-- =============================================
+
+-- =============================================
+-- MESSAGES TABLE FOR CHAT FEATURE
+-- =============================================
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [Messages] (
+        [Id] bigint IDENTITY(1,1) NOT NULL,
+        [SenderId] bigint NOT NULL,
+        [ReceiverId] bigint NOT NULL,
+        [Content] nvarchar(max) NOT NULL,
+        [Timestamp] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+        [IsRead] bit NOT NULL DEFAULT 0,
+        CONSTRAINT [PK_Messages] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Messages_Users_Sender] FOREIGN KEY ([SenderId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_Messages_Users_Receiver] FOREIGN KEY ([ReceiverId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION
+    );
+
+    CREATE INDEX [IX_Messages_SenderId] ON [Messages] ([SenderId]);
+    CREATE INDEX [IX_Messages_ReceiverId] ON [Messages] ([ReceiverId]);
+    CREATE INDEX [IX_Messages_Timestamp] ON [Messages] ([Timestamp]);
+    CREATE INDEX [IX_Messages_IsRead] ON [Messages] ([IsRead]);
+    CREATE INDEX [IX_Messages_Conversation] ON [Messages] ([SenderId], [ReceiverId], [Timestamp]);
+
+    PRINT 'Messages table created successfully';
+END
+ELSE
+BEGIN
+    PRINT 'Messages table already exists';
+END
+GO
+
+
+-- =============================================
+-- MERGED FROM: AddMessageAttachments.sql
+-- =============================================
+
+-- =============================================
+-- MESSAGE ATTACHMENTS FOR RICH MEDIA SUPPORT
+-- =============================================
+
+-- Add attachment columns to Messages table
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND name = 'AttachmentUrl')
+BEGIN
+    ALTER TABLE [Messages]
+    ADD [AttachmentUrl] nvarchar(512) NULL,
+        [AttachmentType] nvarchar(50) NULL,
+        [AttachmentName] nvarchar(256) NULL,
+        [AttachmentSize] bigint NULL,
+        [ThumbnailUrl] nvarchar(512) NULL;
+
+    PRINT 'Attachment columns added to Messages table';
+END
+ELSE
+BEGIN
+    PRINT 'Attachment columns already exist';
+END
+GO
+
+-- Create index for attachment queries
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Messages_AttachmentType' AND object_id = OBJECT_ID('Messages'))
+BEGIN
+    CREATE INDEX [IX_Messages_AttachmentType] ON [Messages] ([AttachmentType]);
+    PRINT 'Index IX_Messages_AttachmentType created';
+END
+GO
+
+-- Create MessageAttachments table for multiple attachments per message
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[MessageAttachments]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [MessageAttachments] (
+        [Id] bigint IDENTITY(1,1) NOT NULL,
+        [MessageId] bigint NOT NULL,
+        [AttachmentUrl] nvarchar(512) NOT NULL,
+        [AttachmentType] nvarchar(50) NOT NULL, -- 'image', 'file', 'video', 'audio'
+        [FileName] nvarchar(256) NOT NULL,
+        [FileSize] bigint NOT NULL,
+        [MimeType] nvarchar(100) NULL,
+        [ThumbnailUrl] nvarchar(512) NULL,
+        [UploadedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+        CONSTRAINT [PK_MessageAttachments] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_MessageAttachments_Messages] FOREIGN KEY ([MessageId]) REFERENCES [Messages] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_MessageAttachments_MessageId] ON [MessageAttachments] ([MessageId]);
+    CREATE INDEX [IX_MessageAttachments_AttachmentType] ON [MessageAttachments] ([AttachmentType]);
+
+    PRINT 'MessageAttachments table created successfully';
+END
+ELSE
+BEGIN
+    PRINT 'MessageAttachments table already exists';
+END
+GO
+
+
+-- =============================================
+-- MERGED FROM: AddMessageAttachments_Simple.sql
+-- =============================================
+
+-- =============================================
+-- MESSAGE ATTACHMENTS - SIMPLE VERSION
+-- Add attachment columns to Messages table
+-- =============================================
+
+-- Check if columns exist and add them if they don't
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND name = 'AttachmentUrl')
+BEGIN
+    ALTER TABLE [Messages]
+    ADD [AttachmentUrl] nvarchar(512) NULL;
+    PRINT 'AttachmentUrl column added';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND name = 'AttachmentType')
+BEGIN
+    ALTER TABLE [Messages]
+    ADD [AttachmentType] nvarchar(50) NULL;
+    PRINT 'AttachmentType column added';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND name = 'AttachmentName')
+BEGIN
+    ALTER TABLE [Messages]
+    ADD [AttachmentName] nvarchar(256) NULL;
+    PRINT 'AttachmentName column added';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND name = 'AttachmentSize')
+BEGIN
+    ALTER TABLE [Messages]
+    ADD [AttachmentSize] bigint NULL;
+    PRINT 'AttachmentSize column added';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND name = 'ThumbnailUrl')
+BEGIN
+    ALTER TABLE [Messages]
+    ADD [ThumbnailUrl] nvarchar(512) NULL;
+    PRINT 'ThumbnailUrl column added';
+END
+
+PRINT 'Message attachments migration completed successfully';
+GO
+
+-- =============================================
+-- 30. FRIENDSHIPS TABLE (MỚI)
+-- =============================================
+CREATE TABLE [Friendships] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [RequesterId] bigint NOT NULL, -- Người gửi lời mời
+    [ReceiverId] bigint NOT NULL,  -- Người nhận lời mời
+    [Status] int NOT NULL DEFAULT 0, -- 0: Pending (Chờ), 1: Accepted (Bạn bè), 2: Blocked (Chặn)
+    [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
+    [UpdatedAt] datetime2 NULL,
+    CONSTRAINT [PK_Friendships] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Friendships_Users_Requester] FOREIGN KEY ([RequesterId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
+    CONSTRAINT [FK_Friendships_Users_Receiver] FOREIGN KEY ([ReceiverId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
+    -- Đảm bảo không có record trùng lặp giữa 2 người
+    CONSTRAINT [UK_Friendships_Pair] UNIQUE ([RequesterId], [ReceiverId])
+);
+GO
+
+-- Index để query nhanh danh sách bạn bè
+CREATE INDEX [IX_Friendships_RequesterId_Status] ON [Friendships] ([RequesterId], [Status]);
+CREATE INDEX [IX_Friendships_ReceiverId_Status] ON [Friendships] ([ReceiverId], [Status]);
+

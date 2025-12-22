@@ -32,7 +32,7 @@ public class NetWorthService : INetWorthService
     public async Task<NetWorthDto> CalculateNetWorthAsync(long userId, bool includeHidden = false)
     {
         var query = _context.Accounts
-            .Where(a => a.UserId == userId && a.IncludeInTotal);
+            .Where(a => a.UserId == userId);
 
         if (!includeHidden)
         {
@@ -86,7 +86,7 @@ public class NetWorthService : INetWorthService
     {
         var totalAssets = await _context.Accounts
             .Where(a => a.UserId == userId
-                && a.IncludeInTotal
+
                 && a.IsActive
                 && a.CurrentBalance >= 0)
             .SumAsync(a => a.CurrentBalance);
@@ -101,7 +101,7 @@ public class NetWorthService : INetWorthService
     {
         var accounts = await _context.Accounts
             .Where(a => a.UserId == userId
-                && a.IncludeInTotal
+
                 && a.IsActive
                 && a.CurrentBalance < 0)
             .ToListAsync();
@@ -116,7 +116,7 @@ public class NetWorthService : INetWorthService
     {
         var accounts = await _context.Accounts
             .Where(a => a.UserId == userId
-                && a.IncludeInTotal
+
                 && a.IsActive)
             .ToListAsync();
 
@@ -132,7 +132,7 @@ public class NetWorthService : INetWorthService
     {
         var accounts = await _context.Accounts
             .Where(a => a.UserId == userId
-                && a.IncludeInTotal
+
                 && a.IsActive)
             .ToListAsync();
 

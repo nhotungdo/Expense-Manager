@@ -54,7 +54,7 @@ public class CategoryService : ICategoryService
     {
         var query = _context.Categories
             .Include(c => c.ParentCategory)
-            .Where(c => (c.UserId == userId || c.IsDefault) && c.IsActive);
+            .Where(c => (c.UserId == userId || c.IsDefault));
 
         if (type.HasValue)
             query = query.Where(c => c.Type == type.Value);
@@ -80,7 +80,7 @@ public class CategoryService : ICategoryService
         var query = _context.Categories
             .Include(c => c.ParentCategory)
             .Include(c => c.InverseParentCategory)
-            .Where(c => (c.UserId == userId || c.IsDefault) && c.IsActive);
+            .Where(c => (c.UserId == userId || c.IsDefault));
 
         if (type.HasValue)
             query = query.Where(c => c.Type == type.Value);
@@ -107,7 +107,7 @@ public class CategoryService : ICategoryService
     public async Task<List<CategorySummaryDto>> GetCategorySummariesAsync(long userId, int? type = null)
     {
         var query = _context.Categories
-            .Where(c => (c.UserId == userId || c.IsDefault) && c.IsActive);
+            .Where(c => (c.UserId == userId || c.IsDefault));
 
         if (type.HasValue)
             query = query.Where(c => c.Type == type.Value);
@@ -243,59 +243,56 @@ public class CategoryService : ICategoryService
     /// </summary>
     public async Task<bool> DeactivateCategoryAsync(long categoryId, long userId)
     {
-        var category = await _context.Categories
-            .Where(c => c.Id == categoryId && c.UserId == userId)
-            .FirstOrDefaultAsync();
-
-        if (category == null)
-            return false;
-
-        if (category.IsDefault)
-            throw new InvalidOperationException("Cannot deactivate default categories");
-
-        category.IsActive = false;
-        category.UpdatedAt = DateTime.UtcNow;
-
-        _context.Categories.Update(category);
-        await _context.SaveChangesAsync();
-
-        return true;
+         // IsActive not supported in DB
+         return await Task.FromResult(false);
     }
 
     /// <summary>
     /// Initialize default categories for a new user
     /// </summary>
+    /// <summary>
+    /// Initialize default categories for a new user
+    /// </summary>
     public async Task InitializeDefaultCategoriesAsync(long userId)
     {
-        // Check if user already has categories
-        var hasCategories = await _context.Categories
-            .AnyAsync(c => c.UserId == userId);
+        // Check for existing categories by type
+        var hasIncome = await _context.Categories.AnyAsync(c => c.UserId == userId && c.Type == 1);
+        var hasExpense = await _context.Categories.AnyAsync(c => c.UserId == userId && c.Type == 2);
 
-        if (hasCategories)
-            return;
+        var categoriesToAdd = new List<Category>();
 
-        var defaultCategories = new List<Category>
+        if (!hasIncome)
         {
-            // Income Categories
-            new Category { Name = "Lương", Type = 1, Icon = "💰", Color = "#4CAF50", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Bán thời gian", Type = 1, Icon = "💼", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Đầu tư", Type = 1, Icon = "📈", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Quà tặng", Type = 1, Icon = "🎁", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Thu nhập khác", Type = 1, Icon = "💵", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+            categoriesToAdd.AddRange(new[]
+            {
+                new Category { Name = "Lương", Type = 1, Icon = "💰", Color = "#4CAF50", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Bán thời gian", Type = 1, Icon = "💼", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Đầu tư", Type = 1, Icon = "📈", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Quà tặng", Type = 1, Icon = "🎁", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Thu nhập khác", Type = 1, Icon = "💵", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow }
+            });
+        }
 
-            // Expense Categories
-            new Category { Name = "Ăn uống", Type = 2, Icon = "🍔", Color = "#FF5722", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Di chuyển", Type = 2, Icon = "🚗", Color = "#3F51B5", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Mua sắm", Type = 2, Icon = "🛍️", Color = "#E91E63", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Giải trí", Type = 2, Icon = "🎬", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Hóa đơn & Tiện ích", Type = 2, Icon = "📄", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Sức khỏe", Type = 2, Icon = "🏥", Color = "#F44336", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Giáo dục", Type = 2, Icon = "📚", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
-            new Category { Name = "Chi tiêu khác", Type = 2, Icon = "💸", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow }
-        };
+        if (!hasExpense)
+        {
+            categoriesToAdd.AddRange(new[]
+            {
+                new Category { Name = "Ăn uống", Type = 2, Icon = "🍔", Color = "#FF5722", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Di chuyển", Type = 2, Icon = "🚗", Color = "#3F51B5", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Mua sắm", Type = 2, Icon = "🛍️", Color = "#E91E63", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Giải trí", Type = 2, Icon = "🎬", Color = "#9C27B0", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Hóa đơn & Tiện ích", Type = 2, Icon = "📄", Color = "#FF9800", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Sức khỏe", Type = 2, Icon = "🏥", Color = "#F44336", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Giáo dục", Type = 2, Icon = "📚", Color = "#2196F3", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow },
+                new Category { Name = "Chi tiêu khác", Type = 2, Icon = "💸", Color = "#607D8B", UserId = userId, IsDefault = false, IsActive = true, CreatedAt = DateTime.UtcNow }
+            });
+        }
 
-        _context.Categories.AddRange(defaultCategories);
-        await _context.SaveChangesAsync();
+        if (categoriesToAdd.Any())
+        {
+            _context.Categories.AddRange(categoriesToAdd);
+            await _context.SaveChangesAsync();
+        }
     }
 
     // Helper Methods

@@ -1,0 +1,96 @@
+@* Global Transaction Modal - Handles Income, Expense, and Transfer *@
+<div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+            <div class="modal-header border-0 pb-0 pt-6 px-6 bg-white">
+                <h5 class="modal-title font-bold text-xl text-slate-800" id="transactionModalTitle">Giao dịch mới</h5>
+                <button type="button" class="btn-close opacity-50 hover:opacity-100 transition-opacity" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-6 bg-white">
+                <form id="globalTransactionForm">
+                    <!-- Type Selector -->
+                    <div class="grid grid-cols-3 gap-2 mb-6 bg-slate-100 p-1.5 rounded-xl">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="TransactionType" value="2" class="peer sr-only" checked onchange="handleTransTypeChange(2)">
+                            <div class="text-center py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 peer-checked:bg-white peer-checked:text-rose-600 peer-checked:shadow-sm transition-all">
+                                Chi tiêu
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="TransactionType" value="1" class="peer sr-only" onchange="handleTransTypeChange(1)">
+                            <div class="text-center py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 peer-checked:bg-white peer-checked:text-emerald-600 peer-checked:shadow-sm transition-all">
+                                Thu nhập
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="TransactionType" value="3" class="peer sr-only" onchange="handleTransTypeChange(3)">
+                            <div class="text-center py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all">
+                                Chuyển tiền
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="mb-6 text-center bg-slate-50 rounded-xl p-4 border border-slate-100 focus-within:border-blue-200 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                        <label class="text-xs uppercase tracking-wider font-bold text-slate-400 mb-2 block">Số tiền</label>
+                        <div class="relative flex items-center justify-center">
+                            <input type="text" inputmode="decimal" class="w-full bg-transparent border-0 text-center font-bold text-3xl text-slate-800 p-0 focus:ring-0 placeholder-slate-300" 
+                                   id="transAmount" name="Amount" placeholder="0" required autocomplete="off">
+                            <span class="absolute right-4 text-slate-400 font-medium text-sm pointer-events-none">VND</span>
+                        </div>
+                    </div>
+
+                    <!-- Fields Container -->
+                    <div class="space-y-4">
+                        <!-- Date -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ngày thực hiện</label>
+                            <input type="date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" 
+                                   id="transDate" name="TransactionDate" required>
+                        </div>
+
+                        <!-- Source Wallet -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5" id="sourceWalletLabel">Ví nguồn</label>
+                            <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" 
+                                    id="transWallet" name="AccountId" required>
+                                <option value="">Đang tải ví...</option>
+                            </select>
+                        </div>
+
+                        <!-- Target Wallet (Transfer Only) -->
+                        <div id="targetWalletGroup" class="hidden">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Đến ví</label>
+                            <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" 
+                                    id="transTargetWallet" name="TargetAccountId">
+                                <option value="">Đang tải ví...</option>
+                            </select>
+                        </div>
+
+                        <!-- Category (Income/Expense Only) -->
+                        <div id="categoryGroup">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Danh mục</label>
+                            <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all" 
+                                    id="transCategory" name="CategoryId">
+                                <option value="">Chọn danh mục...</option>
+                            </select>
+                        </div>
+
+                        <!-- Note -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ghi chú (Tùy chọn)</label>
+                            <textarea class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all resize-none" 
+                                      id="transNote" name="Note" rows="2" placeholder="Nhập ghi chú..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full mt-8 py-3.5 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2" id="btnSaveTransaction">
+                        <span>Lưu chi tiêu</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

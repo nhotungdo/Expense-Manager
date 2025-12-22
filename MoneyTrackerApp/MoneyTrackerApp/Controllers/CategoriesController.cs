@@ -64,34 +64,11 @@ namespace MoneyTrackerApp.Controllers
 
                 _logger.LogInformation($"Returning {result.Count} categories");
 
-                // If still empty, return some test categories
                 if (!result.Any())
                 {
-                    _logger.LogWarning("Categories still empty, returning test data");
-                    dynamic testResult = new List<dynamic>();
-
-                    if (type == null || type == 2)
-                    {
-                        testResult = new List<dynamic>
-                        {
-                            new { id = 1L, name = "Ăn uống", icon = "🍔", type = 2, description = "", color = "", isActive = true },
-                            new { id = 2L, name = "Di chuyển", icon = "🚗", type = 2, description = "", color = "", isActive = true },
-                            new { id = 3L, name = "Mua sắm", icon = "🛍️", type = 2, description = "", color = "", isActive = true },
-                            new { id = 4L, name = "Giải trí", icon = "🎬", type = 2, description = "", color = "", isActive = true },
-                            new { id = 5L, name = "Hóa đơn & Tiện ích", icon = "📄", type = 2, description = "", color = "", isActive = true }
-                        };
-                    }
-                    else if (type == 1)
-                    {
-                        testResult = new List<dynamic>
-                        {
-                            new { id = 1L, name = "Lương", icon = "💰", type = 1, description = "", color = "", isActive = true },
-                            new { id = 2L, name = "Làm thêm", icon = "💼", type = 1, description = "", color = "", isActive = true },
-                            new { id = 3L, name = "Đầu tư", icon = "📈", type = 1, description = "", color = "", isActive = true }
-                        };
-                    }
-
-                    return Ok(testResult);
+                    _logger.LogWarning("Categories still empty after initialization attempt.");
+                    // Return empty list instead of fake data to avoid "Category not found" errors
+                    return Ok(new List<object>()); 
                 }
 
                 return Ok(result);

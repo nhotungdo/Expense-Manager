@@ -16,7 +16,7 @@ function formatCurrency(amount) {
 // Load personal wallet data (summary cards)
 async function loadPersonalWalletData() {
     try {
-        const response = await fetch('/api/Dashboard/personal-wallet', {
+        const response = await fetch(`/api/Dashboard/personal-wallet?t=${Date.now()}`, {
             credentials: 'include'
         });
 
@@ -25,7 +25,7 @@ async function loadPersonalWalletData() {
         }
 
         const data = await response.json();
-        
+
         // Update summary cards
         document.getElementById('cardTotalAssets').textContent = formatCurrency(data.totalBalance || 0);
         document.getElementById('monthlyIncome').textContent = formatCurrency(data.monthlyIncome || 0);
@@ -42,7 +42,7 @@ async function loadPersonalWalletData() {
 // Load expense breakdown by category
 async function loadExpenseBreakdown(period = 'month') {
     try {
-        const response = await fetch(`/api/Dashboard/expense-breakdown?period=${period}`, {
+        const response = await fetch(`/api/Dashboard/expense-breakdown?period=${period}&t=${Date.now()}`, {
             credentials: 'include'
         });
 
@@ -62,7 +62,7 @@ async function loadExpenseBreakdown(period = 'month') {
 // Load income breakdown by category
 async function loadIncomeBreakdown(period = 'month') {
     try {
-        const response = await fetch(`/api/Dashboard/income-breakdown?period=${period}`, {
+        const response = await fetch(`/api/Dashboard/income-breakdown?period=${period}&t=${Date.now()}`, {
             credentials: 'include'
         });
 
@@ -148,7 +148,7 @@ function renderExpenseChart(data) {
                         usePointStyle: true,
                         pointStyle: 'circle',
                         boxWidth: 12,
-                        generateLabels: function(chart) {
+                        generateLabels: function (chart) {
                             const data = chart.data;
                             if (data.labels.length && data.datasets.length) {
                                 return data.labels.map((label, i) => {
@@ -183,7 +183,7 @@ function renderExpenseChart(data) {
                         size: 13
                     },
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             const label = context.label || '';
                             const value = context.parsed || 0;
                             const percentage = ((value / total) * 100).toFixed(1);
@@ -271,7 +271,7 @@ function renderIncomeChart(data) {
                         usePointStyle: true,
                         pointStyle: 'circle',
                         boxWidth: 12,
-                        generateLabels: function(chart) {
+                        generateLabels: function (chart) {
                             const data = chart.data;
                             if (data.labels.length && data.datasets.length) {
                                 return data.labels.map((label, i) => {
@@ -306,7 +306,7 @@ function renderIncomeChart(data) {
                         size: 13
                     },
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             const label = context.label || '';
                             const value = context.parsed || 0;
                             const percentage = ((value / total) * 100).toFixed(1);
@@ -328,7 +328,7 @@ function renderIncomeChart(data) {
 // Load recent transactions
 async function loadRecentTransactions() {
     try {
-        const response = await fetch('/api/Transactions/recent?limit=5', {
+        const response = await fetch(`/api/Transactions/recent?limit=5&t=${Date.now()}`, {
             credentials: 'include'
         });
 
@@ -353,7 +353,7 @@ async function loadRecentTransactions() {
 // Render transaction list
 function renderTransactionList(transactions) {
     const container = document.getElementById('transactionList');
-    
+
     if (!transactions || transactions.length === 0) {
         container.innerHTML = `
             <div class="p-8 text-center text-slate-400">
@@ -397,7 +397,7 @@ function renderTransactionList(transactions) {
 // Load accounts for dropdowns
 async function loadAccounts() {
     try {
-        const response = await fetch('/api/Accounts', {
+        const response = await fetch(`/api/Accounts?t=${Date.now()}`, {
             credentials: 'include'
         });
 
@@ -406,11 +406,11 @@ async function loadAccounts() {
         }
 
         const accounts = await response.json();
-        
+
         // Populate transaction modal account dropdown
         const transAccountSelect = document.getElementById('transAccount');
         if (transAccountSelect) {
-            transAccountSelect.innerHTML = accounts.map(acc => 
+            transAccountSelect.innerHTML = accounts.map(acc =>
                 `<option value="${acc.accountId}">${acc.accountName} (${formatCurrency(acc.balance)})</option>`
             ).join('');
         }
@@ -418,12 +418,12 @@ async function loadAccounts() {
         // Populate transfer modal dropdowns
         const transferSource = document.getElementById('transferSource');
         const transferTarget = document.getElementById('transferTarget');
-        
+
         if (transferSource && transferTarget) {
-            const accountOptions = accounts.map(acc => 
+            const accountOptions = accounts.map(acc =>
                 `<option value="${acc.accountId}">${acc.accountName} (${formatCurrency(acc.balance)})</option>`
             ).join('');
-            
+
             transferSource.innerHTML = '<option value="">Chọn ví nguồn...</option>' + accountOptions;
             transferTarget.innerHTML = '<option value="">Chọn ví đích...</option>' + accountOptions;
         }
@@ -434,7 +434,7 @@ async function loadAccounts() {
 }
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Load initial data
     loadPersonalWalletData();
     loadExpenseBreakdown('month');
@@ -443,21 +443,31 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAccounts();
 
     // Setup period change listeners
-    document.getElementById('expenseChartPeriod')?.addEventListener('change', function(e) {
+    document.getElementById('expenseChartPeriod')?.addEventListener('change', function (e) {
         loadExpenseBreakdown(e.target.value);
     });
 
-    document.getElementById('incomeChartPeriod')?.addEventListener('change', function(e) {
+    document.getElementById('incomeChartPeriod')?.addEventListener('change', function (e) {
         loadIncomeBreakdown(e.target.value);
     });
 
-    // Set default transaction date
     const transDateInput = document.getElementById('transDate');
     if (transDateInput) {
         transDateInput.valueAsDate = new Date();
     }
+
+    // Listen for global transaction saved event
+    window.addEventListener('transaction:saved', () => {
+        loadPersonalWalletData();
+        loadExpenseBreakdown('month');
+        loadIncomeBreakdown('month');
+        loadRecentTransactions();
+    });
 });
 
 // Export functions for use in inline scripts
 window.loadPersonalWalletData = loadPersonalWalletData;
 window.loadAccounts = loadAccounts;
+window.loadRecentTransactions = loadRecentTransactions;
+window.loadExpenseBreakdown = loadExpenseBreakdown;
+window.loadIncomeBreakdown = loadIncomeBreakdown;

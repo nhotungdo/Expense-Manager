@@ -13,6 +13,7 @@ public partial class Account
 
     public int AccountType { get; set; }
 
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public decimal InitialBalance { get; set; }
 
     public decimal CurrentBalance { get; set; }
@@ -23,9 +24,11 @@ public partial class Account
 
     public string? Color { get; set; }
 
-    public bool IsActive { get; set; }
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IsActive { get; set; } = true;
 
-    public bool IncludeInTotal { get; set; }
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IncludeInTotal { get; set; } = true;
 
     public DateTime? CreatedAt { get; set; }
 

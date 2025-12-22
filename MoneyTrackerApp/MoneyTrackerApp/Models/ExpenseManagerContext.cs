@@ -91,6 +91,10 @@ public partial class ExpenseManagerContext : DbContext
     
     public virtual DbSet<UserOtp> UserOtps { get; set; }
 
+    public virtual DbSet<Friendship> Friendships { get; set; }
+
+    public virtual DbSet<Message> Messages { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
@@ -110,9 +114,8 @@ public partial class ExpenseManagerContext : DbContext
                 .HasDefaultValue("VND");
             entity.Property(e => e.CurrentBalance).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Icon).HasMaxLength(50);
-            entity.Property(e => e.IncludeInTotal).HasDefaultValue(true);
-            entity.Property(e => e.InitialBalance).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+
             entity.Property(e => e.Name).HasMaxLength(100);
 
             entity.HasOne(d => d.User).WithMany(p => p.Accounts).HasForeignKey(d => d.UserId);
@@ -232,7 +235,7 @@ public partial class ExpenseManagerContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.Description).HasMaxLength(512);
             entity.Property(e => e.Icon).HasMaxLength(50);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
+
             entity.Property(e => e.Name).HasMaxLength(100);
 
             entity.HasOne(d => d.ParentCategory).WithMany(p => p.InverseParentCategory).HasForeignKey(d => d.ParentCategoryId);
@@ -747,6 +750,50 @@ public partial class ExpenseManagerContext : DbContext
             entity.Property(e => e.IsUsed).HasDefaultValue(false);
             
             entity.HasOne(d => d.User).WithMany().HasForeignKey(d => d.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Friendship>(entity =>
+        {
+            entity.HasIndex(e => new { e.RequesterId, e.Status }, "IX_Friendships_RequesterId_Status");
+
+            entity.HasIndex(e => new { e.ReceiverId, e.Status }, "IX_Friendships_ReceiverId_Status");
+
+            entity.HasIndex(e => new { e.RequesterId, e.ReceiverId }, "UK_Friendships_Pair").IsUnique();
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Receiver).WithMany(p => p.FriendshipReceivers)
+                .HasForeignKey(d => d.ReceiverId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Friendships_Users_Receiver");
+
+            entity.HasOne(d => d.Requester).WithMany(p => p.FriendshipRequesters)
+                .HasForeignKey(d => d.RequesterId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Friendships_Users_Requester");
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasIndex(e => e.SenderId, "IX_Messages_SenderId");
+            entity.HasIndex(e => e.ReceiverId, "IX_Messages_ReceiverId");
+            entity.HasIndex(e => e.Timestamp, "IX_Messages_Timestamp");
+
+            entity.Property(e => e.Content).IsRequired();
+            entity.Property(e => e.Timestamp).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.IsRead).HasDefaultValue(false);
+
+            entity.HasOne(d => d.Sender)
+                .WithMany(p => p.SentMessages)
+                .HasForeignKey(d => d.SenderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Messages_Users_Sender");
+
+            entity.HasOne(d => d.Receiver)
+                .WithMany(p => p.ReceivedMessages)
+                .HasForeignKey(d => d.ReceiverId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Messages_Users_Receiver");
         });
 
         OnModelCreatingPartial(modelBuilder);

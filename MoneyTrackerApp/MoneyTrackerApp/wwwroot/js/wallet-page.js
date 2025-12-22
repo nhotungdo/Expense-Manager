@@ -31,6 +31,18 @@ document.addEventListener('DOMContentLoaded', function () {
     setupEventListeners();
     setupFormListeners();
     loadAnalyticsData('month');
+
+    // Listen for global transaction saved event
+    window.addEventListener('transaction:saved', () => {
+        loadRecentTransactions();
+        loadAnalyticsData('month');
+        // If categoryBreakdownChart is active, reload it too
+        const period = document.getElementById('categoryPeriod')?.value || 'month';
+        loadCategoryBreakdown(period);
+        // Refresh chart data if needed (balance chart is static in init currently, but in real app probably needs fetch)
+        // For now, re-init charts might be overkill or buggy if not destroyed properly.
+        // Let's assume balance distribution is static or handled separately.
+    });
 });
 
 function updateChartColorsFromTheme() {
@@ -72,32 +84,7 @@ function setupEventListeners() {
 
 // Setup Form Listeners for Modals
 function setupFormListeners() {
-    // Deposit Form
-    const depositForm = document.getElementById('depositForm');
-    if (depositForm) {
-        depositForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            await handleTransactionSubmit(this, 1); // 1 = Income
-        });
-    }
-
-    // Withdraw Form
-    const withdrawForm = document.getElementById('withdrawForm');
-    if (withdrawForm) {
-        withdrawForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            await handleTransactionSubmit(this, 2); // 2 = Expense
-        });
-    }
-
-    // Transfer Form
-    const transferForm = document.getElementById('transferForm');
-    if (transferForm) {
-        transferForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            await handleTransferSubmit(this);
-        });
-    }
+    // Deposit, Withdraw, Transfer listeners removed (handled by global modal)
 
     // Add Account Form
     const addAccountForm = document.getElementById('addAccountForm');
@@ -109,80 +96,7 @@ function setupFormListeners() {
     }
 }
 
-// Handle Deposit/Withdraw Submission
-async function handleTransactionSubmit(form, type) {
-    const formData = new FormData(form);
-    const data = {
-        accountId: formData.get('accountId'),
-        amount: parseFloat(formData.get('amount')),
-        transactionType: type,
-        note: formData.get('note'),
-        currency: 'VND', // Default
-        transactionDate: new Date().toISOString()
-    };
-
-    try {
-        const response = await fetch('/api/Transactions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            showNotification('Giao dịch thành công!', 'success');
-            const modalElement = form.closest('.modal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-            form.reset();
-            // Refresh data
-            setTimeout(() => window.location.reload(), 1000); // Reload to show new balance
-        } else {
-            const error = await response.json();
-            showNotification(error.message || 'Giao dịch thất bại', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Đã xảy ra lỗi kết nối', 'error');
-    }
-}
-
-// Handle Transfer Submission
-async function handleTransferSubmit(form) {
-    const formData = new FormData(form);
-    const data = {
-        sourceAccountId: formData.get('sourceAccountId'),
-        targetAccountId: formData.get('targetAccountId'),
-        amount: parseFloat(formData.get('amount')),
-        note: formData.get('note')
-    };
-
-    try {
-        const response = await fetch('/api/Transactions/transfer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            showNotification('Chuyển khoản thành công!', 'success');
-            const modalElement = form.closest('.modal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-            form.reset();
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            const error = await response.json();
-            showNotification(error.message || 'Chuyển khoản thất bại', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Đã xảy ra lỗi kết nối', 'error');
-    }
-}
+// Transaction handlers removed - see global-transaction-modal.js
 
 // Handle Add Account Submission
 async function handleAddAccountSubmit(form) {
@@ -421,7 +335,7 @@ function initCategoryBreakdownChart() {
 // Load analytics data from API
 async function loadAnalyticsData(period) {
     try {
-        const response = await fetch(`/api/Report/wallet-summary?period=${period}`);
+        const response = await fetch(`/api/Report/wallet-summary?period=${period}&t=${Date.now()}`);
 
         if (!response.ok) {
             console.warn('API call failed, using mock data');
@@ -466,7 +380,7 @@ function updateTransactionTypeChart(data) {
 // Load category breakdown
 async function loadCategoryBreakdown(period) {
     try {
-        const response = await fetch(`/api/Report/expense-breakdown?period=${period}`);
+        const response = await fetch(`/api/Report/expense-breakdown?period=${period}&t=${Date.now()}`);
 
         if (!response.ok) {
             // Mock data if failed
@@ -524,7 +438,7 @@ function updateCategoryList(categories) {
 // Load recent transactions
 async function loadRecentTransactions() {
     try {
-        const response = await fetch('/api/Transactions/recent?limit=5');
+        const response = await fetch(`/api/Transactions/recent?limit=5&t=${Date.now()}`);
 
         if (!response.ok) {
             console.error('Failed to load recent transactions');

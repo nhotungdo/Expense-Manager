@@ -44,10 +44,10 @@
             <span class="text-sm font-medium">Ví chia sẻ</span>
         </a>
 
-        <!-- Bank Sync -->
-        <a href="/Wallets/BankSync" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets/banksync") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
-            <i class="fas fa-university w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets/banksync") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
-            <span class="text-sm font-medium">Liên kết ngân hàng</span>
+        <!-- Investments -->
+        <a href="/Investments/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/investments") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-briefcase w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/investments") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Đầu tư</span>
         </a>
 
         <!-- Budgets -->
@@ -88,6 +88,12 @@
         <a href="/Groups/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/groups") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
             <i class="fas fa-users w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/groups") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
             <span class="text-sm font-medium">Chi tiêu nhóm</span>
+        </a>
+
+        <!-- Contacts -->
+        <a href="/Contacts/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/contacts") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-address-book w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/contacts") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Danh bạ</span>
         </a>
         
         <!-- Service Packages (Premium) -->

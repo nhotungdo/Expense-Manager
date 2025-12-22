@@ -34,6 +34,7 @@ public class CreateTransactionDto
     public long? PairedAccountId { get; set; }
 
     // For receipt scanning
+    [StringLength(512, ErrorMessage = "Attachment URL must be less than 512 characters")]
     public string? AttachmentUrl { get; set; }
     public string? OcrText { get; set; }
 
@@ -62,6 +63,7 @@ public class UpdateTransactionDto
 
     public DateTime? TransactionDate { get; set; }
 
+    [StringLength(512, ErrorMessage = "Attachment URL must be less than 512 characters")]
     public string? AttachmentUrl { get; set; }
 }
 
@@ -96,6 +98,8 @@ public class TransactionResponseDto
     /// Display description for the transaction (combines CategoryName and Note intelligently)
     /// </summary>
     public string Description { get; set; } = null!;
+
+    public string? WarningMessage { get; set; }
 }
 
 /// <summary>

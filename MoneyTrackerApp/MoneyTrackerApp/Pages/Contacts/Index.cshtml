@@ -1,0 +1,287 @@
+@page
+@model MoneyTrackerApp.Pages.Contacts.IndexModel
+@{
+    ViewData["Title"] = "Danh bạ";
+}
+
+<div class="contacts-page">
+    <div class="contacts-container">
+        <!-- Sidebar -->
+        <aside class="contacts-sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">
+                    <i class="fas fa-address-book"></i>
+                    Danh bạ
+                </h1>
+                <p class="sidebar-subtitle">Quản lý kết nối của bạn</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="friends">
+                    <div class="nav-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <span class="nav-label">Bạn bè</span>
+                    <span class="nav-badge">@Model.Friends.Count</span>
+                </button>
+
+                <button class="nav-item" data-tab="requests">
+                    <div class="nav-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <span class="nav-label">Lời mời</span>
+                    @if(Model.ReceivedRequests.Count > 0) {
+                        <span class="nav-badge badge-alert">@Model.ReceivedRequests.Count</span>
+                    }
+                </button>
+
+                <button class="nav-item" data-tab="chat">
+                    <div class="nav-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <span class="nav-label">Tin nhắn</span>
+                    <span class="nav-badge hidden" id="unread-badge">0</span>
+                </button>
+
+                <button class="nav-item" data-tab="search">
+                    <div class="nav-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <span class="nav-label">Tìm kiếm</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <p class="user-name">Tài khoản của tôi</p>
+                        <p class="user-status">
+                            <span class="status-dot"></span>
+                            Trực tuyến
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="contacts-main">
+            <!-- Friends Tab -->
+            <div class="tab-content active" id="tab-friends">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title">Danh sách bạn bè</h2>
+                        <p class="content-subtitle">@Model.Friends.Count người bạn</p>
+                    </div>
+                </div>
+
+                @if (Model.Friends.Any())
+                {
+                    <div class="contacts-grid">
+                        @foreach (var friend in Model.Friends)
+                        {
+                            <div class="contact-card" id="friend-@friend.Id">
+                                <div class="card-actions">
+                                    <button class="action-btn" onclick="Contacts.unfriend(@friend.Id)" title="Hủy kết bạn">
+                                        <i class="fas fa-user-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="contact-avatar-wrapper">
+                                    <img class="contact-avatar" 
+                                         src="@(friend.FriendAvatar ?? "/images/default-avatar.png")" 
+                                         alt="@friend.FriendName">
+                                    <span class="status-indicator" id="status-@friend.Id"></span>
+                                </div>
+                                
+                                <h3 class="contact-name">@friend.FriendName</h3>
+                                <span class="contact-badge">Bạn bè</span>
+                                
+                                <button class="btn-primary" onclick="Contacts.startChat(@friend.Id, '@friend.FriendName', '@(friend.FriendAvatar ?? "/images/default-avatar.png")')">
+                                    <i class="fas fa-comment-dots"></i>
+                                    Nhắn tin
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h3 class="empty-title">Chưa có bạn bè</h3>
+                        <p class="empty-text">Hãy tìm kiếm và kết nối với mọi người</p>
+                        <button class="btn-primary" onclick="Contacts.switchTab('search')">
+                            <i class="fas fa-search"></i>
+                            Tìm bạn bè
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <!-- Requests Tab -->
+            <div class="tab-content" id="tab-requests">
+                <div class="content-header">
+                    <h2 class="content-title">Lời mời kết bạn</h2>
+                </div>
+
+                <div class="requests-section">
+                    <h3 class="section-title">Lời mời đến (@Model.ReceivedRequests.Count)</h3>
+                    @if (Model.ReceivedRequests.Any())
+                    {
+                        <div class="requests-list">
+                            @foreach (var req in Model.ReceivedRequests)
+                            {
+                                <div class="request-card" id="request-@req.Id">
+                                    <img class="request-avatar" 
+                                         src="@(req.FriendAvatar ?? "/images/default-avatar.png")" 
+                                         alt="@req.FriendName">
+                                    <div class="request-info">
+                                        <h4 class="request-name">@req.FriendName</h4>
+                                        <p class="request-date">@req.CreatedAt?.ToString("dd/MM/yyyy")</p>
+                                    </div>
+                                    <div class="request-actions">
+                                        <button class="btn-accept" onclick="Contacts.acceptRequest(@req.Id)">
+                                            <i class="fas fa-check"></i>
+                                            Chấp nhận
+                                        </button>
+                                        <button class="btn-reject" onclick="Contacts.rejectRequest(@req.Id)">
+                                            <i class="fas fa-times"></i>
+                                            Từ chối
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="empty-message">Không có lời mời nào</p>
+                    }
+                </div>
+
+                <div class="requests-section">
+                    <h3 class="section-title">Lời mời đã gửi (@Model.SentRequests.Count)</h3>
+                    @if (Model.SentRequests.Any())
+                    {
+                        <div class="sent-requests-grid">
+                            @foreach (var req in Model.SentRequests)
+                            {
+                                <div class="sent-request-card">
+                                    <img class="sent-avatar" 
+                                         src="@(req.FriendAvatar ?? "/images/default-avatar.png")" 
+                                         alt="@req.FriendName">
+                                    <div class="sent-info">
+                                        <p class="sent-name">@req.FriendName</p>
+                                        <p class="sent-status">Đang chờ...</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="empty-message">Chưa gửi lời mời nào</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Search Tab -->
+            <div class="tab-content" id="tab-search">
+                <div class="search-container">
+                    <div class="search-header">
+                        <h2 class="search-title">Tìm kiếm bạn bè</h2>
+                        <p class="search-subtitle">Nhập tên hoặc email để tìm kiếm</p>
+                    </div>
+
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               id="searchInput" 
+                               class="search-input" 
+                               placeholder="Tìm kiếm người dùng..."
+                               autocomplete="off">
+                    </div>
+
+                    <div id="searchResults" class="search-results">
+                        <div class="search-placeholder">
+                            <i class="fas fa-search"></i>
+                            <p>Nhập để bắt đầu tìm kiếm</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Tab -->
+            <div class="tab-content" id="tab-chat">
+                <div class="chat-layout">
+                    <!-- Conversations List -->
+                    <div class="chat-sidebar" id="chatSidebar">
+                        <div class="chat-sidebar-header">
+                            <h3>Tin nhắn</h3>
+                        </div>
+                        <div id="conversationList" class="conversation-list">
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Window -->
+                    <div class="chat-window" id="chatWindow">
+                        <div class="chat-header">
+                            <button class="btn-back" onclick="Contacts.backToConversations()">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <img id="chatAvatar" class="chat-user-avatar" src="" alt="">
+                            <div class="chat-user-info">
+                                <h4 id="chatUserName">Chọn cuộc trò chuyện</h4>
+                                <p id="chatUserStatus">Offline</p>
+                            </div>
+                        </div>
+
+                        <div id="chatMessages" class="chat-messages"></div>
+
+                        <div class="chat-input-container">
+                            <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar">
+                            <button class="btn-attach">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <input type="text" 
+                                   id="chatInput" 
+                                   class="chat-input" 
+                                   placeholder="Nhập tin nhắn..."
+                                   autocomplete="off">
+                            <button class="btn-send" onclick="Contacts.sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/contacts.css">
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script src="~/js/contacts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Contacts.init({
+                currentUserId: @Model.CurrentUserId
+            });
+        });
+    </script>
+}

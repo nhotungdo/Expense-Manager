@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSignalR();
 
 builder.Services.AddDbContext<MoneyTrackerApp.Models.ExpenseManagerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBDefault"))
@@ -35,6 +36,7 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IInvestmentService, MoneyTra
 
 // Register Group & Split Bill Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IGroupExpenseService, MoneyTrackerApp.Services.GroupExpenseService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IFriendshipService, MoneyTrackerApp.Services.FriendshipService>();
 
 // Register Report & Analytics Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IReportService, MoneyTrackerApp.Services.ReportService>();
@@ -80,6 +82,8 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayService>();
 builder.Services.Configure<MoneyTrackerApp.Configurations.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<MoneyTrackerApp.Services.IEmailService, MoneyTrackerApp.Services.EmailService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IOtpService, MoneyTrackerApp.Services.OtpService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IChatService, MoneyTrackerApp.Services.ChatService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IFileUploadService, MoneyTrackerApp.Services.FileUploadService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");
@@ -160,5 +164,6 @@ app.UseMiddleware<MoneyTrackerApp.Middleware.OnboardingMiddleware>();
 
 app.MapRazorPages();
 app.MapControllers();
+app.MapHub<MoneyTrackerApp.Hubs.ChatHub>("/chatHub");
 
 app.Run();

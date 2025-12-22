@@ -41,6 +41,10 @@
       "PackagePath": "staticwebassets\\css\\christmas.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\contacts.css",
+      "PackagePath": "staticwebassets\\css\\contacts.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\debts.css",
       "PackagePath": "staticwebassets\\css\\debts.css"
     },
@@ -93,6 +97,10 @@
       "PackagePath": "staticwebassets\\css\\reports.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\savings.css",
+      "PackagePath": "staticwebassets\\css\\savings.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\service-packages.css",
       "PackagePath": "staticwebassets\\css\\service-packages.css"
     },
@@ -123,6 +131,26 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallets.css",
       "PackagePath": "staticwebassets\\css\\wallets.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\Technical_TransactionErrorFix.md",
+      "PackagePath": "staticwebassets\\docs\\Technical_TransactionErrorFix.md"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-architecture.md",
+      "PackagePath": "staticwebassets\\docs\\messaging-architecture.md"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-feature.md",
+      "PackagePath": "staticwebassets\\docs\\messaging-feature.md"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-quick-reference.md",
+      "PackagePath": "staticwebassets\\docs\\messaging-quick-reference.md"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-setup-guide.md",
+      "PackagePath": "staticwebassets\\docs\\messaging-setup-guide.md"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\requirement_update.md",
@@ -157,12 +185,24 @@
       "PackagePath": "staticwebassets\\js\\christmas.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\contacts.js",
+      "PackagePath": "staticwebassets\\js\\contacts.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\debts.js",
       "PackagePath": "staticwebassets\\js\\debts.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\frontend-error-tests.js",
       "PackagePath": "staticwebassets\\js\\frontend-error-tests.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\global-transaction-modal.js",
+      "PackagePath": "staticwebassets\\js\\global-transaction-modal.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\groups-tests.js",
+      "PackagePath": "staticwebassets\\js\\groups-tests.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\groups.js",
@@ -185,6 +225,22 @@
       "PackagePath": "staticwebassets\\js\\micro-interactions.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\onboarding-basic-settings.js",
+      "PackagePath": "staticwebassets\\js\\onboarding-basic-settings.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\onboarding-create-wallet.js",
+      "PackagePath": "staticwebassets\\js\\onboarding-create-wallet.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\onboarding-savings-goal.js",
+      "PackagePath": "staticwebassets\\js\\onboarding-savings-goal.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\onboarding-setup-categories.js",
+      "PackagePath": "staticwebassets\\js\\onboarding-setup-categories.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\onboarding-welcome.js",
       "PackagePath": "staticwebassets\\js\\onboarding-welcome.js"
     },
@@ -205,6 +261,10 @@
       "PackagePath": "staticwebassets\\js\\reports.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\savings.js",
+      "PackagePath": "staticwebassets\\js\\savings.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\service-packages.js",
       "PackagePath": "staticwebassets\\js\\service-packages.js"
     },
@@ -223,6 +283,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\trading.js",
       "PackagePath": "staticwebassets\\js\\trading.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\transactions-utils.js",
+      "PackagePath": "staticwebassets\\js\\transactions-utils.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\vnpay-checkout.js",
@@ -465,12 +529,84 @@
       "PackagePath": "staticwebassets\\test-reports-api.html"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\28bdeb7e-dcef-4e9b-bba6-619980cd5821.webp",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\28bdeb7e-dcef-4e9b-bba6-619980cd5821.webp"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\28bdeb7e-dcef-4e9b-bba6-619980cd5821_thumb.webp",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\28bdeb7e-dcef-4e9b-bba6-619980cd5821_thumb.webp"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\3e17ba09-ea58-427a-b0d1-d3d741c26f10.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\3e17ba09-ea58-427a-b0d1-d3d741c26f10.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\3e17ba09-ea58-427a-b0d1-d3d741c26f10_thumb.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\3e17ba09-ea58-427a-b0d1-d3d741c26f10_thumb.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\5315bf71-5596-46df-b027-cc9fc0386358.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\5315bf71-5596-46df-b027-cc9fc0386358.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\5315bf71-5596-46df-b027-cc9fc0386358_thumb.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\5315bf71-5596-46df-b027-cc9fc0386358_thumb.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\6163ac46-d6a3-4968-b9b0-8b86d00928f0.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\6163ac46-d6a3-4968-b9b0-8b86d00928f0.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\6163ac46-d6a3-4968-b9b0-8b86d00928f0_thumb.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\6163ac46-d6a3-4968-b9b0-8b86d00928f0_thumb.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\6cf0e72c-2592-47c3-9154-e86ca159936d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\6cf0e72c-2592-47c3-9154-e86ca159936d.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\6cf0e72c-2592-47c3-9154-e86ca159936d_thumb.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\6cf0e72c-2592-47c3-9154-e86ca159936d_thumb.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\b7ab8752-560d-49aa-9703-257f769ff3a6.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\b7ab8752-560d-49aa-9703-257f769ff3a6.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\1\\b7ab8752-560d-49aa-9703-257f769ff3a6_thumb.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\1\\b7ab8752-560d-49aa-9703-257f769ff3a6_thumb.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\2\\fc9190f7-7372-461d-bbc3-82d8dc50ea2c.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\2\\fc9190f7-7372-461d-bbc3-82d8dc50ea2c.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\images\\2\\fc9190f7-7372-461d-bbc3-82d8dc50ea2c_thumb.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\2\\fc9190f7-7372-461d-bbc3-82d8dc50ea2c_thumb.jpg"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\1_7fae67f3-0c15-470d-bdff-b3605193bb49.png",
       "PackagePath": "staticwebassets\\uploads\\profiles\\1_7fae67f3-0c15-470d-bdff-b3605193bb49.png"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\1_a7227041-4857-42fb-aeae-d989bc0ced64.png",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\1_a7227041-4857-42fb-aeae-d989bc0ced64.png"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\2_4ac3ee7b-2d97-4ccd-bcfe-4a2ce14a833b.jpg",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\2_4ac3ee7b-2d97-4ccd-bcfe-4a2ce14a833b.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\2_ac93351b-17cc-4bb6-842d-860bbf6bef3e.png",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\2_ac93351b-17cc-4bb6-842d-860bbf6bef3e.png"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\2_ba6b8f33-748a-449e-93fa-952aa3cb09e2.jpg",
       "PackagePath": "staticwebassets\\uploads\\profiles\\2_ba6b8f33-748a-449e-93fa-952aa3cb09e2.jpg"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\3_0ce645e9-c76f-4f24-ab38-755402a3bc17.png",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\3_0ce645e9-c76f-4f24-ab38-755402a3bc17.png"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.MoneyTrackerApp.Microsoft.AspNetCore.StaticWebAssets.props",
