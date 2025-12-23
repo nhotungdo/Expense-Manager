@@ -165,5 +165,6 @@ app.UseMiddleware<MoneyTrackerApp.Middleware.OnboardingMiddleware>();
 app.MapRazorPages();
 app.MapControllers();
 app.MapHub<MoneyTrackerApp.Hubs.ChatHub>("/chatHub");
+app.MapHub<MoneyTrackerApp.Hubs.WalletHub>("/walletHub");
 
 app.Run();

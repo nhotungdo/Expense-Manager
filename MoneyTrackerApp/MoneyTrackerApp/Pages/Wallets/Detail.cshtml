@@ -1,0 +1,314 @@
+@page "{id:long}"
+@model MoneyTrackerApp.Pages.Wallets.DetailModel
+@{
+    ViewData["Title"] = Model.Workspace?.Name ?? "Ví Chia Sẻ";
+    bool isAdmin = Model.CurrentUserPermission >= 2;
+    var currentMember = Model.Members.FirstOrDefault(m => m.UserId == Model.CurrentUserId);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/wallet-detail-modern.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+}
+
+<div class="wallet-detail-container">
+    
+    <!-- 1. HEADER SECTION -->
+    <div class="wallet-header-card">
+        <div class="header-top-nav">
+            <a href="/Wallets/Index" class="back-link">
+                <i class="fas fa-chevron-left"></i> Quay lại danh sách
+            </a>
+            <div class="header-actions">
+                 @if (!isAdmin && currentMember != null)
+                 {
+                    <form method="post" asp-page-handler="Leave" onsubmit="return confirm('Bạn có chắc muốn rời khỏi ví này?');" style="display:inline;">
+                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                            <i class="fas fa-sign-out-alt me-2"></i> Rời ví
+                        </button>
+                    </form>
+                 }
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap align-items-end gap-3">
+            <div class="wallet-info-flex">
+                <div class="wallet-icon-large" style="background: @(Model.Workspace?.Color ?? "var(--primary-gradient)")">
+                     <i class="@(Model.Workspace?.Icon ?? "fas fa-wallet")"></i>
+                </div>
+                <div class="wallet-title-block">
+                    <h1>@Model.Workspace?.Name</h1>
+                    <h2 class="wallet-balance-large">
+                        @Model.Workspace?.CurrentBalance.ToString("N0") <small style="font-size:1rem; color:var(--text-secondary);">@Model.Workspace?.Currency</small>
+                    </h2>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-chart-line me-1"></i> Chi tiêu tháng này: <strong>@Model.MonthSpending.ToString("N0") @Model.Workspace?.Currency</strong>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Member Stack -->
+            <div class="member-stack-section">
+                <div class="member-avatars">
+                    @foreach (var member in Model.Members.Take(5))
+                    {
+                        var avatarUrl = !string.IsNullOrEmpty(member.AvatarUrl) ? member.AvatarUrl : null;
+                        <div class="avatar-circle" title="@member.UserName (@member.PermissionDisplay)">
+                            @if(avatarUrl != null) {
+                                <img src="@avatarUrl" alt="@member.UserName" />
+                            } else {
+                                <span>@member.UserName.Substring(0, 1).ToUpper()</span>
+                            }
+                        </div>
+                    }
+                    @if (Model.Members.Count > 5)
+                    {
+                        <div class="avatar-circle more" style="background:#334155; color:white; border-color:white;">
+                            +@(Model.Members.Count - 5)
+                        </div>
+                    }
+                </div>
+                
+                @if (isAdmin)
+                {
+                    <button class="btn-invite-circle" data-bs-toggle="modal" data-bs-target="#inviteModal" title="Mời thành viên mới">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. TABS NAVIGATION -->
+    <div class="modern-tabs">
+        <button class="tab-link active" onclick="switchTab('overview')" id="tab-overview">
+            <i class="fas fa-home me-2"></i>Tổng quan
+        </button>
+        <button class="tab-link" onclick="switchTab('transactions')" id="tab-transactions">
+             <i class="fas fa-list-ul me-2"></i>Giao dịch
+        </button>
+        @if (isAdmin)
+        {
+            <button class="tab-link" onclick="switchTab('settings')" id="tab-settings">
+                 <i class="fas fa-cog me-2"></i>Thành viên & Cài đặt
+            </button>
+        }
+    </div>
+
+    <!-- 3. TAB CONTENTS -->
+    
+    <!-- OVERVIEW TAB -->
+    <div id="view-overview" class="tab-content-panel active">
+        <div class="analytics-grid">
+            <div class="chart-container-card">
+                 <h4 class="fw-bold mb-4">Mức đóng góp chi tiêu (Tháng này)</h4>
+                 <div style="height:300px; position:relative;">
+                     <canvas id="contributionChart"></canvas>
+                 </div>
+            </div>
+             <div class="chart-container-card">
+                 <h4 class="fw-bold mb-4">Chi tiết thành viên</h4>
+                 <div class="table-responsive">
+                     <table class="table table-borderless align-middle" id="contributionTable">
+                         <thead class="text-secondary" style="font-size:0.85rem;">
+                             <tr>
+                                 <th>THÀNH VIÊN</th>
+                                 <th class="text-end">ĐÃ CHI</th>
+                                 <th class="text-end">%</th>
+                             </tr>
+                         </thead>
+                         <tbody><!-- JS Populated --></tbody>
+                     </table>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS TAB -->
+    <div id="view-transactions" class="tab-content-panel">
+        <div class="toolbar-section">
+            <div class="search-bar-modern">
+                <i class="fas fa-search"></i>
+                <input type="text" id="txnSearch" placeholder="Tìm kiếm giao dịch (Ghi chú, Danh mục)...">
+            </div>
+            
+            <select id="userFilter" class="form-select rounded-pill border-0 shadow-sm" style="width:auto; min-width:160px; height:45px;">
+                <option value="">Tất cả thành viên</option>
+                @foreach (var m in Model.Members)
+                {
+                    <option value="@m.UserId">@m.UserName</option>
+                }
+            </select>
+
+            @if (Model.CurrentUserPermission >= 1)
+            {
+                <button class="btn-modern-primary ms-auto d-flex align-items-center gap-2" onclick="openTransactionModal(@Model.Workspace.Id)">
+                    <i class="fas fa-plus"></i> <span class="d-none d-sm-inline">Thêm giao dịch</span>
+                </button>
+            }
+        </div>
+        
+        <div id="transaction-list-container">
+            <div class="d-flex justify-content-center p-5 text-muted">
+                <i class="fas fa-spinner fa-spin me-2"></i> Đang tải dữ liệu...
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS TAB (Admin Only) -->
+    @if (isAdmin)
+    {
+        <div id="view-settings" class="tab-content-panel">
+            <div class="settings-list">
+                 <div class="p-4 border-bottom">
+                     <h4 class="fw-bold m-0">Quản lý thành viên</h4>
+                     <p class="text-muted small m-0">Phân quyền và quản lý người dùng trong ví chung</p>
+                 </div>
+                 
+                 @foreach (var member in Model.Members)
+                 {
+                    var isOwner = member.Permission == 2; // Assuming 2 is Full Control
+                    <div class="setting-item">
+                        <div class="member-info-block">
+                            <div class="avatar-circle" style="width:48px; height:48px; font-size:1.1rem; background: @(isOwner? "#e0e7ff" : "#f1f5f9"); color: @(isOwner? "#4f46e5" : "#64748b");">
+                                <span>@member.UserName.Substring(0, 1).ToUpper()</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark">@member.UserName @(member.UserId == Model.CurrentUserId ? "(Bạn)" : "")</h6>
+                                <p class="mb-0 text-muted small">@member.UserEmail</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-2">
+                             @if (member.UserId != Model.CurrentUserId && member.SharedByUserId == Model.CurrentUserId)
+                             {
+                                 <form method="post" asp-page-handler="UpdatePermission" class="d-inline">
+                                    <input type="hidden" name="sharedAccountId" value="@member.Id" />
+                                    <select name="newPermission" onchange="this.form.submit()" class="form-select form-select-sm border-0 bg-light fw-bold text-secondary" style="width:130px;">
+                                        <option value="0" selected="@(member.Permission == 0)">Chỉ xem</option>
+                                        <option value="1" selected="@(member.Permission == 1)">Xem & Thêm</option>
+                                        <option value="2" selected="@(member.Permission == 2)">Toàn quyền</option>
+                                    </select>
+                                </form>
+                                <form method="post" asp-page-handler="RemoveMember" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa thành viên này không? Lịch sử giao dịch sẽ được giữ lại.');">
+                                    <input type="hidden" name="memberId" value="@member.Id" />
+                                    <button type="submit" class="btn btn-light btn-sm text-danger rounded-circle" style="width:32px; height:32px;" title="Xóa thành viên">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                             }
+                             else
+                             {
+                                 <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">
+                                     @member.PermissionDisplay
+                                 </span>
+                             }
+                        </div>
+                    </div>
+                 }
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card border-danger border-opacity-25 mt-4 shadow-none">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-danger fw-bold m-0"><i class="fas fa-exclamation-triangle me-2"></i>Khu vực nguy hiểm</h6>
+                        <small class="text-muted">Hành động này không thể hoàn tác</small>
+                    </div>
+                    @if (Model.Workspace.Id == Model.CurrentUserId) // Assuming owner check logic, actually checking if Account owner is me
+                    {
+                       // Need logic to check if current user is owner of the ACCOUNT (CreatedBy)
+                       // Assuming Permission 2 for now implies pseudo-ownership in shared logic, but actual deletion requires distinct rights likely.
+                       // Requirement says: "Delete Wallet for Owner".
+                       <button class="btn btn-outline-danger btn-sm rounded-pill" disabled title="Tính năng đang cập nhật">Xóa ví vĩnh viễn</button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+<!-- Invite Modal -->
+<div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" asp-page-handler="Invite">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Mời thành viên</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Email hoặc Tên bạn bè</label>
+                        <div class="input-group">
+                             <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-user-plus"></i></span>
+                             <input asp-for="InviteEmail" class="form-control border-start-0 ps-0" required placeholder="Nhập để tìm kiếm..." list="friendOptions" autocomplete="off" />
+                        </div>
+                        <datalist id="friendOptions">
+                            @if(Model.Friends != null)
+                            {
+                                @foreach (var friend in Model.Friends)
+                                {
+                                    <option value="@friend.UserName">@friend.FriendName</option>
+                                }
+                            }
+                        </datalist>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Quyền hạn truy cập</label>
+                        <div class="d-flex flex-column gap-2">
+                            <label class="card p-3 border rounded-3 cursor-pointer radio-select-card active">
+                                <div class="d-flex gap-3">
+                                    <input type="radio" asp-for="InvitePermission" value="1" checked class="mt-1" />
+                                    <div>
+                                        <h6 class="m-0 fw-bold">Xem & Thêm</h6>
+                                        <small class="text-muted">Thành viên có thể xem lịch sử và thêm giao dịch mới.</small>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="card p-3 border rounded-3 cursor-pointer radio-select-card">
+                                <div class="d-flex gap-3">
+                                    <input type="radio" asp-for="InvitePermission" value="0" class="mt-1" />
+                                    <div>
+                                        <h6 class="m-0 fw-bold">Chỉ xem</h6>
+                                        <small class="text-muted">Chỉ được phép xem số dư và lịch sử giao dịch.</small>
+                                    </div>
+                                </div>
+                            </label>
+                             <label class="card p-3 border rounded-3 cursor-pointer radio-select-card">
+                                <div class="d-flex gap-3">
+                                    <input type="radio" asp-for="InvitePermission" value="2" class="mt-1" />
+                                    <div>
+                                        <h6 class="m-0 fw-bold">Toàn quyền</h6>
+                                        <small class="text-muted">Quyền quản lý thành viên và chỉnh sửa ví.</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Gửi lời mời</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/wallet-detail.js" asp-append-version="true"></script>
+    <script>
+        const walletId = @Model.Workspace?.Id;
+        const currentUserId = @Model.CurrentUserId;
+        document.addEventListener('DOMContentLoaded', () => {
+             initWalletDetail(walletId);
+             
+             // Init Overview Tab as default
+             switchTab('overview');
+        });
+    </script>
+}

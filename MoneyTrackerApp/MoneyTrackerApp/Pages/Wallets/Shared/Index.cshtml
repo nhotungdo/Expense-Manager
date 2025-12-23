@@ -4,74 +4,149 @@
     ViewData["Title"] = "Ví Chia Sẻ";
 }
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 fw-bold text-gray-800">Ví Chia Sẻ</h1>
-            <p class="text-muted">Quản lý các ví được chia sẻ với bạn</p>
+<link rel="stylesheet" href="~/css/shared-wallets.css" asp-append-version="true" />
+@Html.AntiForgeryToken()
+
+<div class="shared-wallet-page">
+    <div class="page-header-modern">
+        <div class="container-fluid px-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="fw-bold text-primary mb-1">Ví Chia Sẻ</h1>
+                    <p class="text-muted mb-0">Quản lý và theo dõi các ví được chia sẻ với bạn</p>
+                </div>
+                
+                <div class="d-flex gap-3 align-items-center">
+                     <div class="position-relative">
+                        <input type="text" id="walletSearch" class="form-control rounded-pill ps-4 pe-4" placeholder="Tìm kiếm ví..." style="min-width: 250px;">
+                        <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    </div>
+                    <button class="btn-modern btn-modern-primary" onclick="openShareModal()">
+                        <i class="fas fa-plus me-2"></i> Chia sẻ ví mới
+                    </button>
+                </div>
+            </div>
         </div>
-        <button class="btn btn-primary rounded-pill px-4" onclick="alert('Tính năng chia sẻ đang phát triển!')">
-            <i class="fas fa-plus me-2"></i> Chia sẻ ví mới
-        </button>
     </div>
 
-    @if (Model.SharedWallets.Any())
-    {
-        <div class="row g-4">
-            @foreach (var wallet in Model.SharedWallets)
-            {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div class="icon-box rounded-3 bg-light text-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                    <i class="@wallet.Icon fa-lg"></i>
-                                </div>
-                                <span class="badge bg-@GetPermissionColor(wallet.Permission) bg-opacity-10 text-@GetPermissionColor(wallet.Permission)">
-                                    @wallet.PermissionDisplay
-                                </span>
-                            </div>
-                            
-                            <h5 class="fw-bold mb-1">@wallet.AccountName</h5>
-                            <p class="text-muted small mb-3">Chia sẻ bởi: <strong>@wallet.SharedByUserName</strong></p>
-                            
-                            <h3 class="fw-bold text-primary mb-3">
-                                @wallet.CurrentBalance.ToString("N0") <small class="fs-6 text-muted">@wallet.Currency</small>
-                            </h3>
-                            
-                            <div class="d-flex gap-2 mt-4">
-                                <a href="/Wallets/Details?id=@wallet.Id" class="btn btn-outline-primary flex-grow-1 rounded-pill">Xem chi tiết</a>
-                                @if(wallet.Permission > 0) {
-                                    <a href="/Transactions/Create?accountId=@wallet.Id" class="btn btn-primary flex-grow-1 rounded-pill">
-                                        <i class="fas fa-plus"></i>
-                                    </a>
-                                }
-                            </div>
+    <div class="container-fluid px-4">
+        @if (Model.SharedWallets.Any())
+        {
+            <div class="shared-wallets-grid">
+                @foreach (var wallet in Model.SharedWallets)
+                {
+                    <div class="wallet-card-modern" data-name="@wallet.AccountName" data-shared-by="@wallet.SharedByUserName">
+                        <span class="permission-pill @GetPermissionClass(wallet.Permission)">
+                            @wallet.PermissionDisplay
+                        </span>
+                        
+                        <div class="wallet-icon-wrapper">
+                            <i class="@wallet.Icon"></i>
+                        </div>
+                        
+                        <h3 class="wallet-name" title="@wallet.AccountName">@wallet.AccountName</h3>
+                        
+                        <div class="shared-by-badge">
+                            <i class="fas fa-user-circle"></i>
+                            <span>@wallet.SharedByUserName</span>
+                        </div>
+
+                        <div class="wallet-balance">
+                            @wallet.CurrentBalance.ToString("N0")
+                            <small>@wallet.Currency</small>
+                        </div>
+
+                        <div class="card-actions">
+                            <a href="/Wallets/Detail/@wallet.AccountId" class="btn-modern btn-modern-outline" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            @if(wallet.Permission > 0) {
+                                <a href="/Transactions/Create?accountId=@wallet.Id" class="btn-modern btn-modern-primary" title="Thêm giao dịch">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            }
+                            <button class="btn-modern btn-modern-outline text-danger border-danger hover-bg-danger" onclick="leaveWallet(@wallet.Id)" title="Rời khỏi ví này" style="flex: 0 0 auto; width: 40px;">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="text-center py-5 bg-white rounded-3 shadow-sm border border-dashed">
-            <div class="mb-4">
-                <i class="fas fa-share-alt fa-3x text-muted opacity-50"></i>
+                }
             </div>
-            <h4 class="fw-bold text-gray-800">Chưa có ví nào được chia sẻ</h4>
-            <p class="text-muted max-w-md mx-auto">Khi người khác chia sẻ ví với bạn, danh sách sẽ xuất hiện tại đây.</p>
-        </div>
-    }
+        }
+        else
+        {
+            <div class="empty-state-modern">
+                <div class="empty-icon-circle">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <h3 class="fw-bold text-primary mb-3">Chưa có ví nào được chia sẻ</h3>
+                <p class="text-muted mb-4">Hiện tại bạn chưa được chia sẻ ví nào. Khi ai đó chia sẻ ví với bạn, nó sẽ xuất hiện ở đây.</p>
+                <button class="btn-modern btn-modern-outline" onclick="location.reload()">
+                    <i class="fas fa-sync-alt me-2"></i> Làm mới trang
+                </button>
+            </div>
+        }
+    </div>
 </div>
 
+<!-- Modal Chia sẻ -->
+<div class="modal fade" id="shareWalletModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Chia sẻ ví của bạn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Chọn ví (Của tôi)</label>
+                    <select id="shareAccountId" class="form-select">
+                        <option value="">-- Chọn ví --</option>
+                        @foreach(var w in Model.MyWallets)
+                        {
+                            <option value="@w.Id">@w.Name (@w.CurrentBalance.ToString("N0") @w.Currency)</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Chọn bạn bè</label>
+                    <select id="shareFriendId" class="form-select">
+                        <option value="">-- Chọn bạn bè --</option>
+                        @foreach(var f in Model.Friends)
+                        {
+                            <option value="@f.FriendId">@f.FriendName (@f.UserName)</option>
+                        }
+                    </select>
+                     <div class="form-text">Bạn chỉ có thể chia sẻ ví với người đã kết bạn.</div>
+                </div>
+                 <div class="mb-3">
+                    <label class="form-label fw-bold">Quyền hạn</label>
+                    <select id="sharePermission" class="form-select">
+                        <option value="0">Chỉ xem (View Only)</option>
+                        <option value="1">Được thêm giao dịch (Add)</option>
+                        <option value="2">Toàn quyền (Full Access)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="btnShareSubmit" onclick="submitShareWallet()">
+                    Chia sẻ ngay
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/shared-wallets.js" asp-append-version="true"></script>
+
 @functions {
-    string GetPermissionColor(int permission) {
+    string GetPermissionClass(int permission) {
         return permission switch {
-            0 => "info", // View
-            1 => "warning", // Add
-            2 => "success", // Full
-            _ => "secondary"
+            0 => "permission-view", // View
+            1 => "permission-add", // Add
+            2 => "permission-full", // Full
+            _ => "permission-view"
         };
     }
 }

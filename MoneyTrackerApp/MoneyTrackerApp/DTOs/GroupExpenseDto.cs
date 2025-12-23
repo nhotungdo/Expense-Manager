@@ -124,6 +124,9 @@ public class CreateGroupTransactionDto
     public string Currency { get; set; } = "VND";
     public string? Category { get; set; }
 
+    public bool SyncToPersonalWallet { get; set; }
+    public long? PersonalWalletId { get; set; }
+
     public List<SplitDetailDto> Splits { get; set; } = new();
 }
 

@@ -17,6 +17,20 @@ namespace MoneyTrackerApp.Controllers.Admin
             _userService = userService;
         }
 
+        [HttpPost]
+        public async Task<ActionResult<AdminUserDto>> CreateUser([FromBody] CreateUserDto dto)
+        {
+            try
+            {
+                var user = await _userService.CreateUserAsync(dto);
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<List<AdminUserDto>>> GetAllUsers([FromQuery] UserFilterDto filter)
         {

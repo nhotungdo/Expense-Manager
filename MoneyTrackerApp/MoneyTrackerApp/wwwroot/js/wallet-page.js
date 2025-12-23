@@ -80,6 +80,20 @@ function setupEventListeners() {
             showPeriodSelector();
         });
     }
+
+    // Account Card Click
+    const accountCards = document.querySelectorAll('.account-card[data-account-id]');
+    accountCards.forEach(card => {
+        card.addEventListener('click', function (e) {
+            // Prevent if clicked on menu or action buttons
+            if (e.target.closest('.menu-btn') || e.target.closest('.account-menu')) return;
+
+            const accountId = this.getAttribute('data-account-id');
+            if (accountId) {
+                window.location.href = `/Wallets/Detail/${accountId}`;
+            }
+        });
+    });
 }
 
 // Setup Form Listeners for Modals

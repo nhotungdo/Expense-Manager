@@ -12,6 +12,7 @@ namespace MoneyTrackerApp.Services
         Task<bool> UnlockUserAsync(long id);
         Task<bool> ResetPasswordAsync(long id);
         Task<bool> AssignRoleAsync(long id, string role);
+        Task<AdminUserDto> CreateUserAsync(CreateUserDto dto);
     }
 
     public class UserManagementService : IUserManagementService
@@ -58,6 +59,42 @@ namespace MoneyTrackerApp.Services
                 .FirstOrDefaultAsync(u => u.Id == id);
             
             return user == null ? null : MapToDto(user);
+        }
+
+        public async Task<AdminUserDto> CreateUserAsync(CreateUserDto dto)
+        {
+            // Check existence
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            {
+                throw new Exception("Email already exists");
+            }
+
+            var user = new User
+            {
+                Email = dto.Email,
+                UserName = dto.Email,
+                NormalizedEmail = dto.Email.ToUpperInvariant(),
+                NormalizedUserName = dto.Email.ToUpperInvariant(),
+                FullName = dto.FullName.Trim(),
+                Role = dto.Role,
+                Enabled = true,
+                EmailConfirmed = true,
+                CreatedAt = DateTime.UtcNow,
+                Language = "vi",
+                DefaultCurrency = "VND",
+                Timezone = "Asia/Ho_Chi_Minh",
+                Theme = "light",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                GoogleId = $"local_{Guid.NewGuid()}"
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            // Initialize categories if needed, but we can skip or do manual init here if we had dependency.
+            // Simplified for Admin Create.
+            
+            return MapToDto(user);
         }
 
         public async Task<bool> LockUserAsync(long id, int durationMinutes)

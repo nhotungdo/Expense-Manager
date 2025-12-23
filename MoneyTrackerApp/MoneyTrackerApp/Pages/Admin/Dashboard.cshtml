@@ -2,264 +2,203 @@
 @model MoneyTrackerApp.Pages.Admin.DashboardModel
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Trung tâm điều khiển";
+    ViewData["Title"] = "Tổng quan hệ thống";
 }
 
-<style>
-    .kpi-card {
-        background: #fff;
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        border-left: 5px solid transparent;
-        transition: transform 0.2s;
-        height: 100%;
-        padding: 20px;
-    }
-    .kpi-card:hover {
-        transform: translateY(-5px);
-    }
-    .kpi-card.users { border-left-color: #3498db; }
-    .kpi-card.revenue { border-left-color: #2ecc71; }
-    .kpi-card.traffic { border-left-color: #f39c12; }
-    .kpi-card.health { border-left-color: #e74c3c; }
-    .kpi-card.health.healthy { border-left-color: #95a5a6; } /* Gray if 0 errors */
-
-    .kpi-label {
-        font-size: 0.9rem;
-        color: #7f8c8d;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-    .kpi-value {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-    .kpi-sub {
-        font-size: 0.8rem;
-        margin-top: 5px;
-    }
-
-    .dashboard-panel {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        padding: 20px;
-        height: 100%;
-        margin-bottom: 20px;
-    }
-    .panel-title {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #34495e;
-        margin-bottom: 15px;
-        border-bottom: 1px solid #f1f1f1;
-        padding-bottom: 10px;
-    }
-
-    .status-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f9f9f9;
-        font-size: 0.95rem;
-    }
-    .status-indicator {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 8px;
-    }
-    .bg-connected { background-color: #2ecc71; }
-    .bg-idle { background-color: #f1c40f; }
-    .bg-error { background-color: #e74c3c; }
-
-    .table-custom {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-    .table-custom thead th {
-        background-color: #f8f9fa;
-        color: #7f8c8d;
-        font-weight: 600;
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 2px solid #ecf0f1;
-        font-size: 0.9rem;
-    }
-    .table-custom tbody td {
-        padding: 12px 15px;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        font-size: 0.85rem;
-        color: #34495e;
-    }
-    .table-custom tbody tr:hover {
-        background-color: #fcfcfc;
-    }
-</style>
-
-<!-- Row 1: KPI Cards -->
+<!-- Stats Row -->
 <div class="row g-4 mb-4">
-    <!-- Card 1: Users -->
-    <div class="col-md-3">
-        <div class="kpi-card users">
-            <div class="d-flex justify-content-between">
+    <!-- Total Users -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card-modern">
+            <div class="stat-card">
                 <div>
-                    <div class="kpi-label">Người dùng</div>
-                    <div class="kpi-value">@Model.DashboardData.TotalUsers.ToString("N0")</div>
-                    <div class="kpi-sub text-success">
-                        <i class="fas fa-arrow-up"></i> +@Model.DashboardData.NewUsersToday hôm nay
+                    <div class="stat-label">Người dùng</div>
+                    <div class="stat-value">@Model.DashboardData.TotalUsers.ToString("N0")</div>
+                    <div class="stat-trend text-success">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+@Model.DashboardData.NewUsersToday hôm nay</span>
                     </div>
                 </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-users fa-2x"></i>
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Card 2: Revenue/Assets -->
-    <div class="col-md-3">
-        <div class="kpi-card revenue">
-            <div class="d-flex justify-content-between">
+    <!-- AUM -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card-modern">
+            <div class="stat-card">
                 <div>
-                    <div class="kpi-label">AUM / Tài sản</div>
-                    <div class="kpi-value">@Model.DashboardData.SystemAum.ToString("N0")</div>
-                    <div class="kpi-sub text-muted">Tổng quản lý</div>
-                </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-wallet fa-2x"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 3: Traffic -->
-    <div class="col-md-3">
-        <div class="kpi-card traffic">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="kpi-label">Lưu lượng</div>
-                    <div class="kpi-value">@Model.DashboardData.TodayTransactionsCount.ToString("N0")</div>
-                    <div class="kpi-sub text-warning">Yêu cầu hôm nay</div>
-                </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-exchange-alt fa-2x"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 4: Health -->
-    <div class="col-md-3">
-        <div class="kpi-card health @(Model.DashboardData.SystemHealthWarnings == 0 ? "healthy" : "")">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="kpi-label">Sức khỏe hệ thống</div>
-                    <div class="kpi-value">@Model.DashboardData.SystemHealthWarnings</div>
-                    <div class="kpi-sub @(Model.DashboardData.SystemHealthWarnings > 0 ? "text-danger" : "text-muted")">
-                        @(Model.DashboardData.SystemHealthWarnings > 0 ? "Phát hiện lỗi" : "Hệ thống ổn định")
+                    <div class="stat-label">Tổng tài sản (AUM)</div>
+                    <div class="stat-value">@Model.DashboardData.SystemAum.ToString("N0")</div>
+                    <div class="stat-trend text-muted">
+                        <small>Toàn hệ thống</small>
                     </div>
                 </div>
-                <div class="text-secondary opacity-25">
-                    <i class="fas fa-heartbeat fa-2x"></i>
+                <div class="stat-icon" style="color: #10b981; background-color: #d1fae5;">
+                    <i class="fas fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Traffic -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card-modern">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-label">Lưu lượng hôm nay</div>
+                    <div class="stat-value">@Model.DashboardData.TodayTransactionsCount.ToString("N0")</div>
+                    <div class="stat-trend text-warning">
+                        <small>Yêu cầu xử lý</small>
+                    </div>
+                </div>
+                <div class="stat-icon" style="color: #f59e0b; background-color: #fef3c7;">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card-modern">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-label">Sức khỏe hệ thống</div>
+                    <div class="stat-value">@Model.DashboardData.SystemHealthWarnings</div>
+                    <div class="stat-trend @(Model.DashboardData.SystemHealthWarnings > 0 ? "text-danger" : "text-muted")">
+                        @if(Model.DashboardData.SystemHealthWarnings > 0)
+                        {
+                            <i class="fas fa-exclamation-triangle"></i> <span>Có cảnh báo</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-check-circle text-success"></i> <span class="text-success">Hoạt động tốt</span>
+                        }
+                    </div>
+                </div>
+                <div class="stat-icon" style="color: #ef4444; background-color: #fee2e2;">
+                    <i class="fas fa-heartbeat"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Row 2: Chart & Monitoring (7:3) -->
+<!-- Main Content Row -->
 <div class="row g-4 mb-4">
-    <!-- Chart Section (7) -->
+    <!-- Chart Section -->
     <div class="col-lg-8">
-        <div class="dashboard-panel">
-            <div class="panel-title">
-                <i class="fas fa-chart-area me-2 text-primary"></i> Tổng quan lưu lượng
+        <div class="card-modern">
+            <div class="section-title">
+                <span>Lưu lượng truy cập</span>
+                <select class="form-select form-select-sm w-auto" style="border-radius: 6px;">
+                    <option>7 ngày qua</option>
+                    <option>Tháng này</option>
+                </select>
             </div>
-            <div id="trafficChart" style="min-height: 300px;"></div>
+            <div id="trafficChart" class="chart-container"></div>
         </div>
     </div>
 
-    <!-- Server Status Section (3) -->
+    <!-- Server Status -->
     <div class="col-lg-4">
-        <div class="dashboard-panel">
-            <div class="panel-title">
-                <i class="fas fa-server me-2 text-primary"></i> Trạng thái máy chủ
+        <div class="card-modern">
+            <div class="section-title">
+                <span>Trạng thái dịch vụ</span>
+                <button class="btn btn-sm btn-light rounded-circle"><i class="fas fa-sync-alt"></i></button>
             </div>
-            <div class="status-list">
-                <div class="status-item">
-                    <span>Database Engine</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đã kết nối</span>
+            
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-database"></i></div>
+                        <span class="fw-medium">Database Engine</span>
+                    </div>
+                    <span class="status-badge success"><i class="fas fa-check"></i> Online</span>
                 </div>
-                <div class="status-item">
-                    <span>Email Service</span>
-                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2">Chờ</span>
+                
+                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-envelope"></i></div>
+                        <span class="fw-medium">Email Service</span>
+                    </div>
+                    <span class="status-badge warning"><i class="fas fa-clock"></i> Waiting</span>
                 </div>
-                <div class="status-item">
-                    <span>Banking API Gateway</span>
-                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2">Lỗi</span>
+
+                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-university"></i></div>
+                        <span class="fw-medium">Banking API</span>
+                    </div>
+                    <span class="status-badge danger"><i class="fas fa-times"></i> Error</span>
                 </div>
-                <div class="status-item">
-                    <span>Redis Cache</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đã kết nối</span>
-                </div>
-                <div class="status-item">
-                    <span>Background Jobs</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Đang chạy</span>
+
+                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-memory"></i></div>
+                        <span class="fw-medium">Redis Cache</span>
+                    </div>
+                    <span class="status-badge success"><i class="fas fa-check"></i> Online</span>
                 </div>
             </div>
-             <div class="mt-4 text-center">
-                 <button class="btn btn-outline-primary btn-sm w-100"><i class="fas fa-sync-alt me-1"></i> Làm mới trạng thái</button>
-             </div>
         </div>
     </div>
 </div>
 
-<!-- Row 3: Data Grid -->
+<!-- Recent Logs -->
 <div class="row">
     <div class="col-12">
-        <div class="dashboard-panel">
-            <div class="panel-title d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-shield-alt me-2 text-primary"></i> Nhật ký kiểm toán gần đây</span>
-                <button class="btn btn-sm btn-link text-decoration-none">Xem tất cả</button>
+        <div class="card-modern">
+            <div class="section-title">
+                <span>Nhật ký bảo mật gần đây</span>
+                <a href="/Admin/Monitoring/AuditLogs" class="text-primary text-decoration-none small fw-bold">Xem tất cả <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
-            <div class="table-responsive">
-                <table class="table-custom">
+            
+            <div class="table-modern-wrapper">
+                <table class="table-modern">
                     <thead>
                         <tr>
                             <th>Thời gian</th>
-                            <th>Người dùng (Email)</th>
+                            <th>Người dùng</th>
                             <th>Hành động</th>
-                            <th>Địa chỉ IP</th>
-                            <th>Chi tiết</th>
+                            <th>IP Address</th>
+                            <th>Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.DashboardData.RecentAuditLogs != null && Model.DashboardData.RecentAuditLogs.Any())
+                         @if (Model.DashboardData.RecentAuditLogs != null && Model.DashboardData.RecentAuditLogs.Any())
                         {
                             foreach (var log in Model.DashboardData.RecentAuditLogs.Take(5))
                             {
                                 <tr>
-                                    <td>@log.Time.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                    <td>@log.UserEmail</td>
+                                    <td class="text-muted">@log.Time.ToString("dd/MM HH:mm")</td>
                                     <td>
-                                        <span class="badge bg-light text-dark border">@log.Action</span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle bg-light text-secondary d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; font-size: 10px;">
+                                                @log.UserEmail?.Substring(0,1).ToUpper()
+                                            </div>
+                                            <span class="fw-medium">@log.UserEmail</span>
+                                        </div>
                                     </td>
-                                    <td>@log.IpAddress</td>
-                                    <td class="text-muted small">Thực hiện qua Web Client</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border fw-normal">@log.Action</span>
+                                    </td>
+                                    <td class="font-monospace text-muted small">@log.IpAddress</td>
+                                    <td><span class="status-badge success">Success</span></td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr>
-                                <td colspan="5" class="text-center py-3 text-muted">Không tìm thấy nhật ký gần đây.</td>
+                             <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-2 d-block opacity-25"></i>
+                                    Không có dữ liệu nhật ký mới
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -271,8 +210,6 @@
 
 @section Scripts {
     <script>
-        // Use Mock data for "Hourly Traffic" if model doesn't provide it, or map TransactionVolumeChart
-        // Mapping TransactionVolumeChart (Day) to Chart
         var trafficLabels = [];
         var trafficData = [];
         
@@ -284,44 +221,57 @@
                 @:trafficData.push(@item.Count);
             }
         }
-
-        // Fallback mock labels/data if empty
+        
         if (trafficLabels.length === 0) {
-            trafficLabels = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-            trafficData = [12, 45, 67, 89, 34, 56, 78, 90, 110, 65];
+            trafficLabels = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
+            trafficData = [30, 40, 35, 50, 49, 60, 70];
         }
 
         var options = {
             series: [{
-                name: 'Lưu lượng',
+                name: 'Requests',
                 data: trafficData
             }],
             chart: {
-                height: 350,
-                type: 'line',
-                zoom: { enabled: false },
-                toolbar: { show: false }
+                height: 320,
+                type: 'area',
+                toolbar: { show: false },
+                fontFamily: 'Plus Jakarta Sans, sans-serif'
             },
             dataLabels: { enabled: false },
             stroke: {
                 curve: 'smooth',
-                width: 3,
-                colors: ['#3498db']
+                width: 2
             },
-            title: {
-                text: 'Lưu lượng / Yêu cầu theo giờ',
-                align: 'left',
-                style: { color: '#7f8c8d' }
-            },
-            grid: {
-                row: {
-                    colors: ['#f3f3f3', 'transparent'],
-                    opacity: 0.5
-                },
-                borderColor: '#ecf0f1'
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.4,
+                    opacityTo: 0.05,
+                    stops: [0, 90, 100]
+                }
             },
             xaxis: {
                 categories: trafficLabels,
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                show: true,
+                tickAmount: 5
+            },
+            grid: {
+                borderColor: '#f1f5f9',
+                strokeDashArray: 4,
+            },
+            theme: {
+                monochrome: {
+                    enabled: true,
+                    color: '#4f46e5',
+                    shadeTo: 'light',
+                    shadeIntensity: 0.65
+                }
             }
         };
 

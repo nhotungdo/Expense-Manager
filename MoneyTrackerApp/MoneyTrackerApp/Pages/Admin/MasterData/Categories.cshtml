@@ -6,119 +6,116 @@
     ViewData["HideFooter"] = true;
 }
 
-<!-- Page Header -->
-<div class="page-header">
-    <div class="page-title">
-        <div class="icon-box" style="background: rgba(79, 70, 229, 0.1); color: var(--primary);">
-            <i class="fas fa-tags"></i>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card-modern">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex gap-3">
+                    <button class="btn btn-link text-decoration-none fw-bold border-bottom border-2 border-primary text-primary p-0 pb-1" onclick="filterType(null, this)">
+                        Tất cả
+                    </button>
+                    <button class="btn btn-link text-decoration-none fw-medium text-muted border-bottom border-2 border-transparent p-0 pb-1" onclick="filterType(1, this)">
+                        Thu nhập
+                    </button>
+                    <button class="btn btn-link text-decoration-none fw-medium text-muted border-bottom border-2 border-transparent p-0 pb-1" onclick="filterType(2, this)">
+                        Chi tiêu
+                    </button>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="showAddModal()">
+                    <i class="fas fa-plus me-1"></i> Thêm danh mục
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-5">
+                <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+                <p class="text-muted">Đang tải danh mục...</p>
+            </div>
+
+            <!-- Categories Grid -->
+            <div id="categoryList" class="row g-4">
+                <!-- Content injected by JS -->
+            </div>
         </div>
-        Danh mục Thu chi
-    </div>
-    <div class="user-actions">
-        <button class="btn btn-primary" onclick="showAddModal()">
-            <i class="fas fa-plus"></i> Thêm danh mục
-        </button>
-    </div>
-</div>
-
-<!-- Category Tabs -->
-<div style="padding: 0 2rem; margin-bottom: 1.5rem;">
-    <div style="display: flex; gap: 1rem; border-bottom: 1px solid var(--border);">
-        <button class="btn btn-outline active-tab" onclick="filterType(null, this)" style="border:none; border-bottom: 2px solid var(--primary); border-radius: 0; color: var(--primary);">
-            Tất cả
-        </button>
-        <button class="btn btn-outline" onclick="filterType(1, this)" style="border:none; border-bottom: 2px solid transparent; border-radius: 0; color: var(--text-secondary);">
-            Thu nhập
-        </button>
-        <button class="btn btn-outline" onclick="filterType(2, this)" style="border:none; border-bottom: 2px solid transparent; border-radius: 0; color: var(--text-secondary);">
-            Chi tiêu
-        </button>
-    </div>
-</div>
-
-<!-- Main Content -->
-<div class="bento-container" id="categoryList" style="grid-template-columns: repeat(3, 1fr); padding-top: 0;">
-    <!-- Loading State -->
-    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
-        <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
-        <p style="margin-top: 10px; color: var(--text-secondary);">Đang tải danh mục...</p>
     </div>
 </div>
 
 <!-- Add/Edit Modal -->
-<div id="categoryModal" class="modal">
-    <div class="modal-content">
-        <button class="close-modal" onclick="closeModal()">
-            <i class="fas fa-times"></i>
-        </button>
-        <h2 class="card-title mb-4" id="modalTitle">Thêm danh mục</h2>
-        <form id="categoryForm">
-            <input type="hidden" id="catId" />
-            
-            <div class="form-group">
-                <label class="form-label" for="catType">Loại giao dịch *</label>
-                <div style="display: flex; gap: 1rem;">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; border: 1px solid var(--border); border-radius: 8px; flex: 1;">
-                        <input type="radio" name="catType" value="1" onchange="loadParents(1)" required>
-                        <span style="color: var(--success); font-weight: 600;">Thu nhập</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; border: 1px solid var(--border); border-radius: 8px; flex: 1;">
-                        <input type="radio" name="catType" value="2" onchange="loadParents(2)" checked>
-                        <span style="color: var(--danger); font-weight: 600;">Chi tiêu</span>
-                    </label>
-                </div>
+<div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold" id="modalTitle">Thêm danh mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
-            <div class="form-group">
-                <label class="form-label" for="catName">Tên danh mục *</label>
-                <input type="text" id="catName" class="form-control" required placeholder="Ví dụ: Ăn uống, Lương..." />
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Biểu tượng & Màu sắc</label>
-                <div style="display: flex; gap: 10px;">
-                    <div style="position: relative; flex: 1;">
-                        <select id="catIcon" class="form-control" style="font-size: 1.2rem;">
-                            <!-- Common Icons -->
-                            <optgroup label="Chi tiêu">
-                                <option value="🏠">🏠 Nhà ở</option>
-                                <option value="🍕">🍕 Ăn uống</option>
-                                <option value="🚗">🚗 Di chuyển</option>
-                                <option value="🛍️">🛍️ Mua sắm</option>
-                                <option value="🎬">🎬 Giải trí</option>
-                                <option value="🏥">🏥 Y tế</option>
-                                <option value="🎓">🎓 Giáo dục</option>
-                            </optgroup>
-                            <optgroup label="Thu nhập">
-                                <option value="💰">💰 Lương</option>
-                                <option value="💼">💼 Thưởng</option>
-                                <option value="📈">📈 Đầu tư</option>
-                                <option value="🎁">🎁 Quà tặng</option>
-                            </optgroup>
-                        </select>
+            <div class="modal-body p-4">
+                <form id="categoryForm">
+                    <input type="hidden" id="catId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Loại giao dịch *</label>
+                        <div class="d-flex gap-3">
+                            <label class="flex-fill cursor-pointer p-3 border rounded d-flex align-items-center gap-2 hover-shadow transition-all">
+                                <input type="radio" class="form-check-input" name="catType" value="1" onchange="loadParents(1)" required>
+                                <span class="fw-bold text-success">Thu nhập</span>
+                            </label>
+                            <label class="flex-fill cursor-pointer p-3 border rounded d-flex align-items-center gap-2 hover-shadow transition-all">
+                                <input type="radio" class="form-check-input" name="catType" value="2" onchange="loadParents(2)" checked>
+                                <span class="fw-bold text-danger">Chi tiêu</span>
+                            </label>
+                        </div>
                     </div>
-                    <input type="color" id="catColor" class="form-control" style="width: 60px; padding: 2px; height: 42px;" value="#4f46e5">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label" for="catParent">Danh mục cha (Không bắt buộc)</label>
-                <select id="catParent" class="form-control">
-                    <option value="">-- Không có --</option>
-                </select>
-                <p class="text-sm text-muted mt-1">Chọn danh mục cha để tạo nhóm danh mục con.</p>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="catDesc">Mô tả</label>
-                <input type="text" id="catDesc" class="form-control" placeholder="Ghi chú thêm..." />
-            </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Tên danh mục *</label>
+                        <input type="text" id="catName" class="form-control bg-light" required placeholder="Ví dụ: Ăn uống, Lương..." />
+                    </div>
 
-            <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Biểu tượng & Màu sắc</label>
+                        <div class="d-flex gap-2">
+                            <div class="flex-grow-1">
+                                <select id="catIcon" class="form-select bg-light" style="font-size: 1.2rem;">
+                                    <optgroup label="Chi tiêu">
+                                        <option value="🏠">🏠 Nhà ở</option>
+                                        <option value="🍕">🍕 Ăn uống</option>
+                                        <option value="🚗">🚗 Di chuyển</option>
+                                        <option value="🛍️">🛍️ Mua sắm</option>
+                                        <option value="🎬">🎬 Giải trí</option>
+                                        <option value="🏥">🏥 Y tế</option>
+                                        <option value="🎓">🎓 Giáo dục</option>
+                                    </optgroup>
+                                    <optgroup label="Thu nhập">
+                                        <option value="💰">💰 Lương</option>
+                                        <option value="💼">💼 Thưởng</option>
+                                        <option value="📈">📈 Đầu tư</option>
+                                        <option value="🎁">🎁 Quà tặng</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <input type="color" id="catColor" class="form-control form-control-color" value="#4f46e5" title="Chọn màu">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Danh mục cha</label>
+                        <select id="catParent" class="form-select bg-light">
+                            <option value="">-- Không có --</option>
+                        </select>
+                        <div class="form-text">Chọn nếu đây là danh mục con.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Mô tả</label>
+                        <textarea id="catDesc" class="form-control bg-light" rows="2" placeholder="Ghi chú thêm..."></textarea>
+                    </div>
+                </form>
             </div>
-        </form>
+            <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary px-4" onclick="submitForm()">Lưu</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -127,42 +124,37 @@
     let allCategories = [];
     let currentFilterType = null;
     let isEditMode = false;
+    let modalInstance = null;
 
     document.addEventListener('DOMContentLoaded', () => {
+        modalInstance = new bootstrap.Modal(document.getElementById('categoryModal'));
         loadCategories();
     });
 
     async function loadCategories() {
         try {
             const token = getCookie('AccessToken');
-            // Assuming the simple list is plenty, but let's try tree if available if we want visual nesting
-            // But simple list with parentId is easier to manipulate for filtering
-            // Let's use get all (flat) and build UI manually
             const res = await fetch('/api/Categories', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
             
-            // Map flat data if needed, assuming the response is List<CategoryResponseDto>
-            // JS property names might be camelCase because of Controller implementation comment
             allCategories = data;
+            document.getElementById('loadingState').style.display = 'none';
             renderCategories();
-            loadParents(2); // Default load parents for expense
+            loadParents(2);
         } catch (e) {
             console.error(e);
-            document.getElementById('categoryList').innerHTML = `<p class="text-danger text-center w-100">Lỗi tải dữ liệu</p>`;
+            document.getElementById('loadingState').innerHTML = `<p class="text-danger">Lỗi tải dữ liệu</p>`;
         }
     }
 
     function renderCategories() {
-        // Build Tree from Flat List
-        // 1. Filter by Type if selected
-        let filtered = allCategories.filter(c => c.isActive !== false); // Hide inactive? Or show with opacity?
+        let filtered = allCategories.filter(c => c.isActive !== false);
         if (currentFilterType) {
             filtered = filtered.filter(c => c.type === currentFilterType);
         }
 
-        // 2. Separate Parents and Children
         const parents = filtered.filter(c => !c.parentCategoryId);
         const children = filtered.filter(c => c.parentCategoryId);
 
@@ -170,98 +162,100 @@
         
         if (parents.length === 0) {
             container.innerHTML = `
-                <div style="grid-column: 1/-1; text-align:center; padding: 3rem;" class="empty-state">
-                    <div class="empty-icon">📂</div>
-                    <h3>Chưa có danh mục nào</h3>
-                    <p>Hãy tạo danh mục đầu tiên!</p>
+                <div class="col-12 text-center py-5">
+                    <div class="text-muted mb-2 display-4">📂</div>
+                    <h5 class="text-muted">Chưa có danh mục nào</h5>
+                    <button class="btn btn-outline-primary mt-3" onclick="showAddModal()">Tạo mới ngay</button>
                 </div>
             `;
             return;
         }
 
         container.innerHTML = parents.map(p => {
-            // Find children for this parent
             const myChildren = children.filter(c => c.parentCategoryId === p.id);
             const isIncome = p.type === 1;
+            const cardBorderColor = p.color || (isIncome ? '#10b981' : '#ef4444');
             
             return `
-            <div class="bento-card" style="position: relative; overflow: hidden; border-left: 4px solid ${p.color || (isIncome ? 'var(--success)' : 'var(--danger)')};">
-                 <!-- Actions -->
-                 <div style="position: absolute; top: 1rem; right: 1rem; display: flex; gap: 5px;">
-                     ${!p.isDefault ? `
-                        <button class="btn-icon" onclick="editCategory(${p.id})" title="Sửa" style="background:none; border:none; cursor:pointer; color: var(--text-secondary);"><i class="fas fa-edit"></i></button>
-                        ${p.transactionCount === 0 && myChildren.length === 0 ? 
-                            `<button class="btn-icon" onclick="deleteCategory(${p.id})" title="Xóa" style="background:none; border:none; cursor:pointer; color: var(--danger);"><i class="fas fa-trash"></i></button>` 
-                            : ''}
-                     ` : '<span class="badge badge-neutral">Mặc định</span>'}
-                 </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow transition-all" style="border-left: 4px solid ${cardBorderColor} !important;">
+                    <div class="card-body">
+                         <div class="d-flex justify-content-between align-items-start mb-3">
+                             <div class="d-flex align-items-center gap-3">
+                                <div class="rounded p-2 d-flex align-items-center justify-content-center" style="background-color: ${cardBorderColor}20; width: 48px; height: 48px; font-size: 1.5rem;">
+                                    ${p.icon || '📁'}
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">${escapeHtml(p.name)}</h6>
+                                    <small class="text-muted">${p.transactionCount} giao dịch</small>
+                                </div>
+                             </div>
+                             
+                             <div class="dropdown">
+                                <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                                    ${!p.isDefault ? `
+                                        <li><button class="dropdown-item" onclick="editCategory(${p.id})"><i class="fas fa-edit me-2 text-primary"></i> Sửa</button></li>
+                                        ${p.transactionCount === 0 && myChildren.length === 0 ? 
+                                            `<li><button class="dropdown-item text-danger" onclick="deleteCategory(${p.id})"><i class="fas fa-trash me-2"></i> Xóa</button></li>` 
+                                            : ''}
+                                    ` : '<li><span class="dropdown-item text-muted small">Mặc định</span></li>'}
+                                </ul>
+                             </div>
+                         </div>
 
-                <div style="display: flex; align-items: start; gap: 15px; margin-bottom: 10px;">
-                    <div class="icon-box" style="background: ${p.color}20; color: ${p.color || '#333'}; font-size: 1.5rem;">
-                        ${p.icon || '📁'}
-                    </div>
-                    <div>
-                        <h3 class="card-title" style="margin-bottom: 4px;">${escapeHtml(p.name)}</h3>
-                        <p class="text-secondary" style="font-size: 0.85rem; margin: 0;">${p.transactionCount} giao dịch</p>
+                        ${myChildren.length > 0 ? `
+                            <div class="pt-3 border-top mt-2">
+                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Danh mục con</small>
+                                <div class="mt-2 d-flex flex-column gap-2">
+                                    ${myChildren.map(child => `
+                                        <div class="d-flex align-items-center justify-content-between bg-light rounded p-2 px-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span>${child.icon}</span>
+                                                <span class="small fw-medium">${escapeHtml(child.name)}</span>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-link p-0 text-secondary" style="font-size: 0.8rem;" onclick="editCategory(${child.id})"><i class="fas fa-pen"></i></button>
+                                                ${!child.isDefault && child.transactionCount === 0 ? 
+                                                    `<button class="btn btn-link p-0 text-danger" style="font-size: 0.8rem;" onclick="deleteCategory(${child.id})"><i class="fas fa-times"></i></button>`
+                                                    : ''}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
-
-                ${myChildren.length > 0 ? `
-                    <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border);">
-                        <p class="text-sm text-muted" style="margin-bottom: 8px;">Danh mục con:</p>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            ${myChildren.map(child => `
-                                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; padding: 4px 8px; background: var(--bg-body); border-radius: 6px;">
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span>${child.icon}</span>
-                                        <span>${escapeHtml(child.name)}</span>
-                                    </div>
-                                    <div style="display:flex; gap: 5px;">
-                                        <button onclick="editCategory(${child.id})" style="border:none; background:none; cursor:pointer; font-size: 0.8rem; color: var(--primary);"><i class="fas fa-pen"></i></button>
-                                         ${!child.isDefault && child.transactionCount === 0 ? 
-                                            `<button onclick="deleteCategory(${child.id})" style="border:none; background:none; cursor:pointer; font-size: 0.8rem; color: var(--danger);"><i class="fas fa-times"></i></button>`
-                                            : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                ` : ''}
             </div>
             `;
         }).join('');
     }
 
-    // Filter Logic
     function filterType(type, btn) {
         currentFilterType = type;
         
-        // Update Tabs
-        const buttons = btn.parentElement.querySelectorAll('button');
+        // Reset styles
+        const container = btn.parentElement;
+        const buttons = container.querySelectorAll('button');
         buttons.forEach(b => {
-            b.style.borderBottomColor = 'transparent';
-            b.style.color = 'var(--text-secondary)';
-            b.classList.remove('active-tab');
+            b.className = 'btn btn-link text-decoration-none fw-medium text-muted border-bottom border-2 border-transparent p-0 pb-1';
         });
-        btn.style.borderBottomColor = 'var(--primary)';
-        btn.style.color = 'var(--primary)';
-        btn.classList.add('active-tab');
-
+        
+        btn.className = 'btn btn-link text-decoration-none fw-bold border-bottom border-2 border-primary text-primary p-0 pb-1';
         renderCategories();
     }
 
-    // Modal Logic
     function showAddModal() {
         isEditMode = false;
         document.getElementById('modalTitle').innerText = "Thêm danh mục mới";
         document.getElementById('categoryForm').reset();
         document.getElementById('catId').value = "";
         
-        // Default to Expense
         document.querySelector('input[name="catType"][value="2"]').checked = true;
         loadParents(2);
         
-        document.getElementById('categoryModal').style.display = 'block';
+        modalInstance.show();
     }
 
     function editCategory(id) {
@@ -274,42 +268,35 @@
         document.getElementById('catName').value = cat.name;
         document.getElementById('catDesc').value = cat.description || '';
         document.getElementById('catColor').value = cat.color || '#4f46e5';
-        document.getElementById('catIcon').value = cat.icon; // Might not match custom icons
         
-        // Handle custom icon if not in select
-        const options = Array.from(document.getElementById('catIcon').options).map(o => o.value);
-        if(!options.includes(cat.icon)) {
-             // Create temp option
+        // Handle custom icon
+        const iconSelect = document.getElementById('catIcon');
+        let optionExists = false;
+        for(let i=0; i<iconSelect.options.length; i++) {
+            if(iconSelect.options[i].value == cat.icon) optionExists = true;
+        }
+        if(!optionExists && cat.icon) {
              const opt = document.createElement('option');
              opt.value = cat.icon;
              opt.text = cat.icon;
-             document.getElementById('catIcon').add(opt);
+             iconSelect.add(opt);
         }
         document.getElementById('catIcon').value = cat.icon;
 
-        // Type radio
         const radios = document.getElementsByName('catType');
         radios.forEach(r => {
              r.checked = parseInt(r.value) === cat.type;
-             r.disabled = true; // Cannot change type on edit usually
         });
         
-        loadParents(cat.type, cat.parentCategoryId, cat.id); // pass selfId to exclude self from parents
+        loadParents(cat.type, cat.parentCategoryId, cat.id);
         
-        document.getElementById('categoryModal').style.display = 'block';
-    }
-
-    function closeModal() {
-        document.getElementById('categoryModal').style.display = 'none';
-        // Re-enable radios
-        document.getElementsByName('catType').forEach(r => r.disabled = false);
+        modalInstance.show();
     }
 
     function loadParents(type, selectedId = null, excludeId = null) {
         const parentSelect = document.getElementById('catParent');
         parentSelect.innerHTML = '<option value="">-- Không có --</option>';
         
-        // Filter potential parents: Same type, no parent themselves (only 2 levels), and not self
         const potentialParents = allCategories.filter(c => 
             c.type == type && 
             !c.parentCategoryId && 
@@ -325,7 +312,10 @@
         });
     }
 
-    // Submit
+    function submitForm() {
+        document.getElementById('categoryForm').dispatchEvent(new Event('submit'));
+    }
+
     document.getElementById('categoryForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const token = getCookie('AccessToken');
@@ -343,29 +333,23 @@
             let res;
             if(isEditMode) {
                 const id = document.getElementById('catId').value;
-                data.id = parseInt(id); // Required for DTO
+                data.id = parseInt(id);
                 res = await fetch(`/api/Categories/${id}`, {
                     method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(data)
                 });
             } else {
                 res = await fetch('/api/Categories', {
                     method: 'POST',
-                    headers: { 
-                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(data)
                 });
             }
 
             if(res.ok) {
-                closeModal();
-                loadCategories(); // Reload
+                modalInstance.hide();
+                loadCategories();
             } else {
                 const err = await res.json();
                 alert(err.message || 'Có lỗi xảy ra');
@@ -378,22 +362,12 @@
 
     async function deleteCategory(id) {
         if(!confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
-        
         const token = getCookie('AccessToken');
         try {
-            const res = await fetch(`/api/Categories/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if(res.ok) {
-                loadCategories();
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Không thể xóa');
-            }
-        } catch(ex) {
-             alert("Lỗi hệ thống");
-        }
+            const res = await fetch(`/api/Categories/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            if(res.ok) loadCategories();
+            else alert('Không thể xóa');
+        } catch(ex) { alert("Lỗi hệ thống"); }
     }
 
     function getCookie(name) {
@@ -404,13 +378,8 @@
 
     function escapeHtml(text) {
         if(!text) return '';
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = "none";
-        }
+        var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 </script>
 }

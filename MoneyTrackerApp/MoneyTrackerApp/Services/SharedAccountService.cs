@@ -18,6 +18,8 @@ public interface ISharedAccountService
     Task<bool> RevokeAccessAsync(long userId, long sharedAccountId);
     Task<bool> CanAccessAccountAsync(long accountId, long userId);
     Task<int> GetPermissionLevelAsync(long accountId, long userId);
+    Task<bool> LeaveSharedAccountAsync(long userId, long sharedAccountId);
+    Task<SharedAccountResponseDto> InviteMemberAsync(long senderId, long accountId, string emailOrPhone, int permission);
 }
 
 public class SharedAccountService : ISharedAccountService
@@ -67,11 +69,15 @@ public class SharedAccountService : ISharedAccountService
     /// </summary>
     public async Task<List<SharedAccountResponseDto>> GetAccountSharingAsync(long accountId, long userId)
     {
+        // Check if user has access (Owner or Shared)
+        if (!await CanAccessAccountAsync(accountId, userId))
+             return new List<SharedAccountResponseDto>();
+
         var sharedAccounts = await _context.SharedAccounts
             .Include(sa => sa.Account)
             .Include(sa => sa.User)
             .Include(sa => sa.SharedByUser)
-            .Where(sa => sa.AccountId == accountId && sa.Account.UserId == userId)
+            .Where(sa => sa.AccountId == accountId)
             .OrderByDescending(sa => sa.CreatedAt)
             .ToListAsync();
 
@@ -210,6 +216,70 @@ public class SharedAccountService : ISharedAccountService
         return sharedAccount;
     }
 
+    /// <summary>
+    /// Allow a user to leave a shared account
+    /// </summary>
+    public async Task<bool> LeaveSharedAccountAsync(long userId, long sharedAccountId)
+    {
+        var sharedAccount = await _context.SharedAccounts
+            .Where(sa => sa.Id == sharedAccountId && sa.UserId == userId)
+            .FirstOrDefaultAsync();
+
+        if (sharedAccount == null)
+            return false;
+
+        _context.SharedAccounts.Remove(sharedAccount);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    /// <summary>
+    /// Invite a member to the shared account by Email or Phone
+    /// </summary>
+    public async Task<SharedAccountResponseDto> InviteMemberAsync(long senderId, long accountId, string emailOrPhone, int permission)
+    {
+        // Find user by Email or Phone
+        var targetUser = await _context.Users
+            .Where(u => u.Email == emailOrPhone || u.PhoneNumber == emailOrPhone || u.UserName == emailOrPhone)
+            .FirstOrDefaultAsync();
+
+        if (targetUser == null)
+            throw new InvalidOperationException("User not found with matching Email, Phone, or Username.");
+
+        if (targetUser.Id == senderId)
+             throw new InvalidOperationException("You cannot invite yourself.");
+
+        var dto = new ShareAccountDto
+        {
+            AccountId = accountId,
+            UserId = targetUser.Id,
+            Permission = permission
+        };
+
+        var result = await ShareAccountAsync(senderId, dto);
+
+        // Send Notification
+        var sender = await _context.Users.FindAsync(senderId);
+        var account = await _context.Accounts.FindAsync(accountId);
+        
+        var notification = new Notification
+        {
+            UserId = targetUser.Id,
+            Title = "Lời mời tham gia ví chung",
+            Message = $"{sender?.FullName ?? "Someone"} đã mời bạn tham gia ví '{account?.Name}' với quyền {result.PermissionDisplay}.",
+            Type = "WalletInvite",
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow,
+            ActionUrl = $"/Wallets/Detail?id={accountId}" 
+        };
+
+        _context.Notifications.Add(notification);
+        await _context.SaveChangesAsync();
+
+        return result;
+    }
+
     // Helper Methods
 
     private SharedAccountResponseDto MapToSharedAccountResponseDto(SharedAccount sharedAccount)
@@ -226,6 +296,7 @@ public class SharedAccountService : ISharedAccountService
             PermissionDisplay = GetPermissionDisplay(sharedAccount.Permission),
             SharedByUserId = sharedAccount.SharedByUserId,
             SharedByUserName = sharedAccount.SharedByUser?.UserName ?? "Unknown",
+            AvatarUrl = sharedAccount.User?.ProfilePictureUrl,
             CreatedAt = sharedAccount.CreatedAt
         };
     }
@@ -235,6 +306,7 @@ public class SharedAccountService : ISharedAccountService
         return new SharedAccountListDto
         {
             Id = sharedAccount.Id,
+            AccountId = sharedAccount.AccountId,
             AccountName = sharedAccount.Account?.Name ?? "Unknown",
             CurrentBalance = sharedAccount.Account?.CurrentBalance ?? 0,
             Currency = sharedAccount.Account?.Currency ?? "USD",

@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MoneyTrackerApp.Services;
 
+using MoneyTrackerApp.Hubs;
+using Microsoft.AspNetCore.SignalR;
+
 /// <summary>
 /// Service for managing transactions (Income, Expense, Transfer)
 /// Handles CRUD operations, filtering, and balance updates
@@ -18,17 +21,28 @@ public interface ITransactionService
     Task<bool> DeleteTransactionAsync(long transactionId, long userId);
     Task<decimal> GetAccountBalanceFromTransactionsAsync(long accountId);
     Task<List<TransactionResponseDto>> GetRecentTransactionsAsync(long userId, int count = 10);
+    Task<List<TransactionResponseDto>> GetTransactionsByAccountIdAsync(long accountId, long userId, int count = 50);
+    Task<List<SpendingContributionDto>> GetSpendingContributionAsync(long accountId, long userId, int month, int year);
 }
+
 
 public class TransactionService : ITransactionService
 {
     private readonly ExpenseManagerContext _context;
     private readonly IBudgetService _budgetService;
+    private readonly ISharedAccountService _sharedAccountService;
+    private readonly IHubContext<WalletHub> _hubContext;
 
-    public TransactionService(ExpenseManagerContext context, IBudgetService budgetService)
+    public TransactionService(
+        ExpenseManagerContext context, 
+        IBudgetService budgetService, 
+        ISharedAccountService sharedAccountService,
+        IHubContext<WalletHub> hubContext)
     {
         _context = context;
         _budgetService = budgetService;
+        _sharedAccountService = sharedAccountService;
+        _hubContext = hubContext;
     }
 
     /// <summary>
@@ -40,8 +54,16 @@ public class TransactionService : ITransactionService
             .Include(t => t.Account)
             .Include(t => t.Category)
             .Include(t => t.PairedAccount)
-            .Where(t => t.Id == transactionId && t.UserId == userId)
+            .Include(t => t.User)
+            .Where(t => t.Id == transactionId) // Allow fetching if we have access (add custom check later or assume controller checks)
+            // Ideally we check if userId has access to AccountId
             .FirstOrDefaultAsync();
+        
+        if (transaction == null) return null;
+        
+        // Security check
+        var hasAccess = await _sharedAccountService.CanAccessAccountAsync(transaction.AccountId, userId);
+        if (!hasAccess) return null;
 
         if (transaction == null)
             return null;
@@ -58,6 +80,7 @@ public class TransactionService : ITransactionService
             .Include(t => t.Account)
             .Include(t => t.Category)
             .Include(t => t.PairedAccount)
+            .Include(t => t.User)
             .Where(t => t.UserId == userId);
 
         // Apply filters
@@ -109,23 +132,28 @@ public class TransactionService : ITransactionService
     /// </summary>
     public async Task<TransactionResponseDto> CreateTransactionAsync(long userId, CreateTransactionDto dto)
     {
-        // Verify account belongs to user
-        var account = await _context.Accounts
-            .Where(a => a.Id == dto.AccountId && a.UserId == userId)
-            .FirstOrDefaultAsync();
+        // Check permission (Owner or Shared with Add/Full permission)
+        // 0 = View, 1 = Add, 2 = Full
+        var permission = await _sharedAccountService.GetPermissionLevelAsync(dto.AccountId, userId);
+        if (permission < 1) 
+            throw new InvalidOperationException("You do not have permission to add transactions to this wallet.");
 
+        var account = await _context.Accounts.FindAsync(dto.AccountId);
         if (account == null)
-            throw new InvalidOperationException("Account not found or you don't have permission");
+             throw new InvalidOperationException("Account not found");
 
         // For transfer transactions, verify paired account
         if (dto.TransactionType == 3 && dto.PairedAccountId.HasValue)
         {
-            var pairedAccount = await _context.Accounts
-                .Where(a => a.Id == dto.PairedAccountId.Value && a.UserId == userId)
-                .FirstOrDefaultAsync();
+            // Check permission for target wallet too if provided
+            var targetPermission = await _sharedAccountService.GetPermissionLevelAsync(dto.PairedAccountId.Value, userId);
+            if (targetPermission < 1) 
+                 throw new InvalidOperationException("You do not have permission to add transactions to the target wallet.");
+
+            var pairedAccount = await _context.Accounts.FindAsync(dto.PairedAccountId.Value);
 
             if (pairedAccount == null)
-                throw new InvalidOperationException("Paired account not found or you don't have permission");
+                throw new InvalidOperationException("Paired account not found");
                 
             // Check sufficient funds in source
             if (account.CurrentBalance < dto.Amount)
@@ -239,11 +267,16 @@ public class TransactionService : ITransactionService
         // Reload with includes
         await _context.Entry(transaction).Reference(t => t.Account).LoadAsync();
         await _context.Entry(transaction).Reference(t => t.Category).LoadAsync();
+        await _context.Entry(transaction).Reference(t => t.User).LoadAsync();
         if (transaction.PairedAccountId.HasValue)
             await _context.Entry(transaction).Reference(t => t.PairedAccount).LoadAsync();
 
         var response = MapToResponseDto(transaction);
         response.WarningMessage = await CheckBudgetWarningsAsync(userId, transaction);
+
+        // Notify Shared Members
+        await NotifySharedWalletMembers(transaction.AccountId, transaction.UserId, "giao dịch mới", $"{transaction.Amount:N0} {transaction.Currency}");
+
         return response;
     }
     
@@ -467,6 +500,74 @@ public class TransactionService : ITransactionService
     }
 
     /// <summary>
+    /// Get transactions for a specific account (Shared Wallet support)
+    /// </summary>
+    public async Task<List<TransactionResponseDto>> GetTransactionsByAccountIdAsync(long accountId, long userId, int count = 50)
+    {
+        // Verify access first
+        if (!await _sharedAccountService.CanAccessAccountAsync(accountId, userId))
+            throw new InvalidOperationException("Access denied to this wallet.");
+
+        var transactions = await _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .Include(t => t.PairedAccount)
+            .Include(t => t.User)
+            .Where(t => t.AccountId == accountId)
+            .OrderByDescending(t => t.TransactionDate)
+            .ThenByDescending(t => t.CreatedAt)
+            .Take(count)
+            .ToListAsync();
+
+        return transactions.Select(t => MapToResponseDto(t, accountId)).ToList();
+    }
+
+    /// <summary>
+    /// Calculate spending contribution for each member in a shared wallet
+    /// </summary>
+    public async Task<List<SpendingContributionDto>> GetSpendingContributionAsync(long accountId, long userId, int month, int year)
+    {
+         // Verify access first
+        if (!await _sharedAccountService.CanAccessAccountAsync(accountId, userId))
+            throw new InvalidOperationException("Access denied to this wallet.");
+
+        var startDate = new DateTime(year, month, 1);
+        var endDate = startDate.AddMonths(1).AddTicks(-1);
+
+        var spendingGroups = await _context.Transactions
+            .Where(t => t.AccountId == accountId && t.TransactionType == 2 && // Expense only
+                        t.TransactionDate >= startDate && t.TransactionDate <= endDate) 
+            .GroupBy(t => t.UserId)
+            .Select(g => new 
+            {
+                UserId = g.Key,
+                TotalAmount = g.Sum(t => t.Amount)
+            })
+            .ToListAsync();
+
+        if (!spendingGroups.Any())
+            return new List<SpendingContributionDto>();
+
+        var totalWalletSpending = spendingGroups.Sum(x => x.TotalAmount);
+        
+        var userIds = spendingGroups.Select(x => x.UserId).ToList();
+        var users = await _context.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u);
+
+        var result = spendingGroups.Select(g => new SpendingContributionDto
+        {
+            UserId = g.UserId,
+            UserName = users.ContainsKey(g.UserId) ? (users[g.UserId].FullName ?? users[g.UserId].UserName ?? "Unknown") : "Unknown",
+            UserAvatar = users.ContainsKey(g.UserId) ? users[g.UserId].ProfilePictureUrl : null,
+            TotalAmount = g.TotalAmount,
+            Percentage = totalWalletSpending > 0 ? (double)(g.TotalAmount / totalWalletSpending * 100) : 0
+        }).OrderByDescending(x => x.TotalAmount).ToList();
+
+        return result;
+    }
+
+    /// <summary>
     /// Check if the transaction exceeds any budget and return a warning message
     /// </summary>
     private async Task<string?> CheckBudgetWarningsAsync(long userId, Transaction transaction)
@@ -498,6 +599,53 @@ public class TransactionService : ITransactionService
         }
 
         return null;
+    }
+
+    private async Task NotifySharedWalletMembers(long accountId, long actorId, string action, string amountDisplay)
+    {
+        // 1. SignalR Update (Real-time sync)
+        await _hubContext.Clients.Group($"Wallet-{accountId}").SendAsync("ReceiveWalletUpdate", accountId);
+
+        // 2. Notification (Persistent)
+        var members = await _sharedAccountService.GetAccountSharingAsync(accountId, actorId);
+        
+        var account = await _context.Accounts.FindAsync(accountId);
+        if (account == null) return;
+        
+        var actor = await _context.Users.FindAsync(actorId);
+        var actorName = actor?.FullName ?? actor?.UserName ?? "Ai đó";
+        var accountName = account.Name ?? "Ví chung";
+
+        var recipients = members.Select(m => m.UserId).ToList();
+        
+        // Add Owner if not already in shared list (usually owner is not in shared list)
+        if (!recipients.Contains(account.UserId))
+        {
+            recipients.Add(account.UserId);
+        }
+
+        var notifications = new List<Notification>();
+        foreach (var userId in recipients.Distinct())
+        {
+            if (userId == actorId) continue; // Don't notify self
+
+            notifications.Add(new Notification
+            {
+                UserId = userId,
+                Title = $"Biến động số dư: {accountName}",
+                Message = $"{actorName} vừa thực hiện {action} với số tiền {amountDisplay}.",
+                Type = "Transaction",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow,
+                ActionUrl = $"/Wallets/Detail?id={accountId}"
+            });
+        }
+
+        if (notifications.Any())
+        {
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
+        }
     }
 
     // Helper Methods
@@ -561,7 +709,9 @@ public class TransactionService : ITransactionService
             OcrText = transaction.OcrText,
             CreatedAt = transaction.CreatedAt,
             UpdatedAt = transaction.UpdatedAt,
-            Description = description
+            Description = description,
+            UserName = transaction.User?.FullName ?? transaction.User?.UserName ?? "Unknown",
+            UserAvatar = transaction.User?.ProfilePictureUrl
         };
     }
 

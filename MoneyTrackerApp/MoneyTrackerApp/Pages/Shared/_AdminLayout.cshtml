@@ -3,244 +3,118 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Trung tâm điều khiển</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - MoneyTracker Admin</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="~/css/christmas.css" asp-append-version="true" />
+    
+    <!-- Core Admin CSS -->
+    <link rel="stylesheet" href="~/css/admin-modern.css" asp-append-version="true" />
+    
+    <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <style>
-        :root {
-            --admin-sidebar-bg: #2c3e50;
-            --admin-sidebar-text: #ecf0f1;
-            --admin-sidebar-active: #34495e;
-            --admin-header-bg: #ffffff;
-            --admin-accent: #3498db;
-        }
-
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar */
-        #wrapper {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-        }
-
-        #sidebar-wrapper {
-            min-width: 260px;
-            max-width: 260px;
-            background-color: var(--admin-sidebar-bg);
-            color: var(--admin-sidebar-text);
-            transition: all 0.3s;
-            min-height: 100vh;
-        }
-
-        #sidebar-wrapper.toggled {
-            margin-left: -260px;
-        }
-
-        .sidebar-heading {
-            padding: 1.5rem 1.25rem;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .sidebar-brand-icon {
-             font-size: 1.5rem;
-             color: var(--admin-accent);
-        }
-
-        .list-group-item {
-            padding: 1rem 1.25rem;
-            background-color: transparent;
-            color: rgba(255,255,255,0.7);
-            border: none;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s;
-        }
-
-        .list-group-item i {
-            width: 24px;
-            margin-right: 10px;
-            text-align: center;
-        }
-
-        .list-group-item:hover {
-            background-color: rgba(255,255,255,0.05);
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .list-group-item.active {
-            background-color: rgba(255,255,255,0.1);
-            color: #fff;
-            border-left: 4px solid var(--admin-accent);
-        }
-
-        /* Page Content */
-        #page-content-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header Styles imported via partial, but layout css needed */
-        .admin-header {
-            background: var(--admin-header-bg);
-            padding: 0.75rem 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
-        }
-
-        .search-bar-container {
-            flex-grow: 1;
-            max-width: 600px;
-            margin: 0 2rem;
-        }
-
-        .search-input {
-            background-color: #f1f3f4;
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            width: 100%;
-            outline: none;
-        }
-        .search-input:focus {
-            background-color: #fff;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .notification-icon {
-            position: relative;
-            cursor: pointer;
-            color: #7f8c8d;
-            font-size: 1.2rem;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background-color: #e74c3c;
-            border-radius: 50%;
-            border: 1px solid #fff;
-        }
-
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .admin-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: #3498db;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .admin-name {
-            font-weight: 600;
-            color: #333;
-            font-size: 0.95rem;
-        }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            #sidebar-wrapper {
-                margin-left: -260px;
-            }
-            #sidebar-wrapper.toggled {
-                margin-left: 0;
-            }
-            .search-bar-container {
-                display: none;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div id="snow-container"></div>
-    <div class="d-flex" id="wrapper">
+    <div class="admin-wrapper">
         <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <a href="@Url.Content("~/")" onclick="window.location.href = '@Url.Content("~/")'; return false;" class="sidebar-heading text-decoration-none" style="cursor: pointer;">
-                <i class="fas fa-chart-line sidebar-brand-icon"></i>
-                MoneyTracker Admin
-            </a>
-            <div class="list-group list-group-flush mt-3">
-                <a href="/Admin/Dashboard" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Dashboard") == true ? "active" : "")">
-                    <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
-                </a>
-                <a href="/Admin/Users" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Users") == true ? "active" : "")">
-                    <i class="fas fa-users"></i> Quản lý User
-                </a>
-                <a href="/Admin/Transactions" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Transactions") == true ? "active" : "")">
-                    <i class="fas fa-list-alt"></i> Sổ giao dịch
-                </a>
-                <a href="/Admin/Settings" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
-                    <i class="fas fa-cog"></i> Cấu hình hệ thống
-                </a>
-                <a href="/Admin/Monitoring/Logs" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring/Logs") == true ? "active" : "")">
-                    <i class="fas fa-clipboard-list"></i> Logs hệ thống
-                </a>
-                <a href="/Admin/Monitoring/AuditLogs" class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring") == true ? "active" : "")">
-                    <i class="fas fa-shield-alt"></i> Nhật ký & Audit
-                </a>
-                <div class="mt-4 px-3 text-muted small text-uppercase fw-bold">Hệ thống</div>
-                <a href="/home" class="list-group-item list-group-item-action">
-                    <i class="fas fa-sign-out-alt"></i> Thoát về ứng dụng
+        <aside class="admin-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/Admin/Dashboard" class="brand-logo text-decoration-none">
+                    <i class="fas fa-chart-line"></i>
+                    <span>MoneyTracker</span>
                 </a>
             </div>
-        </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-label">Tổng quan</div>
+                <a href="/Admin/Dashboard" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Dashboard") == true ? "active" : "")">
+                    <i class="fas fa-grid-2"></i> <span>Dashboard</span>
+                </a>
+                
+                <div class="nav-label">Quản lý</div>
+                <a href="/Admin/Users" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Users") == true ? "active" : "")">
+                    <i class="fas fa-users"></i> <span>Người dùng</span>
+                </a>
+                <a href="/Admin/Transactions" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Transactions") == true ? "active" : "")">
+                    <i class="fas fa-receipt"></i> <span>Giao dịch</span>
+                </a>
+                
+                <div class="nav-label">Hệ thống</div>
+                <a href="/Admin/Settings" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
+                    <i class="fas fa-sliders-h"></i> <span>Cấu hình</span>
+                </a>
+                <a href="/Admin/Monitoring/Logs" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring/Logs") == true ? "active" : "")">
+                    <i class="fas fa-server"></i> <span>System Logs</span>
+                </a>
+                <a href="/Admin/Monitoring/AuditLogs" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring/AuditLogs") == true ? "active" : "")">
+                    <i class="fas fa-shield-alt"></i> <span>Audit Logs</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="/" class="nav-link" style="color: #94a3b8; justify-content: center;">
+                    <i class="fas fa-sign-out-alt"></i> <span>Về trang chủ</span>
+                </a>
+            </div>
+        </aside>
 
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <!-- Header -->
-            <partial name="_AdminHeader" />
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar is inlined here for simplicity in this rewrite -->
+            <header class="admin-topbar">
+                <div class="topbar-left d-flex align-items-center gap-3">
+                    <button class="icon-btn d-lg-none" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>@ViewData["Title"]</h1>
+                </div>
+                
+                <div class="topbar-right">
+                    <div class="search-box d-none d-md-block">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm kiếm nhanh...">
+                    </div>
+                    
+                    <button class="icon-btn">
+                        <i class="far fa-bell"></i>
+                        <span class="badge-dot"></span>
+                    </button>
+                    
+                    <div class="user-mini-profile">
+                        <div class="user-avatar">AD</div>
+                    </div>
+                </div>
+            </header>
 
-            <!-- Main Content -->
-            <div class="p-4" style="flex: 1; overflow-y: auto;">
+            <div class="admin-content">
                 @RenderBody()
             </div>
-        </div>
+        </main>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/christmas.js" asp-append-version="true"></script>
-
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            var sidebar = document.getElementById('sidebar');
+            var toggle = document.getElementById('sidebarToggle');
+            if (window.innerWidth <= 1024) {
+                 if (!sidebar.contains(event.target) && !toggle.contains(event.target) && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

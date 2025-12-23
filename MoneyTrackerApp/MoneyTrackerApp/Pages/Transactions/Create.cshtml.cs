@@ -133,7 +133,11 @@ public class CreateModel : PageModel
                     });
                 }
             }
-            return RedirectToPage("/Transactions/Index");
+            if (SavingsGoalId.HasValue && SavingsGoalId.Value > 0)
+            {
+                return RedirectToPage("/Savings/Index");
+            }
+            return RedirectToPage("/Index");
         }
         catch (Exception ex)
         {

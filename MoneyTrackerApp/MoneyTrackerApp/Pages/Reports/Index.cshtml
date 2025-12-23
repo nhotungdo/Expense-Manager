@@ -1,0 +1,335 @@
+@page
+@model MoneyTrackerApp.Pages.Reports.IndexModel
+@{
+    ViewData["Title"] = "Báo cáo tài chính";
+}
+
+
+<div class="space-y-6" id="report-content">
+    <!-- Header & Filter -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-sm animate-fade-in-up" data-html2canvas-ignore="true">
+        <div>
+            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                Báo cáo tài chính
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Tổng quan tình hình tài chính của bạn</p>
+        </div>
+        
+        <form method="get" class="flex flex-wrap items-center gap-3">
+            <select name="AccountId" asp-for="AccountId" class="form-select rounded-xl border-gray-200 bg-white/80 text-sm py-2 focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition-colors">
+                <option value="">Tất cả tài khoản</option>
+                @foreach (var acc in Model.Accounts)
+                {
+                    <option value="@acc.Id">@acc.Name</option>
+                }
+            </select>
+            
+            <div class="flex items-center gap-2 bg-white/80 rounded-xl border border-gray-200 p-1">
+                <input type="date" name="StartDate" asp-for="StartDate" class="border-0 bg-transparent text-sm focus:ring-0 p-1" />
+                <span class="text-gray-400">-</span>
+                <input type="date" name="EndDate" asp-for="EndDate" class="border-0 bg-transparent text-sm focus:ring-0 p-1" />
+            </div>
+            
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-95" title="Lọc dữ liệu">
+                <i class="fa-solid fa-filter"></i>
+            </button>
+            
+            <button type="button" onclick="exportToPDF()" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-xl shadow-lg shadow-red-500/30 transition-all active:scale-95" title="Xuất PDF">
+                <i class="fa-solid fa-file-pdf"></i>
+            </button>
+            
+            <button type="button" onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-xl shadow-lg shadow-green-500/30 transition-all active:scale-95" title="Xuất Excel">
+                <i class="fa-solid fa-file-excel"></i>
+            </button>
+            
+            <button type="button" onclick="exportToCSV()" class="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-xl shadow-lg shadow-purple-500/30 transition-all active:scale-95" title="Xuất CSV">
+                <i class="fa-solid fa-file-csv"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 animate-fade-in-up" style="animation-delay: 0.1s">
+        <!-- Income -->
+        <div class="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 p-6 rounded-3xl border border-green-200/50 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+            <div class="relative z-10">
+                <p class="text-green-600 dark:text-green-400 text-sm font-medium mb-1">Tổng thu nhập</p>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">@Model.TotalIncome.ToString("N0")₫</h3>
+                <div class="mt-4 flex items-center text-xs text-green-700 dark:text-green-300">
+                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> Thu nhập thực tế
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense -->
+        <div class="bg-gradient-to-br from-red-50 to-pink-100 dark:from-red-900/20 dark:to-pink-900/20 p-6 rounded-3xl border border-red-200/50 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+            <div class="relative z-10">
+                <p class="text-red-600 dark:text-red-400 text-sm font-medium mb-1">Tổng chi tiêu</p>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">@Model.TotalExpense.ToString("N0")₫</h3>
+                <div class="mt-4 flex items-center text-xs text-red-700 dark:text-red-300">
+                    <i class="fa-solid fa-arrow-trend-down mr-1"></i> Chi tiêu thực tế
+                </div>
+            </div>
+        </div>
+
+        <!-- Net -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-3xl border border-blue-200/50 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+            <div class="relative z-10">
+                <p class="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1">Số dư ròng</p>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                    @Model.NetIncome.ToString("N0")₫
+                </h3>
+                <div class="mt-4 flex items-center text-xs text-blue-700 dark:text-blue-300">
+                    <i class="fa-solid fa-wallet mr-1"></i> Thu - Chi
+                </div>
+            </div>
+        </div>
+
+        <!-- Savings Rate -->
+        <div class="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/20 dark:to-violet-900/20 p-6 rounded-3xl border border-purple-200/50 shadow-sm relative overflow-hidden group">
+             <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+            <div class="relative z-10">
+                <p class="text-purple-600 dark:text-purple-400 text-sm font-medium mb-1">Tỷ lệ tiết kiệm</p>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">@Model.SavingsRate.ToString("N1")%</h3>
+                <div class="w-full bg-purple-200 rounded-full h-1.5 mt-4">
+                    <div class="bg-purple-600 h-1.5 rounded-full transition-all duration-1000" style="width: @(Model.SavingsRate > 100 ? 100 : Model.SavingsRate)%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Main Line Chart -->
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm animate-fade-in-up" style="animation-delay: 0.2s">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="font-bold text-gray-800 dark:text-white">Xu hướng dòng tiền</h3>
+                    <p class="text-xs text-gray-500">So sánh thu nhập và chi tiêu theo ngày</p>
+                </div>
+            </div>
+            <div class="relative h-72 w-full">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm animate-fade-in-up" style="animation-delay: 0.3s">
+            <div class="mb-6">
+                 <h3 class="font-bold text-gray-800 dark:text-white">Cơ cấu chi tiêu</h3>
+                 <p class="text-xs text-gray-500">Top danh mục chi tiêu nhiều nhất</p>
+            </div>
+            <div class="relative h-64 w-full flex justify-center">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Transactions Table -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm animate-fade-in-up" style="animation-delay: 0.4s">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-gray-800 dark:text-white">Chi tiết giao dịch</h3>
+            <span class="text-xs text-gray-500">@Model.Transactions.Count giao dịch</span>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th class="px-4 py-3 rounded-l-xl">Ngày</th>
+                        <th class="px-4 py-3">Danh mục</th>
+                        <th class="px-4 py-3">Ghi chú</th>
+                        <th class="px-4 py-3 text-right">Số tiền</th>
+                        <th class="px-4 py-3 rounded-r-xl text-center">Loại</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @foreach (var t in Model.Transactions.Take(50)) // Limit to 50 for view
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-200">
+                                @t.TransactionDate.ToString("dd/MM/yyyy")
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium" 
+                                      style="background-color: @(t.Category?.Color ?? "#cbd5e1")20; color: @(t.Category?.Color ?? "#64748b")">
+                                    @(t.Category?.Name ?? "Khác")
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-gray-500 max-w-[200px] truncate" title="@t.Note">
+                                @t.Note
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold @(t.TransactionType == 1 ? "text-green-600" : "text-red-600")">
+                                @(t.TransactionType == 1 ? "+" : "-")@t.Amount.ToString("N0")₫
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                @if(t.TransactionType == 1) { <span class="text-xs text-green-500">Thu</span> }
+                                else if(t.TransactionType == 2) { <span class="text-xs text-red-500">Chi</span> }
+                                else { <span class="text-xs text-blue-500">Chuyển</span> }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if(Model.Transactions.Count > 50)
+            {
+                <div class="text-center mt-4">
+                    <span class="text-xs text-gray-400">Đang hiển thị 50 giao dịch mới nhất</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            const element = document.getElementById('report-content');
+            const opt = {
+                margin:       [5, 5, 5, 5],
+                filename:     `BaoCaoTaiChinh_${new Date().toISOString().split('T')[0]}.pdf`,
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Add loading state
+            const btn = document.querySelector('button[onclick="exportToPDF()"]');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error(err);
+                alert('Lỗi xuất PDF');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            });
+        }
+    </script>
+    <script>
+        function exportToExcel() {
+            const queryParams = new URLSearchParams(window.location.search);
+            const url = `/api/ReportExport/excel?${queryParams.toString()}`;
+            window.location.href = url;
+        }
+
+        function exportToCSV() {
+            const queryParams = new URLSearchParams(window.location.search);
+            const url = `/api/ReportExport/csv?${queryParams.toString()}`;
+            window.location.href = url;
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Colors from CSS variables or Hardcoded for consistency
+            const colors = {
+                income: '#10b981', // emerald-500
+                expense: '#ef4444', // red-500
+                grid: 'rgba(100, 116, 139, 0.1)',
+                text: '#64748b'
+            };
+
+            // Trend Chart
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctxTrend, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.DailyLabels)),
+                    datasets: [
+                        {
+                            label: 'Thu nhập',
+                            data: @Html.Raw(Json.Serialize(Model.DailyIncomeData)),
+                            backgroundColor: colors.income,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
+                        },
+                        {
+                            label: 'Chi tiêu',
+                            data: @Html.Raw(Json.Serialize(Model.DailyExpenseData)),
+                            backgroundColor: colors.expense,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: { usePointStyle: true, boxWidth: 8 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: colors.grid, drawBorder: false },
+                            ticks: { color: colors.text }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: colors.text }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                }
+            });
+
+            // Category Pie Chart
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            const catData = @Html.Raw(Json.Serialize(Model.ExpenseCategoryData));
+            const catLabels = @Html.Raw(Json.Serialize(Model.ExpenseCategoryLabels));
+            const catColors = @Html.Raw(Json.Serialize(Model.ExpenseCategoryColors));
+
+            if(catData.length === 0) {
+                 // Show empty state if no data
+                 ctxCat.font = "14px 'Inter'";
+                 ctxCat.fillStyle = colors.text;
+                 ctxCat.textAlign = "center";
+                 ctxCat.fillText("Chưa có dữ liệu", ctxCat.canvas.width/2, ctxCat.canvas.height/2);
+            } else {
+                new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: {
+                        labels: catLabels,
+                        datasets: [{
+                            data: catData,
+                            backgroundColor: catColors,
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { 
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    font: { size: 11 }
+                                }
+                            }
+                        },
+                        cutout: '75%'
+                    }
+                });
+            }
+        });
+    </script>
+}

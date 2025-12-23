@@ -1,128 +1,173 @@
 @page
 @model MoneyTrackerApp.Pages.Trading.IndexModel
 @{
-    ViewData["Title"] = "Giao dịch";
-}
-@section Styles {
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/trading.css" />
+    ViewData["Title"] = "Giao dịch & Phân tích AI";
 }
 
-<div class="trading-container">
-    <!-- Header & Time Filters -->
-    <div class="trading-header animate-slide-down">
-        <div class="header-left">
-            <h1 class="trading-title">
-                <span class="icon-wrapper glass-icon"><i class="fas fa-chart-pie"></i></span>
-                <span data-i18n="tradingTitle">Phân bổ Giao dịch</span>
-            </h1>
+<div class="trading-container fade-in-up" id="tradingDashboard">
+    <!-- Header & Controls -->
+    <div class="trading-header d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="display-6 fw-bold mb-1">Phân tích Giao dịch</h1>
+            <p class="text-muted mb-0">Thông tin tài chính và dự báo thông minh từ AI</p>
         </div>
         
-        <div class="header-actions" style="display: flex; gap: 0.5rem; align-items: center;">
-             <button class="export-btn" onclick="changeLanguage()" title="Language/Ngôn ngữ">
-                <i class="fas fa-globe"></i>
-            </button>
+        <div class="d-flex flex-wrap gap-2 align-items-center controls-wrapper">
+             <!-- Period Selector -->
+            <div class="btn-group" role="group" aria-label="Khoảng thời gian">
+                <input type="radio" class="btn-check" name="period" id="period-today" value="today" autocomplete="off">
+                <label class="btn btn-outline-primary" for="period-today">Hôm nay</label>
 
-            <div class="time-filters glass-panel-sm" style="margin-left: 0.5rem;">
-                <button class="filter-btn active" data-filter="day" onclick="updateFilter('day')">Hôm nay</button>
-                <button class="filter-btn" data-filter="week" onclick="updateFilter('week')">Tuần này</button>
-                <button class="filter-btn" data-filter="month" onclick="updateFilter('month')">Tháng này</button>
-                <button class="filter-btn" data-filter="year" onclick="updateFilter('year')">Năm này</button>
+                <input type="radio" class="btn-check" name="period" id="period-week" value="week" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="period-week">Tuần</label>
+
+                <input type="radio" class="btn-check" name="period" id="period-month" value="month" autocomplete="off">
+                <label class="btn btn-outline-primary" for="period-month">Tháng</label>
+
+                <input type="radio" class="btn-check" name="period" id="period-year" value="year" autocomplete="off">
+                <label class="btn btn-outline-primary" for="period-year">Năm</label>
+            </div>
+
+            <!-- Comparison Dropdown -->
+            <select class="form-select w-auto" id="comparisonSelect" onchange="updateComparison()">
+                <option value="">Không so sánh</option>
+                <option value="previous">Kỳ trước</option>
+                <option value="lastMonth">Tháng trước</option>
+                <option value="lastYear">Cùng kỳ năm ngoái</option>
+            </select>
+
+            <!-- Export Actions -->
+            <div class="export-actions d-flex gap-2">
+                <button class="btn btn-export-pdf" onclick="exportTradingReport()" title="Xuất PDF">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+                <button class="btn btn-export-excel" onclick="exportTradingExcel()" title="Xuất Excel">
+                    <i class="fas fa-file-excel"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Main Content Grid -->
-    <div class="trading-grid">
-        
-        <!-- AI Analysis Section -->
-        <div class="ai-analysis-card glass-panel animate-fade-in">
-             <div class="ai-header">
-                 <h2><i class="fas fa-robot" style="color: #8B5CF6; margin-right: 0.5rem;"></i> <span data-i18n="aiTitle">Trợ lý Phân tích AI</span></h2>
-                 <span class="ai-badge">LIVE ANALYSIS</span>
-             </div>
-             <div class="ai-content" id="aiContent">
-                  <!-- JS populated -->
-                  <div class="text-center p-4">Đang phân tích dữ liệu...</div>
-             </div>
-        </div>
-
-        <!-- Chart Section -->
-        <div class="chart-card glass-panel animate-fade-in delay-1">
-            <div class="chart-header">
-                <h2 data-i18n="financialStructure">Cơ cấu Tài chính</h2>
-                <div class="chart-controls">
-                    <button class="control-btn" onclick="toggleChartType()" title="Đổi loại biểu đồ"><i class="fas fa-exchange-alt"></i></button>
-                    <button class="control-btn" onclick="resetZoom()" title="Đặt lại zoom"><i class="fas fa-undo"></i></button>
-                </div>
-            </div>
-            <div class="chart-wrapper">
-                 <canvas id="allocationChart"></canvas>
-            </div>
-             <div class="chart-overlay-info" id="chartCenterText">
-                <span class="label" data-i18n="total">Tổng</span>
-                <span class="value" id="totalCenterValue">...</span>
-            </div>
-        </div>
-
-        <!-- Overview / Details Section -->
-        <div class="details-card glass-panel animate-fade-in delay-2">
-            <div class="details-header">
-                <h2 data-i18n="detailsTitle">Chi tiết Giao dịch</h2>
-                <div class="header-decoration"></div>
-            </div>
-            <div class="details-filters">
-                 <button class="type-btn active" data-type="expense" onclick="setType('expense')" data-i18n="expense">Chi tiêu</button>
-                 <button class="type-btn" data-type="income" onclick="setType('income')" data-i18n="income">Thu nhập</button>
-            </div>
-            <div id="detailsList" class="details-list custom-scrollbar">
-                <!-- Data populated by JS (Loading skeleton initially) -->
-                 <div class="skeleton-item"></div>
-                 <div class="skeleton-item"></div>
-                 <div class="skeleton-item"></div>
-            </div>
-            <div class="total-summary glass-panel-sm">
-                <span data-i18n="totalLabel">Tổng cộng:</span>
-                <span id="totalAmount" class="amount">0 đ</span>
-            </div>
-        </div>
-
-        <!-- Transaction History Section -->
-        <div class="history-section glass-panel animate-fade-in delay-3">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2 data-i18n="historyTitle" style="margin-bottom: 0;">Lịch sử Giao dịch</h2>
-                <div class="table-filters" style="display: flex; gap: 0.5rem;">
-                    <div class="search-container glass-panel-sm" style="padding: 0.25rem 0.5rem; display: flex; align-items: center;">
-                        <i class="fas fa-search" style="color: #64748B; margin-right: 0.5rem;"></i>
-                        <input type="text" id="txnSearch" placeholder="Tìm kiếm..." style="border: none; background: transparent; outline: none; color: inherit; width: 120px; font-size: 0.9rem;">
+    <div class="row g-4">
+        <!-- Left Column: Charts & Stats -->
+        <div class="col-lg-8">
+            <!-- Summary Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon income-icon"><i class="fas fa-arrow-down"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Tổng Chi tiêu</span>
+                            <h3 class="stat-value" id="totalExpense">--</h3>
+                            <small class="stat-trend" id="expenseTrend"></small>
+                        </div>
                     </div>
-                    <select id="categoryFilter" class="glass-panel-sm" style="border: none; outline: none; padding: 0.25rem 0.5rem; color: inherit; font-size: 0.9rem; cursor: pointer;">
-                        <option value="">Tất cả danh mục</option>
-                        <!-- Populated by JS -->
-                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon income-icon-up"><i class="fas fa-arrow-up"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Tổng Thu nhập</span>
+                            <h3 class="stat-value" id="totalIncome">--</h3>
+                            <small class="stat-trend" id="incomeTrend"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon balance-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Số dư ròng</span>
+                            <h3 class="stat-value" id="netBalance">--</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="history-table-wrapper custom-scrollbar">
-                 <table class="history-table">
-                     <thead>
-                         <tr>
-                             <th data-i18n="colDate">Ngày</th>
-                             <th data-i18n="colCategory">Danh mục</th>
-                             <th data-i18n="colNote">Nội dung</th>
-                             <th data-i18n="colAmount">Số tiền</th>
-                             <th data-i18n="colStatus">Trạng thái AI</th>
-                         </tr>
-                     </thead>
-                     <tbody id="historyTableBody">
-                         <!-- Populated by JS -->
-                     </tbody>
-                 </table>
+
+            <!-- Main Chart Card -->
+            <div class="card glass-card mb-4 chart-section">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-line me-2 text-primary"></i>Biểu đồ thu chi & Dự báo</h5>
+                    <span class="badge bg-warning text-dark"><i class="fas fa-bolt me-1"></i>Hỗ trợ bởi AI</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height: 350px;">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                </div>
             </div>
+            
+             <!-- Transaction List -->
+             <div class="card glass-card">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">Giao dịch gần đây</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="transactionsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Danh mục</th>
+                                    <th>Mô tả</th>
+                                    <th class="text-end">Số tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic Content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+             </div>
         </div>
 
+        <!-- Right Column: AI Insights & Recommendations -->
+        <div class="col-lg-4">
+            <!-- AI Analysis Card -->
+            <div class="card glass-card ai-card mb-4">
+                <div class="card-body">
+                    <div class="ai-badge mb-3">
+                        <span class="ai-pulse"></span>
+                        Trợ lý AI
+                    </div>
+                    <h5 class="card-title">Phân tích trực tiếp</h5>
+                    <p class="card-text text-muted" id="aiAnalysisText">
+                        Đang phân tích thói quen chi tiêu của bạn...
+                    </p>
+                    <div class="ai-insight-box mt-3" id="aiInsightBox">
+                        <!-- Dynamic Insight -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Recommendations -->
+            <div class="card glass-card">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0"><i class="fas fa-lightbulb me-2 text-warning"></i>Gợi ý thông minh</h5>
+                </div>
+                <div class="card-body">
+                    <div class="recommendations-list" id="savingsRecommendations">
+                        <!-- Dynamic Recommendations -->
+                         <div class="d-flex justify-content-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/trading.css" asp-append-version="true" />
+}
+
 @section Scripts {
-    <script src="~/js/trading.js"></script>
+    <!-- Html2Pdf for Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="~/js/trading.js" asp-append-version="true"></script>
 }

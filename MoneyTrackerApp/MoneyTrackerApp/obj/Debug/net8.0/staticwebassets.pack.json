@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets\\css\\admin-dark.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\admin-modern.css",
+      "PackagePath": "staticwebassets\\css\\admin-modern.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\animations.css",
       "PackagePath": "staticwebassets\\css\\animations.css"
     },
@@ -109,6 +113,10 @@
       "PackagePath": "staticwebassets\\css\\settings.css"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\shared-wallets.css",
+      "PackagePath": "staticwebassets\\css\\shared-wallets.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
@@ -119,6 +127,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\trading.css",
       "PackagePath": "staticwebassets\\css\\trading.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallet-detail-modern.css",
+      "PackagePath": "staticwebassets\\css\\wallet-detail-modern.css"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallet-modern.css",
@@ -133,24 +145,16 @@
       "PackagePath": "staticwebassets\\css\\wallets.css"
     },
     {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\Technical_TransactionErrorFix.md",
-      "PackagePath": "staticwebassets\\docs\\Technical_TransactionErrorFix.md"
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\Reports_Trading_Enhancements.md",
+      "PackagePath": "staticwebassets\\docs\\Reports_Trading_Enhancements.md"
     },
     {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-architecture.md",
-      "PackagePath": "staticwebassets\\docs\\messaging-architecture.md"
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\Trading_Features.md",
+      "PackagePath": "staticwebassets\\docs\\Trading_Features.md"
     },
     {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-feature.md",
-      "PackagePath": "staticwebassets\\docs\\messaging-feature.md"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-quick-reference.md",
-      "PackagePath": "staticwebassets\\docs\\messaging-quick-reference.md"
-    },
-    {
-      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\messaging-setup-guide.md",
-      "PackagePath": "staticwebassets\\docs\\messaging-setup-guide.md"
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\Trading_Implementation_Summary.md",
+      "PackagePath": "staticwebassets\\docs\\Trading_Implementation_Summary.md"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\requirement_update.md",
@@ -187,6 +191,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\contacts.js",
       "PackagePath": "staticwebassets\\js\\contacts.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\debts-vue.js",
+      "PackagePath": "staticwebassets\\js\\debts-vue.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\debts.js",
@@ -269,6 +277,10 @@
       "PackagePath": "staticwebassets\\js\\service-packages.js"
     },
     {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\shared-wallets.js",
+      "PackagePath": "staticwebassets\\js\\shared-wallets.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },
@@ -291,6 +303,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\vnpay-checkout.js",
       "PackagePath": "staticwebassets\\js\\vnpay-checkout.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\wallet-detail.js",
+      "PackagePath": "staticwebassets\\js\\wallet-detail.js"
     },
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\wallet-page.js",
@@ -607,6 +623,10 @@
     {
       "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\3_0ce645e9-c76f-4f24-ab38-755402a3bc17.png",
       "PackagePath": "staticwebassets\\uploads\\profiles\\3_0ce645e9-c76f-4f24-ab38-755402a3bc17.png"
+    },
+    {
+      "Id": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\3_6f4c8657-4668-4c5e-907f-2f4dc07c56c1.jpg",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\3_6f4c8657-4668-4c5e-907f-2f4dc07c56c1.jpg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.MoneyTrackerApp.Microsoft.AspNetCore.StaticWebAssets.props",

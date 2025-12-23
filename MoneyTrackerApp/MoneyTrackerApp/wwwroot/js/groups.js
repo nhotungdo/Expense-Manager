@@ -10,6 +10,7 @@ const app = createApp({
         const groupBalances = ref({}); // { groupId: balance }
         const recentActivities = ref([]);
         const categories = ref([]); // For Chart
+        const wallets = ref([]); // User's personal wallets
 
         // Selected Group State
         const selectedGroup = ref(null);
@@ -31,13 +32,17 @@ const app = createApp({
             paidByUserId: null,
             splitType: 'equal', // 'equal' | 'amount'
             selectedMemberIds: [],
-            manualSplits: {}
+            manualSplits: {},
+            syncToWallet: false,
+            walletId: null
         });
 
         const settleUpForm = ref({
             payerId: null,
             payeeId: null,
-            amount: null
+            amount: null,
+            syncToWallet: false,
+            walletId: null
         });
 
         // --- Computed ---
@@ -269,6 +274,16 @@ const app = createApp({
             }
         };
 
+        const loadWallets = async () => {
+            try {
+                const res = await fetch('/api/Accounts'); // Correct endpoint
+                if (res.ok) {
+                    const data = await res.json();
+                    wallets.value = data;
+                }
+            } catch (e) { console.warn("Load wallets failed", e); }
+        };
+
         // Actions - Create Group
         const showCreateGroupModal = () => {
             newGroup.value = { name: '', description: '', selectedFriendIds: [] };
@@ -307,7 +322,9 @@ const app = createApp({
                 paidByUserId: myId,
                 splitType: 'equal',
                 selectedMemberIds: selectedGroup.value.members.map(m => m.userId), // Default all
-                manualSplits: {}
+                manualSplits: {},
+                syncToWallet: false,
+                walletId: wallets.value.length > 0 ? wallets.value[0].id : null
             };
             new bootstrap.Modal(document.getElementById('addExpenseModal')).show();
         };
@@ -351,7 +368,9 @@ const app = createApp({
                 amount: expenseForm.value.amount,
                 paidByUserId: expenseForm.value.paidByUserId,
                 transactionDate: new Date().toISOString(),
-                splits: splits
+                splits: splits,
+                syncToPersonalWallet: expenseForm.value.syncToWallet,
+                personalWalletId: expenseForm.value.syncToWallet ? expenseForm.value.walletId : null
             };
 
             try {
@@ -404,7 +423,9 @@ const app = createApp({
             settleUpForm.value = {
                 payerId: payer,
                 payeeId: payee || (selectedGroup.value.members[0].userId == payer ? selectedGroup.value.members[1]?.userId : selectedGroup.value.members[0]?.userId),
-                amount: amt
+                amount: amt,
+                syncToWallet: false,
+                walletId: wallets.value.length > 0 ? wallets.value[0].id : null
             };
             new bootstrap.Modal(document.getElementById('settleUpModal')).show();
         };
@@ -418,7 +439,9 @@ const app = createApp({
                 amount: settleUpForm.value.amount,
                 paidByUserId: settleUpForm.value.payerId,
                 transactionDate: new Date().toISOString(),
-                splits: [{ userId: settleUpForm.value.payeeId, amount: settleUpForm.value.amount }]
+                splits: [{ userId: settleUpForm.value.payeeId, amount: settleUpForm.value.amount }],
+                syncToPersonalWallet: settleUpForm.value.syncToWallet,
+                personalWalletId: settleUpForm.value.syncToWallet ? settleUpForm.value.walletId : null
             };
 
             try {
@@ -497,8 +520,8 @@ const app = createApp({
             if (window.currentUserId) {
                 loadGroups();
                 loadFriends();
+                loadWallets();
             }
-            // Auto refresh interval could be added here
         });
 
         return {
@@ -517,6 +540,7 @@ const app = createApp({
             settleUpForm,
             recentActivities,
             categories,
+            wallets,
 
             // Add Member
             showAddMemberModal,

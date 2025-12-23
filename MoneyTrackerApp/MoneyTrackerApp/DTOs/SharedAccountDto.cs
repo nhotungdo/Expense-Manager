@@ -43,6 +43,8 @@ public class SharedAccountResponseDto
 
     public string SharedByUserName { get; set; } = null!;
 
+    public string? AvatarUrl { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 }
 
@@ -52,6 +54,7 @@ public class SharedAccountResponseDto
 public class SharedAccountListDto
 {
     public long Id { get; set; }
+    public long AccountId { get; set; }
 
     public string AccountName { get; set; } = null!;
 

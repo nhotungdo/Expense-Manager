@@ -157,6 +157,7 @@ public class FriendshipService : IFriendshipService
                 FriendId = friend.Id,
                 FriendName = friend.FullName ?? friend.UserName ?? "Unknown",
                 FriendAvatar = friend.ProfilePictureUrl,
+                UserName = friend.UserName,
                 Status = f.Status,
                 IsRequester = isRequester,
                 CreatedAt = f.CreatedAt
@@ -178,6 +179,7 @@ public class FriendshipService : IFriendshipService
                 FriendId = f.Requester.Id,
                 FriendName = f.Requester.FullName ?? f.Requester.UserName ?? "Unknown",
                 FriendAvatar = f.Requester.ProfilePictureUrl,
+                UserName = f.Requester.UserName,
                 Status = f.Status,
                 IsRequester = false,
                 CreatedAt = f.CreatedAt
@@ -198,6 +200,7 @@ public class FriendshipService : IFriendshipService
                 FriendId = f.Receiver.Id,
                 FriendName = f.Receiver.FullName ?? f.Receiver.UserName ?? "Unknown",
                 FriendAvatar = f.Receiver.ProfilePictureUrl,
+                UserName = f.Receiver.UserName,
                 Status = f.Status,
                 IsRequester = true,
                 CreatedAt = f.CreatedAt

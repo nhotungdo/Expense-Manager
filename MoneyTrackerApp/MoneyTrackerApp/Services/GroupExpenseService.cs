@@ -26,10 +26,12 @@ public interface IGroupExpenseService
 public class GroupExpenseService : IGroupExpenseService
 {
     private readonly ExpenseManagerContext _context;
+    private readonly ITransactionService _transactionService;
 
-    public GroupExpenseService(ExpenseManagerContext context)
+    public GroupExpenseService(ExpenseManagerContext context, ITransactionService transactionService)
     {
         _context = context;
+        _transactionService = transactionService;
     }
 
     /// <summary>
@@ -308,6 +310,34 @@ public class GroupExpenseService : IGroupExpenseService
         _context.GroupTransactions.Add(transaction);
         await _context.SaveChangesAsync();
 
+        // Handle Personal Wallet Sync
+        if (dto.SyncToPersonalWallet && dto.PersonalWalletId.HasValue && dto.PaidByUserId == userId)
+        {
+            try
+            {
+                var personalTransaction = new CreateTransactionDto
+                {
+                    AccountId = dto.PersonalWalletId.Value,
+                    Amount = dto.Amount,
+                    TransactionType = 2, // Expense
+                    Note = $"Group Expense: {dto.Description}",
+                    TransactionDate = dto.TransactionDate,
+                    // Try to map category by name if exists, or leave null
+                    // For now we skip category mapping to avoid complexity, or we could look it up
+                };
+
+                await _transactionService.CreateTransactionAsync(userId, personalTransaction);
+            }
+            catch (Exception)
+            {
+                // Log warning but don't fail the group transaction? 
+                // Or allow it to bubble up? 
+                // Requirement doesn't specify. Safe to ignore for now or let user know.
+                // We'll let it fail so user knows sync failed.
+                throw;
+            }
+        }
+
         // Create splits
         var splits = new List<GroupTransactionSplit>();
         foreach (var item in dto.Splits)
@@ -359,6 +389,9 @@ public class GroupExpenseService : IGroupExpenseService
     /// <summary>
     /// Get group balances (who owes whom)
     /// </summary>
+    /// <summary>
+    /// Get group balances (who owes whom)
+    /// </summary>
     public async Task<GroupBalanceSummaryDto> GetGroupBalancesAsync(long groupId, long userId)
     {
         // Verify user is a member
@@ -368,6 +401,42 @@ public class GroupExpenseService : IGroupExpenseService
         if (!isMember)
             throw new InvalidOperationException("You are not a member of this group");
 
+        var memberBalances = await CalculateMemberBalancesAsync(groupId);
+        var settlements = CalculateOptimalSettlements(memberBalances);
+
+        var groupName = await _context.GroupExpenses
+            .Where(g => g.Id == groupId)
+            .Select(g => g.Name)
+            .FirstOrDefaultAsync() ?? "Unknown";
+
+        return new GroupBalanceSummaryDto
+        {
+            GroupId = groupId,
+            GroupName = groupName,
+            MemberBalances = memberBalances,
+            Settlements = settlements
+        };
+    }
+
+    /// <summary>
+    /// Calculate optimal debt settlements
+    /// </summary>
+    public async Task<List<GroupDebtDto>> CalculateSettlementsAsync(long groupId, long userId)
+    {
+        // Verify user is a member
+        var isMember = await _context.GroupMembers
+            .AnyAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
+
+        if (!isMember)
+            throw new InvalidOperationException("You are not a member of this group");
+
+        var memberBalances = await CalculateMemberBalancesAsync(groupId);
+        return CalculateOptimalSettlements(memberBalances);
+    }
+
+    // Helper: Calculate raw member balances
+    private async Task<List<GroupMemberBalanceDto>> CalculateMemberBalancesAsync(long groupId)
+    {
         var group = await _context.GroupExpenses
             .Include(g => g.GroupMembers)
                 .ThenInclude(gm => gm.User)
@@ -405,51 +474,62 @@ public class GroupExpenseService : IGroupExpenseService
                 Balance = balance
             });
         }
-
-        var settlements = await CalculateSettlementsAsync(groupId, userId);
-
-        return new GroupBalanceSummaryDto
-        {
-            GroupId = groupId,
-            GroupName = group.Name,
-            MemberBalances = memberBalances,
-            Settlements = settlements
-        };
+        
+        return memberBalances;
     }
 
-    /// <summary>
-    /// Calculate optimal debt settlements
-    /// </summary>
-    public async Task<List<GroupDebtDto>> CalculateSettlementsAsync(long groupId, long userId)
+    // Helper: Pure logic for settlements
+    private List<GroupDebtDto> CalculateOptimalSettlements(List<GroupMemberBalanceDto> memberBalances)
     {
-        var balances = await GetGroupBalancesAsync(groupId, userId);
         var settlements = new List<GroupDebtDto>();
+        
+        // Clone to avoid modifying original references if needed, but here we work with DTOs
+        // Make sure we don't modify the input list objects if they are used elsewhere (they are used in GetGroupBalancesAsync return)
+        // So we should clone the balances for calculation
+        var workingBalances = memberBalances.Select(b => new { b.UserId, b.UserName, Balance = b.Balance }).ToList();
 
-        var creditors = balances.MemberBalances.Where(b => b.Balance > 0).OrderByDescending(b => b.Balance).ToList();
-        var debtors = balances.MemberBalances.Where(b => b.Balance < 0).OrderBy(b => b.Balance).ToList();
+        var creditors = workingBalances.Where(b => b.Balance > 0).OrderByDescending(b => b.Balance).ToList();
+        var debtors = workingBalances.Where(b => b.Balance < 0).OrderBy(b => b.Balance).ToList();
 
         int i = 0, j = 0;
-        while (i < creditors.Count && j < debtors.Count)
-        {
-            var creditor = creditors[i];
-            var debtor = debtors[j];
+        // Use a wrapper class or modify local variable to track remaining balance
+        // Since anonymous types are read-only, let's use a small local class or dictionary
+        var creditorBalances = creditors.ToDictionary(c => c.UserId, c => c.Balance);
+        var debtorBalances = debtors.ToDictionary(d => d.UserId, d => d.Balance);
 
-            var settlementAmount = Math.Min(creditor.Balance, Math.Abs(debtor.Balance));
+        // Re-build lists of IDs to iterate
+        var creditorIds = creditors.Select(c => c.UserId).ToList();
+        var debtorIds = debtors.Select(d => d.UserId).ToList();
+
+        while (i < creditorIds.Count && j < debtorIds.Count)
+        {
+            var creditorId = creditorIds[i];
+            var debtorId = debtorIds[j];
+            
+            var creditAmount = creditorBalances[creditorId];
+            var debtAmount = debtorBalances[debtorId]; // Negative
+
+            var settlementAmount = Math.Min(creditAmount, Math.Abs(debtAmount));
+
+            // Find names
+            var creditorName = workingBalances.First(b => b.UserId == creditorId).UserName;
+            var debtorName = workingBalances.First(b => b.UserId == debtorId).UserName;
 
             settlements.Add(new GroupDebtDto
             {
-                FromUserId = debtor.UserId,
-                FromUserName = debtor.UserName,
-                ToUserId = creditor.UserId,
-                ToUserName = creditor.UserName,
+                FromUserId = debtorId,
+                FromUserName = debtorName,
+                ToUserId = creditorId,
+                ToUserName = creditorName,
                 Amount = settlementAmount
             });
 
-            creditor.Balance -= settlementAmount;
-            debtor.Balance += settlementAmount;
+            creditorBalances[creditorId] -= settlementAmount;
+            debtorBalances[debtorId] += settlementAmount;
 
-            if (creditor.Balance == 0) i++;
-            if (debtor.Balance == 0) j++;
+            // Use a small epsilon for float comparison if needed, but decimal is precise
+            if (creditorBalances[creditorId] == 0) i++;
+            if (debtorBalances[debtorId] == 0) j++;
         }
 
         return settlements;

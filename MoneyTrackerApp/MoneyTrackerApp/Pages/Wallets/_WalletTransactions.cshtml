@@ -7,6 +7,7 @@
             <tr class="text-xs uppercase tracking-wider text-gray-400 border-b border-gray-100 dark:border-gray-700">
                 <th class="py-3 pl-4 font-medium">Thời gian</th>
                 <th class="py-3 font-medium">Mô tả</th>
+                <th class="py-3 font-medium">Người thực hiện</th>
                 <th class="py-3 font-medium">Số tiền</th>
                 <th class="py-3 font-medium">Trạng thái</th>
                 <th class="py-3 pr-4 text-center font-medium">Hóa đơn</th>
@@ -34,6 +35,23 @@
                                         @(string.IsNullOrEmpty(transaction.Note) ? transaction.Description : transaction.Note)
                                     </div>
                                 </div>
+                            </div>
+                        </td>
+                        <td class="py-4">
+                            <div class="flex items-center gap-2">
+                                @if (!string.IsNullOrEmpty(transaction.UserAvatar))
+                                {
+                                    <img src="@transaction.UserAvatar" class="w-6 h-6 rounded-full border border-gray-200 object-cover" title="@transaction.UserName" alt="@transaction.UserName" />
+                                }
+                                else
+                                {
+                                    <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold ring-1 ring-white" title="@(transaction.UserName ?? "Unknown")">
+                                        @(!string.IsNullOrEmpty(transaction.UserName) ? transaction.UserName.Substring(0, 1).ToUpper() : "?")
+                                    </div>
+                                }
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[100px]">
+                                    @(transaction.UserName ?? "Unknown")
+                                </span>
                             </div>
                         </td>
                         <td class="py-4 font-mono font-medium">

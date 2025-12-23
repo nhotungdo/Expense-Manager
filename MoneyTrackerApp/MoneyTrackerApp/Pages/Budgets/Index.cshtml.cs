@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -25,11 +26,8 @@ namespace MoneyTrackerApp.Pages.Budgets
         public decimal Percentage { get; set; } = 0;
         public decimal ProjectedSpent { get; set; } = 0;
 
-        // Breakdown Data
-        public decimal ApiSpent { get; set; } = 0;
-        public decimal ProSpent { get; set; } = 0;
-        public decimal StorageSpent { get; set; } = 0;
-        public decimal OtherSpent { get; set; } = 0;
+        public List<CategorySpendingDto> CategorySpendings { get; set; } = new();
+        public List<DailySpendingDto> DailySpendings { get; set; } = new();
 
         public async Task OnGetAsync()
         {
@@ -42,7 +40,6 @@ namespace MoneyTrackerApp.Pages.Budgets
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
             // 2. Fetch Global Monthly Budget (CategoryId == null represents global)
-            // Assuming Period = 2 is Monthly as per Schema comments
             var budget = await _context.Budgets
                 .Where(b => b.UserId == userId 
                          && b.CategoryId == null 
@@ -52,18 +49,11 @@ namespace MoneyTrackerApp.Pages.Budgets
                 .OrderByDescending(b => b.CreatedAt)
                 .FirstOrDefaultAsync();
 
-            if (budget != null)
-            {
-                TotalBudget = budget.Amount;
-            }
-            else
-            {
-                // Default fallback if no budget set
-                TotalBudget = 0;
-            }
+            TotalBudget = budget?.Amount ?? 0;
 
-            // 3. Calculate Total Spent this month
+            // 3. Fetch Expenses for this month
             var expenses = await _context.Transactions
+                .Include(t => t.Category)
                 .Where(t => t.UserId == userId 
                          && t.TransactionType == 2 // Expense
                          && t.TransactionDate >= startOfMonth 
@@ -87,16 +77,45 @@ namespace MoneyTrackerApp.Pages.Budgets
                 ProjectedSpent = dailyAvg * daysInMonth;
             }
 
-            // 5. Mock Breakdown (Ideally fetch by Category Name)
-            // For now, we simulate this distribution to match the UI requirements, 
-            // but normally we would GroupBy Category.
-            // Let's approximate based on TotalSpent for the demo chart to look realistic relative to actual spending.
-            if (TotalSpent > 0)
+            // 5. Populate Category Spending
+            var groupedByCategory = expenses
+                .GroupBy(t => t.CategoryId)
+                .Select(g => new 
+                { 
+                    CategoryId = g.Key, 
+                    Amount = g.Sum(t => t.Amount),
+                    CategoryObj = g.First().Category
+                })
+                .OrderByDescending(x => x.Amount)
+                .ToList();
+
+            foreach (var item in groupedByCategory)
             {
-                ApiSpent = TotalSpent * 0.6m;
-                ProSpent = TotalSpent * 0.2m;
-                StorageSpent = TotalSpent * 0.1m;
-                OtherSpent = TotalSpent * 0.1m;
+                CategorySpendings.Add(new CategorySpendingDto
+                {
+                    Name = item.CategoryObj?.Name ?? "Khác",
+                    Amount = item.Amount,
+                    Color = item.CategoryObj?.Color ?? "#9CA3AF", // Default gray
+                    Icon = item.CategoryObj?.Icon ?? "fas fa-coins"
+                });
+            }
+
+            // 6. Populate Daily Spending (Cumulative)
+            decimal runningTotal = 0;
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                if (day > now.Day) break;
+
+                var date = new DateTime(now.Year, now.Month, day);
+                var dailySum = expenses.Where(t => t.TransactionDate.Date == date.Date).Sum(t => t.Amount);
+                runningTotal += dailySum;
+
+                DailySpendings.Add(new DailySpendingDto
+                {
+                    Date = date.ToString("dd/MM"),
+                    Amount = dailySum,
+                    Cumulative = runningTotal
+                });
             }
         }
 
@@ -146,10 +165,6 @@ namespace MoneyTrackerApp.Pages.Budgets
                 }
 
                 await _context.SaveChangesAsync();
-
-                // Recalculate status to return
-                // We re-query expenses to be safe, or just use what we passed if we want to be fast. 
-                // Let's just return the new limit.
                 return new JsonResult(new { success = true, newLimit = budget.Amount });
             }
             catch (Exception ex)
@@ -162,6 +177,21 @@ namespace MoneyTrackerApp.Pages.Budgets
         {
             public decimal Amount { get; set; }
             public string? CapType { get; set; }
+        }
+
+        public class CategorySpendingDto
+        {
+            public string Name { get; set; }
+            public decimal Amount { get; set; }
+            public string Color { get; set; }
+            public string Icon { get; set; }
+        }
+
+        public class DailySpendingDto
+        {
+            public string Date { get; set; }
+            public decimal Amount { get; set; }
+            public decimal Cumulative { get; set; }
         }
     }
 }

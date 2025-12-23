@@ -100,6 +100,10 @@ public class TransactionResponseDto
     public string Description { get; set; } = null!;
 
     public string? WarningMessage { get; set; }
+    
+    // Spender details for Shared Wallets
+    public string? UserName { get; set; }
+    public string? UserAvatar { get; set; }
 }
 
 /// <summary>
@@ -141,4 +145,13 @@ public class OcrResultDto
     public decimal? Amount { get; set; }
     public DateTime? Date { get; set; }
     public decimal Confidence { get; set; }
+}
+
+public class SpendingContributionDto
+{
+    public long UserId { get; set; }
+    public string UserName { get; set; } = null!;
+    public string? UserAvatar { get; set; }
+    public decimal TotalAmount { get; set; }
+    public double Percentage { get; set; }
 }

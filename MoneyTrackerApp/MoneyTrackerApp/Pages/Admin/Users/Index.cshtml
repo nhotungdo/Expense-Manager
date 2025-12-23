@@ -5,65 +5,117 @@
     ViewData["Title"] = "Quản lý người dùng";
 }
 
-<h2>Quản lý người dùng</h2>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo tên, email, số điện thoại...">
+<div class="card-modern mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-5">
+            <div class="search-box w-100">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, email, số điện thoại..." onkeypress="if(event.key === 'Enter') loadUsers()">
             </div>
-            <div class="col-md-3">
-                <select id="statusFilter" class="form-select">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="true">Hoạt động</option>
-                    <option value="false">Không hoạt động</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100" onclick="loadUsers()">Tìm kiếm</button>
-            </div>
+        </div>
+        <div class="col-md-3">
+            <select id="statusFilter" class="form-select form-select-sm" style="border-radius: 2rem; padding: 0.5rem 1rem;">
+                <option value="">Tất cả trạng thái</option>
+                <option value="true">Hoạt động</option>
+                <option value="false">Không hoạt động</option>
+            </select>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" onclick="loadUsers()" style="border-radius: 2rem; padding: 0.5rem 1.5rem;">
+                <i class="fas fa-filter me-2"></i> Lọc dữ liệu
+            </button>
         </div>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Người dùng</th>
-                        <th>Vai trò</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày tham gia</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody">
-                    <!-- Loaded via JS -->
-                </tbody>
-            </table>
-        </div>
-        <nav>
-            <ul class="pagination justify-content-center" id="pagination">
-                <!-- Pagination -->
-            </ul>
-        </nav>
+<div class="card-modern">
+    <div class="section-title">
+        <span>Danh sách người dùng</span>
+        <button class="btn btn-sm btn-outline-success rounded-pill" onclick="showCreateUserModal()">
+            <i class="fas fa-plus me-1"></i> Thêm mới
+        </button>
     </div>
+    
+    <div class="table-responsive table-modern-wrapper">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Người dùng</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tham gia</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- Loaded via JS -->
+                 <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p class="mb-0">Đang tải dữ liệu...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center" id="pagination">
+            <!-- Pagination -->
+        </ul>
+    </nav>
 </div>
 
 <!-- User Details Modal -->
 <div class="modal fade" id="userDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Chi tiết người dùng</h5>
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Chi tiết người dùng</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="userDetailsContent">
+            <div class="modal-body p-4" id="userDetailsContent">
                 <!-- Details loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Thêm người dùng mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="createUserForm">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Email *</label>
+                        <input type="email" class="form-control bg-light" id="newEmail" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Họ tên *</label>
+                        <input type="text" class="form-control bg-light" id="newFullName" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Mật khẩu *</label>
+                        <input type="password" class="form-control bg-light" id="newPassword" required minlength="6" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Vai trò</label>
+                        <select class="form-select bg-light" id="newRole">
+                            <option value="User">User (Người dùng thường)</option>
+                            <option value="Admin">Admin (Quản trị viên)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary px-4" onclick="createNewUser()">Tạo mới</button>
             </div>
         </div>
     </div>
@@ -84,35 +136,56 @@
 
             try {
                 const response = await fetch(url);
+                if (!response.ok) throw new Error('API Error');
                 const users = await response.json();
                 renderTable(users);
             } catch (error) {
                 console.error('Error loading users:', error);
+                document.getElementById('userTableBody').innerHTML = `
+                    <tr><td colspan="6" class="text-center text-danger py-4">Lỗi tải dữ liệu. Vui lòng thử lại.</td></tr>
+                `;
             }
         }
 
         function renderTable(users) {
             const tbody = document.getElementById('userTableBody');
+            
+            if (!users || users.length === 0) {
+                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Không tìm thấy người dùng nào.</td></tr>`;
+                 return;
+            }
+
             tbody.innerHTML = users.map(u => `
                 <tr>
-                    <td>${u.id}</td>
+                    <td class="text-muted">#${u.id}</td>
                     <td>
-                        <div class="fw-bold">${u.fullName}</div>
-                        <div class="small text-muted">${u.email}</div>
+                        <div class="d-flex align-items-center gap-2">
+                             <div class="rounded-circle bg-light text-primary d-flex justify-content-center align-items-center fw-bold" style="width: 32px; height: 32px; font-size: 12px;">
+                                ${(u.fullName || u.userName || '?').substring(0,1).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark">${u.fullName || u.userName}</div>
+                                <div class="small text-muted">${u.email}</div>
+                            </div>
+                        </div>
                     </td>
-                    <td><span class="badge bg-info text-dark">${u.roles.join(', ')}</span></td>
+                    <td>
+                        ${u.roles.map(r => `<span class="badge bg-light text-primary border border-primary-subtle me-1">${r}</span>`).join('')}
+                    </td>
                     <td>
                         ${u.isActive 
-                            ? '<span class="badge bg-success">Hoạt động</span>' 
-                            : '<span class="badge bg-danger">Không hoạt động</span>'}
-                        ${u.isLocked ? '<span class="badge bg-warning text-dark">Bị khóa</span>' : ''}
+                            ? '<span class="status-badge success"><i class="fas fa-check-circle"></i> Hoạt động</span>' 
+                            : '<span class="status-badge danger"><i class="fas fa-times-circle"></i> Vô hiệu</span>'}
+                        ${u.isLocked ? '<span class="status-badge warning"><i class="fas fa-lock"></i> Bị khóa</span>' : ''}
                     </td>
-                    <td>${new Date(u.createdAt).toLocaleDateString('vi-VN')}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary" onclick="viewUser(${u.id})">Xem</button>
+                    <td class="text-muted">${new Date(u.createdAt).toLocaleDateString('vi-VN')}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-light text-primary border hover-shadow" onclick="viewUser(${u.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         ${u.isLocked 
-                            ? `<button class="btn btn-sm btn-success" onclick="unlockUser(${u.id})">Mở khóa</button>`
-                            : `<button class="btn btn-sm btn-warning" onclick="lockUser(${u.id})">Khóa</button>`}
+                            ? `<button class="btn btn-sm btn-light text-success border hover-shadow ms-1" onclick="unlockUser(${u.id})" title="Mở khóa"><i class="fas fa-lock-open"></i></button>`
+                            : `<button class="btn btn-sm btn-light text-warning border hover-shadow ms-1" onclick="lockUser(${u.id})" title="Khóa tài khoản"><i class="fas fa-lock"></i></button>`}
                     </td>
                 </tr>
             `).join('');
@@ -124,26 +197,27 @@
                 const user = await response.json();
                 
                 const content = `
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Thông tin cơ bản</h6>
-                            <p><strong>Tên:</strong> ${user.fullName}</p>
-                            <p><strong>Email:</strong> ${user.email}</p>
-                            <p><strong>Số điện thoại:</strong> ${user.phoneNumber || 'N/A'}</p>
-                            <p><strong>Vai trò:</strong> ${user.roles.join(', ')}</p>
+                    <div class="row g-4">
+                        <div class="col-md-6 border-end">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3">Thông tin cơ bản</h6>
+                            <div class="mb-2"><span class="text-muted w-100 d-block small">Họ tên</span> <span class="fw-medium">${user.fullName || 'N/A'}</span></div>
+                            <div class="mb-2"><span class="text-muted w-100 d-block small">Email</span> <span class="fw-medium">${user.email}</span></div>
+                            <div class="mb-2"><span class="text-muted w-100 d-block small">Số điện thoại</span> <span class="fw-medium">${user.phoneNumber || 'N/A'}</span></div>
+                            <div class="mb-2"><span class="text-muted w-100 d-block small">Vai trò</span> <span class="text-primary fw-bold">${user.roles.join(', ')}</span></div>
                         </div>
                         <div class="col-md-6">
-                            <h6>Trạng thái tài khoản</h6>
-                            <p><strong>Trạng thái:</strong> ${user.isActive ? 'Hoạt động' : 'Không hoạt động'}</p>
-                            <p><strong>Đăng nhập lần cuối:</strong> ${user.lastLogin ? new Date(user.lastLogin).toLocaleString('vi-VN') : 'Chưa bao giờ'}</p>
-                            <p><strong>Bị khóa:</strong> ${user.isLocked ? `Đến ${new Date(user.lockoutEnd).toLocaleString('vi-VN')}` : 'Không'}</p>
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3">Trạng thái & Bảo mật</h6>
+                            <div class="mb-2"><span class="text-muted w-100 d-block small">Trạng thái</span> ${user.isActive ? '<span class="text-success fw-bold">Hoạt động</span>' : '<span class="text-danger fw-bold">Vô hiệu</span>'}</div>
+                            <div class="mb-2"><span class="text-muted w-100 d-block small">Đăng nhập lần cuối</span> <span class="fw-medium">${user.lastLogin ? new Date(user.lastLogin).toLocaleString('vi-VN') : 'Chưa bao giờ'}</span></div>
+                            <div class="mb-2"><span class="text-muted w-100 d-block small">Khóa tạm thời</span> <span class="fw-medium">${user.isLocked ? `Đến ${new Date(user.lockoutEnd).toLocaleString('vi-VN')}` : 'Không'}</span></div>
                         </div>
                     </div>
-                    <hr>
-                    <h6>Hành động</h6>
+                    <hr class="my-4 op-2">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Quản trị</h6>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-warning" onclick="resetPassword(${user.id})">Đặt lại mật khẩu</button>
-                        <button class="btn btn-info" onclick="promoteUser(${user.id})">Đổi vai trò</button>
+                        <button class="btn btn-warning btn-sm" onclick="resetPassword(${user.id})"><i class="fas fa-key me-1"></i> Reset Password</button>
+                        <button class="btn btn-info btn-sm text-white" onclick="promoteUser(${user.id})"><i class="fas fa-user-shield me-1"></i> Đổi vai trò</button>
+                         <button class="btn btn-outline-danger btn-sm ms-auto" onclick="alert('Tính năng xóa chưa khả dụng')"><i class="fas fa-trash me-1"></i> Xóa User</button>
                     </div>
                 `;
                 
@@ -151,29 +225,68 @@
                 new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
             } catch (error) {
                 alert('Lỗi tải chi tiết người dùng');
+                console.error(error);
             }
         }
 
         async function lockUser(id) {
             if (!confirm('Bạn có chắc chắn muốn khóa người dùng này trong 24 giờ không?')) return;
-            await fetch(`/api/admin/users/${id}/lock`, {
+             await fetch(`/api/admin/users/${id}/lock`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ durationMinutes: 1440 })
-            });
-            loadUsers(currentPage);
+            }).then(() => loadUsers(currentPage));
         }
 
         async function unlockUser(id) {
             if (!confirm('Mở khóa người dùng này?')) return;
-            await fetch(`/api/admin/users/${id}/unlock`, { method: 'POST' });
-            loadUsers(currentPage);
+            await fetch(`/api/admin/users/${id}/unlock`, { method: 'POST' })
+            .then(() => loadUsers(currentPage));
         }
         
         async function resetPassword(id) {
             if (!confirm('Gửi email đặt lại mật khẩu cho người dùng này?')) return;
             await fetch(`/api/admin/users/${id}/reset-password`, { method: 'POST' });
             alert('Email đặt lại mật khẩu đã được thêm vào hàng đợi.');
+        }
+
+        function showCreateUserModal() {
+            document.getElementById('createUserForm').reset();
+            new bootstrap.Modal(document.getElementById('createUserModal')).show();
+        }
+
+        async function createNewUser() {
+            const form = document.getElementById('createUserForm');
+            if(!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const data = {
+                email: document.getElementById('newEmail').value,
+                fullName: document.getElementById('newFullName').value,
+                password: document.getElementById('newPassword').value,
+                role: document.getElementById('newRole').value
+            };
+
+            try {
+                const res = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
+                    loadUsers();
+                    alert("Tạo người dùng thành công");
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Lỗi tạo người dùng');
+                }
+            } catch(e) {
+                alert('Lỗi kết nối');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => loadUsers());

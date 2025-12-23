@@ -5,178 +5,154 @@
     ViewData["Title"] = "Logs hệ thống";
 }
 
-<div class="container-fluid">
-    <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
-        <div>
-            <h2 class="mb-1">Logs hệ thống</h2>
-            <p class="text-muted mb-0">Theo dõi lỗi ứng dụng, webhook và retry.</p>
-        </div>
-        <div class="ms-auto d-flex gap-2">
-            <button class="btn btn-outline-secondary"><i class="fas fa-download me-1"></i> Xuất log</button>
-            <button class="btn btn-primary"><i class="fas fa-sync me-1"></i> Làm mới</button>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted small mb-1">Lỗi ứng dụng (24h)</div>
-                    <h4 class="mb-0 text-danger">--</h4>
-                    <div class="text-muted small">Hiển thị khi nối nguồn log.</div>
+<div class="row g-4 mb-4">
+    <!-- Stats Cards -->
+    <div class="col-md-4">
+        <div class="card-modern">
+            <div class="stat-card">
+                <div>
+                     <div class="stat-label">Lỗi ứng dụng (24h)</div>
+                     <div class="stat-value text-danger">5</div>
+                     <div class="stat-trend text-muted"><small>Cần kiểm tra</small></div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted small mb-1">Webhook thất bại</div>
-                    <h4 class="mb-0 text-warning">--</h4>
-                    <div class="text-muted small">Số lần lỗi gần nhất.</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted small mb-1">Retry thành công</div>
-                    <h4 class="mb-0 text-success">--</h4>
-                    <div class="text-muted small">Tỷ lệ xử lý lại thành công.</div>
-                </div>
+                <div class="stat-icon" style="color: #ef4444; background-color: #fee2e2;"><i class="fas fa-bug"></i></div>
             </div>
         </div>
     </div>
-
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-            <div class="d-flex align-items-center mb-3">
-                <h5 class="mb-0">Application Logs</h5>
-                <div class="ms-auto small text-muted">Bộ lọc mẫu.</div>
-            </div>
-            <div class="row g-2 mb-3">
-                <div class="col-md-3">
-                    <select class="form-select form-select-sm">
-                        <option>Mức độ</option>
-                        <option>Error</option>
-                        <option>Warning</option>
-                        <option>Info</option>
-                    </select>
+    <div class="col-md-4">
+        <div class="card-modern">
+            <div class="stat-card">
+                <div>
+                     <div class="stat-label">Webhook thất bại</div>
+                     <div class="stat-value text-warning">2</div>
+                     <div class="stat-trend text-muted"><small>Đang thử lại</small></div>
                 </div>
-                <div class="col-md-3">
-                    <input class="form-control form-control-sm" placeholder="Từ khóa / requestId" />
-                </div>
-                <div class="col-md-3">
-                    <input type="date" class="form-control form-control-sm" />
-                </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-secondary w-100">Lọc</button>
-                    <button class="btn btn-sm btn-light w-100">Clear</button>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Thời gian</th>
-                            <th>Cấp độ</th>
-                            <th>Nguồn</th>
-                            <th>Thông điệp</th>
-                            <th class="text-end">Chi tiết</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>2025-01-02 10:05</td>
-                            <td><span class="badge bg-danger-subtle text-danger border">Error</span></td>
-                            <td>CheckoutController</td>
-                            <td>Timeout khi gọi Payment Gateway</td>
-                            <td class="text-end"><button class="btn btn-sm btn-outline-secondary">Xem</button></td>
-                        </tr>
-                        <tr>
-                            <td>2025-01-02 10:15</td>
-                            <td><span class="badge bg-warning-subtle text-warning border">Warn</span></td>
-                            <td>SubscriptionJob</td>
-                            <td>Retry charge lần 2</td>
-                            <td class="text-end"><button class="btn btn-sm btn-outline-secondary">Xem</button></td>
-                        </tr>
-                        <tr>
-                            <td>2025-01-02 11:20</td>
-                            <td><span class="badge bg-info-subtle text-info border">Info</span></td>
-                            <td>WebhookReceiver</td>
-                            <td>Stripe event invoice.paid</td>
-                            <td class="text-end"><button class="btn btn-sm btn-outline-secondary">Xem</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="stat-icon" style="color: #f59e0b; background-color: #fef3c7;"><i class="fas fa-satellite-dish"></i></div>
             </div>
         </div>
     </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <div class="d-flex align-items-center mb-3">
-                <h5 class="mb-0">Webhook Logs</h5>
-                <div class="ms-auto small text-muted">Hiển thị payload ngắn, cho phép retry.</div>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Gateway</th>
-                            <th>Event</th>
-                            <th>Trạng thái</th>
-                            <th>Đã thử</th>
-                            <th>Cập nhật</th>
-                            <th class="text-end">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Stripe</td>
-                            <td>invoice.payment_failed</td>
-                            <td><span class="badge bg-danger-subtle text-danger border">Failed</span></td>
-                            <td>2 lần</td>
-                            <td>5 phút trước</td>
-                            <td class="text-end">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-secondary">Chi tiết</button>
-                                    <button class="btn btn-outline-primary">Retry</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Momo</td>
-                            <td>payment.success</td>
-                            <td><span class="badge bg-success-subtle text-success border">Success</span></td>
-                            <td>1 lần</td>
-                            <td>30 phút trước</td>
-                            <td class="text-end">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-secondary">Chi tiết</button>
-                                    <button class="btn btn-outline-primary">Replay</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Paypal</td>
-                            <td>subscription.canceled</td>
-                            <td><span class="badge bg-warning-subtle text-warning border">Pending</span></td>
-                            <td>1 lần</td>
-                            <td>2 giờ trước</td>
-                            <td class="text-end">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-secondary">Chi tiết</button>
-                                    <button class="btn btn-outline-primary">Retry</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div class="col-md-4">
+        <div class="card-modern">
+            <div class="stat-card">
+                <div>
+                     <div class="stat-label">Retry thành công</div>
+                     <div class="stat-value text-success">98%</div>
+                     <div class="stat-trend text-success"><small>Hoạt động tốt</small></div>
+                </div>
+                <div class="stat-icon" style="color: #10b981; background-color: #d1fae5;"><i class="fas fa-redo"></i></div>
             </div>
         </div>
     </div>
 </div>
 
+<div class="card-modern mb-4">
+    <div class="section-title">
+        <span>Application Logs</span>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-filter me-1"></i> Bộ lọc</button>
+            <button class="btn btn-sm btn-light"><i class="fas fa-sync-alt"></i></button>
+        </div>
+    </div>
+    
+    <!-- Filter Bar -->
+    <div class="row g-2 mb-4">
+        <div class="col-md-3">
+             <select class="form-select form-select-sm bg-light border-0">
+                <option>Tất cả mức độ</option>
+                <option>Error</option>
+                <option>Warning</option>
+                <option>Info</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <div class="search-box w-100">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Tìm kiếm log..." style="background-color: #f8fafc;">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control form-control-sm bg-light border-0" />
+        </div>
+    </div>
 
+    <div class="table-responsive table-modern-wrapper">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Cấp độ</th>
+                    <th>Nguồn</th>
+                    <th>Thông điệp</th>
+                    <th class="text-end">Chi tiết</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-muted font-monospace small">2025-01-02 10:05</td>
+                    <td><span class="status-badge danger">Error</span></td>
+                    <td class="fw-medium">CheckoutController</td>
+                    <td>Timeout khi gọi Payment Gateway</td>
+                    <td class="text-end"><button class="btn btn-sm btn-light border hover-shadow"><i class="fas fa-eye"></i></button></td>
+                </tr>
+                <tr>
+                    <td class="text-muted font-monospace small">2025-01-02 10:15</td>
+                    <td><span class="status-badge warning">Warn</span></td>
+                    <td class="fw-medium">SubscriptionJob</td>
+                    <td>Retry charge lần 2</td>
+                    <td class="text-end"><button class="btn btn-sm btn-light border hover-shadow"><i class="fas fa-eye"></i></button></td>
+                </tr>
+                <tr>
+                    <td class="text-muted font-monospace small">2025-01-02 11:20</td>
+                    <td><span class="status-badge info">Info</span></td>
+                    <td class="fw-medium">WebhookReceiver</td>
+                    <td>Stripe event invoice.paid</td>
+                    <td class="text-end"><button class="btn btn-sm btn-light border hover-shadow"><i class="fas fa-eye"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
+<div class="card-modern">
+    <div class="section-title">
+        <span>Webhook Logs</span>
+        <small class="text-muted fw-normal ms-2">Các sự kiện từ cổng thanh toán</small>
+    </div>
+    <div class="table-responsive table-modern-wrapper">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Gateway</th>
+                    <th>Event</th>
+                    <th>Trạng thái</th>
+                    <th>Đã thử</th>
+                    <th>Cập nhật</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold"><i class="fab fa-stripe text-primary me-2"></i>Stripe</td>
+                    <td class="font-monospace text-primary">invoice.payment_failed</td>
+                    <td><span class="status-badge danger">Failed</span></td>
+                    <td>2 lần</td>
+                    <td class="text-muted small">5 phút trước</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-primary ms-1"><i class="fas fa-redo me-1"></i> Retry</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Momo</td>
+                    <td class="font-monospace text-primary">payment.success</td>
+                    <td><span class="status-badge success">Success</span></td>
+                    <td>1 lần</td>
+                    <td class="text-muted small">30 phút trước</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-light border hover-shadow"><i class="fas fa-eye"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
