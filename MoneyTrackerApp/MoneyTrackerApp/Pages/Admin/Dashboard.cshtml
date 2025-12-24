@@ -1,204 +1,254 @@
 @page
 @model MoneyTrackerApp.Pages.Admin.DashboardModel
 @{
-    Layout = "/Pages/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Tổng quan hệ thống";
+    ViewData["Title"] = "Bảng điều khiển";
+    Layout = "_AdminLayout";
+    var data = Model.Data;
 }
 
-<!-- Stats Row -->
 <div class="row g-4 mb-4">
-    <!-- Total Users -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card-modern">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Người dùng</div>
-                    <div class="stat-value">@Model.DashboardData.TotalUsers.ToString("N0")</div>
-                    <div class="stat-trend text-success">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>+@Model.DashboardData.NewUsersToday hôm nay</span>
+    <!-- Welcome Section -->
+    <div class="col-12 col-xl-8">
+        <div class="admin-card bg-gradient-brand text-white border-0 shadow-lg h-100">
+            <div class="card-body p-4 p-md-5 d-flex align-items-center justify-content-between position-relative overflow-hidden">
+                <div class="position-relative z-1">
+                    <h2 class="fw-bold mb-2">Xin chào, Admin! 👋</h2>
+                    <p class="mb-4 opacity-75 fs-5">Hệ thống đang hoạt động ổn định. Chúc bạn một ngày làm việc hiệu quả!</p>
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-light text-primary fw-bold px-4" onclick="document.getElementById('quickActions').scrollIntoView({behavior: 'smooth'})">
+                            <i class="fas fa-bolt me-2"></i>Thao tác nhanh
+                        </button>
+                        <a href="/Admin/Monitoring/Logs" class="btn btn-outline-light px-4">
+                            <i class="fas fa-terminal me-2"></i>Xem Logs
+                        </a>
                     </div>
                 </div>
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
+                <!-- Abstract Decoration -->
+                <div class="position-absolute end-0 bottom-0 opacity-25 me-n5 mb-n5 d-none d-md-block" style="transform: rotate(-15deg);">
+                    <i class="fas fa-chart-pie" style="font-size: 15rem;"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- AUM -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card-modern">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Tổng tài sản (AUM)</div>
-                    <div class="stat-value">@Model.DashboardData.SystemAum.ToString("N0")</div>
-                    <div class="stat-trend text-muted">
-                        <small>Toàn hệ thống</small>
-                    </div>
-                </div>
-                <div class="stat-icon" style="color: #10b981; background-color: #d1fae5;">
-                    <i class="fas fa-wallet"></i>
-                </div>
+    <!-- Quick Actions Card (New Feature) -->
+    <div class="col-12 col-xl-4">
+        <div class="admin-card h-100" id="quickActions">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-bold mb-0">Thao tác nhanh</h5>
             </div>
-        </div>
-    </div>
-
-    <!-- Traffic -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card-modern">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Lưu lượng hôm nay</div>
-                    <div class="stat-value">@Model.DashboardData.TodayTransactionsCount.ToString("N0")</div>
-                    <div class="stat-trend text-warning">
-                        <small>Yêu cầu xử lý</small>
+            <div class="card-body pt-0">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <a href="/Admin/Users" class="btn btn-light w-100 h-100 p-3 text-start border hover-shadow transition-all">
+                            <div class="text-primary mb-2"><i class="fas fa-user-plus fa-2x"></i></div>
+                            <div class="fw-bold text-dark">Quản lý User</div>
+                        </a>
                     </div>
-                </div>
-                <div class="stat-icon" style="color: #f59e0b; background-color: #fef3c7;">
-                    <i class="fas fa-exchange-alt"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- System Health -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card-modern">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Sức khỏe hệ thống</div>
-                    <div class="stat-value">@Model.DashboardData.SystemHealthWarnings</div>
-                    <div class="stat-trend @(Model.DashboardData.SystemHealthWarnings > 0 ? "text-danger" : "text-muted")">
-                        @if(Model.DashboardData.SystemHealthWarnings > 0)
-                        {
-                            <i class="fas fa-exclamation-triangle"></i> <span>Có cảnh báo</span>
-                        }
-                        else
-                        {
-                            <i class="fas fa-check-circle text-success"></i> <span class="text-success">Hoạt động tốt</span>
-                        }
+                    <div class="col-6">
+                         <a href="/Admin/ServicePackages" class="btn btn-light w-100 h-100 p-3 text-start border hover-shadow transition-all">
+                            <div class="text-warning mb-2"><i class="fas fa-box-open fa-2x"></i></div>
+                            <div class="fw-bold text-dark">Gói dịch vụ</div>
+                        </a>
                     </div>
-                </div>
-                <div class="stat-icon" style="color: #ef4444; background-color: #fee2e2;">
-                    <i class="fas fa-heartbeat"></i>
+                    <div class="col-6">
+                         <a href="/Admin/Settings" class="btn btn-light w-100 h-100 p-3 text-start border hover-shadow transition-all">
+                            <div class="text-info mb-2"><i class="fas fa-cogs fa-2x"></i></div>
+                            <div class="fw-bold text-dark">Cấu hình</div>
+                        </a>
+                    </div>
+                     <div class="col-6">
+                         <a href="/Admin/Transactions?Filter.StartDate=@DateTime.Now.ToString("yyyy-MM-dd")" class="btn btn-light w-100 h-100 p-3 text-start border hover-shadow transition-all">
+                            <div class="text-success mb-2"><i class="fas fa-search-dollar fa-2x"></i></div>
+                            <div class="fw-bold text-dark">Soát giao dịch</div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Main Content Row -->
-<div class="row g-4 mb-4">
-    <!-- Chart Section -->
-    <div class="col-lg-8">
-        <div class="card-modern">
-            <div class="section-title">
-                <span>Lưu lượng truy cập</span>
-                <select class="form-select form-select-sm w-auto" style="border-radius: 6px;">
-                    <option>7 ngày qua</option>
-                    <option>Tháng này</option>
-                </select>
+<!-- KPI Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="admin-card h-100 hover-translate-y transition-all">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-secondary fw-medium mb-1">Tổng người dùng</p>
+                        <h3 class="fw-bold mb-0">@data.TotalUsers.ToString("N0")</h3>
+                    </div>
+                    <div class="icon-box bg-soft-primary text-primary rounded-circle">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 text-sm">
+                    <span class="badge bg-soft-success text-success rounded-pill">
+                        <i class="fas fa-arrow-up me-1"></i>@data.NewUsersLast7Days
+                    </span>
+                    <span class="text-secondary">trong 7 ngày qua</span>
+                </div>
             </div>
-            <div id="trafficChart" class="chart-container"></div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="admin-card h-100 hover-translate-y transition-all">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-secondary fw-medium mb-1">Đang hoạt động</p>
+                        <h3 class="fw-bold mb-0">@data.ActiveUsers.ToString("N0")</h3>
+                    </div>
+                    <div class="icon-box bg-soft-success text-success rounded-circle">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                </div>
+                <div class="progress h-1 my-2 bg-light">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: @(data.TotalUsers > 0 ? (data.ActiveUsers * 100 / data.TotalUsers) : 0)%"></div>
+                </div>
+                <div class="text-secondary text-sm">
+                    @(data.TotalUsers > 0 ? (data.ActiveUsers * 100 / data.TotalUsers) : 0)% tỷ lệ tương tác
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Server Status -->
-    <div class="col-lg-4">
-        <div class="card-modern">
-            <div class="section-title">
-                <span>Trạng thái dịch vụ</span>
-                <button class="btn btn-sm btn-light rounded-circle"><i class="fas fa-sync-alt"></i></button>
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="admin-card h-100 hover-translate-y transition-all">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-secondary fw-medium mb-1">Tổng tài sản (AUM)</p>
+                        <h3 class="fw-bold mb-0">@data.TotalBalance.ToString("N0") ₫</h3>
+                    </div>
+                    <div class="icon-box bg-soft-warning text-warning rounded-circle">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 text-sm">
+                    <span class="text-secondary">Toàn hệ thống</span>
+                </div>
             </div>
-            
-            <div class="d-flex flex-column gap-3">
-                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-database"></i></div>
-                        <span class="fw-medium">Database Engine</span>
-                    </div>
-                    <span class="status-badge success"><i class="fas fa-check"></i> Online</span>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-envelope"></i></div>
-                        <span class="fw-medium">Email Service</span>
-                    </div>
-                    <span class="status-badge warning"><i class="fas fa-clock"></i> Waiting</span>
-                </div>
+        </div>
+    </div>
 
-                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-university"></i></div>
-                        <span class="fw-medium">Banking API</span>
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="admin-card h-100 hover-translate-y transition-all">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-secondary fw-medium mb-1">Giao dịch hôm nay</p>
+                        <h3 class="fw-bold mb-0">@data.TransactionsToday.ToString("N0")</h3>
                     </div>
-                    <span class="status-badge danger"><i class="fas fa-times"></i> Error</span>
+                    <div class="icon-box bg-soft-info text-info rounded-circle">
+                        <i class="fas fa-receipt"></i>
+                    </div>
                 </div>
-
-                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-light">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded bg-light text-secondary"><i class="fas fa-memory"></i></div>
-                        <span class="fw-medium">Redis Cache</span>
-                    </div>
-                    <span class="status-badge success"><i class="fas fa-check"></i> Online</span>
+                <div class="d-flex align-items-center gap-2 text-sm">
+                    <span class="text-secondary">Cập nhật thời gian thực</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Logs -->
-<div class="row">
+<div class="row g-4">
+    <!-- Charts Section -->
+    <div class="col-12 col-xl-8">
+        <div class="admin-card h-100">
+            <div class="card-header border-bottom-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Biểu đồ giao dịch</h5>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        7 ngày qua
+                    </button>
+                    <ul class="dropdown-menu shadow-sm border-0">
+                        <li><a class="dropdown-item" href="#">7 ngày qua</a></li>
+                        <li><a class="dropdown-item" href="#">30 ngày qua</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="volumeChart" style="min-height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Metrics -->
+    <div class="col-12 col-xl-4">
+        <div class="admin-card h-100">
+            <div class="card-header border-bottom-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Trạng thái hệ thống</h5>
+                <span class="badge bg-soft-success text-success">Ổn định</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var metric in data.SystemMetrics)
+                    {
+                        <div class="list-group-item px-4 py-3 border-0">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="fw-medium">@metric.Name</span>
+                                <span class="badge bg-soft-@metric.Tone text-@metric.Tone">@metric.Status</span>
+                            </div>
+                            <p class="text-secondary text-sm mb-0">@metric.Detail</p>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 text-center pb-4">
+                 <button class="btn btn-light btn-sm w-100 text-secondary">Kiểm tra lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Logs Table -->
+<div class="row g-4 mt-2">
     <div class="col-12">
-        <div class="card-modern">
-            <div class="section-title">
-                <span>Nhật ký bảo mật gần đây</span>
-                <a href="/Admin/Monitoring/AuditLogs" class="text-primary text-decoration-none small fw-bold">Xem tất cả <i class="fas fa-arrow-right ms-1"></i></a>
+        <div class="admin-card">
+            <div class="card-header border-bottom-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Nhật ký Audit gần đây</h5>
+                <a href="/Admin/Monitoring/AuditLogs" class="btn btn-sm btn-light">Xem toàn bộ</a>
             </div>
-            
-            <div class="table-modern-wrapper">
-                <table class="table-modern">
-                    <thead>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <th>Thời gian</th>
-                            <th>Người dùng</th>
+                            <th class="ps-4">Người dùng</th>
                             <th>Hành động</th>
                             <th>IP Address</th>
-                            <th>Trạng thái</th>
+                            <th>Thời gian</th>
+                            <th class="text-end pe-4">Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
-                         @if (Model.DashboardData.RecentAuditLogs != null && Model.DashboardData.RecentAuditLogs.Any())
+                        @foreach (var log in data.RecentAuditLogs)
                         {
-                            foreach (var log in Model.DashboardData.RecentAuditLogs.Take(5))
-                            {
-                                <tr>
-                                    <td class="text-muted">@log.Time.ToString("dd/MM HH:mm")</td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="rounded-circle bg-light text-secondary d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; font-size: 10px;">
-                                                @log.UserEmail?.Substring(0,1).ToUpper()
-                                            </div>
-                                            <span class="fw-medium">@log.UserEmail</span>
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
+                                            @log.UserEmail.Substring(0, 1).ToUpper()
                                         </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border fw-normal">@log.Action</span>
-                                    </td>
-                                    <td class="font-monospace text-muted small">@log.IpAddress</td>
-                                    <td><span class="status-badge success">Success</span></td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">
-                                    <i class="fas fa-inbox fa-2x mb-2 d-block opacity-25"></i>
-                                    Không có dữ liệu nhật ký mới
+                                        <div>
+                                            <div class="fw-medium">@log.UserEmail</div>
+                                        </div>
+                                    </div>
                                 </td>
+                                <td>@log.Action</td>
+                                <td class="font-monospace text-secondary">@log.IpAddress</td>
+                                <td>@log.Time.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-end pe-4">
+                                    <span class="badge bg-soft-secondary text-secondary">Đã ghi nhận</span>
+                                </td>
+                            </tr>
+                        }
+                        @if (!data.RecentAuditLogs.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-secondary">Chưa có nhật ký nào.</td>
                             </tr>
                         }
                     </tbody>
@@ -210,72 +260,50 @@
 
 @section Scripts {
     <script>
-        var trafficLabels = [];
-        var trafficData = [];
-        
-        @if(Model.DashboardData.TransactionVolumeChart != null)
-        {
-            foreach(var item in Model.DashboardData.TransactionVolumeChart)
-            {
-                @:trafficLabels.push("@item.Day");
-                @:trafficData.push(@item.Count);
-            }
-        }
-        
-        if (trafficLabels.length === 0) {
-            trafficLabels = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
-            trafficData = [30, 40, 35, 50, 49, 60, 70];
-        }
-
-        var options = {
-            series: [{
-                name: 'Requests',
-                data: trafficData
-            }],
-            chart: {
-                height: 320,
-                type: 'area',
-                toolbar: { show: false },
-                fontFamily: 'Plus Jakarta Sans, sans-serif'
-            },
-            dataLabels: { enabled: false },
-            stroke: {
-                curve: 'smooth',
-                width: 2
-            },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.4,
-                    opacityTo: 0.05,
-                    stops: [0, 90, 100]
+        document.addEventListener('DOMContentLoaded', function () {
+            var volumeData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(data.TransactionVolumeChart));
+            
+            var options = {
+                series: [{
+                    name: 'Giao dịch',
+                    data: volumeData.map(function(item) { return item.Count; })
+                }],
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    toolbar: { show: false },
+                    fontFamily: 'Plus Jakarta Sans, sans-serif'
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 2 },
+                xaxis: {
+                    categories: volumeData.map(function(item) { return item.Day; }),
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: { show: false },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.2,
+                        stops: [0, 90, 100]
+                    }
+                },
+                theme: {
+                    mode: 'light', 
+                    palette: 'palette1'
+                },
+                colors: ['#4F46E5'],
+                grid: {
+                    borderColor: '#f1f1f1',
+                    strokeDashArray: 4,
                 }
-            },
-            xaxis: {
-                categories: trafficLabels,
-                axisBorder: { show: false },
-                axisTicks: { show: false }
-            },
-            yaxis: {
-                show: true,
-                tickAmount: 5
-            },
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4,
-            },
-            theme: {
-                monochrome: {
-                    enabled: true,
-                    color: '#4f46e5',
-                    shadeTo: 'light',
-                    shadeIntensity: 0.65
-                }
-            }
-        };
-
-        var chart = new ApexCharts(document.querySelector("#trafficChart"), options);
-        chart.render();
+            };
+            
+            var chart = new ApexCharts(document.querySelector("#volumeChart"), options);
+            chart.render();
+        });
     </script>
 }

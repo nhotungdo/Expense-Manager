@@ -13,6 +13,8 @@ namespace MoneyTrackerApp.DTOs
         public string? BadgeText { get; set; }
         public string? BadgeColor { get; set; }
         public int DiscountPercentage { get; set; }
+        public bool IsActive { get; set; }
+        public int DisplayOrder { get; set; }
     }
 
     public class CreateServicePackageDto

@@ -21,6 +21,8 @@ public partial class GroupTransaction
 
     public string? Category { get; set; }
 
+    public string? AttachmentUrl { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }

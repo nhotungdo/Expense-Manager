@@ -1,197 +1,85 @@
 @page
 @model MoneyTrackerApp.Pages.Admin.Settings.IndexModel
 @{
-    Layout = "/Pages/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Cài đặt hệ thống";
+    ViewData["Title"] = "System Settings";
+    Layout = "_AdminLayout";
 }
 
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="card-modern">
-            <div class="d-flex flex-column h-100">
-                <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="maintenanceMode" style="width: 3em; height: 1.5em;">
-                </div>
-                <div class="stat-label">Chế độ bảo trì</div>
-                <div class="text-muted small mt-2 flex-grow-1">Chặn truy cập từ người dùng thường, chỉ Admin có thể truy cập site.</div>
+<div class="row g-4 justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="admin-card">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-bold mb-0">General Configuration</h5>
+                <p class="text-secondary small mb-0">Monitor and update system parameters</p>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card-modern">
-             <div class="mb-2"><i class="fas fa-shield-alt text-primary fa-lg"></i></div>
-             <div class="stat-label mb-1 fw-bold text-dark">Bảo mật</div>
-             <div class="text-muted small">Cấu hình 2FA, khóa API, IP Whitelist.</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card-modern">
-             <div class="mb-2"><i class="fas fa-credit-card text-success fa-lg"></i></div>
-             <div class="stat-label mb-1 fw-bold text-dark">Thanh toán</div>
-             <div class="text-muted small">Cổng thanh toán, Webhooks, tỷ giá.</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card-modern">
-             <div class="mb-2"><i class="fas fa-bell text-warning fa-lg"></i></div>
-             <div class="stat-label mb-1 fw-bold text-dark">Thông báo</div>
-             <div class="text-muted small">Email templates, Push notifications.</div>
-        </div>
-    </div>
-</div>
-
-<div class="card-modern">
-    <div class="section-title">
-        <span>Danh sách cấu hình</span>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-secondary" onclick="alert('Export config')"><i class="fas fa-download me-1"></i> Xuất</button>
-            <button class="btn btn-sm btn-light" onclick="loadSettings()"><i class="fas fa-sync-alt"></i></button>
-        </div>
-    </div>
-    
-    <div class="table-responsive table-modern-wrapper">
-        <table class="table-modern">
-            <thead>
-                <tr>
-                    <th style="width: 20%;">Key</th>
-                    <th style="width: 40%;">Value</th>
-                    <th>Mô tả</th>
-                    <th class="text-end">Action</th>
-                </tr>
-            </thead>
-            <tbody id="settingsTableBody">
-                 <tr>
-                    <td colspan="4" class="text-center py-5 text-muted">
-                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
-                        <p class="mb-0">Đang tải cấu hình...</p>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Edit Setting Modal -->
-<div class="modal fade" id="editSettingModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content border-0 shadow-lg rounded-lg">
-            <div class="modal-header border-bottom-0">
-                <h5 class="modal-title fw-bold">Chỉnh sửa cài đặt</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <input type="hidden" id="editKey">
-                <div class="mb-3">
-                    <label class="form-label small text-muted text-uppercase fw-bold">Key Setting</label>
-                    <input type="text" class="form-control bg-light" id="displayKey" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label small text-muted text-uppercase fw-bold">Giá trị</label>
-                    <textarea class="form-control font-monospace" id="editValue" rows="4"></textarea>
-                </div>
-                <div class="form-check form-switch p-3 bg-light rounded">
-                    <input class="form-check-input ms-0 me-3 float-none" type="checkbox" id="editActive">
-                    <label class="form-check-label fw-medium" for="editActive">Kích hoạt cài đặt này</label>
-                </div>
-            </div>
-            <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary px-4" onclick="saveSetting()">Lưu</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        async function loadSettings() {
-            try {
-                const response = await fetch('/api/admin/settings');
-                const settings = await response.json();
-                renderTable(settings);
-                
-                // Check maintenance mode
-                const maint = settings.find(s => s.key === 'MaintenanceMode');
-                if (maint) {
-                    document.getElementById('maintenanceMode').checked = maint.value === 'true' && maint.isActive;
-                }
-            } catch (error) {
-                console.error('Error loading settings:', error);
-                document.getElementById('settingsTableBody').innerHTML = `
-                    <tr><td colspan="4" class="text-center text-danger py-3">Lỗi tải dữ liệu.</td></tr>
-                `;
-            }
-        }
-
-        function renderTable(settings) {
-            const tbody = document.getElementById('settingsTableBody');
             
-            if(!settings || settings.length === 0) {
-                 tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">Không có cấu hình nào.</td></tr>`;
-                 return;
-            }
-
-            tbody.innerHTML = settings.map(s => `
-                <tr>
-                    <td class="font-monospace fw-medium text-primary">${s.key}</td>
-                    <td>
-                        <div class="text-truncate font-monospace small bg-light p-1 rounded text-dark" style="max-width: 350px;">
-                            ${s.value}
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <!-- Maintenance Mode -->
+                    <div class="list-group-item p-4 border-0 border-bottom">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="fw-bold mb-1">Maintenance Mode</h6>
+                                <p class="text-secondary small mb-0">Disable access for standard users during updates.</p>
+                            </div>
+                            <form method="post" asp-page-handler="MaintenanceMode">
+                                <div class="form-check form-switch">
+                                    @{
+                                        var maintMode = Model.Settings.FirstOrDefault(s => s.Key == "MaintenanceMode");
+                                        var isMaint = maintMode?.Value == "true" && maintMode?.IsActive == true;
+                                    }
+                                    <input class="form-check-input" type="checkbox" role="switch" name="enabled" value="true" 
+                                           onchange="this.form.submit()" @(isMaint ? "checked" : "")>
+                                </div>
+                            </form>
                         </div>
-                    </td>
-                    <td class="text-muted small">${s.description || '-'}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-light border hover-shadow" onclick="editSetting('${s.key}')">
-                            <i class="fas fa-edit text-secondary"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+                    </div>
 
-        async function editSetting(key) {
-            try {
-                const response = await fetch(`/api/admin/settings/${key}`);
-                const setting = await response.json();
-                
-                document.getElementById('editKey').value = setting.key;
-                document.getElementById('displayKey').value = setting.key;
-                document.getElementById('editValue').value = setting.value;
-                document.getElementById('editActive').checked = setting.isActive;
-                
-                new bootstrap.Modal(document.getElementById('editSettingModal')).show();
-            } catch (e) {
-                alert('Error loading setting details');
-            }
-        }
+                    <!-- Other Settings List -->
+                    @foreach (var setting in Model.Settings.Where(s => s.Key != "MaintenanceMode"))
+                    {
+                        <div class="list-group-item p-4 border-0 border-bottom">
+                            <form method="post" asp-page-handler="Update" asp-route-key="@setting.Key">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <h6 class="fw-bold mb-1">@setting.Key</h6>
+                                        <p class="text-secondary small mb-0">@setting.Description</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" name="UpdateSetting.Value" value="@setting.Value">
+                                        <input type="hidden" name="UpdateSetting.IsActive" value="true" />
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <button class="btn btn-sm btn-outline-primary">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    }
 
-        async function saveSetting() {
-            const key = document.getElementById('editKey').value;
-            const value = document.getElementById('editValue').value;
-            const isActive = document.getElementById('editActive').checked;
-            
-            await fetch(`/api/admin/settings/${key}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ value, isActive })
-            });
-            
-            bootstrap.Modal.getInstance(document.getElementById('editSettingModal')).hide();
-            loadSettings();
-        }
+                    @if (!Model.Settings.Any())
+                    {
+                        <div class="p-5 text-center text-secondary">
+                            <i class="fas fa-cogs fa-3x mb-3 text-light"></i>
+                            <p>No settings found.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
-        document.getElementById('maintenanceMode').addEventListener('change', async (e) => {
-            if(!confirm('Thay đổi chế độ bảo trì hệ thống?')) {
-                e.target.checked = !e.target.checked;
-                return;
-            }
-            await fetch('/api/admin/settings/maintenance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(e.target.checked)
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', loadSettings);
-    </script>
-}
+    <!-- Info Panel -->
+    <div class="col-12 col-lg-4">
+        <div class="admin-card bg-primary text-white mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">System Info</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2 opacity-75">Version: <span class="fw-bold">v2.4.0</span></li>
+                    <li class="mb-2 opacity-75">Environment: <span class="fw-bold">Production</span></li>
+                    <li class="opacity-75">Server Time: <span class="fw-bold">@DateTime.UtcNow.ToString("HH:mm") UTC</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

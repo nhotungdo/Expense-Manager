@@ -1,0 +1,129 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.Transactions.IndexModel
+@{
+    ViewData["Title"] = "Transaction Management";
+    Layout = "_AdminLayout";
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="admin-card">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-bold mb-0">Transactions</h5>
+                <p class="text-secondary small mb-0">Monitor all system transactions</p>
+            </div>
+            
+            <div class="card-body border-top bg-light p-3">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="Filter.SearchText" placeholder="Search note, user..." value="@Model.Filter.SearchText">
+                    </div>
+                    <div class="col-md-2">
+                         <input type="date" class="form-control" name="Filter.StartDate" value="@(Model.Filter.StartDate?.ToString("yyyy-MM-dd"))">
+                    </div>
+                     <div class="col-md-2">
+                         <input type="date" class="form-control" name="Filter.EndDate" value="@(Model.Filter.EndDate?.ToString("yyyy-MM-dd"))">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="Filter.TransactionType">
+                            <option value="">All Types</option>
+                            <option value="1" selected="@(Model.Filter.TransactionType == 1)">Income</option>
+                            <option value="2" selected="@(Model.Filter.TransactionType == 2)">Expense</option>
+                            <option value="3" selected="@(Model.Filter.TransactionType == 3)">Transfer</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-dark w-100">Filter</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">User</th>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Wallet</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tx in Model.Transactions)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-xs bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 32px; height: 32px">
+                                            @(string.IsNullOrEmpty(tx.UserName) ? "?" : tx.UserName.Substring(0,1).ToUpper())
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium text-sm">@tx.UserName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-secondary text-sm">
+                                    <div class="fw-medium text-dark">@tx.TransactionDate.ToString("dd MMM yyyy")</div>
+                                    <small>@tx.TransactionDate.ToString("HH:mm")</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="icon-box-sm rounded-circle bg-soft-info text-info" style="width: 30px; height: 30px; display:flex; align-items:center; justify-content:center;">
+                                            <span>@tx.CategoryIcon</span>
+                                        </div>
+                                        <span class="text-sm">@tx.CategoryName</span>
+                                    </div>
+                                    <div class="text-muted text-xs">@tx.Note</div>
+                                </td>
+                                <td>
+                                    @if(tx.TransactionType == 1) {
+                                        <span class="text-success fw-bold">+@tx.Amount.ToString("N0")</span>
+                                    } else if (tx.TransactionType == 2) {
+                                        <span class="text-danger fw-bold">-@tx.Amount.ToString("N0")</span>
+                                    } else {
+                                        <span class="text-dark fw-bold">@tx.Amount.ToString("N0")</span>
+                                        <div class="badge bg-light text-dark border">Transfer</div>
+                                    }
+                                </td>
+                                <td class="text-sm text-secondary">@tx.AccountName</td>
+                                <td class="text-end pe-4">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light rounded-circle icon-btn" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                            <li>
+                                                <form method="post" asp-page-handler="Delete" asp-route-id="@tx.Id" onsubmit="return confirm('Delete this transaction?');">
+                                                    <input type="hidden" name="userId" value="@tx.UserId" />
+                                                    <button class="dropdown-item text-danger"><i class="fas fa-trash me-2"></i>Delete</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+             <div class="card-footer bg-white border-top py-3">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item @(Model.Filter.PageNumber <= 1 ? "disabled" : "")">
+                            <a class="page-link border-0" href="?Filter.PageNumber=@(Model.Filter.PageNumber - 1)">Previous</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link border-0 rounded-circle mx-1" href="#">@Model.Filter.PageNumber</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link border-0" href="?Filter.PageNumber=@(Model.Filter.PageNumber + 1)">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

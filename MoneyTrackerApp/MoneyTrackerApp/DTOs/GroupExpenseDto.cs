@@ -123,6 +123,7 @@ public class CreateGroupTransactionDto
     // Optional fields to maintain compatibility with DB
     public string Currency { get; set; } = "VND";
     public string? Category { get; set; }
+    public string? AttachmentUrl { get; set; }
 
     public bool SyncToPersonalWallet { get; set; }
     public long? PersonalWalletId { get; set; }
@@ -161,6 +162,7 @@ public class GroupTransactionResponseDto
     public string Description { get; set; } = null!;
     public DateTime TransactionDate { get; set; }
     public string? Category { get; set; }
+    public string? AttachmentUrl { get; set; }
     public DateTime? CreatedAt { get; set; }
     public List<GroupTransactionSplitDto> Splits { get; set; } = new();
 }

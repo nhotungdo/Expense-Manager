@@ -1,96 +1,96 @@
-Dựa trên bảng `SharedAccounts` và cấu trúc Database hiện có, chức năng "Ví chia sẻ" (Shared Wallet) khác với "Chi tiêu nhóm".
+Dựa trên cấu trúc bảng `GroupExpenses`, `GroupTransactions`, `GroupTransactionSplits` và `GroupMembers`, trang giao diện **"Chi tiêu nhóm"** (tương tự Splitwise) 
 
-* **Chi tiêu nhóm (Group Expenses):** Là ghi nợ, trả nợ sau (Giống Splitwise).
-* **Ví chia sẻ (Shared Wallet):** Là **nhiều người cùng truy cập vào một nguồn tiền thực tế** (Ví dụ: Tài khoản ngân hàng chung của vợ chồng, Quỹ tiền mặt của phòng ban, Heo đất ảo).
+Để mang lại trải nghiệm người dùng (UX) tốt nhất, tôi chia các tiện ích người dùng có thể thực hiện thành 4 nhóm chính:
 
-Dưới đây là danh sách các tính năng cần thiết cho trang giao diện này:
+### 1. Nhóm Tiện ích Tổng quan (Dashboard Nhóm)
 
-### 1. Nhóm Chức năng Quản lý Ví (Admin/Owner Features)
+Đây là màn hình đầu tiên khi người dùng bấm vào một nhóm cụ thể (ví dụ: "Du lịch Đà Nẵng").
 
-Chỉ người tạo ví (`SharedByUserId` trong bảng `SharedAccounts`) mới có toàn quyền này.
-
-* **Mời thành viên (Invite Members):**
-* Tìm kiếm người dùng qua Email, Số điện thoại hoặc từ danh sách **Bạn bè** (Bảng `Friendships` đã tạo).
-* Gửi thông báo mời tham gia vào bảng `Notifications`.
-
-
-* **Phân quyền truy cập (Permission Settings):**
-Dựa trên cột `Permission` trong bảng `SharedAccounts`, bạn cần làm giao diện Dropdown cho phép chọn:
-1. **Chỉ xem (View Only - 1):** Dành cho con cái xem ví bố mẹ, hoặc nhân viên xem quỹ sếp. Chỉ xem số dư và lịch sử, không được thêm/sửa/xóa.
-2. **Xem & Thêm (View & Add - 2):** Được thêm giao dịch mới, nhưng không được xóa giao dịch của người khác hoặc chỉnh sửa ví.
-3. **Toàn quyền (Full Access - 3):** Ngang hàng với chủ ví (Vợ/Chồng). Được sửa, xóa, mời thêm người khác.
+* **Xem tình trạng nợ cá nhân (My Balance):**
+* Hiển thị ngay trên đầu trang một thẻ (Card) lớn.
+* **Trạng thái Dương (Màu xanh):** *"Bạn được trả lại 500.000đ"* (Người khác đang nợ bạn).
+* **Trạng thái Âm (Màu đỏ):** *"Bạn nợ 250.000đ"* (Bạn cần trả tiền cho người khác).
+* **Trạng thái Cân bằng (Màu xám):** *"Bạn không nợ ai cả"*.
 
 
-* **Trục xuất thành viên (Remove Member):**
-* Xóa quyền truy cập của một người khỏi ví.
-* Lịch sử giao dịch cũ của người đó vẫn phải được giữ lại (Không được xóa transaction).
+* **Xem danh sách thành viên & trạng thái nợ của họ:**
+* Hiển thị Avatar các thành viên trong nhóm.
+* Bên cạnh mỗi thành viên hiển thị số tiền họ đang nợ nhóm hoặc nhóm nợ họ (Tính toán từ `GroupTransactionSplits`).
+
+
+* **Thống kê nhanh:*
+* Tổng số tiền cả nhóm đã tiêu.
+* Thanh tiến trình (Progress bar) nếu nhóm có đặt ngân sách giới hạn (ví dụ: Quỹ nhóm chỉ có 10 triệu).
 
 
 
-### 2. Nhóm Chức năng Hiển thị & Thao tác (Operational Features)
+### 2. Nhóm Tiện ích Giao dịch (Core Features)
 
-* **Hiển thị Người chi tiêu (Spender Identification):**
-* Trong danh sách giao dịch của ví này, cần hiển thị thêm cột hoặc icon **"Người thực hiện"**.
-* *Logic:* Lấy `Avatar` và `FullName` từ bảng `Users` dựa trên `UserId` của từng record trong bảng `Transactions`.
-* *UI:* Avatar nhỏ nằm cạnh số tiền.
+Đây là nơi diễn ra các hoạt động chính.
 
-
-* **Số dư thời gian thực (Real-time Sync):**
-* Khi Vợ thêm giao dịch mua sắm, máy của Chồng phải cập nhật số dư ngay lập tức (Dùng SignalR hoặc cơ chế Pull-to-refresh).
-
-
-* **Bộ lọc theo thành viên (Member Filter):**
-* Thêm filter: "Xem giao dịch của A", "Xem giao dịch của B" hoặc "Xem tất cả".
+* **Thêm khoản chi tiêu mới (Add Expense):**
+* Nhập số tiền và nội dung (VD: Ăn hải sản).
+* **Chọn người trả tiền (Payer):** Mặc định là "Tôi", nhưng có thể chọn người khác (trường hợp bạn nhập hộ).
+* **Chọn ngày:** Mặc định là hôm nay hoặc chọn lại ngày cũ.
+* **Đính kèm ảnh:** Chụp hóa đơn thanh toán up lên để làm bằng chứng (Sử dụng tính năng Attachment).
 
 
-
-### 3. Nhóm Chức năng Báo cáo & Minh bạch (Transparency)
-
-Đây là yếu tố quan trọng nhất của ví chung để tránh tranh cãi.
-
-* **Biểu đồ "Ai tiêu nhiều nhất?" (Spending Contribution):**
-* Biểu đồ tròn hoặc thanh ngang so sánh tổng tiền chi tiêu của từng thành viên trong tháng.
-* *Query:* `SELECT UserId, SUM(Amount) FROM Transactions WHERE AccountId = @SharedId GROUP BY UserId`.
+* **Công cụ Chia tiền thông minh (Split Options):**
+* Khi thêm khoản chi, người dùng có các tùy chọn chia tiền nâng cao (lưu vào `GroupTransactionSplits`):
+* **Chia đều (Equally):** Tổng tiền / Số người.
+* **Chia theo số tiền cụ thể (Exact Amount):** A chịu 50k, B chịu 100k...
+* **Chia theo phần trăm (Percentages):** A chịu 60%, B chịu 40%.
+* **Chia theo suất (Shares):** A ăn 2 suất, B ăn 1 suất.
 
 
-* **Nhật ký hoạt động (Audit Log):**
-* Hiển thị lịch sử thay đổi nhạy cảm: "A đã sửa giao dịch X từ 50k thành 500k", "B đã xóa giao dịch Y".
-* Dữ liệu lấy từ bảng `AuditLogs` nếu bạn có ghi log các hành động Update/Delete.
-
-
-* **Thông báo biến động (Alerts):**
-* Gửi Push Notification/Email cho tất cả thành viên khi có giao dịch mới: *"Vợ vừa chi 200k cho Siêu thị"*.
-* Cấu hình trong bảng `Notifications`.
+* **Chức năng "Thanh toán nợ" (Settle Up):**
+* Đây là tính năng quan trọng nhất để xóa nợ.
+* Giao diện hiển thị gợi ý: *"Trả cho Hùng 200k?"*.
+* Khi người dùng bấm "Xác nhận đã trả", hệ thống tạo một giao dịch đặc biệt để đưa số dư của 2 người về 0.
 
 
 
-### 4. Gợi ý Thiết kế UI (Layout)
+### 3. Nhóm Tiện ích Tương tác & Chi tiết (Activity & Details)
 
-* **Header Ví:**
-* Tên ví + Tổng số dư thật to.
-* Danh sách Avatar các thành viên đang tham gia (chồng lên nhau dạng Stack). Nút `+` bên cạnh để mời nhanh.
-
-
-* **Tab "Tổng quan":**
-* Biểu đồ đóng góp (Ai tiêu bao nhiêu).
-* Biểu đồ xu hướng số dư chung.
+* **Dòng thời gian hoạt động (Activity Feed):**
+* Danh sách các giao dịch được sắp xếp theo thời gian mới nhất.
+* Mỗi dòng hiển thị rõ: *Tháng 12 - Ngày 24: Hùng đã trả 500k cho 'Tiền Taxi'*.
+* Click vào từng giao dịch để xem chi tiết ai chịu bao nhiêu tiền.
 
 
-* **Tab "Giao dịch":**
-* List giao dịch thông thường nhưng có thêm Avatar người tạo.
+* **Bình luận & Thả cảm xúc (Comments & Reactions):**
+* Cho phép thành viên bình luận vào từng khoản chi (VD: *"Món này hôm đó đắt quá"*, *"Chưa tính tiền nước nhé"*).
+* *Lưu ý:* Cần mở rộng bảng `Messages` hoặc tạo bảng `TransactionComments` nếu muốn làm tính năng này sâu hơn.
 
 
-* **Tab "Cài đặt" (Chỉ hiện cho Admin):**
-* List thành viên dạng danh sách dọc. Mỗi dòng có Dropdown chỉnh quyền (View/Edit/Full) và nút Xóa (Thùng rác).
-* Nút "Rời khỏi ví" (Leave Wallet) cho thành viên thường.
-* Nút "Xóa ví vĩnh viễn" (Delete Wallet) cho chủ ví.
+* **Sửa/Xóa giao dịch:**
+* Cho phép người tạo hoặc Admin nhóm sửa lại số tiền nếu nhập sai.
+* Hệ thống sẽ tự động tính toán lại nợ cho toàn bộ thành viên.
 
 
 
-### Lưu ý Logic Backend quan trọng
+### 4. Nhóm Tiện ích Quản trị Nhóm (Settings)
 
-Khi insert giao dịch vào ví chia sẻ, bạn phải cẩn thận với trường `UserId` trong bảng `Transactions`.
+* **Quản lý thành viên:**
+* **Thêm bạn bè:** Mở danh sách từ bảng `Friendships` để thêm nhanh vào nhóm.
+* **Gửi link mời:** Tạo link chia sẻ (Deep link) để mời người chưa kết bạn tham gia nhóm (người dùng bấm vào link sẽ được add vào `GroupMembers`).
+* **Rời nhóm:** Chỉ cho phép rời nhóm khi số dư của người đó bằng 0 (đã trả hết nợ).
 
-* `AccountId`: ID của ví chung.
-* `UserId`: ID của **người thực hiện hành động** (người đang đăng nhập), **KHÔNG PHẢI** ID của chủ ví.
-* Điều này giúp hệ thống phân biệt được ai là người đã tiêu tiền trong ví chung đó.
+
+* **Xuất báo cáo (Export):**
+* Xuất ra file Excel hoặc PDF chi tiết: "Ai đã tiêu gì, vào ngày nào".
+* Tiện ích này rất hữu ích khi đi du lịch về cần tổng kết gửi cho mọi người.
+
+
+* **Cài đặt hiển thị:**
+* Đổi tên nhóm, đổi ảnh bìa/icon nhóm.
+* Chọn đơn vị tiền tệ chính của nhóm (VD: Đi du lịch Thái Lan thì set là THB, hệ thống tự quy đổi ra VND nếu cần).
+
+
+
+### Tóm tắt trải nghiệm người dùng (User Flow)
+
+1. **Vào nhóm:** Thấy ngay mình đang nợ ai, bao nhiêu tiền.
+2. **Đi ăn/chơi:** Bấm nút **(+)** to đùng -> Nhập 500k -> Chọn "Chia đều" -> Xong.
+3. **Cuối chuyến đi:** Bấm **"Thanh toán nợ"** -> Chuyển khoản ngân hàng cho bạn bè -> Xác nhận trên app -> Số dư về 0.
+

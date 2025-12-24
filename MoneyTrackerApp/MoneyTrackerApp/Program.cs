@@ -119,6 +119,18 @@ auth.AddJwtBearer(options =>
                 context.Token = context.Request.Cookies["AccessToken"];
             }
             return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            // If it's an AJAX/API request, return 401. Otherwise, redirect to login.
+            // Simple check: if path starts with /api, let it be 401.
+            // Else if it's a page load, redirect.
+            if (!context.Request.Path.StartsWithSegments("/api"))
+            {
+                context.HandleResponse();
+                context.Response.Redirect("/Auth/Login?returnUrl=" + Uri.EscapeDataString(context.Request.Path + context.Request.QueryString));
+            }
+            return Task.CompletedTask;
         }
     };
 });

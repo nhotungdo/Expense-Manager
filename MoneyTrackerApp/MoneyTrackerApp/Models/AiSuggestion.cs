@@ -15,10 +15,10 @@ namespace MoneyTrackerApp.Models
         public virtual User User { get; set; }
 
         [StringLength(1024)]
-        public string Suggestion { get; set; }
+        public string Suggestion { get; set; } = string.Empty;
 
         [StringLength(50)]
-        public string SuggestionType { get; set; }
+        public string SuggestionType { get; set; } = string.Empty;
 
         public bool IsRead { get; set; } = false;
 

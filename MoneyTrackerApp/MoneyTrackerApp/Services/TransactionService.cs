@@ -23,6 +23,7 @@ public interface ITransactionService
     Task<List<TransactionResponseDto>> GetRecentTransactionsAsync(long userId, int count = 10);
     Task<List<TransactionResponseDto>> GetTransactionsByAccountIdAsync(long accountId, long userId, int count = 50);
     Task<List<SpendingContributionDto>> GetSpendingContributionAsync(long accountId, long userId, int month, int year);
+    Task<List<TransactionResponseDto>> GetAllTransactionsForAdminAsync(TransactionFilterDto filter);
 }
 
 
@@ -600,6 +601,60 @@ public class TransactionService : ITransactionService
 
         return null;
     }
+
+    /// <summary>
+    /// Get ALL transactions for Admin with filtering
+    /// </summary>
+    public async Task<List<TransactionResponseDto>> GetAllTransactionsForAdminAsync(TransactionFilterDto filter)
+    {
+        var query = _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .Include(t => t.PairedAccount)
+            .Include(t => t.User)
+            .AsQueryable();
+
+        // Apply filters
+        if (filter.UserId.HasValue)
+            query = query.Where(t => t.UserId == filter.UserId.Value);
+
+        if (filter.AccountId.HasValue)
+            query = query.Where(t => t.AccountId == filter.AccountId.Value);
+
+        if (filter.CategoryId.HasValue)
+            query = query.Where(t => t.CategoryId == filter.CategoryId.Value);
+
+        if (filter.TransactionType.HasValue)
+            query = query.Where(t => t.TransactionType == filter.TransactionType.Value);
+
+        if (filter.StartDate.HasValue)
+            query = query.Where(t => t.TransactionDate >= filter.StartDate.Value);
+
+        if (filter.EndDate.HasValue)
+            query = query.Where(t => t.TransactionDate <= filter.EndDate.Value);
+
+        if (filter.MinAmount.HasValue)
+            query = query.Where(t => t.Amount >= filter.MinAmount.Value);
+
+        if (filter.MaxAmount.HasValue)
+            query = query.Where(t => t.Amount <= filter.MaxAmount.Value);
+
+        if (!string.IsNullOrWhiteSpace(filter.SearchText))
+            query = query.Where(t => (t.Note != null && t.Note.Contains(filter.SearchText)) || 
+                                     (t.User.UserName != null && t.User.UserName.Contains(filter.SearchText)) ||
+                                     (t.User.Email != null && t.User.Email.Contains(filter.SearchText)));
+
+        // Apply pagination
+        var transactions = await query
+            .OrderByDescending(t => t.TransactionDate)
+            .ThenByDescending(t => t.CreatedAt)
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync();
+
+        return transactions.Select(t => MapToResponseDto(t)).ToList();
+    }
+
 
     private async Task NotifySharedWalletMembers(long accountId, long actorId, string action, string amountDisplay)
     {

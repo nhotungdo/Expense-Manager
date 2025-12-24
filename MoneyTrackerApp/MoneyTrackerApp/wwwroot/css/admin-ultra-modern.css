@@ -1,0 +1,319 @@
+/* Admin Ultra Modern CSS */
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --secondary: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --dark: #0f172a;
+    --light: #f8fafc;
+    --white: #ffffff;
+
+    --bg-body: #f1f5f9;
+    --bg-card: #ffffff;
+
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-body);
+    color: var(--dark);
+    margin: 0;
+    padding: 0;
+}
+
+/* Layout */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* Prevent overflow issue */
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 280px;
+    background-color: var(--dark);
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 100;
+}
+
+.sidebar-header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--white);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.brand-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary), var(--info));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 1.5rem 1rem;
+    overflow-y: auto;
+}
+
+.nav-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
+    padding-left: 0.75rem;
+    font-weight: 600;
+}
+
+.nav-label:first-child {
+    margin-top: 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    color: #cbd5e1;
+    border-radius: 0.5rem;
+    margin-bottom: 0.25rem;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+}
+
+.nav-link.active {
+    background-color: var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+.nav-link i {
+    width: 1.5rem;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Topbar */
+.admin-topbar {
+    height: 70px;
+    background-color: var(--white);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+}
+
+.search-box {
+    position: relative;
+    width: 300px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    background-color: var(--light);
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--white);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.icon-btn:hover {
+    background-color: var(--light);
+    color: var(--primary);
+}
+
+.badge-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--danger);
+    border-radius: 50%;
+    border: 1px solid white;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* Content */
+.admin-content {
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Cards */
+.admin-card {
+    background-color: var(--bg-card);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.admin-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.bg-gradient-brand {
+    background: linear-gradient(135deg, var(--primary), #818cf8);
+}
+
+.icon-box {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+/* Colors Utilities */
+.bg-soft-primary {
+    background-color: #e0e7ff;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.bg-soft-success {
+    background-color: #dcfce7;
+}
+
+.text-success {
+    color: var(--success) !important;
+}
+
+.bg-soft-warning {
+    background-color: #fef3c7;
+}
+
+.text-warning {
+    color: var(--warning) !important;
+}
+
+.bg-soft-info {
+    background-color: #cffafe;
+}
+
+.text-info {
+    color: var(--info) !important;
+}
+
+.bg-soft-secondary {
+    background-color: #f1f5f9;
+}
+
+.text-secondary {
+    color: var(--secondary) !important;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        position: fixed;
+        height: 100%;
+        transform: translateX(-100%);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .admin-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .admin-content {
+        padding: 1rem;
+    }
+}

@@ -8,13 +8,16 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Frameworks -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
     <!-- Core Admin CSS -->
-    <link rel="stylesheet" href="~/css/admin-modern.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-ultra-modern.css" asp-append-version="true" />
     
     <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -25,31 +28,41 @@
         <aside class="admin-sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="/Admin/Dashboard" class="brand-logo text-decoration-none">
-                    <i class="fas fa-chart-line"></i>
+                    <div class="brand-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
                     <span>MoneyTracker</span>
                 </a>
             </div>
             
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav custom-scrollbar">
                 <div class="nav-label">Tổng quan</div>
                 <a href="/Admin/Dashboard" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Dashboard") == true ? "active" : "")">
-                    <i class="fas fa-grid-2"></i> <span>Dashboard</span>
+                    <i class="fas fa-layer-group"></i> <span>Dashboard</span>
                 </a>
                 
                 <div class="nav-label">Quản lý</div>
                 <a href="/Admin/Users" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Users") == true ? "active" : "")">
-                    <i class="fas fa-users"></i> <span>Người dùng</span>
+                    <i class="fas fa-users-cog"></i> <span>Người dùng</span>
+                </a>
+                <a href="/Admin/ServicePackages" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("ServicePackages") == true ? "active" : "")">
+                    <i class="fas fa-box-open"></i> <span>Gói dịch vụ</span>
                 </a>
                 <a href="/Admin/Transactions" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Transactions") == true ? "active" : "")">
                     <i class="fas fa-receipt"></i> <span>Giao dịch</span>
                 </a>
                 
-                <div class="nav-label">Hệ thống</div>
-                <a href="/Admin/Settings" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
-                    <i class="fas fa-sliders-h"></i> <span>Cấu hình</span>
+                <div class="nav-label">Hệ thống & Dữ liệu</div>
+                <a href="/Admin/MasterData/Categories" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("MasterData/Categories") == true ? "active" : "")">
+                    <i class="fas fa-tags"></i> <span>Danh mục</span>
                 </a>
+                <a href="/Admin/Settings" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Settings") == true ? "active" : "")">
+                    <i class="fas fa-cogs"></i> <span>Cấu hình</span>
+                </a>
+                
+                <div class="nav-label">Giám sát</div>
                 <a href="/Admin/Monitoring/Logs" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring/Logs") == true ? "active" : "")">
-                    <i class="fas fa-server"></i> <span>System Logs</span>
+                    <i class="fas fa-terminal"></i> <span>System Logs</span>
                 </a>
                 <a href="/Admin/Monitoring/AuditLogs" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Monitoring/AuditLogs") == true ? "active" : "")">
                     <i class="fas fa-shield-alt"></i> <span>Audit Logs</span>
@@ -57,36 +70,37 @@
             </nav>
             
             <div class="sidebar-footer">
-                <a href="/" class="nav-link" style="color: #94a3b8; justify-content: center;">
-                    <i class="fas fa-sign-out-alt"></i> <span>Về trang chủ</span>
+                <a href="/" class="nav-link justify-content-center text-secondary hover-white">
+                    <i class="fas fa-arrow-left"></i> <span>Về trang chủ</span>
                 </a>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="admin-main">
-            <!-- Topbar is inlined here for simplicity in this rewrite -->
             <header class="admin-topbar">
                 <div class="topbar-left d-flex align-items-center gap-3">
                     <button class="icon-btn d-lg-none" id="sidebarToggle">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1>@ViewData["Title"]</h1>
+                    <h1 class="h5 mb-0 fw-bold header-title">@ViewData["Title"]</h1>
                 </div>
                 
                 <div class="topbar-right">
                     <div class="search-box d-none d-md-block">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Tìm kiếm nhanh...">
+                        <input type="text" placeholder="Tìm kiếm (Ctrl + K)...">
                     </div>
                     
-                    <button class="icon-btn">
+                    <button class="icon-btn position-relative">
                         <i class="far fa-bell"></i>
                         <span class="badge-dot"></span>
                     </button>
                     
-                    <div class="user-mini-profile">
-                        <div class="user-avatar">AD</div>
+                    <div class="user-mini-profile pointer cursor-pointer" data-bs-toggle="dropdown">
+                        <div class="user-avatar">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -99,16 +113,21 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    
     <script>
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
+        // Toggle Sidebar
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('show');
         });
         
-        // Close sidebar when clicking outside on mobile
+        // Close sidebar on mobile click outside
         document.addEventListener('click', function(event) {
             var sidebar = document.getElementById('sidebar');
             var toggle = document.getElementById('sidebarToggle');
-            if (window.innerWidth <= 1024) {
+            if (window.innerWidth <= 1024 && sidebar && toggle) {
                  if (!sidebar.contains(event.target) && !toggle.contains(event.target) && sidebar.classList.contains('show')) {
                     sidebar.classList.remove('show');
                 }

@@ -1,0 +1,141 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.ServicePackages.IndexModel
+@{
+    ViewData["Title"] = "Service Packages";
+    Layout = "_AdminLayout";
+}
+
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h2 class="fw-bold mb-0">Service Packages</h2>
+        <p class="text-secondary text-sm">Manage subscription plans and features</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createPackageModal">
+            <i class="fas fa-plus me-2"></i>Create Package
+        </button>
+    </div>
+</div>
+
+<div class="row g-4">
+    @foreach (var pkg in Model.Packages)
+    {
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="admin-card h-100 position-relative border-top-0 border-end-0 border-bottom-0 border-start border-4 @(pkg.IsActive ? "border-primary" : "border-secondary")">
+                <div class="card-body p-4 d-flex flex-column h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            @if (!pkg.IsActive)
+                            {
+                                <span class="badge bg-secondary mb-2">Inactive</span>
+                            }
+                            else if (pkg.IsPopular)
+                            {
+                                <span class="badge bg-warning text-dark mb-2">Popular</span>
+                            }
+                            <h4 class="fw-bold mb-1">@pkg.Name</h4>
+                            <h3 class="text-primary fw-bold">
+                                @pkg.Price.ToString("N0") ₫
+                                <span class="text-secondary fs-6 fw-normal">/ @pkg.DurationDays days</span>
+                            </h3>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-light rounded-circle icon-btn" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <form method="post" asp-page-handler="ToggleStatus" asp-route-id="@pkg.Id">
+                                        <button class="dropdown-item">
+                                            @if (pkg.IsActive)
+                                            {
+                                                <span><i class="fas fa-pause text-warning me-2"></i>Deactivate</span>
+                                            }
+                                            else
+                                            {
+                                                <span><i class="fas fa-play text-success me-2"></i>Activate</span>
+                                            }
+                                        </button>
+                                    </form>
+                                </li>
+                                @* <li><a class="dropdown-item" href="#"><i class="fas fa-edit text-primary me-2"></i>Edit</a></li> *@
+                                <li>
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@pkg.Id" onsubmit="return confirm('Are you sure?');">
+                                        <button class="dropdown-item text-danger"><i class="fas fa-trash me-2"></i>Delete</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p class="text-secondary small mb-4">@pkg.Description</p>
+                    
+                    <div class="mt-auto">
+                        <h6 class="text-uppercase text-secondary text-xs fw-bold mb-3">Features</h6>
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var feature in pkg.Features.Take(4)) // Show top 4
+                            {
+                                <li class="mb-2 d-flex align-items-center text-sm">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    @feature
+                                </li>
+                            }
+                            @if(pkg.Features.Count > 4)
+                            {
+                                <li class="text-secondary text-xs fst-italic">+@(pkg.Features.Count - 4) more features</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createPackageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Create New Package</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Create">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Package Name</label>
+                            <input asp-for="CreatePackage.Name" class="form-control" required placeholder="e.g. Premium Plan">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Price (VND)</label>
+                            <input asp-for="CreatePackage.Price" type="number" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Duration (Days)</label>
+                            <input asp-for="CreatePackage.DurationDays" type="number" class="form-control" value="30" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Original Price (Optional)</label>
+                            <input asp-for="CreatePackage.OriginalPrice" type="number" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea asp-for="CreatePackage.Description" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-4">
+                                <input asp-for="CreatePackage.IsPopular" class="form-check-input" type="checkbox">
+                                <label class="form-check-label">Mark as Popular</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary ms-2">Create Package</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -119,6 +119,7 @@ public class TransactionFilterDto
     public decimal? MinAmount { get; set; }
     public decimal? MaxAmount { get; set; }
     public string? SearchText { get; set; }
+    public long? UserId { get; set; } // Added for Admin filtering
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 20;
 }

@@ -818,6 +818,9 @@ namespace MoneyTrackerApp.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Category")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");

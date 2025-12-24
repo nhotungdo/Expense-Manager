@@ -21,6 +21,9 @@ public interface IGroupExpenseService
     Task<List<GroupTransactionResponseDto>> GetGroupTransactionsAsync(long groupId, long userId);
     Task<GroupBalanceSummaryDto> GetGroupBalancesAsync(long groupId, long userId);
     Task<List<GroupDebtDto>> CalculateSettlementsAsync(long groupId, long userId);
+    Task<bool> DeleteGroupTransactionAsync(long transactionId, long userId);
+    Task<GroupTransactionResponseDto> UpdateGroupTransactionAsync(long userId, UpdateGroupTransactionDto dto);
+    Task<List<GroupMemberDetailDto>> GetGroupMembersWithStatsAsync(long groupId);
 }
 
 public class GroupExpenseService : IGroupExpenseService
@@ -44,6 +47,7 @@ public class GroupExpenseService : IGroupExpenseService
                 .ThenInclude(gm => gm.User)
             .Include(g => g.CreatedByUser)
             .Include(g => g.GroupTransactions)
+            .AsSplitQuery()
             .Where(g => g.Id == groupId && g.GroupMembers.Any(gm => gm.UserId == userId))
             .FirstOrDefaultAsync();
 
@@ -63,6 +67,7 @@ public class GroupExpenseService : IGroupExpenseService
                 .ThenInclude(gm => gm.User)
             .Include(g => g.CreatedByUser)
             .Include(g => g.GroupTransactions)
+            .AsSplitQuery()
             .Where(g => g.GroupMembers.Any(gm => gm.UserId == userId))
             .OrderByDescending(g => g.CreatedAt)
             .ToListAsync();
@@ -135,6 +140,7 @@ public class GroupExpenseService : IGroupExpenseService
                 .ThenInclude(gm => gm.User)
             .Include(g => g.CreatedByUser)
             .Include(g => g.GroupTransactions)
+            .AsSplitQuery()
             .Where(g => g.Id == dto.Id && g.CreatedByUserId == userId)
             .FirstOrDefaultAsync();
 
@@ -250,26 +256,48 @@ public class GroupExpenseService : IGroupExpenseService
     /// </summary>
     public async Task<bool> RemoveMemberAsync(long groupId, long memberId, long userId)
     {
-        // Verify user has permission
-        var userMember = await _context.GroupMembers
-            .Where(gm => gm.GroupId == groupId && gm.UserId == userId)
-            .FirstOrDefaultAsync();
-
-        if (userMember == null || (userMember.Role != "Owner" && userMember.Role != "Admin"))
-            throw new InvalidOperationException("You don't have permission to remove members");
-
-        var member = await _context.GroupMembers
+        var targetMember = await _context.GroupMembers
+            .Include(gm => gm.User)
             .Where(gm => gm.Id == memberId && gm.GroupId == groupId)
             .FirstOrDefaultAsync();
 
-        if (member == null)
+        if (targetMember == null)
             return false;
 
-        // Cannot remove owner
-        if (member.Role == "Owner")
-            throw new InvalidOperationException("Cannot remove group owner");
+        // Check permissions
+        // 1. User removing themselves (Leave Group)
+        var isSelf = targetMember.UserId == userId;
+        
+        // 2. User is Owner/Admin removing someone else
+        var requestorMember = await _context.GroupMembers
+            .Where(gm => gm.GroupId == groupId && gm.UserId == userId)
+            .FirstOrDefaultAsync();
 
-        _context.GroupMembers.Remove(member);
+        if (!isSelf)
+        {
+            if (requestorMember == null || (requestorMember.Role != "Owner" && requestorMember.Role != "Admin"))
+                throw new InvalidOperationException("Bạn không có quyền xóa thành viên này");
+        }
+
+        // Cannot remove owner (simplification)
+        if (targetMember.Role == "Owner")
+            throw new InvalidOperationException("Không thể xóa chủ nhóm. Hãy chuyển quyền sở hữu trước.");
+
+        // Check Balance if leaving or being removed
+        // We must ensure the member has handled all debts (balance == 0)
+        var memberBalances = await CalculateMemberBalancesAsync(groupId);
+        var memberBalance = memberBalances.FirstOrDefault(b => b.UserId == targetMember.UserId);
+        
+        if (memberBalance != null && Math.Abs(memberBalance.Balance) > 0.01m) // tolerance
+        {
+             // If positive: other owe them. If negative: they owe others.
+             var msg = memberBalance.Balance > 0 
+                ? $"Thành viên này vẫn còn dư {memberBalance.Balance:N0}đ chưa nhận lại." 
+                : $"Thành viên này vẫn còn nợ {Math.Abs(memberBalance.Balance):N0}đ.";
+             throw new InvalidOperationException($"Không thể rời nhóm: {msg} Hãy giải quyết hết nợ nần trước.");
+        }
+
+        _context.GroupMembers.Remove(targetMember);
         await _context.SaveChangesAsync();
 
         return true;
@@ -303,6 +331,7 @@ public class GroupExpenseService : IGroupExpenseService
             Description = dto.Description,
             TransactionDate = dto.TransactionDate,
             Category = dto.Category,
+            AttachmentUrl = dto.AttachmentUrl,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -432,6 +461,99 @@ public class GroupExpenseService : IGroupExpenseService
 
         var memberBalances = await CalculateMemberBalancesAsync(groupId);
         return CalculateOptimalSettlements(memberBalances);
+    }
+
+    /// <summary>
+    /// Delete a group transaction
+    /// </summary>
+    public async Task<bool> DeleteGroupTransactionAsync(long transactionId, long userId)
+    {
+        var transaction = await _context.GroupTransactions
+            .Include(t => t.GroupTransactionSplits)
+            .FirstOrDefaultAsync(t => t.Id == transactionId);
+
+        if (transaction == null) return false;
+
+        // Check permission: Only Creator (PaidBy?) or Group Owner?
+        // Requirement: "Cho phép người tạo hoặc Admin nhóm sửa lại"
+        // We need to check group owner.
+        var groupMember = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == transaction.GroupId && gm.UserId == userId);
+
+        bool isCreator = transaction.PaidByUserId == userId; // Assuming Payer is creator effectively or close enough
+        // Actually PaidBy might be different than Creator. But we don't store Creator of Transaction separately (only Group).
+        // Let's assume Payer or Group Admin/Owner.
+
+        bool isAdmin = groupMember != null && (groupMember.Role == "Owner" || groupMember.Role == "Admin");
+
+        if (!isCreator && !isAdmin)
+            throw new InvalidOperationException("Bạn không có quyền xóa giao dịch này");
+
+        _context.GroupTransactionSplits.RemoveRange(transaction.GroupTransactionSplits);
+        _context.GroupTransactions.Remove(transaction);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    /// <summary>
+    /// Update a group transaction
+    /// </summary>
+    public async Task<GroupTransactionResponseDto> UpdateGroupTransactionAsync(long userId, UpdateGroupTransactionDto dto)
+    {
+        var transaction = await _context.GroupTransactions
+            .Include(t => t.GroupTransactionSplits)
+            .FirstOrDefaultAsync(t => t.Id == dto.Id);
+
+        if (transaction == null)
+            throw new InvalidOperationException("Transaction not found");
+
+        if (transaction.GroupId != dto.GroupId)
+             throw new InvalidOperationException("Group mismatch");
+
+        // Permission check
+        var groupMember = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == transaction.GroupId && gm.UserId == userId);
+
+        bool isCreator = transaction.PaidByUserId == userId; 
+        bool isAdmin = groupMember != null && (groupMember.Role == "Owner" || groupMember.Role == "Admin");
+
+        if (!isCreator && !isAdmin)
+            throw new InvalidOperationException("Bạn không có quyền sửa giao dịch này");
+
+        // Update fields
+        transaction.Description = dto.Description;
+        transaction.Amount = dto.Amount;
+        transaction.PaidByUserId = dto.PaidByUserId;
+        transaction.TransactionDate = dto.TransactionDate;
+        transaction.AttachmentUrl = dto.AttachmentUrl;
+        transaction.Category = dto.Category;
+        transaction.UpdatedAt = DateTime.UtcNow;
+
+        // Update splits: Simplest is remove all and re-add
+        _context.GroupTransactionSplits.RemoveRange(transaction.GroupTransactionSplits);
+        
+        var newSplits = new List<GroupTransactionSplit>();
+        foreach (var item in dto.Splits)
+        {
+            newSplits.Add(new GroupTransactionSplit
+            {
+                GroupTransactionId = transaction.Id,
+                UserId = item.UserId,
+                Amount = item.Amount,
+                IsPaid = (item.UserId == dto.PaidByUserId)
+            });
+        }
+        _context.GroupTransactionSplits.AddRange(newSplits);
+
+        await _context.SaveChangesAsync();
+        
+        // Reload for response
+        await _context.Entry(transaction).Reference(t => t.Group).LoadAsync();
+        await _context.Entry(transaction).Reference(t => t.PaidByUser).LoadAsync();
+        await _context.Entry(transaction).Collection(t => t.GroupTransactionSplits).LoadAsync();
+
+        return MapToTransactionResponseDto(transaction);
     }
 
     // Helper: Calculate raw member balances
@@ -580,6 +702,7 @@ public class GroupExpenseService : IGroupExpenseService
             Description = transaction.Description,
             TransactionDate = transaction.TransactionDate,
             Category = transaction.Category,
+            AttachmentUrl = transaction.AttachmentUrl,
             CreatedAt = transaction.CreatedAt,
             Splits = transaction.GroupTransactionSplits.Select(s => new GroupTransactionSplitDto
             {
@@ -588,5 +711,53 @@ public class GroupExpenseService : IGroupExpenseService
                 IsPaid = s.IsPaid
             }).ToList()
         };
+    }
+
+    /// <summary>
+    /// Get group members with detailed statistics
+    /// </summary>
+    public async Task<List<GroupMemberDetailDto>> GetGroupMembersWithStatsAsync(long groupId)
+    {
+        var members = await _context.GroupMembers
+            .Include(gm => gm.User)
+            .Where(gm => gm.GroupId == groupId)
+            .ToListAsync();
+
+        var transactions = await _context.GroupTransactions
+            .Include(gt => gt.GroupTransactionSplits)
+            .Where(gt => gt.GroupId == groupId)
+            .ToListAsync();
+
+        var memberDetails = new List<GroupMemberDetailDto>();
+
+        foreach (var member in members)
+        {
+            var paidTransactions = transactions.Where(t => t.PaidByUserId == member.UserId);
+            var totalPaid = paidTransactions.Sum(t => t.Amount);
+            var transactionCount = paidTransactions.Count();
+
+            var splits = transactions
+                .SelectMany(t => t.GroupTransactionSplits)
+                .Where(s => s.UserId == member.UserId);
+            var totalOwed = splits.Sum(s => s.Amount);
+
+            var balance = totalPaid - totalOwed;
+
+            memberDetails.Add(new GroupMemberDetailDto
+            {
+                UserId = member.UserId,
+                UserName = member.User?.UserName ?? "Unknown",
+                UserEmail = member.User?.Email,
+                AvatarUrl = null, // TODO: Add avatar support
+                Role = member.Role ?? "Member",
+                IsActive = true,
+                TransactionCount = transactionCount,
+                TotalPaid = totalPaid,
+                Balance = balance,
+                JoinedAt = member.JoinedAt ?? DateTime.UtcNow
+            });
+        }
+
+        return memberDetails;
     }
 }
