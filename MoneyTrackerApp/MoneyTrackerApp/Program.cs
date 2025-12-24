@@ -69,19 +69,11 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IServicePackageService, Mone
 // Register Data Protection (required for VNPay encryption)
 builder.Services.AddDataProtection();
 
-// Register VNPay Error Handler
-builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayErrorHandler>();
-
-// Register VNPay Monitoring Service (Singleton for metrics tracking)
-builder.Services.AddSingleton<MoneyTrackerApp.Services.VnPayMonitoringService>();
-
-// Register VNPay QR Payment Service (Only payment method supported)
 // Register VNPay QR Payment Service (Only payment method supported)
 builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayService>();
 
 // Register Communication Services
-// Map EmailSettings configuration
-builder.Services.Configure<MoneyTrackerApp.Configurations.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<MoneyTrackerApp.Configuration.EmailSettings>(builder.Configuration.GetSection("Smtp"));
 builder.Services.AddScoped<MoneyTrackerApp.Services.IEmailService, MoneyTrackerApp.Services.EmailService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IOtpService, MoneyTrackerApp.Services.OtpService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IChatService, MoneyTrackerApp.Services.ChatService>();

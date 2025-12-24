@@ -1,154 +1,100 @@
-using System;
 using System.Net;
 using System.Net.Mail;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MoneyTrackerApp.Configurations;
+using MoneyTrackerApp.Configuration;
 using MoneyTrackerApp.Models;
 
-namespace MoneyTrackerApp.Services
+namespace MoneyTrackerApp.Services;
+
+public class EmailService : IEmailService
 {
-    public interface IEmailService
+    private readonly EmailSettings _emailSettings;
+    private readonly ExpenseManagerContext _context;
+    private readonly ILogger<EmailService> _logger;
+
+    public EmailService(IOptions<EmailSettings> emailSettings, ExpenseManagerContext context, ILogger<EmailService> logger)
     {
-        Task SendEmailAsync(string toEmail, string subject, string body, long userId);
-        Task SendEmailToUserAsync(long userId, string subject, string body);
+        _emailSettings = emailSettings.Value;
+        _context = context;
+        _logger = logger;
     }
 
-    public class EmailService : IEmailService
+    public async Task SendEmailAsync(List<string> toEmails, string subject, string body, List<IFormFile>? attachments = null)
     {
-        private readonly EmailSettings _emailSettings;
-        private readonly ILogger<EmailService> _logger;
-        private readonly ExpenseManagerContext _context;
-
-        public EmailService(IOptions<EmailSettings> emailSettings, ILogger<EmailService> logger, ExpenseManagerContext context)
+        foreach (var email in toEmails)
         {
-            _emailSettings = emailSettings.Value;
-            _logger = logger;
-            _context = context;
-        }
-
-        /// <summary>
-        /// Gửi email đến user dựa trên UserId, tự động kiểm tra EmailNotifications setting
-        /// </summary>
-        public async Task SendEmailToUserAsync(long userId, string subject, string body)
-        {
-            // 1. Lấy thông tin User từ Database
-            var user = await _context.Users.FindAsync(userId);
-            
-            if (user == null || string.IsNullOrEmpty(user.Email))
-            {
-                _logger.LogWarning($"User {userId} not found or has no email address");
-                return;
-            }
-
-            // 2. Kiểm tra xem User có bật nhận thông báo email không
-            if (!user.EmailNotifications)
-            {
-                _logger.LogInformation($"Email notifications disabled for user {userId}");
-                return; // Người dùng đã tắt thông báo
-            }
-
-            // 3. Tạo bản ghi trong bảng Emails (Trạng thái Pending)
-            var emailLog = new Email
-            {
-                UserId = userId,
-                Subject = subject,
-                Body = body,
-                Status = "pending",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Emails.Add(emailLog);
-            await _context.SaveChangesAsync();
-
-            // 4. Thực hiện gửi Email qua SMTP
             try
             {
-                var message = new MailMessage();
-                message.From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName);
-                message.To.Add(new MailAddress(user.Email));
+                await SendEmailAsync(email, subject, body, attachments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send email to {Email}", email);
+                // Continue sending to others
+            }
+        }
+    }
+
+    public async Task SendEmailAsync(string toEmail, string subject, string body, List<IFormFile>? attachments = null)
+    {
+        var emailLog = new Email
+        {
+            RecipientEmail = toEmail,
+            Subject = subject,
+            Body = body,
+            Status = "Pending",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        // Try to find user by email to link
+        var user = _context.Users.FirstOrDefault(u => u.Email == toEmail);
+        if (user != null)
+        {
+            emailLog.UserId = user.Id;
+        }
+
+        try
+        {
+            using (var message = new MailMessage())
+            {
+                message.From = new MailAddress(_emailSettings.FromEmail, _emailSettings.FromName);
+                message.To.Add(new MailAddress(toEmail));
                 message.Subject = subject;
                 message.Body = body;
-                message.IsBodyHtml = true; // Cho phép gửi HTML
+                message.IsBodyHtml = true;
 
-                using (var client = new SmtpClient(_emailSettings.MailServer, _emailSettings.MailPort))
+                if (attachments != null && attachments.Count > 0)
                 {
-                    client.Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.Password);
+                    foreach (var file in attachments)
+                    {
+                        if (file.Length > 0)
+                        {
+                            var stream = file.OpenReadStream();
+                            var attachment = new Attachment(stream, file.FileName, file.ContentType);
+                            message.Attachments.Add(attachment);
+                        }
+                    }
+                }
+
+                using (var client = new SmtpClient(_emailSettings.Host, _emailSettings.Port))
+                {
+                    client.Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password);
                     client.EnableSsl = _emailSettings.EnableSsl;
                     
                     await client.SendMailAsync(message);
                 }
-
-                // 5. Cập nhật trạng thái thành công
-                emailLog.Status = "sent";
-                emailLog.SentAt = DateTime.UtcNow;
-                _logger.LogInformation($"Email sent successfully to user {userId}");
-            }
-            catch (Exception ex)
-            {
-                // 6. Cập nhật trạng thái thất bại nếu có lỗi
-                emailLog.Status = "failed";
-                _logger.LogError(ex, $"Failed to send email to user {userId}");
             }
 
-            // Lưu cập nhật trạng thái
-            await _context.SaveChangesAsync();
+            emailLog.Status = "Sent";
+            emailLog.SentAt = DateTime.UtcNow;
         }
-
-        /// <summary>
-        /// Gửi email trực tiếp đến địa chỉ email (legacy method, không kiểm tra user settings)
-        /// </summary>
-        public async Task SendEmailAsync(string toEmail, string subject, string body, long userId)
+        catch (Exception ex)
         {
-            var emailLog = new Email
-            {
-                UserId = userId,
-                Subject = subject,
-                Body = body,
-                CreatedAt = DateTime.UtcNow,
-                Status = "pending"
-            };
-
-            try
-            {
-                using var client = new SmtpClient(_emailSettings.MailServer, _emailSettings.MailPort)
-                {
-                    Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.Password),
-                    EnableSsl = _emailSettings.EnableSsl
-                };
-
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
-                    Subject = subject,
-                    Body = body,
-                    IsBodyHtml = true
-                };
-                mailMessage.To.Add(toEmail);
-
-                await client.SendMailAsync(mailMessage);
-                
-                emailLog.Status = "sent";
-                emailLog.SentAt = DateTime.UtcNow;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send email");
-                emailLog.Status = "failed";
-            }
-            finally
-            {
-                try 
-                {
-                    _context.Emails.Add(emailLog);
-                    await _context.SaveChangesAsync();
-                }
-                catch(Exception dbEx)
-                {
-                    _logger.LogError(dbEx, "Failed to log email to database");
-                }
-            }
+            emailLog.Status = "Failed";
+            _logger.LogError(ex, "Error sending email to {Recipient}", toEmail);
         }
+
+        _context.Emails.Add(emailLog);
+        await _context.SaveChangesAsync();
     }
 }

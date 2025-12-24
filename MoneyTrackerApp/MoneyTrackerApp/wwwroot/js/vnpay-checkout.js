@@ -49,12 +49,42 @@
             if (!res.ok) throw new Error('Không tạo được liên kết thanh toán');
             const data = await res.json();
             if (!data.success || !data.paymentUrl) throw new Error('Thiếu URL thanh toán');
-            window.location.href = data.paymentUrl;
+
+            // Allow displaying QR directly if it is an image
+            if (data.paymentUrl.includes('img.vietqr.io')) {
+                showQrCode(data.paymentUrl);
+            } else {
+                window.location.href = data.paymentUrl;
+            }
+
         } catch (err) {
             console.error(err);
             showToast(err.message, 'danger');
             payButton.disabled = false;
             payButton.innerText = 'Thanh toán bằng VNPay QR';
+        }
+    }
+
+    function showQrCode(url) {
+        const checkoutForm = document.getElementById('checkoutForm');
+        if (checkoutForm) {
+            checkoutForm.innerHTML = `
+                <div class="card-body text-center">
+                    <h5 class="mb-3">Quét mã để thanh toán</h5>
+                    <div class="mb-3">
+                        <img src="${url}" alt="VietQR" class="img-fluid" style="max-width: 100%; border: 1px solid #eee; padding: 0.5rem; border-radius: 0.5rem;" />
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Sử dụng ứng dụng ngân hàng của bạn để quét mã QR và hoàn tất thanh toán.
+                    </p>
+                    <button class="btn btn-outline-primary" onclick="window.location.reload()">
+                        Đã thanh toán xong?
+                    </button>
+                    <div class="mt-2">
+                        <small class="text-secondary">Hệ thống sẽ tự động cập nhật (giả lập)</small>
+                    </div>
+                </div>
+            `;
         }
     }
 

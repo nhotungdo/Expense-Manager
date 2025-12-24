@@ -13,12 +13,10 @@ namespace MoneyTrackerApp.Services
     public class OtpService : IOtpService
     {
         private readonly ExpenseManagerContext _context;
-        private readonly IEmailService _emailService;
 
-        public OtpService(ExpenseManagerContext context, IEmailService emailService)
+        public OtpService(ExpenseManagerContext context)
         {
             _context = context;
-            _emailService = emailService;
         }
 
         public async Task<string> GenerateAndSendOtpAsync(long userId)
@@ -43,28 +41,12 @@ namespace MoneyTrackerApp.Services
             _context.UserOtps.Add(userOtp);
             await _context.SaveChangesAsync();
 
-            // 3. Send Email
+            // 3. Send Email (Removed)
+            /*
             var subject = "Mã xác thực OTP - Money Tracker App";
-            var body = $@"
-                <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; max-width: 500px;'>
-                    <h2 style='color: #2563eb;'>Mã Xác Thực Giao Dịch</h2>
-                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
-                    <p>Bạn vừa yêu cầu mã xác thực OTP cho giao dịch trên Money Tracker App.</p>
-                    <div style='background-color: #f3f4f6; padding: 15px; text-align: center; border-radius: 8px; margin: 20px 0;'>
-                        <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1e40af;'>{otpCode}</span>
-                    </div>
-                    <p>Mã này có hiệu lực trong vòng <strong>5 phút</strong>. Tuyệt đối không chia sẻ mã này cho bất kỳ ai.</p>
-                    <hr style='border: 0; border-top: 1px solid #e0e0e0; margin: 20px 0;' />
-                    <p style='font-size: 12px; color: #6b7280;'>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này hoặc liên hệ hỗ trợ.</p>
-                </div>
-            ";
-
-            // Fire and forget email sending to not block response? 
-            // Better to await it to ensure it's sent or logged.
-            if (!string.IsNullOrEmpty(user.Email))
-            {
-                await _emailService.SendEmailAsync(user.Email, subject, body, userId);
-            }
+            var body = $@" ... ";
+            if (!string.IsNullOrEmpty(user.Email)) { ... }
+            */
 
             return otpCode;
         }

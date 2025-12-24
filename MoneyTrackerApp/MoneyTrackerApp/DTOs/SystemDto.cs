@@ -24,6 +24,8 @@ public class CreateNotificationDto
 
     [StringLength(512, ErrorMessage = "Action URL must be less than 512 characters")]
     public string? ActionUrl { get; set; }
+
+    public bool IsImportant { get; set; }
 }
 
 /// <summary>
@@ -38,7 +40,19 @@ public class NotificationResponseDto
     public string Type { get; set; } = null!;
     public string? ActionUrl { get; set; }
     public bool IsRead { get; set; }
+    public bool IsImportant { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string TimeAgo => GetTimeAgo(CreatedAt);
+
+    private static string GetTimeAgo(DateTime dateTime)
+    {
+        var span = DateTime.UtcNow - dateTime;
+        if (span.TotalMinutes < 1) return "Vừa xong";
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes} phút trước";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours} giờ trước";
+        if (span.TotalDays < 7) return $"{(int)span.TotalDays} ngày trước";
+        return dateTime.ToString("dd/MM/yyyy");
+    }
 }
 
 /// <summary>

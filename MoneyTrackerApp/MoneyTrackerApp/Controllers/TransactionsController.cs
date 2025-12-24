@@ -12,12 +12,10 @@ namespace MoneyTrackerApp.Controllers
     public class TransactionsController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
-        private readonly IEmailService _emailService;
 
-        public TransactionsController(ITransactionService transactionService, IEmailService emailService)
+        public TransactionsController(ITransactionService transactionService)
         {
             _transactionService = transactionService;
-            _emailService = emailService;
         }
 
         private long GetUserId()
@@ -65,31 +63,7 @@ namespace MoneyTrackerApp.Controllers
                 var userId = GetUserId();
                 var transaction = await _transactionService.CreateTransactionAsync(userId, dto);
                 
-                // Gửi email thông báo (chạy background, không chờ)
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        var transactionType = dto.TransactionType == 1 ? "thu nhập" : "chi tiêu";
-                        var emailContent = $@"
-                            <h3>Giao dịch mới</h3>
-                            <p>Bạn vừa thêm một giao dịch {transactionType}:</p>
-                            <ul>
-                                <li><strong>Số tiền:</strong> {dto.Amount:N0} {dto.Currency ?? "VND"}</li>
-                                <li><strong>Ghi chú:</strong> {dto.Note ?? "Không có"}</li>
-                                <li><strong>Ngày:</strong> {dto.TransactionDate:dd/MM/yyyy HH:mm}</li>
-                            </ul>
-                            <p>Cảm ơn bạn đã sử dụng Expense Manager!</p>
-                        ";
-                        
-                        await _emailService.SendEmailToUserAsync(userId, "Thông báo giao dịch mới", emailContent);
-                    }
-                    catch (Exception emailEx)
-                    {
-                        // Log error nhưng không ảnh hưởng đến response
-                        Console.WriteLine($"Email notification failed: {emailEx.Message}");
-                    }
-                });
+                // Email notification removed per request
                 
                 return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
             }

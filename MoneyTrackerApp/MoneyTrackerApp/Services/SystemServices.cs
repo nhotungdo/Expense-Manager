@@ -18,6 +18,7 @@ public interface INotificationService
     Task SendBudgetAlertNotificationAsync(long userId, BudgetAlertDto alert);
     Task SendDebtReminderNotificationAsync(long userId, DebtResponseDto debt);
     Task SendScheduledTransactionNotificationAsync(long userId, ScheduledTransactionResponseDto scheduled);
+    Task DeleteNotificationAsync(long notificationId, long userId);
 }
 
 public class NotificationService : INotificationService
@@ -51,6 +52,7 @@ public class NotificationService : INotificationService
             Type = n.Type,
             ActionUrl = n.ActionUrl,
             IsRead = n.IsRead,
+            IsImportant = n.IsImportant,
             CreatedAt = n.CreatedAt ?? DateTime.UtcNow
         }).ToList();
     }
@@ -64,6 +66,7 @@ public class NotificationService : INotificationService
             Message = dto.Message,
             Type = dto.Type,
             ActionUrl = dto.ActionUrl,
+            IsImportant = dto.IsImportant,
             IsRead = false,
             CreatedAt = DateTime.UtcNow
         };
@@ -80,6 +83,7 @@ public class NotificationService : INotificationService
             Type = notification.Type,
             ActionUrl = notification.ActionUrl,
             IsRead = notification.IsRead,
+            IsImportant = notification.IsImportant,
             CreatedAt = notification.CreatedAt ?? DateTime.UtcNow
         };
     }
@@ -161,6 +165,18 @@ public class NotificationService : INotificationService
             Type = "ScheduledTransaction",
             ActionUrl = "/transactions"
         });
+    }
+
+    public async Task DeleteNotificationAsync(long notificationId, long userId)
+    {
+        var notification = await _context.Notifications
+            .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId);
+
+        if (notification != null)
+        {
+            _context.Notifications.Remove(notification);
+            await _context.SaveChangesAsync();
+        }
     }
 }
 

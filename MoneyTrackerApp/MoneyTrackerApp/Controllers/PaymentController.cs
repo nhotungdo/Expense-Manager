@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MoneyTrackerApp.Services;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration; // Added
+using System.Net; // Added
 
 namespace MoneyTrackerApp.Controllers;
 
@@ -11,15 +13,18 @@ public class PaymentController : ControllerBase
     private readonly VnPayService _vnPayService;
     private readonly IServicePackageService _packageService;
     private readonly ILogger<PaymentController> _logger;
+    private readonly IConfiguration _configuration;
 
     public PaymentController(
         VnPayService vnPayService,
         IServicePackageService packageService,
-        ILogger<PaymentController> logger)
+        ILogger<PaymentController> logger,
+        IConfiguration configuration)
     {
         _vnPayService = vnPayService;
         _packageService = packageService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpPost("vnpay/qr")]
@@ -37,16 +42,21 @@ public class PaymentController : ControllerBase
         }
 
         var userId = ResolveUserId(request.UserId);
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0.0.0.0";
-
+        
         try
         {
-            var paymentUrl = _vnPayService.CreatePaymentUrl(
-                userId,
-                package.Id,
-                package.Price,
-                package.Name,
-                ipAddress);
+            var vietQr = _configuration.GetSection("VietQR");
+            var bankId = vietQr["BankId"] ?? "BIDV";
+            var accountNo = vietQr["AccountNo"] ?? "8827256654";
+            var template = vietQr["Template"] ?? "qr_only";
+            var accountName = vietQr["AccountName"] ?? "DO NHO TUNG";
+
+            var amount = package.Price;
+            var description = $"Thanh toan goi {package.Name}";
+            
+            // Construct VietQR URL
+            // Format: https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-<TEMPLATE>.png?amount=<AMOUNT>&addInfo=<CONTENT>&accountName=<NAME>
+            var paymentUrl = $"https://img.vietqr.io/image/{bankId}-{accountNo}-{template}.png?amount={amount}&addInfo={WebUtility.UrlEncode(description)}&accountName={WebUtility.UrlEncode(accountName)}";
 
             return Ok(new
             {
@@ -57,10 +67,11 @@ public class PaymentController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to create VNPay QR URL");
-            return StatusCode(500, new { message = "Không thể tạo liên kết thanh toán" });
+            _logger.LogError(ex, "Failed to create VietQR URL");
+            return StatusCode(500, new { message = "Không thể tạo mã QR thanh toán" });
         }
     }
+
 
     private long ResolveUserId(long? userId)
     {

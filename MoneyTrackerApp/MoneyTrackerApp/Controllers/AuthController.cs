@@ -18,17 +18,16 @@ namespace MoneyTrackerApp.Controllers
         private readonly ExpenseManagerContext _db;
         private readonly IConfiguration _config;
         private readonly MoneyTrackerApp.Services.JwtTokenService _jwtService;
-        private readonly MoneyTrackerApp.Services.IEmailService _emailService;
+
         private readonly MoneyTrackerApp.Services.ISessionService _sessionService;
         private readonly MoneyTrackerApp.Services.IMultiAccountService _multiAccountService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.IEmailService emailService, MoneyTrackerApp.Services.ISessionService sessionService, MoneyTrackerApp.Services.IMultiAccountService multiAccountService, ILogger<AuthController> logger)
+        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.ISessionService sessionService, MoneyTrackerApp.Services.IMultiAccountService multiAccountService, ILogger<AuthController> logger)
         {
             _db = db;
             _config = config;
             _jwtService = jwtService;
-            _emailService = emailService;
             _sessionService = sessionService;
             _sessionService = sessionService;
             _multiAccountService = multiAccountService;
@@ -232,9 +231,9 @@ namespace MoneyTrackerApp.Controllers
                     await _db.SaveChangesAsync();
                 }
 
-                // [Notification] Send Welcome Email
-                await _emailService.SendEmailToUserAsync(user.Id, "Chào mừng đến với MoneyTrackerApp!", 
-                    $"<h3>Xin chào {user.FullName},</h3><p>Cảm ơn bạn đã đăng ký tài khoản tại MoneyTrackerApp. Bắt đầu quản lý tài chính của bạn ngay hôm nay!</p>");
+                // [Notification] Send Welcome Email (Removed)
+                // await _emailService.SendEmailToUserAsync(user.Id, "Chào mừng đến với MoneyTrackerApp!", 
+                //     $"<h3>Xin chào {user.FullName},</h3><p>Cảm ơn bạn đã đăng ký tài khoản tại MoneyTrackerApp. Bắt đầu quản lý tài chính của bạn ngay hôm nay!</p>");
             }
             catch (Exception ex)
             {
@@ -287,59 +286,25 @@ namespace MoneyTrackerApp.Controllers
             if (user == null) return Unauthorized(new { message = "Sai email hoặc mật khẩu" });
 
             // 1. Check Lockout
-            if (user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow)
+            if (IsLockedOut(user))
             {
-                return Unauthorized(new { message = $"Tài khoản bị khóa. Vui lòng thử lại sau {Math.Ceiling((user.LockoutEnd.Value - DateTime.UtcNow).TotalMinutes)} phút." });
+                var prohibitedMinutes = Math.Ceiling((user.LockoutEnd!.Value - DateTime.UtcNow).TotalMinutes);
+                return Unauthorized(new { message = $"Tài khoản bị khóa. Vui lòng thử lại sau {prohibitedMinutes} phút." });
             }
 
-            var ok = user.PasswordHash != null && BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash);
-            if (!ok)
+            // 2. Verify Password
+            if (!VerifyPassword(req.Password, user.PasswordHash))
             {
-                // Increment Failed Count
-                user.AccessFailedCount++;
-                
-                // Lockout if >= 5 attempts
-                if (user.AccessFailedCount >= 5)
-                {
-                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
-                    user.AccessFailedCount = 0; // Reset after locking
-
-                    await _db.SaveChangesAsync(); // Save lock status
-
-                    // Send Lockout Email
-                    await _emailService.SendEmailToUserAsync(user.Id, "Cảnh báo bảo mật: Tài khoản bị khóa tạm thời",
-                        $"<h3>Tài khoản của bạn đã bị khóa tạm thời</h3><p>Hệ thống phát hiện 5 lần đăng nhập thất bại liên tiếp vào lúc {DateTime.UtcNow.ToString("HH:mm dd/MM/yyyy")}.</p><p>Tài khoản sẽ được mở lại sau 15 phút.</p>");
-
-                    return Unauthorized(new { message = "Tài khoản đã bị khóa 15 phút do nhập sai quá nhiều lần." });
-                }
-
-                await _db.SaveChangesAsync();
-                return Unauthorized(new { message = "Sai email hoặc mật khẩu" });
+                return await HandleFailedLogin(user);
             }
 
-            // Reset failed count on success
+            // 3. Reset Fail Count
             if (user.AccessFailedCount > 0)
             {
                 user.AccessFailedCount = 0;
             }
 
-            // [Notification] Check New Device & Send Login Email
-            var currentUa = Request.Headers["User-Agent"].ToString();
-            var isNewDevice = !await _db.AuditLogs.AnyAsync(a => a.UserId == user.Id && a.Action == "Login" && a.UserAgent == currentUa);
-            
-            if (isNewDevice)
-            {
-                 await _emailService.SendEmailToUserAsync(user.Id, "Cảnh báo: Đăng nhập từ thiết bị mới",
-                     $"<h3>Phát hiện đăng nhập từ thiết bị mới</h3><p>Thời gian: {DateTime.UtcNow.ToString("HH:mm dd/MM/yyyy UTC")}</p><p>Thiết bị: {currentUa}</p><p>Nếu không phải bạn, vui lòng đổi mật khẩu ngay.</p>");
-            }
-            else 
-            {
-                // Standard Login Notification (Requirement: "Gửi email khi đăng nhập thành công")
-                 await _emailService.SendEmailToUserAsync(user.Id, "Thông báo đăng nhập thành công",
-                     $"<h3>Đăng nhập thành công</h3><p>Thời gian: {DateTime.UtcNow.ToString("HH:mm dd/MM/yyyy UTC")}</p><p>Kiểm tra hoạt động tài khoản của bạn.</p>");
-            }
-
-            // [Security] Assign Admin Rights if email matches (Self-healing/Ensure)
+            // 4. Admin Auto-Assignment (Self-healing)
             if (user.Email != null && user.Email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))
             {
                 if (user.Role != "Admin")
@@ -349,50 +314,82 @@ namespace MoneyTrackerApp.Controllers
                 }
             }
 
-            // [Security] 2FA Check
-            // Require 2FA if enabled OR if user is Admin
+            // 5. 2FA Check
             if (user.TwoFactorEnabled || user.Role == "Admin")
             {
-                // Generate 6-digit code
-                var code = new Random().Next(100000, 999999).ToString();
-
-                // Save or Update Token
-                var existingToken = await _db.AspNetUserTokens
-                    .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "Auth" && t.Name == "2FA");
-
-                if (existingToken != null)
-                {
-                    existingToken.Value = code;
-                }
-                else
-                {
-                    _db.AspNetUserTokens.Add(new AspNetUserToken
-                    {
-                        UserId = user.Id,
-                        LoginProvider = "Auth",
-                        Name = "2FA",
-                        Value = code
-                    });
-                }
-
-                // Send Email
-                _db.Emails.Add(new MoneyTrackerApp.Models.Email
-                {
-                    UserId = user.Id,
-                    Subject = "Mã xác thực đăng nhập (2FA)",
-                    Body = $"Mã xác thực của bạn là: {code}",
-                    Status = "Queued",
-                    CreatedAt = DateTime.UtcNow
-                });
-
-                await _db.SaveChangesAsync();
-
-                // Return 2FA required status
-                return Ok(new { message = "2fa_required", email = user.Email });
+                return await Initiate2FA(user);
             }
 
-            // If no 2FA, issue token immediately
+            // 6. Issue Token
             return await IssueTokenAndLog(user, "Login Success", req.RememberMe);
+        }
+
+        private bool IsLockedOut(User user)
+        {
+            return user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow;
+        }
+
+        private bool VerifyPassword(string inputPassword, string? hash)
+        {
+            return hash != null && BCrypt.Net.BCrypt.Verify(inputPassword, hash);
+        }
+
+        private async Task<ActionResult> HandleFailedLogin(User user)
+        {
+            user.AccessFailedCount++;
+            
+            if (user.AccessFailedCount >= 5)
+            {
+                user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                user.AccessFailedCount = 0;
+                await _db.SaveChangesAsync();
+
+                // Send Lockout Email (Removed)
+                /*
+                await _emailService.SendEmailToUserAsync(user.Id, "Cảnh báo bảo mật: Tài khoản bị khóa tạm thời",
+                    $"<h3>Tài khoản của bạn đã bị khóa tạm thời</h3><p>Hệ thống phát hiện 5 lần đăng nhập thất bại liên tiếp vào lúc {DateTime.UtcNow:HH:mm dd/MM/yyyy}.</p><p>Tài khoản sẽ được mở lại sau 15 phút.</p>");
+                */
+
+                return Unauthorized(new { message = "Tài khoản đã bị khóa 15 phút do nhập sai quá nhiều lần." });
+            }
+
+            await _db.SaveChangesAsync();
+            return Unauthorized(new { message = "Sai email hoặc mật khẩu" });
+        }
+
+        private async Task<ActionResult> Initiate2FA(User user)
+        {
+            var code = new Random().Next(100000, 999999).ToString();
+
+            var existingToken = await _db.AspNetUserTokens
+                .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "Auth" && t.Name == "2FA");
+
+            if (existingToken != null)
+            {
+                existingToken.Value = code;
+            }
+            else
+            {
+                _db.AspNetUserTokens.Add(new AspNetUserToken
+                {
+                    UserId = user.Id,
+                    LoginProvider = "Auth",
+                    Name = "2FA",
+                    Value = code
+                });
+            }
+
+            _db.Emails.Add(new MoneyTrackerApp.Models.Email
+            {
+                UserId = user.Id,
+                Subject = "Mã xác thực đăng nhập (2FA)",
+                Body = $"Mã xác thực của bạn là: {code}",
+                Status = "Queued",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _db.SaveChangesAsync();
+            return Ok(new { message = "2fa_required", email = user.Email });
         }
 
         [HttpPost("verify-2fa")]

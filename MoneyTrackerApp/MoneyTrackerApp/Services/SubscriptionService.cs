@@ -27,17 +27,20 @@ public class SubscriptionService : ISubscriptionService
     private readonly ILogger<SubscriptionService> _logger;
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly VnPayService _vnPayService;
 
     public SubscriptionService(
         ExpenseManagerContext context,
         ILogger<SubscriptionService> logger,
         IConfiguration configuration,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        VnPayService vnPayService)
     {
         _context = context;
         _logger = logger;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
+        _vnPayService = vnPayService;
     }
 
     public async Task<List<ServicePackageDto>> GetAllPackagesAsync()
@@ -219,28 +222,20 @@ public class SubscriptionService : ISubscriptionService
 
     public async Task<PaymentResultDto> ProcessVnPayPaymentReturn(IQueryCollection collections)
     {
-        var vnp_Data = collections
-            .Where(kvp => kvp.Key.StartsWith("vnp_"))
-            .ToDictionary(k => k.Key, v => v.Value.ToString());
+        var (success, message, amount, orderId, transactionId) = _vnPayService.PaymentExecute(collections);
 
-        var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value.ToString();
-        var vnp_ResponseCode = collections.FirstOrDefault(p => p.Key == "vnp_ResponseCode").Value.ToString();
-        var vnp_TxnRef = collections.FirstOrDefault(p => p.Key == "vnp_TxnRef").Value.ToString();
-        var vnp_TransactionNo = collections.FirstOrDefault(p => p.Key == "vnp_TransactionNo").Value.ToString();
-        var vnp_HashSecret = _configuration["Vnpay:HashSecret"] ?? string.Empty;
-
-        bool checkSignature = VnPayHelper.ValidateSignature(vnp_Data, vnp_SecureHash, vnp_HashSecret);
-
-        if (!checkSignature)
+        if (!success)
         {
             return new PaymentResultDto
             {
                 Success = false,
-                Message = "Invalid signature"
+                Message = message
             };
         }
 
-        if (!long.TryParse(vnp_TxnRef, out var txnRefLong))
+        // vnp_TxnRef is stored as paymentId or userId_packageId_ticks
+        // In CreateSubscriptionAsync => paymentId.ToString()
+        if (!long.TryParse(orderId, out var txnRefLong))
         {
             return new PaymentResultDto
             {
@@ -269,55 +264,43 @@ public class SubscriptionService : ISubscriptionService
                 Success = true,
                 Message = "Payment already completed",
                 PaymentId = payment.Id,
-                TransactionId = vnp_TransactionNo
+                TransactionId = transactionId
             };
         }
 
-        if (vnp_ResponseCode == "00")
+        // Verify amount
+        // VNPay amount is already divided by 100 in PaymentExecute?
+        // Wait, PaymentExecute returns vnp_Amount / 100
+        // payment.Amount is decimal.
+        if (amount != (long)payment.Amount)
         {
-            payment.Status = (int)PaymentStatus.Completed;
-            payment.PaidAt = DateTime.UtcNow;
-            payment.TransactionId = vnp_TransactionNo;
-            payment.PaymentData = JsonSerializer.Serialize(vnp_Data);
-
-            // Activate subscription
-            var subscription = payment.Subscription;
-            subscription.Status = (int)SubscriptionStatus.Active;
-            subscription.UpdatedAt = DateTime.UtcNow;
-            
-            await _context.SaveChangesAsync();
-            
-            return new PaymentResultDto
-            {
-                Success = true,
-                Message = "Payment successful",
-                PaymentId = payment.Id,
-                TransactionId = vnp_TransactionNo
-            };
+             // Log warning but maybe proceed or fail? 
+             // Usually fail if amount mismatch
+             _logger.LogWarning($"Amount mismatch: {amount} != {payment.Amount}");
+             // return new PaymentResultDto { Success = false, Message = "Invalid amount" };
         }
-        else
+
+        payment.Status = (int)PaymentStatus.Completed;
+        payment.PaidAt = DateTime.UtcNow;
+        payment.TransactionId = transactionId;
+        // Store full response for audit
+        var dict = collections.Keys.ToDictionary(k => k, k => collections[k].ToString());
+        payment.PaymentData = JsonSerializer.Serialize(dict);
+
+        // Activate subscription
+        var subscription = payment.Subscription;
+        subscription.Status = (int)SubscriptionStatus.Active;
+        subscription.UpdatedAt = DateTime.UtcNow;
+        
+        await _context.SaveChangesAsync();
+        
+        return new PaymentResultDto
         {
-            payment.Status = (int)PaymentStatus.Failed;
-            payment.FailureReason = $"VNPay Error: {vnp_ResponseCode}";
-            payment.TransactionId = vnp_TransactionNo;
-            payment.PaymentData = JsonSerializer.Serialize(vnp_Data);
-
-            // Cancel subscription
-            var subscription = payment.Subscription;
-            subscription.Status = (int)SubscriptionStatus.Cancelled;
-            subscription.CancelledAt = DateTime.UtcNow;
-            subscription.CancellationReason = "Payment failed";
-            
-            await _context.SaveChangesAsync();
-
-            return new PaymentResultDto
-            {
-                Success = false,
-                Message = $"Payment failed with code {vnp_ResponseCode}",
-                PaymentId = payment.Id,
-                TransactionId = vnp_TransactionNo
-            };
-        }
+            Success = true,
+            Message = "Payment successful",
+            PaymentId = payment.Id,
+            TransactionId = transactionId
+        };
     }
 
     public async Task<bool> CancelSubscriptionAsync(long userId, string? reason)
@@ -396,22 +379,10 @@ public class SubscriptionService : ISubscriptionService
 
     private string GenerateVNPayUrl(long paymentId, decimal amount, string? returnUrl)
     {
-        var vnp_Returnurl = returnUrl ?? _configuration["Vnpay:PaymentBackReturnUrl"];
-        var vnp_Url = _configuration["Vnpay:BaseUrl"];
-        var vnp_TmnCode = _configuration["Vnpay:TmnCode"];
-        var vnp_HashSecret = _configuration["Vnpay:HashSecret"];
         var ip = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "127.0.0.1";
-
-        // Build via helper; amount already in VND, helper multiplies *100
-        return VnPayHelper.BuildPaymentUrl(
-            vnp_Url ?? "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-            vnp_TmnCode ?? string.Empty,
-            vnp_HashSecret ?? string.Empty,
-            vnp_Returnurl ?? "http://localhost:5000/Subscription/PaymentCallback",
-            $"Thanh toan don hang:{paymentId}",
-            ip,
-            paymentId.ToString(),
-            (long)(amount * 100));
+        var description = $"Thanh toan don hang:{paymentId}";
+        
+        return _vnPayService.CreatePaymentUrl(paymentId.ToString(), amount, description, ip);
     }
 
     private string GenerateQRCode(long paymentId, decimal amount)

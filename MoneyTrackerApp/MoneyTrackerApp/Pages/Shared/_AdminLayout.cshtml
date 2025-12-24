@@ -52,6 +52,9 @@
                 <a href="/Admin/Transactions" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Transactions") == true ? "active" : "")">
                     <i class="fas fa-receipt"></i> <span>Giao dịch</span>
                 </a>
+                <a href="/Admin/Notifications/EmailSender" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("EmailSender") == true ? "active" : "")">
+                    <i class="fas fa-paper-plane"></i> <span>Gửi thông báo</span>
+                </a>
                 
                 <div class="nav-label">Hệ thống & Dữ liệu</div>
                 <a href="/Admin/MasterData/Categories" class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("MasterData/Categories") == true ? "active" : "")">
@@ -93,10 +96,10 @@
                         <input type="text" placeholder="Tìm kiếm (Ctrl + K)...">
                     </div>
                     
-                    <button class="icon-btn position-relative">
+                    <a href="/Notifications" class="icon-btn position-relative text-decoration-none text-dark d-flex align-items-center justify-content-center">
                         <i class="far fa-bell"></i>
-                        <span class="badge-dot"></span>
-                    </button>
+                        <span class="badge-dot d-none" id="notificationBadge"></span>
+                    </a>
                     
                     <div class="dropdown">
                         <div class="user-mini-profile pointer cursor-pointer" data-bs-toggle="dropdown">
@@ -274,6 +277,32 @@
                 }
             }
         })();
+
+        // Notification Badge Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationBadge();
+            // Poll every 60 seconds
+            setInterval(updateNotificationBadge, 60000);
+        });
+
+        async function updateNotificationBadge() {
+            try {
+                const response = await fetch('/api/notification/unread-count');
+                if (response.ok) {
+                    const data = await response.json();
+                    const badge = document.getElementById('notificationBadge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.classList.remove('d-none');
+                        } else {
+                            badge.classList.add('d-none');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -169,6 +169,32 @@
             }
         }
     })();
+
+    // User Notification Badge Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        updateUserNotificationBadge();
+        setInterval(updateUserNotificationBadge, 60000);
+    });
+
+    async function updateUserNotificationBadge() {
+        try {
+            const response = await fetch('/api/notification/unread-count');
+            if (response.ok) {
+                const data = await response.json();
+                const badge = document.getElementById('userNotificationBadge');
+                if (badge) {
+                    if (data.count > 0) {
+                        badge.innerText = data.count > 99 ? '99+' : data.count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching user notifications:', error);
+        }
+    }
     </script>
 </body>
 </html>
