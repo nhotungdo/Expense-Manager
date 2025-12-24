@@ -57,6 +57,8 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.OnboardingService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IUserManagementService, MoneyTrackerApp.Services.UserManagementService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ISystemSettingsService, MoneyTrackerApp.Services.SystemSettingsService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IAdminDashboardService, MoneyTrackerApp.Services.AdminDashboardService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.ISessionService, MoneyTrackerApp.Services.SessionService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IMultiAccountService, MoneyTrackerApp.Services.MultiAccountService>();
 
 // Register Subscription Service
 builder.Services.AddScoped<MoneyTrackerApp.Services.ISubscriptionService, MoneyTrackerApp.Services.SubscriptionService>();
@@ -135,7 +137,10 @@ auth.AddJwtBearer(options =>
     };
 });
 
-auth.AddCookie("External");
+auth.AddCookie("External", o => {
+    o.Cookie.SameSite = SameSiteMode.Lax;
+    o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+});
 
 var googleSection = builder.Configuration.GetSection("Authentication:Google");
 auth.AddGoogle(options =>
@@ -144,6 +149,21 @@ auth.AddGoogle(options =>
     options.ClientSecret = googleSection.GetValue<string>("ClientSecret") ?? "";
     options.SignInScheme = "External";
     options.CallbackPath = "/signin-google";
+
+    // Handle dynamic prompts (e.g., select_account) passed via AuthenticationProperties
+    options.Events.OnRedirectToAuthorizationEndpoint = context =>
+    {
+        var uri = context.RedirectUri;
+        if (context.Properties.Items.TryGetValue("prompt", out var prompt))
+        {
+            if (!string.IsNullOrEmpty(prompt))
+            {
+               uri += $"&prompt={Uri.EscapeDataString(prompt)}";
+            }
+        }
+        context.Response.Redirect(uri);
+        return Task.CompletedTask;
+    };
 });
 
 var app = builder.Build();
@@ -171,6 +191,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<MoneyTrackerApp.Middleware.SessionValidationMiddleware>();
 
 app.UseMiddleware<MoneyTrackerApp.Middleware.OnboardingMiddleware>();
 

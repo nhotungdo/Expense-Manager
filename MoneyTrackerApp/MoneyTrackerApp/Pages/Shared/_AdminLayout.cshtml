@@ -21,6 +21,7 @@
     
     <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <meta name="current-session-id" content="@User.FindFirst("sid")?.Value" />
 </head>
 <body>
     <div class="admin-wrapper">
@@ -97,10 +98,43 @@
                         <span class="badge-dot"></span>
                     </button>
                     
-                    <div class="user-mini-profile pointer cursor-pointer" data-bs-toggle="dropdown">
-                        <div class="user-avatar">
-                            <i class="fas fa-user-shield"></i>
+                    <div class="dropdown">
+                        <div class="user-mini-profile pointer cursor-pointer" data-bs-toggle="dropdown">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
                         </div>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-3" style="min-width: 280px;">
+                            <li>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-primary-subtle text-primary rounded-circle p-2 me-2">
+                                        <i class="fas fa-user-shield"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="dropdown-header p-0 mb-0 text-dark">@User.Identity?.Name</h6>
+                                        <small class="text-muted">Administrator</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <li><h6 class="dropdown-header text-uppercase x-small text-muted">Chuyển tài khoản</h6></li>
+                            <div id="adminAccountSwitcher">
+                                <li class="text-center text-muted small py-2"><i class="fas fa-spinner fa-spin me-1"></i> Loading...</li>
+                            </div>
+                            
+                            <li><a class="dropdown-item text-primary fw-medium" href="/Auth/Login?action=add_account&returnUrl=/Admin/Dashboard"><i class="fas fa-plus-circle me-2"></i>Thêm tài khoản</a></li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/Profile"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="/Settings"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form asp-page="/Auth/Logout" method="post" class="m-0">
+                                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </header>
@@ -133,6 +167,113 @@
                 }
             }
         });
+
+        // Admin Account Switcher Logic
+        const adminSwitcherContainer = document.getElementById('adminAccountSwitcher');
+        if (adminSwitcherContainer) {
+            // Use Bootstrap events if possible, or lazy load
+            const dropdown = adminSwitcherContainer.closest('.dropdown');
+            if (dropdown) {
+                dropdown.addEventListener('show.bs.dropdown', function () {
+                    loadAdminAccounts();
+                });
+            }
+        }
+
+        async function loadAdminAccounts() {
+            const container = document.getElementById('adminAccountSwitcher');
+            if (!container) return;
+            
+            try {
+                const response = await fetch('/api/auth/accounts');
+                if (response.ok) {
+                    const accounts = await response.json();
+                    if (accounts.length === 0) {
+                        container.innerHTML = '<li class="dropdown-item-text text-muted small italic">Không có tài khoản khác</li>';
+                        return;
+                    }
+                    
+                    container.innerHTML = accounts.map(acc => {
+                         const activeClass = acc.isActive ? 'bg-light border-start border-3 border-primary' : '';
+                         const check = acc.isActive ? '<i class="fas fa-check text-primary ms-auto"></i>' : '';
+                         
+                         return `
+                            <li>
+                                <a href="javascript:void(0)" onclick="switchAdminAccount('${acc.sessionId}', ${acc.isActive})" 
+                                   class="dropdown-item d-flex align-items-center gap-2 py-2 ${activeClass}">
+                                    <div class="rounded-circle bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 10px;">
+                                        ${acc.email.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class="ms-1" style="line-height: 1.2;">
+                                        <div class="fw-medium small text-truncate" style="max-width: 150px;">${acc.fullName || acc.email}</div>
+                                        <div class="text-muted x-small text-truncate" style="max-width: 150px;">${acc.email}</div>
+                                    </div>
+                                    ${check}
+                                </a>
+                            </li>
+                         `;
+                    }).join('');
+                }
+            } catch (e) {
+                container.innerHTML = '<li class="dropdown-item-text text-danger small">Lỗi tải dữ liệu</li>';
+            }
+        }
+
+        async function switchAdminAccount(sessionId, isActive) {
+            if (isActive) return;
+            try {
+                const res = await fetch(`/api/auth/switch-account/${sessionId}`, { method: 'POST' });
+                if (res.ok) {
+                    sessionStorage.setItem('currentSessionId', sessionId);
+                    window.location.reload();
+                }
+                else alert('Chuyển tài khoản thất bại');
+            } catch (e) {
+                alert('Lỗi kết nối');
+            }
+        }
+
+        // Auto Restore Session Script
+        (function() {
+            const metaSid = document.querySelector('meta[name="current-session-id"]')?.content;
+            if (metaSid) {
+                const storedSid = sessionStorage.getItem('currentSessionId');
+                if (storedSid && storedSid !== metaSid) {
+                     const restoreAttempts = parseInt(sessionStorage.getItem('restore_attempts') || '0');
+                     if (restoreAttempts < 3) {
+                         sessionStorage.setItem('restore_attempts', restoreAttempts + 1);
+                         // Overlay
+                         const overlay = document.createElement('div');
+                         overlay.className = 'position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center';
+                         overlay.style.zIndex = '9999';
+                         overlay.style.opacity = '0.8';
+                         overlay.innerHTML = '<div class="text-center"><div class="spinner-border text-primary mb-2"></div><div>Đang khôi phục phiên làm việc...</div></div>';
+                         document.body.appendChild(overlay);
+
+                         fetch('/api/auth/switch-account/' + storedSid, { method: 'POST' })
+                             .then(res => {
+                                 if (res.ok) {
+                                     sessionStorage.removeItem('restore_attempts');
+                                     window.location.reload();
+                                 } else {
+                                     sessionStorage.setItem('currentSessionId', metaSid);
+                                     sessionStorage.removeItem('restore_attempts');
+                                     if(document.body.contains(overlay)) document.body.removeChild(overlay);
+                                 }
+                             }).catch(() => {
+                                 if(document.body.contains(overlay)) document.body.removeChild(overlay);
+                             });
+                     } else {
+                         sessionStorage.setItem('currentSessionId', metaSid);
+                         sessionStorage.removeItem('restore_attempts');
+                     }
+                } else if (!storedSid) {
+                    sessionStorage.setItem('currentSessionId', metaSid);
+                } else {
+                    sessionStorage.removeItem('restore_attempts');
+                }
+            }
+        })();
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

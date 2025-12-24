@@ -451,12 +451,12 @@
           }
           else
           {
-            <span>Lỗi: @error</span>
+            <span>Lỗi: @error @(string.IsNullOrEmpty(Request.Query["details"]) ? "" : $"({Request.Query["details"]})")</span>
           }
         </div>
       }
 
-      <form id="login-form" onsubmit="handleLogin(event)">
+      <form id="login-form" method="post" onsubmit="handleLogin(event)">
         <div class="form-group">
           <label for="email">Email</label>
           <div class="input-wrapper">
@@ -475,7 +475,7 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <label class="remember-me" style="display: flex; align-items: center; font-weight: 400; font-size: 14px; cursor: pointer; margin: 0;">
-            <input type="checkbox" id="rememberMe" style="width: 16px; height: 16px; margin-right: 8px; accent-color: var(--primary-color);">
+            <input type="checkbox" id="rememberMe" name="rememberMe" style="width: 16px; height: 16px; margin-right: 8px; accent-color: var(--primary-color);">
             Ghi nhớ đăng nhập
           </label>
 
@@ -580,6 +580,10 @@
       if (roleFromUrl) {
         localStorage.setItem('role', roleFromUrl);
       }
+      const sessionId = params.get('sessionId');
+      if (sessionId) {
+          sessionStorage.setItem('currentSessionId', sessionId);
+      }
       
       // Show success message for Google Login
       window.onload = function() {
@@ -638,6 +642,7 @@
         localStorage.setItem('refreshToken', data.refreshToken);
 
         localStorage.setItem('role', data.role || '');
+        if (data.sessionId) sessionStorage.setItem('currentSessionId', data.sessionId);
         
         // Show success message
         showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
@@ -676,7 +681,6 @@
             const response = await fetch('/api/auth/verify-2fa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     email: window.pendingEmail, 
                     code: code,
@@ -697,6 +701,7 @@
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
             localStorage.setItem('role', data.role || '');
+            if (data.sessionId) sessionStorage.setItem('currentSessionId', data.sessionId);
 
             showSuccess('Xác thực thành công! Đang chuyển hướng...');
 

@@ -85,6 +85,7 @@
     <link rel="stylesheet" href="~/css/christmas.css" asp-append-version="true" />
     
     @await RenderSectionAsync("Styles", required: false)
+    <meta name="current-session-id" content="@User.FindFirst("sid")?.Value" />
 </head>
 
 @using Microsoft.AspNetCore.Identity
@@ -138,5 +139,36 @@
     <partial name="_AiChatWidget" />
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+    (function() {
+        const metaSid = document.querySelector('meta[name="current-session-id"]')?.content;
+        if (metaSid) {
+            const storedSid = sessionStorage.getItem('currentSessionId');
+            if (storedSid && storedSid !== metaSid) {
+                const restoreAttempts = parseInt(sessionStorage.getItem('restore_attempts') || '0');
+                if (restoreAttempts < 3) {
+                    sessionStorage.setItem('restore_attempts', restoreAttempts + 1);
+                    document.body.style.opacity = '0.5';
+                    fetch('/api/auth/switch-account/' + storedSid, { method: 'POST' })
+                        .then(res => {
+                            if (res.ok) {
+                                sessionStorage.removeItem('restore_attempts');
+                                window.location.reload();
+                            } else {
+                                sessionStorage.setItem('currentSessionId', metaSid);
+                            }
+                        }).catch(() => {});
+                } else {
+                    sessionStorage.setItem('currentSessionId', metaSid);
+                    sessionStorage.removeItem('restore_attempts');
+                }
+            } else if (!storedSid) {
+                sessionStorage.setItem('currentSessionId', metaSid);
+            } else {
+                sessionStorage.removeItem('restore_attempts');
+            }
+        }
+    })();
+    </script>
 </body>
 </html>

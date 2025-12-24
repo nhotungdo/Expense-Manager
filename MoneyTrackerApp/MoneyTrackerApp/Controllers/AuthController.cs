@@ -19,14 +19,19 @@ namespace MoneyTrackerApp.Controllers
         private readonly IConfiguration _config;
         private readonly MoneyTrackerApp.Services.JwtTokenService _jwtService;
         private readonly MoneyTrackerApp.Services.IEmailService _emailService;
+        private readonly MoneyTrackerApp.Services.ISessionService _sessionService;
+        private readonly MoneyTrackerApp.Services.IMultiAccountService _multiAccountService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.IEmailService emailService, ILogger<AuthController> logger)
+        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.IEmailService emailService, MoneyTrackerApp.Services.ISessionService sessionService, MoneyTrackerApp.Services.IMultiAccountService multiAccountService, ILogger<AuthController> logger)
         {
             _db = db;
             _config = config;
             _jwtService = jwtService;
             _emailService = emailService;
+            _sessionService = sessionService;
+            _sessionService = sessionService;
+            _multiAccountService = multiAccountService;
             _logger = logger;
         }
 
@@ -50,6 +55,7 @@ namespace MoneyTrackerApp.Controllers
             public string RefreshToken { get; set; } = string.Empty;
             public bool OnboardingCompleted { get; set; }
             public string Role { get; set; } = string.Empty;
+            public Guid SessionId { get; set; }
         }
 
         public class Verify2FARequest
@@ -64,6 +70,8 @@ namespace MoneyTrackerApp.Controllers
         public IActionResult GoogleStart()
         {
             var props = new AuthenticationProperties { RedirectUri = Url.Action("GoogleCallback")! };
+            // Force account selection to allow adding multiple Google accounts
+            props.Items["prompt"] = "select_account";
             return Challenge(props, GoogleDefaults.AuthenticationScheme);
         }
 
@@ -132,7 +140,11 @@ namespace MoneyTrackerApp.Controllers
                 });
                 await _db.SaveChangesAsync();
 
-                var pair = await _jwtService.IssueAsync(user);
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                var session = await _sessionService.CreateSessionAsync(user.Id, userAgent, ipAddress);
+
+                var pair = await _jwtService.IssueAsync(user, session.Id);
 
                 Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
                 {
@@ -142,13 +154,16 @@ namespace MoneyTrackerApp.Controllers
                     Expires = DateTime.UtcNow.AddMinutes(60) // Google login default 60 mins (could ask user before but standard is session)
                 });
 
-                var url = $"/Auth/Login?accessToken={Uri.EscapeDataString(pair.access)}&refreshToken={Uri.EscapeDataString(pair.refresh)}&role={Uri.EscapeDataString(user.Role)}";
+                // [MultiAccount] Track Session
+                _multiAccountService.AddSessionToCookie(session.Id);
+
+                var url = $"/Auth/Login?accessToken={Uri.EscapeDataString(pair.access)}&refreshToken={Uri.EscapeDataString(pair.refresh)}&role={Uri.EscapeDataString(user.Role)}&sessionId={session.Id}";
                 return Redirect(url);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Google authentication failed");
-                return Redirect("/Auth/Login?error=google_unavailable");
+                return Redirect($"/Auth/Login?error=google_unavailable&details={Uri.EscapeDataString(ex.Message)}");
             }
         }
 
@@ -235,7 +250,11 @@ namespace MoneyTrackerApp.Controllers
             }
 
             // 6. Issue Tokens
-            var pair = await _jwtService.IssueAsync(user);
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            var session = await _sessionService.CreateSessionAsync(user.Id, userAgent, ipAddress);
+
+            var pair = await _jwtService.IssueAsync(user, session.Id);
 
             // 6. Set Cookie (Important for auto-login consistency)
             Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
@@ -246,12 +265,16 @@ namespace MoneyTrackerApp.Controllers
                 Expires = DateTime.UtcNow.AddMinutes(60)
             });
 
+            // [MultiAccount] Track Session
+            _multiAccountService.AddSessionToCookie(session.Id);
+
             var tokens = new TokenResponse
             {
                 AccessToken = pair.access,
                 RefreshToken = pair.refresh,
                 OnboardingCompleted = user.OnboardingCompleted,
-                Role = user.Role
+                Role = user.Role,
+                SessionId = session.Id
             };
             return Ok(tokens);
         }
@@ -407,7 +430,11 @@ namespace MoneyTrackerApp.Controllers
 
         private async Task<ActionResult<TokenResponse>> IssueTokenAndLog(User user, string auditAction, bool rememberMe = false)
         {
-            var pair = await _jwtService.IssueAsync(user);
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            var session = await _sessionService.CreateSessionAsync(user.Id, userAgent, ipAddress);
+
+            var pair = await _jwtService.IssueAsync(user, session.Id);
 
             var cookieOptions = new CookieOptions
             {
@@ -419,6 +446,9 @@ namespace MoneyTrackerApp.Controllers
             
             Response.Cookies.Append("AccessToken", pair.access, cookieOptions);
 
+            // [MultiAccount] Track Session
+            _multiAccountService.AddSessionToCookie(session.Id);
+
             // [Audit] Log Success
             _db.AuditLogs.Add(new MoneyTrackerApp.Models.AuditLog
             {
@@ -426,8 +456,8 @@ namespace MoneyTrackerApp.Controllers
                 Action = "Login",
                 Details = auditAction + (rememberMe ? " (RememberMe)" : ""),
                 CreatedAt = DateTime.UtcNow,
-                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                UserAgent = Request.Headers["User-Agent"].ToString()
+                IpAddress = ipAddress,
+                UserAgent = userAgent
             });
             await _db.SaveChangesAsync();
 
@@ -436,7 +466,8 @@ namespace MoneyTrackerApp.Controllers
                 AccessToken = pair.access,
                 RefreshToken = pair.refresh,
                 OnboardingCompleted = user.OnboardingCompleted,
-                Role = user.Role
+                Role = user.Role,
+                SessionId = session.Id
             };
             return Ok(tokens);
         }
@@ -460,21 +491,51 @@ namespace MoneyTrackerApp.Controllers
             if (userIdClaim == null) return Unauthorized();
             if (!long.TryParse(userIdClaim, out var userId)) return Unauthorized();
 
-            var stored = await _db.AspNetUserTokens.FirstOrDefaultAsync(t => t.UserId == userId && t.LoginProvider == "Auth" && t.Name == "RefreshToken" && t.Value == body.RefreshToken);
-            if (stored == null) return Unauthorized();
-
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) return Unauthorized();
-
-            var pair = await _jwtService.IssueAsync(user);
-            var tokens = new TokenResponse
+            // Try to find in UserSessions first
+            var session = await _db.UserSessions.FirstOrDefaultAsync(s => s.RefreshToken == body.RefreshToken);
+            
+            if (session != null)
             {
-                AccessToken = pair.access,
-                RefreshToken = pair.refresh,
-                OnboardingCompleted = user.OnboardingCompleted,
-                Role = user.Role
-            };
-            return Ok(tokens);
+                if (!session.IsActive) return Unauthorized(new { message = "Session revoked" });
+
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null) return Unauthorized();
+
+                // Rotate tokens in session
+                var pair = await _jwtService.IssueAsync(user, session.Id);
+                
+                // Update Last Active
+                await _sessionService.RefreshSessionActivityAsync(session.Id);
+
+                var tokens = new TokenResponse
+                {
+                    AccessToken = pair.access,
+                    RefreshToken = pair.refresh,
+                    OnboardingCompleted = user.OnboardingCompleted,
+                    Role = user.Role,
+                    SessionId = session.Id
+                };
+                return Ok(tokens);
+            }
+            else
+            {
+                // Fallback to legacy
+                var stored = await _db.AspNetUserTokens.FirstOrDefaultAsync(t => t.UserId == userId && t.LoginProvider == "Auth" && t.Name == "RefreshToken" && t.Value == body.RefreshToken);
+                if (stored == null) return Unauthorized();
+
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null) return Unauthorized();
+
+                var pair = await _jwtService.IssueAsync(user); // No session ID passed, so it updates legacy token
+                var tokens = new TokenResponse
+                {
+                    AccessToken = pair.access,
+                    RefreshToken = pair.refresh,
+                    OnboardingCompleted = user.OnboardingCompleted,
+                    Role = user.Role
+                };
+                return Ok(tokens);
+            }
         }
 
         [HttpPost("logout")]
@@ -482,10 +543,34 @@ namespace MoneyTrackerApp.Controllers
         public async Task<IActionResult> Logout()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!long.TryParse(userIdStr, out var userId)) return Ok();
-            var userTokens = _db.AspNetUserTokens.Where(t => t.UserId == userId && t.LoginProvider == "Auth" && t.Name == "RefreshToken");
-            _db.AspNetUserTokens.RemoveRange(userTokens);
-            await _db.SaveChangesAsync();
+            var sidStr = User.FindFirst("sid")?.Value;
+            
+            if (long.TryParse(userIdStr, out var userId))
+            {
+                // Remove specific refresh token if we know the session, otherwise remove all? 
+                // Better to remove only the current session's token.
+                // But legacy code removes all "RefreshToken" tokens?
+                // Line 529: returns IQueryable. Line 530: RemoveRange.
+                // This removes ALL refresh tokens for the user device? No, just "RefreshToken" name.
+                // Actually the current code removes ALL tokens named "RefreshToken" for that user.
+                // That might kill other sessions on other devices if they share the same token name?
+                // The DB schema shows AspNetUserTokens. 
+                // Let's stick to cleaning up the current session from the cookie list.
+                
+                if (Guid.TryParse(sidStr, out var sid))
+                {
+                    _multiAccountService.RemoveSessionFromCookie(sid);
+                    
+                    // Also try to remove the session from UserSessions table to be clean
+                    var dbSession = await _db.UserSessions.FindAsync(sid);
+                    if (dbSession != null)
+                    {
+                        _db.UserSessions.Remove(dbSession);
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
+
             Response.Cookies.Delete("AccessToken");
             return Ok();
         }
@@ -574,6 +659,86 @@ namespace MoneyTrackerApp.Controllers
             {
                 return StatusCode(500, new { message = ex.Message });
             }
+        }
+
+        [HttpGet("accounts")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<MoneyTrackerApp.DTOs.UserAccountSummaryDto>>> GetAvailableAccounts()
+        {
+            var sessionIds = _multiAccountService.GetSessionIdsFromCookie();
+            if (!sessionIds.Any()) return Ok(new List<MoneyTrackerApp.DTOs.UserAccountSummaryDto>());
+
+            var currentSidStr = User.FindFirst("sid")?.Value;
+            Guid.TryParse(currentSidStr, out var currentSid);
+
+            var sessions = await _db.UserSessions
+                .Include(s => s.User)
+                .Where(s => sessionIds.Contains(s.Id) && s.IsActive)
+                .ToListAsync();
+
+            var result = sessions.Select(s => new MoneyTrackerApp.DTOs.UserAccountSummaryDto
+            {
+                UserId = s.UserId,
+                Email = s.User.Email ?? "",
+                FullName = s.User.FullName ?? "",
+                SessionId = s.Id,
+                IsActive = s.Id == currentSid,
+                AvatarUrl = "/api/profile/avatar/" + s.UserId
+            }).ToList();
+
+            return Ok(result);
+        }
+
+        [HttpPost("switch-account/{sessionId}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<TokenResponse>> SwitchAccount(Guid sessionId)
+        {
+            // 1. Validate the session is in our "Trusted" list (Cookie)
+            var allowedSessions = _multiAccountService.GetSessionIdsFromCookie();
+            if (!allowedSessions.Contains(sessionId))
+            {
+                return Forbidden("Session not accessible from this device.");
+            }
+
+            // 2. Fetch Session from DB
+            var session = await _db.UserSessions.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == sessionId);
+            if (session == null || !session.IsActive)
+            {
+                _multiAccountService.RemoveSessionFromCookie(sessionId);
+                return Unauthorized("Session expired or invalid.");
+            }
+
+            // 3. Issue New Token
+            var user = session.User;
+            var pair = await _jwtService.IssueAsync(user, session.Id);
+
+            // 4. Update Activity
+            await _sessionService.RefreshSessionActivityAsync(session.Id);
+
+            // 5. Update Cookies
+            Response.Cookies.Append("AccessToken", pair.access, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(60)
+            });
+            
+            _multiAccountService.AddSessionToCookie(sessionId);
+
+            return Ok(new TokenResponse
+            {
+                AccessToken = pair.access,
+                RefreshToken = pair.refresh,
+                OnboardingCompleted = user.OnboardingCompleted,
+                Role = user.Role,
+                SessionId = session.Id
+            });
+        }
+        
+        private ObjectResult Forbidden(string message) 
+        {
+            return StatusCode(403, new { message });
         }
     }
 }

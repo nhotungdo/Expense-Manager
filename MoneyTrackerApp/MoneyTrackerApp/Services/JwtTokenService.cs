@@ -17,7 +17,7 @@ namespace MoneyTrackerApp.Services
             _db = db;
         }
 
-        public async Task<(string access, string refresh)> IssueAsync(User user)
+        public async Task<(string access, string refresh)> IssueAsync(User user, Guid? sessionId = null)
         {
             var jwtSection = _config.GetSection("Jwt");
             var issuer = jwtSection.GetValue<string>("Issuer") ?? "MoneyTrackerApp";
@@ -34,6 +34,11 @@ namespace MoneyTrackerApp.Services
                 new Claim("OnboardingCompleted", user.OnboardingCompleted.ToString())
             };
 
+            if (sessionId.HasValue)
+            {
+                claims.Add(new Claim("sid", sessionId.Value.ToString()));
+            }
+
             var keyBytes = Encoding.UTF8.GetBytes(key);
             var creds = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256);
             var now = DateTime.UtcNow;
@@ -45,17 +50,37 @@ namespace MoneyTrackerApp.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim("typ", "refresh")
             };
+            // Add session ID to refresh token as well for validation if needed
+             if (sessionId.HasValue)
+            {
+                refreshClaims.Add(new Claim("sid", sessionId.Value.ToString()));
+            }
+            
             var refreshToken = new JwtSecurityToken(issuer, audience, refreshClaims, now, now.AddDays(refreshDays), creds);
             var refresh = new JwtSecurityTokenHandler().WriteToken(refreshToken);
 
-            var existingRefresh = _db.AspNetUserTokens.FirstOrDefault(t => t.UserId == user.Id && t.LoginProvider == "Auth" && t.Name == "RefreshToken");
-            if (existingRefresh == null)
+            if (sessionId.HasValue)
             {
-                existingRefresh = new AspNetUserToken { UserId = user.Id, LoginProvider = "Auth", Name = "RefreshToken" };
-                _db.AspNetUserTokens.Add(existingRefresh);
+                var session = await _db.UserSessions.FindAsync(sessionId.Value);
+                if (session != null)
+                {
+                    session.RefreshToken = refresh;
+                    session.RefreshTokenExpiryTime = now.AddDays(refreshDays);
+                    await _db.SaveChangesAsync();
+                }
             }
-            existingRefresh.Value = refresh;
-            await _db.SaveChangesAsync();
+            else
+            {
+                // Fallback to old table for non-session-aware calls
+                var existingRefresh = _db.AspNetUserTokens.FirstOrDefault(t => t.UserId == user.Id && t.LoginProvider == "Auth" && t.Name == "RefreshToken");
+                if (existingRefresh == null)
+                {
+                    existingRefresh = new AspNetUserToken { UserId = user.Id, LoginProvider = "Auth", Name = "RefreshToken" };
+                    _db.AspNetUserTokens.Add(existingRefresh);
+                }
+                existingRefresh.Value = refresh;
+                await _db.SaveChangesAsync();
+            }
 
             return (access, refresh);
         }

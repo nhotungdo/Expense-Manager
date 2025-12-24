@@ -11,30 +11,34 @@ namespace MoneyTrackerApp.Pages.Auth
     {
         private readonly ExpenseManagerContext _db;
         private readonly MoneyTrackerApp.Services.JwtTokenService _jwtService;
+        private readonly MoneyTrackerApp.Services.ISessionService _sessionService;
+        private readonly MoneyTrackerApp.Services.IMultiAccountService _multiAccountService;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(ExpenseManagerContext db, MoneyTrackerApp.Services.JwtTokenService jwtService, ILogger<LoginModel> logger)
+        public LoginModel(ExpenseManagerContext db, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.ISessionService sessionService, MoneyTrackerApp.Services.IMultiAccountService multiAccountService, ILogger<LoginModel> logger)
         {
             _db = db;
             _jwtService = jwtService;
+            _sessionService = sessionService;
+            _sessionService = sessionService;
+            _multiAccountService = multiAccountService;
             _logger = logger;
         }
 
-        public IActionResult OnGet()
+        public IActionResult OnGet(string? action)
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                 // Check if user has specific claims or db lookups if needed, 
-                 // but basic redirect is enough as per requirement 2.
-                 // Requirement 3 says redirect to /home.
-                 return Redirect("/home");
+                 if (action != "add_account")
+                 {
+                     return Redirect("/home");
+                 }
             }
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string email, string password)
+        public async Task<IActionResult> OnPostAsync(string email, string password, bool rememberMe = false)
         {
-            // Validate input
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 return Redirect("/Auth/Login?error=missing_fields");
@@ -42,44 +46,76 @@ namespace MoneyTrackerApp.Pages.Auth
 
             try
             {
-                // Find user by email
-                var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email && u.Enabled);
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-                if (user == null)
+                if (user == null || !user.Enabled)
                 {
-                    _logger.LogWarning($"Login attempt with non-existent email: {email}");
+                    // Don't reveal user existence, but for debugging/flow we redirect with generic error
                     return Redirect("/Auth/Login?error=invalid_credentials");
                 }
 
-                // Verify password
+                // Check Lockout
+                if (user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow)
+                {
+                    var minutes = Math.Ceiling((user.LockoutEnd.Value - DateTime.UtcNow).TotalMinutes);
+                    return Redirect($"/Auth/Login?error=locked_out&details={minutes}_minutes");
+                }
+
+                // Verify Password
                 if (!VerifyPassword(password, user.PasswordHash ?? string.Empty))
                 {
-                    _logger.LogWarning($"Failed login attempt for user: {email}");
+                    user.AccessFailedCount++;
+                    if (user.AccessFailedCount >= 5)
+                    {
+                        user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                        user.AccessFailedCount = 0;
+                         _logger.LogWarning($"User {email} locked out due to too many failed attempts.");
+                    }
+                    await _db.SaveChangesAsync();
+                    
                     return Redirect("/Auth/Login?error=invalid_credentials");
                 }
 
-                // Generate JWT tokens
-                var (accessToken, refreshToken) = await _jwtService.IssueAsync(user);
+                // Reset Lockout on success
+                if (user.AccessFailedCount > 0)
+                {
+                    user.AccessFailedCount = 0;
+                }
+                user.LastLogin = DateTime.UtcNow;
+                
+                // Track Session
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                var session = await _sessionService.CreateSessionAsync(user.Id, userAgent, ipAddress);
 
-                // Log successful login
-                _logger.LogInformation($"User {email} logged in successfully");
+                // Issue Tokens
+                var (accessToken, refreshToken) = await _jwtService.IssueAsync(user, session.Id);
+                
+                // Save DB changes (LastLogin, etc)
+                await _db.SaveChangesAsync();
 
-                // Set AccessToken cookie
+                _logger.LogInformation($"User {email} logged in successfully via Page Model");
+
+                // Set Cookie
                 Response.Cookies.Append("AccessToken", accessToken, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddMinutes(60)
+                    Expires = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddMinutes(60)
                 });
 
-                // Redirect based on role and onboarding status
-                var baseUrl = user.OnboardingCompleted ? "/home" : "/Onboarding/Welcome";
+                // [MultiAccount] Track Session
+                _multiAccountService.AddSessionToCookie(session.Id);
 
+                // Redirect
+                var baseUrl = user.OnboardingCompleted ? "/home" : "/Onboarding/Welcome";
                 if (user.Role == "Admin")
                 {
                     baseUrl = "/Admin/Dashboard";
                 }
+                
+                // We pass tokens in URL for client-side storage if needed, though Cookie is primary
                 var redirectUrl = $"{baseUrl}?accessToken={Uri.EscapeDataString(accessToken)}&refreshToken={Uri.EscapeDataString(refreshToken)}";
                 return Redirect(redirectUrl);
             }
@@ -90,30 +126,15 @@ namespace MoneyTrackerApp.Pages.Auth
             }
         }
 
-        /// <summary>
-        /// Verify password using PBKDF2
-        /// </summary>
         private bool VerifyPassword(string password, string hash)
         {
             if (string.IsNullOrEmpty(hash)) return false;
-
-            try
+            try 
             {
-                // Extract salt and hash from stored value (format: salt$hash)
-                var parts = hash.Split('$');
-                if (parts.Length != 2) return false;
-
-                var saltBytes = Convert.FromBase64String(parts[0]);
-                var hashBytes = Convert.FromBase64String(parts[1]);
-
-                // Compute hash of input password
-                using (var pbkdf2 = new Rfc2898DeriveBytes(password, saltBytes, 10000, System.Security.Cryptography.HashAlgorithmName.SHA256))
-                {
-                    var computedHash = pbkdf2.GetBytes(32);
-                    return computedHash.SequenceEqual(hashBytes);
-                }
+                // Use BCrypt to match AuthController
+                return BCrypt.Net.BCrypt.Verify(password, hash);
             }
-            catch
+            catch 
             {
                 return false;
             }

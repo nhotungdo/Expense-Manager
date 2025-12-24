@@ -1277,3 +1277,48 @@ GO
 CREATE INDEX [IX_Friendships_RequesterId_Status] ON [Friendships] ([RequesterId], [Status]);
 CREATE INDEX [IX_Friendships_ReceiverId_Status] ON [Friendships] ([ReceiverId], [Status]);
 
+
+-- =============================================
+-- 31. USER SESSIONS TABLE
+-- =============================================
+CREATE TABLE [UserSessions] (
+    [Id] uniqueidentifier NOT NULL DEFAULT NEWID(),
+    [UserId] bigint NOT NULL,
+    [DeviceName] nvarchar(256) NULL,
+    [DeviceType] nvarchar(100) NULL,
+    [OperatingSystem] nvarchar(100) NULL,
+    [Browser] nvarchar(100) NULL,
+    [IpAddress] nvarchar(45) NULL,
+    [Location] nvarchar(256) NULL,
+    [RefreshToken] nvarchar(512) NULL,
+    [RefreshTokenExpiryTime] datetime2 NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [LastActiveAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [IsActive] bit NOT NULL DEFAULT 1,
+    CONSTRAINT [PK_UserSessions] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_UserSessions_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_UserSessions_UserId] ON [UserSessions] ([UserId]);
+CREATE INDEX [IX_UserSessions_RefreshToken] ON [UserSessions] ([RefreshToken]);
+GO
+
+-- =============================================
+-- 32. USER OTPS TABLE
+-- =============================================
+CREATE TABLE [UserOtps] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [UserId] bigint NOT NULL,
+    [OtpCode] nvarchar(20) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [ExpiresAt] datetime2 NOT NULL,
+    [IsUsed] bit NOT NULL DEFAULT 0,
+    CONSTRAINT [PK_UserOtps] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_UserOtps_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_UserOtps_UserId] ON [UserOtps] ([UserId]);
+GO
+
