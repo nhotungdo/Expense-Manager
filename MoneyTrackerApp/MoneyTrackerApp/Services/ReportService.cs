@@ -207,7 +207,7 @@ public class ReportService : IReportService
         // Get current balance
         var accounts = await _context.Accounts
             .AsNoTracking()
-            .Where(a => a.UserId == userId && a.IsActive)
+            .Where(a => a.UserId == userId)
             .ToListAsync();
         var currentBalance = accounts.Sum(a => a.CurrentBalance);
 

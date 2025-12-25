@@ -42,6 +42,10 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IFriendshipService, MoneyTra
 builder.Services.AddScoped<MoneyTrackerApp.Services.IReportService, MoneyTrackerApp.Services.ReportService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTrackerApp.Services.ExportService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IFinancialAnalysisService, MoneyTrackerApp.Services.FinancialAnalysisService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IAutomationService, MoneyTrackerApp.Services.AutomationService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IChallengeService, MoneyTrackerApp.Services.ChallengeService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IAssetService, MoneyTrackerApp.Services.AssetService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IShoppingService, MoneyTrackerApp.Services.ShoppingService>();
 
 // Register System Utility Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();
@@ -74,11 +78,12 @@ builder.Services.AddDataProtection();
 builder.Services.AddScoped<MoneyTrackerApp.Services.VnPayService>();
 
 // Register Communication Services
-builder.Services.Configure<MoneyTrackerApp.Configuration.EmailSettings>(builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<MoneyTrackerApp.Configuration.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<MoneyTrackerApp.Services.IEmailService, MoneyTrackerApp.Services.EmailService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IOtpService, MoneyTrackerApp.Services.OtpService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IChatService, MoneyTrackerApp.Services.ChatService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IFileUploadService, MoneyTrackerApp.Services.FileUploadService>();
+builder.Services.AddHostedService<MoneyTrackerApp.Services.Background.EmailBackgroundService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");

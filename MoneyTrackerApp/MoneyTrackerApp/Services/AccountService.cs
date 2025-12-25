@@ -27,10 +27,12 @@ public interface IAccountService
 public class AccountService : IAccountService
 {
     private readonly ExpenseManagerContext _context;
+    private readonly ISubscriptionService _subscriptionService;
 
-    public AccountService(ExpenseManagerContext context)
+    public AccountService(ExpenseManagerContext context, ISubscriptionService subscriptionService)
     {
         _context = context;
+        _subscriptionService = subscriptionService;
     }
 
     public async Task<AccountResponseDto?> GetAccountByIdAsync(long accountId, long userId)
@@ -86,9 +88,31 @@ public class AccountService : IAccountService
 
     /// <summary>
     /// Create a new account/wallet
+    /// Enforces wallet limits: Free accounts (max 3), Pro accounts (unlimited)
     /// </summary>
     public async Task<AccountResponseDto> CreateAccountAsync(long userId, CreateAccountDto dto)
     {
+        // Get current wallet count
+        var currentCount = await _context.Accounts.CountAsync(a => a.UserId == userId);
+        
+        // Check subscription and enforce wallet limit
+        var subscription = await _subscriptionService.GetActiveSubscriptionAsync(userId);
+        
+        // Determine if user has Pro account (unlimited wallets)
+        bool isPro = subscription != null && subscription.PackageId != 1; // PackageId 1 is Free
+        
+        if (!isPro)
+        {
+            // Free account: maximum 3 wallets
+            const int FREE_MAX_WALLETS = 3;
+            
+            if (currentCount >= FREE_MAX_WALLETS)
+            {
+                throw new InvalidOperationException($"Bạn đã đạt giới hạn {FREE_MAX_WALLETS} ví cho tài khoản miễn phí. Vui lòng nâng cấp lên gói Pro để tạo không giới hạn ví.");
+            }
+        }
+        // Pro accounts have unlimited wallets - no check needed
+
         var account = new Account
         {
             UserId = userId,

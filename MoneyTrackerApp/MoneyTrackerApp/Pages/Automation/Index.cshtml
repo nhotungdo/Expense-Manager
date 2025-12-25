@@ -1,0 +1,125 @@
+@page
+@model MoneyTrackerApp.Pages.Automation.IndexModel
+@using System.Text.Json
+@using MoneyTrackerApp.DTOs
+@{
+    ViewData["Title"] = "Tự động hóa";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Tự động hóa</h1>
+            <p class="text-slate-500 mt-1">Quản lý các quy tắc tự động để tiết kiệm thời gian.</p>
+        </div>
+        <a asp-page="Create" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5">
+            <i class="fas fa-plus me-2"></i>Thêm Quy tắc
+        </a>
+    </div>
+
+    @if (!Model.Rules.Any())
+    {
+        <!-- Empty State -->
+        <div class="text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+            <div class="w-24 h-24 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-robot text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Chưa có quy tắc nào</h3>
+            <p class="text-slate-500 max-w-md mx-auto mb-8">Tạo quy tắc tự động để hệ thống giúp bạn quản lý tài chính thông minh hơn.</p>
+            <a asp-page="Create" class="inline-flex items-center px-6 py-3 rounded-xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors">
+                Bắt đầu ngay
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Rules Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var rule in Model.Rules)
+            {
+                var triggerName = rule.TriggerType switch
+                {
+                    "TransactionCreated" => "Giao dịch mới",
+                    _ => rule.TriggerType
+                };
+
+                var actionLimit = 50;
+                var actionName = rule.ActionType switch 
+                {
+                    "Notify" => "Gửi thông báo",
+                    "Transfer" => "Chuyển tiền",
+                    _ => rule.ActionType
+                };
+
+                <div class="group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all hover:border-blue-100 relative">
+                    <!-- Status Indicator -->
+                    <div class="absolute top-6 right-6">
+                        <form method="post" asp-page-handler="Toggle" asp-route-id="@rule.Id">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" onchange="this.form.submit()" @(rule.IsActive ? "checked" : "")>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </form>
+                    </div>
+
+                    <!-- Header -->
+                    <div class="pr-12 mb-6">
+                        <h3 class="font-bold text-lg text-slate-900 line-clamp-1 mb-1" title="@rule.Name">@rule.Name</h3>
+                        <p class="text-xs text-slate-400">Tạo ngày @rule.CreatedAt.ToString("dd/MM/yyyy")</p>
+                    </div>
+
+                    <!-- Visual Flow -->
+                    <div class="flex flex-col gap-3 mb-6 relative">
+                        <!-- Connecting Line -->
+                        <div class="absolute left-6 top-8 bottom-8 w-0.5 bg-slate-100 -z-10"></div>
+
+                        <!-- Trigger -->
+                        <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Khi</p>
+                                <p class="text-sm font-semibold text-slate-700">@triggerName</p>
+                            </div>
+                        </div>
+
+                        <!-- Action -->
+                        <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="w-10 h-10 rounded-full @(rule.ActionType == "Transfer" ? "bg-amber-100 text-amber-600" : "bg-green-100 text-green-600") flex items-center justify-center shrink-0">
+                                <i class="fas @(rule.ActionType == "Transfer" ? "fa-exchange-alt" : "fa-bell")"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Thì</p>
+                                <p class="text-sm font-semibold text-slate-700">@actionName</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="pt-4 border-t border-slate-50 flex items-center justify-between">
+                        <span class="text-xs font-medium px-2.5 py-1 rounded-lg @(rule.IsActive ? "bg-green-50 text-green-600" : "bg-slate-100 text-slate-500")">
+                            @(rule.IsActive ? "Đang chạy" : "Đã tắt")
+                        </span>
+
+                        <div class="flex items-center gap-2">
+                             @if (rule.LastExecutedAt.HasValue)
+                             {
+                                <span class="text-xs text-slate-400" title="Lần chạy cuối: @rule.LastExecutedAt">
+                                    <i class="fas fa-history me-1"></i>@rule.LastExecutedAt.Value.ToString("dd/MM")
+                                </span>
+                             }
+                            
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@rule.Id" onsubmit="return confirm('Bạn có chắc chắn muốn xóa quy tắc này?');">
+                                <button class="w-8 h-8 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition-colors">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

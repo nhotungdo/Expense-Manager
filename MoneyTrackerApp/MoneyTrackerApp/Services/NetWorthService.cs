@@ -20,6 +20,9 @@ public interface INetWorthService
 public class NetWorthService : INetWorthService
 {
     private readonly ExpenseManagerContext _context;
+    // We can't easily inject AssetService here if NetWorthService is used by others? 
+    // Actually, it's fine. We will just use _context to fetch assets directly to avoid circular dependency if AssetService uses NetWorth (it won't).
+    // Or just query tables directly.
 
     public NetWorthService(ExpenseManagerContext context)
     {
@@ -31,13 +34,9 @@ public class NetWorthService : INetWorthService
     /// </summary>
     public async Task<NetWorthDto> CalculateNetWorthAsync(long userId, bool includeHidden = false)
     {
-        var query = _context.Accounts
-            .Where(a => a.UserId == userId);
+        var query = _context.Accounts.Where(a => a.UserId == userId);
 
-        if (!includeHidden)
-        {
-            query = query.Where(a => a.IsActive);
-        }
+
 
         var accounts = await query.ToListAsync();
 
@@ -55,6 +54,13 @@ public class NetWorthService : INetWorthService
                 totalDebt += Math.Abs(account.CurrentBalance);
             }
         }
+
+        // Add Physical Assets
+        var physicalAssetsValue = await _context.Assets
+            .Where(a => a.UserId == userId)
+            .SumAsync(a => a.CurrentValue);
+        
+        totalAssets += physicalAssetsValue;
 
         var netWorth = totalAssets - totalDebt;
 
@@ -87,7 +93,6 @@ public class NetWorthService : INetWorthService
         var totalAssets = await _context.Accounts
             .Where(a => a.UserId == userId
 
-                && a.IsActive
                 && a.CurrentBalance >= 0)
             .SumAsync(a => a.CurrentBalance);
 
@@ -102,7 +107,6 @@ public class NetWorthService : INetWorthService
         var accounts = await _context.Accounts
             .Where(a => a.UserId == userId
 
-                && a.IsActive
                 && a.CurrentBalance < 0)
             .ToListAsync();
 
@@ -115,9 +119,7 @@ public class NetWorthService : INetWorthService
     public async Task<Dictionary<string, decimal>> GetNetWorthByCurrencyAsync(long userId)
     {
         var accounts = await _context.Accounts
-            .Where(a => a.UserId == userId
-
-                && a.IsActive)
+            .Where(a => a.UserId == userId)
             .ToListAsync();
 
         return accounts
@@ -131,9 +133,7 @@ public class NetWorthService : INetWorthService
     public async Task<List<NetWorthByTypeDto>> GetNetWorthByTypeAsync(long userId)
     {
         var accounts = await _context.Accounts
-            .Where(a => a.UserId == userId
-
-                && a.IsActive)
+            .Where(a => a.UserId == userId)
             .ToListAsync();
 
         var groupedByType = accounts

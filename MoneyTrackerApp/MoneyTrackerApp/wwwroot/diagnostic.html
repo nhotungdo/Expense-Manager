@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Diagnostic Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .feature-list li.disabled::before {
+            content: "✗";
+            color: #dc3545;
+        }
+
+        .json-output {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .issue-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+        }
+
+        .sql-script {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            margin: 10px 0;
+        }
+
+        .sql-script pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Subscription Diagnostic Tool</h1>
+            <p>Check and fix your professional package subscription issues</p>
+        </div>
+
+        <div class="card">
+            <h2>Quick Actions</h2>
+            <button class="btn" onclick="checkSubscription()">Check My Subscription</button>
+            <button class="btn" onclick="showSQLFix()">Show SQL Fix Script</button>
+            <button class="btn copy-btn" onclick="copyFixScript()">Copy Fix Script</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function checkSubscription() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="card"><div class="loading"><div class="spinner"></div><p>Checking subscription...</p></div></div>';
+
+            try {
+                const response = await fetch('/api/Diagnostic/check-subscription', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    resultsDiv.innerHTML = `
+                        <div class="card">
+                            <div class="status error">
+                                <strong>Error:</strong> ${data.message || 'Failed to check subscription'}
+                            </div>
+                            <p>Please make sure you are logged in.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                displayResults(data);
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <div class="status error">
+                            <strong>Error:</strong> ${error.message}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+
+            let html = '';
+
+            // User Info
+            html += `
+                <div class="card">
+                    <h2>👤 User Information</h2>
+                    <p><strong>Email:</strong> ${data.user.email}</p>
+                    <p><strong>Name:</strong> ${data.user.fullName || 'N/A'}</p>
+                    <p><strong>User ID:</strong> ${data.user.id}</p>
+                </div>
+            `;
+
+            // Diagnosis Summary
+            html += `
+                <div class="card">
+                    <h2>📊 Diagnosis Summary</h2>
+                    <div class="grid">
+                        <div class="stat-card">
+                            <h3>${data.diagnosis.hasActiveSubscription ? '✓' : '✗'}</h3>
+                            <p>Active Subscription</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>${data.diagnosis.packageName}</h3>
+                            <p>Package</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>${data.diagnosis.possibleIssues.length}</h3>
+                            <p>Issues Found</p>
+                        </div>
+                    </div>
+            `;
+
+            // Issues
+            if (data.diagnosis.possibleIssues.length > 0) {
+                html += `
+                    <div class="status warning">
+                        <strong>⚠️ Issues Detected</strong>
+                    </div>
+                    <div style="margin-top: 15px;">
+                `;
+                data.diagnosis.possibleIssues.forEach(issue => {
+                    html += `<div class="issue-item">• ${issue}</div>`;
+                });
+                html += `</div>`;
+            } else {
+                html += `
+                    <div class="status success">
+                        <strong>✓ No Issues Found</strong> - Your subscription is properly configured!
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+
+            // Active Subscription Details
+            if (data.activeSubscription) {
+                const sub = data.activeSubscription;
+                html += `
+                    <div class="card">
+                        <h2>📦 Active Subscription</h2>
+                        <p><strong>Package:</strong> ${sub.packageName}</p>
+                        <p><strong>Status:</strong> <span class="status ${sub.statusName === 'Active' ? 'success' : 'error'}">${sub.statusName}</span></p>
+                        <p><strong>Start Date:</strong> ${new Date(sub.startDate).toLocaleString()}</p>
+                        <p><strong>End Date:</strong> ${new Date(sub.endDate).toLocaleString()}</p>
+                        <p><strong>Days Remaining:</strong> ${sub.daysRemaining}</p>
+                        
+                        <h3 style="margin-top: 20px;">Features Status</h3>
+                        <ul class="feature-list">
+                            <li class="${sub.features.hasAdvancedReports ? '' : 'disabled'}">
+                                Advanced Reports: ${sub.features.hasAdvancedReports ? 'Enabled' : 'Disabled'}
+                            </li>
+                            <li class="${sub.features.hasAiAdvisor ? '' : 'disabled'}">
+                                AI Advisor: ${sub.features.hasAiAdvisor ? 'Enabled' : 'Disabled'}
+                            </li>
+                            <li class="${sub.features.hasGroupExpense ? '' : 'disabled'}">
+                                Group Expense: ${sub.features.hasGroupExpense ? 'Enabled' : 'Disabled'}
+                            </li>
+                            <li>
+                                Max Accounts: ${sub.features.maxAccounts}
+                            </li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // All Packages
+            if (data.allPackages && data.allPackages.length > 0) {
+                html += `
+                    <div class="card">
+                        <h2>📋 Available Packages</h2>
+                        <div class="json-output">${JSON.stringify(data.allPackages, null, 2)}</div>
+                    </div>
+                `;
+            }
+
+            // Raw Data
+            html += `
+                <div class="card">
+                    <h2>🔍 Raw Diagnostic Data</h2>
+                    <div class="json-output">${JSON.stringify(data, null, 2)}</div>
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function showSQLFix() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="card">
+                    <h2>🛠️ SQL Fix Script</h2>
+                    <p>Run this script in SQL Server Management Studio or Azure Data Studio to fix your package features:</p>
+                    <div class="sql-script">
+                        <pre id="sqlScript">${getFixScript()}</pre>
+                    </div>
+                    <button class="btn copy-btn" onclick="copyFixScript()">Copy Script</button>
+                    <div class="status info" style="margin-top: 15px;">
+                        <strong>Instructions:</strong>
+                        <ol style="margin-left: 20px; margin-top: 10px;">
+                            <li>Copy the SQL script above</li>
+                            <li>Open SQL Server Management Studio or Azure Data Studio</li>
+                            <li>Connect to your database: <code>NHOTUNG\\SQLEXPRESS</code></li>
+                            <li>Select database: <code>ExpenseManager</code></li>
+                            <li>Paste and execute the script</li>
+                            <li>Refresh your application</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getFixScript() {
+            return `-- Fix Professional Package Features
+-- Run this in SQL Server Management Studio
+
+-- Update Professional package to enable all features
+UPDATE ServicePackages
+SET 
+    HasAdvancedReports = 1,
+    HasAiAdvisor = 1,
+    HasGroupExpense = 1,
+    HasPrioritySupport = 1,
+    MaxAccounts = 10,
+    MaxBudgets = 50,
+    MaxTransactions = -1,
+    UpdatedAt = GETUTCDATE()
+WHERE PackageType = 1 OR Name LIKE '%Pro%';
+
+-- Verify the update
+SELECT 
+    Id, Name, PackageType,
+    HasAdvancedReports, HasAiAdvisor, HasGroupExpense, HasPrioritySupport,
+    MaxAccounts, MaxBudgets, MaxTransactions,
+    UpdatedAt
+FROM ServicePackages
+WHERE PackageType = 1 OR Name LIKE '%Pro%';`;
+        }
+
+        function copyFixScript() {
+            const script = getFixScript();
+            navigator.clipboard.writeText(script).then(() => {
+                alert('SQL script copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy script. Please copy manually.');
+            });
+        }
+
+        // Auto-check on load if user is logged in
+        window.addEventListener('load', () => {
+            // Uncomment to auto-check on page load
+            // checkSubscription();
+        });
+    </script>
+</body>
+
+</html>

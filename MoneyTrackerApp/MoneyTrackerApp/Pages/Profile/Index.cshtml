@@ -30,6 +30,9 @@
                     <a href="#sessions" class="list-group-item list-group-item-action" data-bs-toggle="list">
                         <i class="bi bi-laptop me-2">💻</i> Phiên hoạt động
                     </a>
+                    <a href="#subscription" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-crown me-2">👑</i> Gói dịch vụ
+                    </a>
                 </div>
             </div>
         </div>
@@ -151,6 +154,92 @@
                         <div class="card-body p-0">
                             <div class="list-group list-group-flush" id="sessionsList">
                                 <div class="text-center p-4">Đang tải phiên...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subscription Tab -->
+                <div class="tab-pane fade" id="subscription">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">Gói dịch vụ hiện tại</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="subscriptionLoading" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3 text-muted">Đang tải thông tin gói dịch vụ...</p>
+                            </div>
+                            
+                            <div id="subscriptionContent" class="d-none">
+                                <!-- Active Subscription -->
+                                <div id="activeSubscription" class="d-none">
+                                    <div class="row align-items-center mb-4">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="subscription-icon">
+                                                    <i class="fas fa-crown" style="font-size: 2.5rem; color: #f59e0b;"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="mb-1" id="packageName">-</h3>
+                                                    <p class="text-muted mb-0" id="packageDescription">-</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-md-end">
+                                            <div class="badge bg-success px-3 py-2 fs-6" id="subscriptionStatus">Đang hoạt động</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-md-4">
+                                            <div class="p-3 bg-light rounded">
+                                                <small class="text-muted d-block mb-1">Giá gói</small>
+                                                <h5 class="mb-0" id="packagePrice">-</h5>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="p-3 bg-light rounded">
+                                                <small class="text-muted d-block mb-1">Ngày bắt đầu</small>
+                                                <h6 class="mb-0" id="startDate">-</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="p-3 bg-light rounded">
+                                                <small class="text-muted d-block mb-1">Ngày hết hạn</small>
+                                                <h6 class="mb-0" id="endDate">-</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <h6 class="mb-3">Tính năng của gói</h6>
+                                        <div class="row g-2" id="packageFeatures">
+                                            <!-- Features will be loaded here -->
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <a href="/ServicePackages" class="btn btn-primary">
+                                            <i class="fas fa-arrow-up"></i> Nâng cấp gói
+                                        </a>
+                                        <button class="btn btn-outline-danger" onclick="cancelSubscription()">
+                                            <i class="fas fa-times"></i> Hủy gói
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- No Subscription -->
+                                <div id="noSubscription" class="d-none text-center py-5">
+                                    <i class="fas fa-box-open" style="font-size: 4rem; color: #cbd5e1;"></i>
+                                    <h4 class="mt-3 mb-2">Chưa có gói dịch vụ</h4>
+                                    <p class="text-muted mb-4">Bạn đang sử dụng gói miễn phí với tính năng cơ bản</p>
+                                    <a href="/ServicePackages" class="btn btn-primary">
+                                        <i class="fas fa-crown"></i> Nâng cấp ngay
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -435,7 +524,123 @@
             }
         }
 
-        // Toast Helper
+        // Load Subscription Info
+        async function loadSubscription() {
+            const loadingEl = document.getElementById('subscriptionLoading');
+            const contentEl = document.getElementById('subscriptionContent');
+            const activeEl = document.getElementById('activeSubscription');
+            const noSubEl = document.getElementById('noSubscription');
+
+            try {
+                const response = await fetch('/api/Subscription/my-subscription');
+                
+                loadingEl.classList.add('d-none');
+                contentEl.classList.remove('d-none');
+
+                if (response.status === 404 || !response.ok) {
+                    // No active subscription
+                    noSubEl.classList.remove('d-none');
+                    activeEl.classList.add('d-none');
+                    return;
+                }
+
+                const subscription = await response.json();
+                
+                // Show active subscription
+                activeEl.classList.remove('d-none');
+                noSubEl.classList.add('d-none');
+
+                // Populate subscription details
+                document.getElementById('packageName').textContent = subscription.packageName || '-';
+                document.getElementById('packageDescription').textContent = subscription.packageDescription || 'Gói dịch vụ cao cấp';
+                
+                // Format price
+                const price = subscription.price || 0;
+                document.getElementById('packagePrice').textContent = price === 0 ? 'Miễn phí' : `${price.toLocaleString('vi-VN')} ₫`;
+                
+                // Format dates
+                if (subscription.startDate) {
+                    document.getElementById('startDate').textContent = new Date(subscription.startDate).toLocaleDateString('vi-VN');
+                }
+                if (subscription.endDate) {
+                    document.getElementById('endDate').textContent = new Date(subscription.endDate).toLocaleDateString('vi-VN');
+                }
+
+                // Update status badge
+                const statusBadge = document.getElementById('subscriptionStatus');
+                if (subscription.status === 'Active') {
+                    statusBadge.className = 'badge bg-success px-3 py-2 fs-6';
+                    statusBadge.textContent = 'Đang hoạt động';
+                } else if (subscription.status === 'Expired') {
+                    statusBadge.className = 'badge bg-danger px-3 py-2 fs-6';
+                    statusBadge.textContent = 'Đã hết hạn';
+                } else if (subscription.status === 'Cancelled') {
+                    statusBadge.className = 'badge bg-secondary px-3 py-2 fs-6';
+                    statusBadge.textContent = 'Đã hủy';
+                }
+
+                // Render features
+                const featuresContainer = document.getElementById('packageFeatures');
+                featuresContainer.innerHTML = '';
+                
+                const features = [
+                    { icon: 'fa-wallet', text: `Tối đa ${subscription.maxWallets || 'Không giới hạn'} ví`, enabled: true },
+                    { icon: 'fa-exchange-alt', text: `${subscription.maxTransactions || 'Không giới hạn'} giao dịch`, enabled: true },
+                    { icon: 'fa-chart-line', text: 'Báo cáo nâng cao', enabled: subscription.hasAdvancedReports },
+                    { icon: 'fa-robot', text: 'Tư vấn AI', enabled: subscription.hasAiAdvisor },
+                    { icon: 'fa-users', text: 'Chi tiêu nhóm', enabled: subscription.hasGroupExpense },
+                    { icon: 'fa-headset', text: 'Hỗ trợ ưu tiên', enabled: subscription.hasPrioritySupport }
+                ];
+
+                features.forEach(feature => {
+                    if (feature.enabled) {
+                        const featureEl = document.createElement('div');
+                        featureEl.className = 'col-md-6';
+                        featureEl.innerHTML = `
+                            <div class="d-flex align-items-center gap-2 p-2 bg-light rounded">
+                                <i class="fas ${feature.icon} text-success"></i>
+                                <span class="small">${feature.text}</span>
+                            </div>
+                        `;
+                        featuresContainer.appendChild(featureEl);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading subscription:', error);
+                loadingEl.classList.add('d-none');
+                contentEl.classList.remove('d-none');
+                noSubEl.classList.remove('d-none');
+                activeEl.classList.add('d-none');
+            }
+        }
+
+        // Cancel Subscription
+        async function cancelSubscription() {
+            const reason = prompt('Vui lòng cho biết lý do hủy gói (tùy chọn):');
+            if (reason === null) return; // User cancelled
+
+            if (!confirm('Bạn có chắc chắn muốn hủy gói dịch vụ hiện tại không?')) return;
+
+            try {
+                const response = await fetch('/api/Subscription/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: reason || 'Không có lý do' })
+                });
+
+                if (response.ok) {
+                    showToast('Đã hủy gói dịch vụ thành công.', 'success');
+                    loadSubscription(); // Reload subscription info
+                } else {
+                    const data = await response.json();
+                    showToast(data.message || 'Không thể hủy gói dịch vụ.', 'danger');
+                }
+            } catch (error) {
+                showToast('Lỗi khi hủy gói dịch vụ.', 'danger');
+            }
+        }
+
         function showToast(message, type = 'info') {
             const toastEl = document.getElementById('liveToast');
             const toastBody = document.getElementById('toastMessage');
@@ -450,6 +655,7 @@
             loadProfile();
             load2FAStatus();
             loadSessions();
+            loadSubscription();
         });
     </script>
 }

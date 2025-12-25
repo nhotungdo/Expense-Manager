@@ -1,100 +1,144 @@
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MoneyTrackerApp.DTOs;
+using Microsoft.EntityFrameworkCore;
+using MoneyTrackerApp.Models;
 using MoneyTrackerApp.Services;
+using MoneyTrackerApp.DTOs;
+
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace MoneyTrackerApp.Pages.Wallets;
-
-[Authorize]
-public class IndexModel : PageModel
+namespace MoneyTrackerApp.Pages.Wallets
 {
-    private readonly IAccountService _accountService;
-    private readonly ITransactionService _transactionService;
-    private readonly ISubscriptionService _subscriptionService;
-    private readonly ILogger<IndexModel> _logger;
-
-    public IndexModel(
-        IAccountService accountService, 
-        ITransactionService transactionService,
-        ISubscriptionService subscriptionService,
-        ILogger<IndexModel> logger)
+    public class WalletIndexModel : PageModel
     {
-        _accountService = accountService;
-        _transactionService = transactionService;
-        _subscriptionService = subscriptionService;
-        _logger = logger;
-    }
+        private readonly ExpenseManagerContext _context;
+        private readonly ISubscriptionService _subscriptionService;
+        private readonly ISessionService _sessionService;
+        private readonly IAccountService _accountService;
 
-    public List<AccountResponseDto> Wallets { get; set; } = new();
-    public List<TransactionResponseDto> RecentTransactions { get; set; } = new();
-    public SubscriptionDto? CurrentSubscription { get; set; }
-    public decimal TotalBalance { get; set; }
-    public string DefaultCurrency { get; set; } = "VND";
-    public long SelectedWalletId { get; set; }
-
-    public async Task OnGetAsync()
-    {
-        var userId = GetUserId();
-        if (userId > 0)
+        public WalletIndexModel(
+            ExpenseManagerContext context,
+            ISubscriptionService subscriptionService,
+            ISessionService sessionService,
+            IAccountService accountService)
         {
-            Wallets = await _accountService.GetUserAccountsAsync(userId);
-            try 
+            _context = context;
+            _subscriptionService = subscriptionService;
+            _sessionService = sessionService;
+            _accountService = accountService;
+        }
+
+        public IList<Account> Wallets { get; set; } = new List<Account>();
+        public int MaxWallets { get; set; } = 3; // Default for Free
+        public int CurrentWalletCount { get; set; }
+        public bool CanCreateMore { get; set; }
+        public bool IsPro { get; set; }
+
+        [BindProperty]
+        public CreateAccountDto NewWallet { get; set; } = new CreateAccountDto { Currency = "VND", Color = "#667eea", Icon="fas fa-wallet", IncludeInTotal=true };
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user == null)
             {
-                CurrentSubscription = await _subscriptionService.GetActiveSubscriptionAsync(userId);
+                return RedirectToPage("/Auth/Login");
+            }
+
+            await LoadWalletData(user.Id);
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostCreateAsync()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user == null) return RedirectToPage("/Auth/Login");
+
+            if (!ModelState.IsValid)
+            {
+                await LoadWalletData(user.Id);
+                return Page();
+            }
+
+            try
+            {
+                await _accountService.CreateAccountAsync(user.Id, NewWallet);
+                TempData["SuccessMessage"] = "Tạo ví thành công!";
+                return RedirectToPage();
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to load subscription for user {UserId}", userId);
+                ModelState.AddModelError("", ex.Message);
+                await LoadWalletData(user.Id);
+                return Page();
             }
+        }
+
+        private async Task LoadWalletData(long userId)
+        {
+            // Get Subscription
+            var subscription = await _subscriptionService.GetActiveSubscriptionAsync(userId);
             
-            if (Wallets.Any())
+            // Determine if user has Pro account
+            // PackageId 1 is Free, anything else (2=Pro, 3=Team, etc.) is considered Pro
+            if (subscription != null && subscription.PackageId != 1)
             {
-                DefaultCurrency = Wallets.First().Currency;
-                TotalBalance = Wallets.Where(w => w.IncludeInTotal).Sum(w => w.CurrentBalance);
-                
-                // Select first wallet by default
-                SelectedWalletId = Wallets.First().Id;
-                
-                // Fetch recent transactions (global or first wallet? User request implied "Overview", let's show all latest)
-                // If specific filter needed, we can default to All or First Wallet. 
-                // "Overview Area" usually implies global.
-                RecentTransactions = await _transactionService.GetUserTransactionsAsync(userId, new TransactionFilterDto
-                {
-                    PageSize = 20,
-                    PageNumber = 1
-                });
+                // Pro account: unlimited wallets
+                IsPro = true;
+                MaxWallets = 9999; // Represent unlimited with a very high number
             }
-        }
-    }
+            else
+            {
+                // Free account: maximum 3 wallets
+                IsPro = false;
+                MaxWallets = 3;
+            }
 
-    public async Task<IActionResult> OnGetWalletTransactionsAsync(long? walletId, string? filterType, string? dateRange)
-    {
-        var userId = GetUserId();
-        if (userId <= 0) return Unauthorized();
+            // Get Wallets
+            Wallets = await _context.Accounts
+                .Where(a => a.UserId == userId && a.IsActive)
+                .Include(a => a.User)
+                .OrderByDescending(a => a.IsActive)
+                .ThenBy(a => a.Name)
+                .ToListAsync();
 
-        var filter = new TransactionFilterDto
-        {
-            AccountId = walletId == 0 ? null : walletId, 
-            PageSize = 20,
-            PageNumber = 1
-        };
-        
-        // Basic filtering mapping
-        if (!string.IsNullOrEmpty(filterType) && filterType != "All")
-        {
-             // TODO: Add TransactionType filter to DTO if needed
+            CurrentWalletCount = Wallets.Count;
+            CanCreateMore = IsPro || CurrentWalletCount < MaxWallets;
         }
 
-        var transactions = await _transactionService.GetUserTransactionsAsync(userId, filter);
+        private async Task<User?> GetCurrentUserAsync()
+        {
+            try
+            {
+                var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
+                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                {
+                    var token = HttpContext.Request.Cookies["accessToken"];
+                    if (string.IsNullOrEmpty(token)) return null;
+                    authHeader = $"Bearer {token}";
+                }
 
-        return Partial("_WalletTransactions", transactions);
-    }
+                var tokenString = authHeader.Substring("Bearer ".Length);
+                var handler = new JwtSecurityTokenHandler();
 
-    private long GetUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return long.TryParse(userIdClaim, out var userId) ? userId : 0;
+                if (handler.CanReadToken(tokenString))
+                {
+                    var token = handler.ReadJwtToken(tokenString);
+                    var userIdClaim = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                    if (userIdClaim != null && long.TryParse(userIdClaim.Value, out var userId))
+                    {
+                        return await _context.Users.FindAsync(userId);
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
     }
 }

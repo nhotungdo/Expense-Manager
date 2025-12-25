@@ -33,17 +33,23 @@ public class TransactionService : ITransactionService
     private readonly IBudgetService _budgetService;
     private readonly ISharedAccountService _sharedAccountService;
     private readonly IHubContext<WalletHub> _hubContext;
+    private readonly IAutomationService _automationService;
+    private readonly IChallengeService _challengeService;
 
     public TransactionService(
         ExpenseManagerContext context, 
         IBudgetService budgetService, 
         ISharedAccountService sharedAccountService,
-        IHubContext<WalletHub> hubContext)
+        IHubContext<WalletHub> hubContext,
+        IAutomationService automationService,
+        IChallengeService challengeService)
     {
         _context = context;
         _budgetService = budgetService;
         _sharedAccountService = sharedAccountService;
         _hubContext = hubContext;
+        _automationService = automationService;
+        _challengeService = challengeService;
     }
 
     /// <summary>
@@ -263,6 +269,18 @@ public class TransactionService : ITransactionService
         {
             // Capture inner exception for details
             throw new Exception($"Database update failed: {dbEx.InnerException?.Message ?? dbEx.Message}", dbEx);
+        }
+
+        // Smart Automation Hook
+        try 
+        {
+            await _automationService.CheckAndExecuteRulesAsync(transaction);
+            // Update Challenges
+            await _challengeService.UpdateChallengeProgressAsync(userId, transaction);
+        }
+        catch (Exception ex)
+        {
+             Console.WriteLine($"Automation/Challenge error: {ex.Message}");
         }
 
         // Reload with includes

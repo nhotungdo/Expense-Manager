@@ -115,7 +115,11 @@ public class SubscriptionService : ISubscriptionService
             EndDate = subscription.EndDate,
             DaysRemaining = daysRemaining > 0 ? daysRemaining : 0,
             AutoRenew = subscription.AutoRenew,
-            CreatedAt = subscription.CreatedAt
+            CreatedAt = subscription.CreatedAt,
+            HasAdvancedReports = subscription.Package.HasAdvancedReports,
+            HasAiAdvisor = subscription.Package.HasAiAdvisor,
+            HasGroupExpense = subscription.Package.HasGroupExpense,
+            MaxAccounts = subscription.Package.MaxAccounts
         };
     }
 

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Alert</title>
+</head>
+
+<body
+    style="margin: 0; padding: 0; background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td style="padding: 20px 0 30px 0;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="600"
+                    style="border-collapse: collapse; border: 1px solid #e5e7eb; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" bgcolor="#DC2626" style="padding: 30px 0 25px 0;">
+                            <!-- Icon/Symbol could go here -->
+                            <h1
+                                style="color: #ffffff; margin: 0; font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                                Budget Alert</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td
+                                        style="color: #1f2937; font-size: 20px; font-weight: 600; padding-bottom: 20px;">
+                                        Hello {{UserName}},
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="color: #4b5563; font-size: 16px; line-height: 24px; padding-bottom: 30px;">
+                                        You have exceeded your budget limit for the category <strong
+                                            style="color: #DC2626;">{{CategoryName}}</strong>.
+                                    </td>
+                                </tr>
+                                <!-- Stats Box -->
+                                <tr>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%"
+                                            style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;">
+                                            <tr>
+                                                <td style="padding: 20px;">
+                                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr>
+                                                            <td
+                                                                style="padding-bottom: 10px; color: #7f1d1d; font-size: 14px; font-weight: bold;">
+                                                                BUDGET LIMIT</td>
+                                                            <td align="right"
+                                                                style="padding-bottom: 10px; color: #7f1d1d; font-size: 14px;">
+                                                                {{BudgetLimit}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding-top: 10px; border-top: 1px solid #fca5a5; color: #991b1b; font-size: 18px; font-weight: bold;">
+                                                                CURRENT SPENDING</td>
+                                                            <td align="right"
+                                                                style="padding-top: 10px; border-top: 1px solid #fca5a5; color: #DC2626; font-size: 18px; font-weight: bold;">
+                                                                {{CurrentSpending}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="padding: 30px 0 10px 0; color: #4b5563; font-size: 16px; line-height: 24px;">
+                                        Please review your expenses to stay on track.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top: 30px;">
+                                        <table border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="center" bgcolor="#DC2626" style="border-radius: 6px;">
+                                                    <a href="{{DashboardLink}}" target="_blank"
+                                                        style="display: inline-block; padding: 14px 30px; font-family: 'Segoe UI', sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">View
+                                                        Dashboard</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td bgcolor="#f8fafc" style="padding: 20px 30px 20px 30px; border-top: 1px solid #e2e8f0;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td
+                                        style="color: #94a3b8; font-family: sans-serif; font-size: 12px; text-align: center;">
+                                        This is an automated alert from Money Tracker App.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

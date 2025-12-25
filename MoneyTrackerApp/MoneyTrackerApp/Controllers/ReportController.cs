@@ -20,19 +20,22 @@ public class ReportController : ControllerBase
     private readonly ILogger<ReportController> _logger;
     private readonly IWebHostEnvironment _env;
     private readonly IMemoryCache _cache; // Caching service
+    private readonly ISubscriptionService _subscriptionService;
 
     public ReportController(
         IReportService reportService, 
         IExportService exportService, 
         ILogger<ReportController> logger, 
         IWebHostEnvironment env,
-        IMemoryCache cache)
+        IMemoryCache cache,
+        ISubscriptionService subscriptionService)
     {
         _reportService = reportService;
         _exportService = exportService;
         _logger = logger;
         _env = env;
         _cache = cache;
+        _subscriptionService = subscriptionService;
     }
 
     private long GetUserId()
@@ -302,7 +305,9 @@ public class ReportController : ControllerBase
             }
 
             // Role-based access control for advanced features
-            var isPremiumUser = User.IsInRole("Premium") || User.IsInRole("Admin");
+            var sub = await _subscriptionService.GetActiveSubscriptionAsync(userId);
+            var hasAdvancedReports = sub?.HasAdvancedReports ?? false;
+            var isPremiumUser = User.IsInRole("Admin") || hasAdvancedReports;
             
             // PDF export only for premium users
             if (request.FileFormat == 1 && !isPremiumUser)
@@ -418,12 +423,17 @@ public class ReportController : ControllerBase
     /// Get AI-powered financial analysis (Premium feature)
     /// </summary>
     [HttpGet("ai-analysis")]
-    [Authorize(Roles = "Premium,Admin")]
+    [Authorize]
     public async Task<ActionResult> GetAiAnalysis()
     {
         try
         {
             var userId = GetUserId();
+            var sub = await _subscriptionService.GetActiveSubscriptionAsync(userId);
+            if (!User.IsInRole("Admin") && !(sub?.HasAiAdvisor ?? false))
+            {
+                return Forbid("AI Analysis is only available for Premium users");
+            }
             
             // This would integrate with an AI service
             // For now, return mock data structure
@@ -458,17 +468,24 @@ public class ReportController : ControllerBase
     /// Get report access permissions for current user
     /// </summary>
     [HttpGet("permissions")]
-    public ActionResult GetReportPermissions()
+    public async Task<ActionResult> GetReportPermissions()
     {
+        var userId = GetUserId();
+        var sub = await _subscriptionService.GetActiveSubscriptionAsync(userId);
+        
+        var hasAdvanced = sub?.HasAdvancedReports ?? false;
+        var hasAi = sub?.HasAiAdvisor ?? false;
+        var isAdmin = User.IsInRole("Admin");
+
         var permissions = new
         {
-            canExportPdf = User.IsInRole("Premium") || User.IsInRole("Admin"),
+            canExportPdf = isAdmin || hasAdvanced,
             canExportExcel = true,
             canExportCsv = true,
-            canUseAdvancedFilters = User.IsInRole("Premium") || User.IsInRole("Admin"),
-            canAccessAiInsights = User.IsInRole("Premium") || User.IsInRole("Admin"),
-            maxDateRangeDays = User.IsInRole("Premium") || User.IsInRole("Admin") ? 365 : 90,
-            canScheduleReports = User.IsInRole("Premium") || User.IsInRole("Admin")
+            canUseAdvancedFilters = isAdmin || hasAdvanced,
+            canAccessAiInsights = isAdmin || hasAi,
+            maxDateRangeDays = (isAdmin || hasAdvanced) ? 365 : 90,
+            canScheduleReports = isAdmin || hasAdvanced
         };
 
         return Ok(permissions);

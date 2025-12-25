@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Mail;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MoneyTrackerApp.Configuration;
 using MoneyTrackerApp.Models;
@@ -47,7 +48,7 @@ public class EmailService : IEmailService
         };
 
         // Try to find user by email to link
-        var user = _context.Users.FirstOrDefault(u => u.Email == toEmail);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == toEmail);
         if (user != null)
         {
             emailLog.UserId = user.Id;

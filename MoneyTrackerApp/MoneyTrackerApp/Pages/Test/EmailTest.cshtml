@@ -1,0 +1,108 @@
+@page
+@model MoneyTrackerApp.Pages.Test.EmailTestModel
+@{
+    ViewData["Title"] = "Test Gửi Email";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-envelope-open-text me-2"></i>Test Chức Năng Gửi Email</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @Model.StatusMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Thông tin cấu hình SMTP hiện tại:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Host: smtp.gmail.com</li>
+                            <li>Port: 587</li>
+                            <li>Username: nhotungdo89@@gmail.com</li>
+                            <li>From Email: nhotungdo89@@gmail.com</li>
+                            <li>SSL: Enabled</li>
+                        </ul>
+                    </div>
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label asp-for="Input.ToEmail" class="form-label fw-bold"></label>
+                            <input asp-for="Input.ToEmail" class="form-control" placeholder="example@gmail.com" />
+                            <span asp-validation-for="Input.ToEmail" class="text-danger"></span>
+                            <div class="form-text">Nhập email người nhận để test</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Subject" class="form-label fw-bold"></label>
+                            <input asp-for="Input.Subject" class="form-control" />
+                            <span asp-validation-for="Input.Subject" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Body" class="form-label fw-bold"></label>
+                            <textarea asp-for="Input.Body" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Input.Body" class="text-danger"></span>
+                            <div class="form-text">Hỗ trợ HTML</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Gửi Email Test
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Lưu ý quan trọng:</h6>
+                        <ul class="mb-0">
+                            <li>Gmail App Password phải là 16 ký tự <strong>không có dấu cách</strong></li>
+                            <li>Kiểm tra trong bảng <code>Emails</code> để xem trạng thái gửi</li>
+                            <li>Nếu lỗi, kiểm tra logs trong console</li>
+                            <li>Email có thể vào thư mục Spam, hãy kiểm tra cả Spam folder</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-database me-2"></i>Kiểm tra Database</h5>
+                </div>
+                <div class="card-body">
+                    <p>Chạy query này trong SQL Server để xem email logs:</p>
+                    <pre class="bg-light p-3 rounded"><code>SELECT TOP 10 
+    Id, 
+    RecipientEmail, 
+    Subject, 
+    Status, 
+    CreatedAt, 
+    SentAt 
+FROM Emails 
+ORDER BY CreatedAt DESC;</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

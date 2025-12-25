@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Activated</title>
+</head>
+
+<body
+    style="margin: 0; padding: 0; background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td style="padding: 20px 0 30px 0;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="600"
+                    style="border-collapse: collapse; border: 1px solid #e5e7eb; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" bgcolor="#10B981" style="padding: 30px 0 25px 0;">
+                            <h1
+                                style="color: #ffffff; margin: 0; font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                                ✓ Subscription Activated</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td
+                                        style="color: #1f2937; font-size: 20px; font-weight: 600; padding-bottom: 20px;">
+                                        Xin chào {{UserName}},
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="color: #4b5563; font-size: 16px; line-height: 24px; padding-bottom: 30px;">
+                                        Cảm ơn bạn đã đăng ký gói dịch vụ <strong
+                                            style="color: #10B981;">{{PackageName}}</strong>! Gói dịch vụ của bạn đã
+                                        được kích hoạt thành công.
+                                    </td>
+                                </tr>
+                                <!-- Package Details Box -->
+                                <tr>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%"
+                                            style="background-color: #f0fdf4; border: 1px solid #d1fae5; border-radius: 8px;">
+                                            <tr>
+                                                <td style="padding: 20px;">
+                                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr>
+                                                            <td
+                                                                style="padding-bottom: 15px; color: #065f46; font-size: 18px; font-weight: bold;">
+                                                                CHI TIẾT GÓI DỊCH VỤ</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 8px 0; color: #047857; font-size: 14px;">
+                                                                <strong>Tên gói:</strong> {{PackageName}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 8px 0; color: #047857; font-size: 14px;">
+                                                                <strong>Giá:</strong> {{PackagePrice}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 8px 0; color: #047857; font-size: 14px;">
+                                                                <strong>Ngày bắt đầu:</strong> {{StartDate}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 8px 0; color: #047857; font-size: 14px;">
+                                                                <strong>Ngày hết hạn:</strong> {{EndDate}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding-top: 15px; border-top: 1px solid #a7f3d0; color: #065f46; font-size: 14px;">
+                                                                <strong>Tính năng:</strong>
+                                                                <ul style="margin: 10px 0; padding-left: 20px;">
+                                                                    {{Features}}
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="padding: 30px 0 10px 0; color: #4b5563; font-size: 16px; line-height: 24px;">
+                                        Bạn có thể bắt đầu sử dụng tất cả các tính năng của gói dịch vụ ngay bây giờ.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top: 30px;">
+                                        <table border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="center" bgcolor="#10B981" style="border-radius: 6px;">
+                                                    <a href="{{DashboardLink}}" target="_blank"
+                                                        style="display: inline-block; padding: 14px 30px; font-family: 'Segoe UI', sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">Xem
+                                                        Gói Dịch Vụ</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td bgcolor="#f8fafc" style="padding: 20px 30px 20px 30px; border-top: 1px solid #e2e8f0;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td
+                                        style="color: #94a3b8; font-family: sans-serif; font-size: 12px; text-align: center;">
+                                        Cảm ơn bạn đã sử dụng Money Tracker App.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="color: #94a3b8; font-family: sans-serif; font-size: 12px; text-align: center; padding-top: 10px;">
+                                        Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

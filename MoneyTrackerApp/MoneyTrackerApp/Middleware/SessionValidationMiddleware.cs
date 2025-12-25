@@ -28,8 +28,19 @@ namespace MoneyTrackerApp.Middleware
                          var session = await db.UserSessions.FindAsync(sessionId);
                          if (session == null || !session.IsActive)
                          {
-                             context.Response.StatusCode = 401; // Invalid session
-                             await context.Response.WriteAsync("Session revoked");
+                             // Clear the invalid cookie so the user isn't stuck in a loop
+                             context.Response.Cookies.Delete("AccessToken");
+
+                             if (context.Request.Path.StartsWithSegments("/api"))
+                             {
+                                 context.Response.StatusCode = 401;
+                                 await context.Response.WriteAsJsonAsync(new { message = "Session revoked/expired" });
+                             }
+                             else
+                             {
+                                 // Redirect to login to re-authenticate
+                                 context.Response.Redirect("/Auth/Login?reason=session_expired");
+                             }
                              return;
                          }
                          

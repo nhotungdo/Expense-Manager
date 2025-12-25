@@ -32,11 +32,13 @@
             <span class="text-sm font-medium">Giao dịch</span>
         </a>
 
-        <!-- Wallets -->
-        <a href="/Wallets/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
-            <i class="fas fa-wallet w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
-            <span class="text-sm font-medium">Ví của tôi</span>
+        <!-- My Wallet -->
+        <a href="/Wallets/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower() == "/wallets/index" ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-wallet w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower() == "/wallets/index" ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Ví cá nhân</span>
         </a>
+
+
 
         <!-- Shared Wallets -->
         <a href="/Wallets/Shared/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/wallets/shared") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
@@ -56,10 +58,40 @@
             <span class="text-sm font-medium">Ngân sách</span>
         </a>
 
+        <!-- Shopping -->
+        <a href="/Shopping/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/shopping") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-shopping-basket w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/shopping") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Mua sắm</span>
+        </a>
+
+        <!-- Assets -->
+        <a href="/Assets/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/assets") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-gem w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/assets") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Tài sản</span>
+        </a>
+
         <!-- Savings -->
         <a href="/Savings/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/savings") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
             <i class="fas fa-piggy-bank w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/savings") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
             <span class="text-sm font-medium">Sổ tiết kiệm</span>
+        </a>
+
+        <!-- Games -->
+        <a href="/Games/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/games") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-gamepad w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/games") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Trò chơi</span>
+        </a>
+
+        <!-- Analysis -->
+        <a href="/Analysis" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/analysis") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-chart-area w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/analysis") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Phân tích</span>
+        </a>
+
+        <!-- Automation -->
+        <a href="/Automation/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/automation") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
+            <i class="fas fa-robot w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/automation") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
+            <span class="text-sm font-medium">Tự động hóa</span>
         </a>
 
         <div class="my-4 px-3">

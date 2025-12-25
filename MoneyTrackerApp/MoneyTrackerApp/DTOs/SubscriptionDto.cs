@@ -18,6 +18,10 @@ public class SubscriptionDto
     public int DaysRemaining { get; set; }
     public bool AutoRenew { get; set; }
     public DateTime? CreatedAt { get; set; }
+    public bool HasAdvancedReports { get; set; }
+    public bool HasAiAdvisor { get; set; }
+    public bool HasGroupExpense { get; set; }
+    public int MaxAccounts { get; set; }
 }
 
 /// <summary>

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "kvi2vlfTHRx3qvY94DsyGwsY//ltByfg7RSkHccA+C0=",
+  "Hash": "07mk4Wf3j5ecMpzQjtTTHxX7zuVUBJ4nwrcu1VIYacw=",
   "Source": "MoneyTrackerApp",
   "BasePath": "_content/MoneyTrackerApp",
   "Mode": "Default",
@@ -853,12 +853,12 @@
       "OriginalItemSpec": "wwwroot\\css\\wallet-detail-modern.css"
     },
     {
-      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallet-modern.css",
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallet-index-modern.css",
       "SourceId": "MoneyTrackerApp",
       "SourceType": "Discovered",
       "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
       "BasePath": "_content/MoneyTrackerApp",
-      "RelativePath": "css/wallet-modern.css",
+      "RelativePath": "css/wallet-index-modern.css",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -869,26 +869,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\css\\wallet-modern.css"
-    },
-    {
-      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallet-page.css",
-      "SourceId": "MoneyTrackerApp",
-      "SourceType": "Discovered",
-      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
-      "BasePath": "_content/MoneyTrackerApp",
-      "RelativePath": "css/wallet-page.css",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\css\\wallet-page.css"
+      "OriginalItemSpec": "wwwroot\\css\\wallet-index-modern.css"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\css\\wallets.css",
@@ -908,6 +889,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\wallets.css"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\diagnostic.html",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "diagnostic.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\diagnostic.html"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\docs\\requirement_update.md",
@@ -1573,25 +1573,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\wallet-detail.js"
-    },
-    {
-      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\js\\wallet-page.js",
-      "SourceId": "MoneyTrackerApp",
-      "SourceType": "Discovered",
-      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
-      "BasePath": "_content/MoneyTrackerApp",
-      "RelativePath": "js/wallet-page.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\js\\wallet-page.js"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",
@@ -3000,6 +2981,25 @@
       "OriginalItemSpec": "wwwroot\\uploads\\images\\2\\fc9190f7-7372-461d-bbc3-82d8dc50ea2c.jpg"
     },
     {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\1_5627d9ac-c612-4fe8-af92-80881048fbc8.png",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "uploads/profiles/1_5627d9ac-c612-4fe8-af92-80881048fbc8.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\profiles\\1_5627d9ac-c612-4fe8-af92-80881048fbc8.png"
+    },
+    {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\1_7fae67f3-0c15-470d-bdff-b3605193bb49.png",
       "SourceId": "MoneyTrackerApp",
       "SourceType": "Discovered",
@@ -3074,6 +3074,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\profiles\\2_4ac3ee7b-2d97-4ccd-bcfe-4a2ce14a833b.jpg"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\2_684070a1-c842-4e1c-991f-1d0961e163b4.jpg",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "uploads/profiles/2_684070a1-c842-4e1c-991f-1d0961e163b4.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\profiles\\2_684070a1-c842-4e1c-991f-1d0961e163b4.jpg"
     },
     {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\2_95efa665-820e-4e57-8796-b52f96d5cf42.jpg",
@@ -3171,6 +3190,25 @@
       "OriginalItemSpec": "wwwroot\\uploads\\profiles\\3_6f4c8657-4668-4c5e-907f-2f4dc07c56c1.jpg"
     },
     {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\3_9dc5e9fb-9227-4912-84a7-19a4b5b04249.jpg",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "uploads/profiles/3_9dc5e9fb-9227-4912-84a7-19a4b5b04249.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\profiles\\3_9dc5e9fb-9227-4912-84a7-19a4b5b04249.jpg"
+    },
+    {
       "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\3_cd28daf2-a87f-4bde-b2d6-380847dee819.png",
       "SourceId": "MoneyTrackerApp",
       "SourceType": "Discovered",
@@ -3207,6 +3245,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\profiles\\4_2757e65e-f20d-42bf-8009-d1e1dde9592f.png"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\uploads\\profiles\\5_d326bdc8-58fa-4c99-a8f7-cb2cf0734b0f.png",
+      "SourceId": "MoneyTrackerApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\wwwroot\\",
+      "BasePath": "_content/MoneyTrackerApp",
+      "RelativePath": "uploads/profiles/5_d326bdc8-58fa-4c99-a8f7-cb2cf0734b0f.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\profiles\\5_d326bdc8-58fa-4c99-a8f7-cb2cf0734b0f.png"
     }
   ]
 }

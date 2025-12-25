@@ -25,6 +25,16 @@ namespace MoneyTrackerApp.Models
 
         public string Features { get; set; } = string.Empty; // JSON array of features
 
+        public int PackageType { get; set; }
+        public int BillingCycle { get; set; }
+        public int MaxTransactions { get; set; }
+        public int MaxAccounts { get; set; }
+        public int MaxBudgets { get; set; }
+        public bool HasAdvancedReports { get; set; }
+        public bool HasAiAdvisor { get; set; }
+        public bool HasGroupExpense { get; set; }
+        public bool HasPrioritySupport { get; set; }
+
         public bool IsPopular { get; set; }
 
         public bool IsActive { get; set; } = true;

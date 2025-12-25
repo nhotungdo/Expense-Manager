@@ -64,29 +64,45 @@ public class EmailSenderModel : PageModel
                                  .Select(e => e.Trim())
                                  .ToList();
 
-        if (Input.ScheduleTime.HasValue && Input.ScheduleTime.Value > DateTime.UtcNow)
+        if (Input.ScheduleTime.HasValue)
         {
-            // Scheduling logic
-            foreach (var recipient in recipients)
-            {
-                var email = new Email
-                {
-                    RecipientEmail = recipient,
-                    Subject = Input.Subject,
-                    Body = Input.Body,
-                    ScheduledAt = Input.ScheduleTime.Value,
-                    Status = "Scheduled",
-                    CreatedAt = DateTime.UtcNow
-                };
-                
-                // Link user if exists
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == recipient);
-                if (user != null) email.UserId = user.Id;
+            // Convert Input Time (Local) to UTC
+            var scheduledTimeLocal = Input.ScheduleTime.Value;
+            var scheduledTimeUtc = scheduledTimeLocal.ToUniversalTime();
 
-                _context.Emails.Add(email);
+            // Nếu user chọn thời gian trong quá khứ hoặc hiện tại (so với UTC now), gửi ngay
+            // Nếu tương lai > 1 phút, thì schedule.
+            
+            if (scheduledTimeUtc > DateTime.UtcNow.AddMinutes(1))
+            {
+                // Scheduling logic
+                foreach (var recipient in recipients)
+                {
+                    var email = new Email
+                    {
+                        RecipientEmail = recipient,
+                        Subject = Input.Subject,
+                        Body = Input.Body,
+                        ScheduledAt = scheduledTimeUtc, // Lưu UTC
+                        Status = "Scheduled",
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    
+                    // Link user if exists
+                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == recipient);
+                    if (user != null) email.UserId = user.Id;
+
+                    _context.Emails.Add(email);
+                }
+                await _context.SaveChangesAsync();
+                StatusMessage = $"Emails scheduled successfully for {scheduledTimeUtc:g} UTC (Local: {scheduledTimeLocal:g}).";
             }
-            await _context.SaveChangesAsync();
-            StatusMessage = "Emails scheduled successfully.";
+            else
+            {
+                // Send immediately if time is passed or very close
+                 await _emailService.SendEmailAsync(recipients, Input.Subject, Input.Body, Input.Attachments);
+                 StatusMessage = "Emails sent immediately (scheduled time was passed or too close).";
+            }
         }
         else
         {

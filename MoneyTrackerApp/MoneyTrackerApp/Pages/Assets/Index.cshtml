@@ -1,0 +1,136 @@
+@page
+@model MoneyTrackerApp.Pages.Assets.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Tài sản";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-slate-800"><i class="fas fa-gem text-primary me-2"></i>Tài sản & Khấu hao</h2>
+            <p class="text-muted">Theo dõi giá trị tài sản thực tế của bạn theo thời gian.</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAssetModal">
+            <i class="fas fa-plus me-2"></i>Thêm Tài sản
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <small class="text-muted fw-bold uppercase">Tổng giá trị ban đầu</small>
+                <h3 class="fw-bold mt-2">@Model.Assets.Sum(a => a.InitialValue).ToString("#,##0") ₫</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <small class="text-muted fw-bold uppercase">Giá trị hiện tại</small>
+                <h3 class="fw-bold text-success mt-2">@Model.Assets.Sum(a => a.CurrentValue).ToString("#,##0") ₫</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <small class="text-muted fw-bold uppercase">Tổng khấu hao</small>
+                <h3 class="fw-bold text-danger mt-2">
+                    @((Model.Assets.Sum(a => a.InitialValue) - Model.Assets.Sum(a => a.CurrentValue)).ToString("#,##0")) ₫
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asset List -->
+    <div class="card border-0 shadow-sm rounded-3xl">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="ps-4 py-3 text-secondary text-xs uppercase fw-bold">Tên tài sản</th>
+                        <th class="py-3 text-secondary text-xs uppercase fw-bold">Ngày mua</th>
+                        <th class="py-3 text-secondary text-xs uppercase fw-bold text-end">Giá gốc</th>
+                        <th class="py-3 text-secondary text-xs uppercase fw-bold text-end">Giá trị hiện tại</th>
+                        <th class="py-3 text-secondary text-xs uppercase fw-bold text-center">Thời gian sử dụng</th>
+                        <th class="pe-4 py-3 text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var asset in Model.Assets)
+                    {
+                        var depreciationPercent = asset.InitialValue > 0 
+                            ? (asset.InitialValue - asset.CurrentValue) / asset.InitialValue * 100 
+                            : 0;
+
+                        <tr>
+                            <td class="ps-4">
+                                <span class="fw-bold text-slate-800">@asset.Name</span>
+                            </td>
+                            <td class="text-muted">@asset.PurchaseDate.ToString("dd/MM/yyyy")</td>
+                            <td class="text-end fw-medium">@asset.InitialValue.ToString("#,##0")</td>
+                            <td class="text-end fw-bold text-success">@asset.CurrentValue.ToString("#,##0")</td>
+                            <td class="text-center">
+                                <div class="d-flex align-items-center justify-content-center flex-column">
+                                    <small>@asset.UsefulLifeMonths tháng</small>
+                                    <div class="progress w-24 h-1.5 mt-1 bg-slate-200">
+                                        <div class="progress-bar bg-danger" style="width: @depreciationPercent%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@asset.Id" onsubmit="return confirm('Xóa tài sản này?');">
+                                    <button class="btn btn-link text-muted hover:text-danger p-0">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Assets.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-box-open text-3xl mb-3 opacity-25"></i>
+                                <p>Chưa có tài sản nào.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addAssetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="post" class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Thêm Tài sản mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Tên tài sản</label>
+                    <input asp-for="Input.Name" class="form-control" placeholder="Ví dụ: iPhone 15" required />
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Giá trị mua (VNĐ)</label>
+                        <input asp-for="Input.InitialValue" type="number" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Thời gian sử dụng (Tháng)</label>
+                        <input asp-for="Input.UsefulLifeMonths" type="number" class="form-control" placeholder="Để tính khấu hao" required />
+                    </div>
+                </div>
+                <div class="mb-3 mt-3">
+                    <label class="form-label">Ngày mua</label>
+                    <input asp-for="Input.PurchaseDate" type="date" class="form-control" required />
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>

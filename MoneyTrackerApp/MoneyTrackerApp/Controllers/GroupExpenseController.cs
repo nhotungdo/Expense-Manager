@@ -16,11 +16,16 @@ public class GroupExpenseController : ControllerBase
 {
     private readonly IGroupExpenseService _groupExpenseService;
     private readonly ILogger<GroupExpenseController> _logger;
+    private readonly ISubscriptionService _subscriptionService;
 
-    public GroupExpenseController(IGroupExpenseService groupExpenseService, ILogger<GroupExpenseController> logger)
+    public GroupExpenseController(
+        IGroupExpenseService groupExpenseService, 
+        ILogger<GroupExpenseController> logger,
+        ISubscriptionService subscriptionService)
     {
         _groupExpenseService = groupExpenseService;
         _logger = logger;
+        _subscriptionService = subscriptionService;
     }
 
     private long GetUserId()
@@ -83,6 +88,12 @@ public class GroupExpenseController : ControllerBase
                 return BadRequest(ModelState);
 
             var userId = GetUserId();
+            var sub = await _subscriptionService.GetActiveSubscriptionAsync(userId);
+            if (!User.IsInRole("Admin") && !(sub?.HasGroupExpense ?? false))
+            {
+                 return Forbid("Group Expense feature is only available for Pro/Team users");
+            }
+
             var group = await _groupExpenseService.CreateGroupAsync(userId, dto);
             return CreatedAtAction(nameof(GetGroupById), new { id = group.Id }, group);
         }

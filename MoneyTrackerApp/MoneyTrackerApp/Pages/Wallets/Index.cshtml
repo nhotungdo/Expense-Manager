@@ -1,208 +1,231 @@
 @page
-@model MoneyTrackerApp.Pages.Wallets.IndexModel
+@model MoneyTrackerApp.Pages.Wallets.WalletIndexModel
 @{
     ViewData["Title"] = "Ví của tôi";
 }
 
-<!-- My Wallet Page - Redesigned -->
-<div class="wallet-page">
-    <div class="bento-grid">
-        <!-- Header Section -->
-        <div class="page-header bento-col-span-12">
-            <div>
-                <h1 class="page-title">
-                    <i class="fas fa-wallet"></i> Ví của tôi
-                </h1>
-                <p class="page-subtitle">Quản lý tài khoản và theo dõi số dư của bạn</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn-filter" id="periodFilter">
-                    <i class="far fa-calendar"></i>
-                    <span id="selectedPeriod">Tháng này</span>
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/wallet-index-modern.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+}
+
+<div class="wallet-index-container">
+    
+    <!-- Header & Actions -->
+    <div class="wallet-header-section">
+        <div>
+            <h1>Ví của bạn</h1>
+            <p>Quản lý tất cả nguồn tiền tại một nơi.</p>
         </div>
-
-        <!-- Balance Overview Card -->
-        <div class="balance-overview-card bento-col-span-8">
-            <div class="balance-gradient-bg"></div>
-            <div class="balance-content">
-                <div class="balance-main">
-                    <div class="balance-info">
-                        <span class="balance-label">
-                            <i class="fas fa-coins"></i> Tổng số dư
-                        </span>
-                        <h2 class="balance-amount" id="totalBalance">
-                            @Model.TotalBalance.ToString("N0") <span class="currency">VND</span>
-                        </h2>
-                        <div class="balance-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>+12.5% so với tháng trước</span>
-                        </div>
-                    </div>
-                    
-                    <div class="quick-actions">
-                        <button class="action-btn deposit" onclick="openTransactionModal(1)">
-                            <div class="action-icon">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <span>Nạp tiền</span>
-                        </button>
-                        <button class="action-btn withdraw" onclick="openTransactionModal(2)">
-                            <div class="action-icon">
-                                <i class="fas fa-minus"></i>
-                            </div>
-                            <span>Rút tiền</span>
-                        </button>
-                        <button class="action-btn transfer" onclick="openTransactionModal(3)">
-                            <div class="action-icon">
-                                <i class="fas fa-exchange-alt"></i>
-                            </div>
-                            <span>Chuyển khoản</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Balance Distribution Chart -->
-                <div class="balance-chart-section">
-                    <h6 class="chart-title">Phân bổ số dư</h6>
-                    <div class="chart-container">
-                        <canvas id="balanceDistributionChart"></canvas>
-                    </div>
-                    <div id="chartLegend" class="chart-legend"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Accounts Section -->
-        <div class="accounts-section bento-col-span-4">
-            <div class="section-header">
-                <h5 class="section-title">
-                    <i class="fas fa-credit-card"></i> Tài khoản của tôi
-                </h5>
-                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addAccountModal">
-                    <i class="fas fa-plus"></i> Thêm tài khoản
+        
+        <div>
+            @if (Model.CanCreateMore)
+            {
+                <button type="button" class="btn-add-wallet" data-bs-toggle="modal" data-bs-target="#createWalletModal">
+                    <i class="fas fa-plus"></i> Tạo Ví Mới
                 </button>
-            </div>
+            }
+            else
+            {
+                <button class="btn-add-wallet disabled" title="Bạn đã đạt giới hạn số lượng ví cho gói hiện tại">
+                    <i class="fas fa-lock"></i> Đạt giới hạn
+                </button>
+            }
+        </div>
+    </div>
 
-            <div class="accounts-grid">
-                @if (Model.Wallets != null && Model.Wallets.Any())
-                {
-                    foreach (var wallet in Model.Wallets)
-                    {
-                        <div class="account-card" data-account-id="@wallet.Id">
-                            <div class="account-header">
-                                <div class="account-icon">
-                                    <i class="fas fa-wallet"></i>
-                                </div>
-                                <div class="account-menu">
-                                    <button class="menu-btn">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                </div>
+     @if (!ModelState.IsValid)
+    {
+        <div class="alert alert-danger mb-4 rounded-3 border-0 shadow-sm">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span asp-validation-summary="All"></span>
+        </div>
+    }
+    
+    @if(TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success mb-4 rounded-3 border-0 shadow-sm">
+             <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Usage Stats / Limit Info -->
+    <div class="usage-stats">
+        <div class="usage-info">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h6 class="m-0 fw-bold text-dark">Trạng thái gói: 
+                    @if(Model.IsPro) {
+                        <span class="pro-badge">PRO PLAN</span>
+                    } else {
+                        <span class="badge bg-secondary">MIỄN PHÍ</span>
+                    }
+                </h6>
+            </div>
+            
+            <p class="text-muted small m-0 mb-2">
+                @if(!Model.IsPro) {
+                   <span>Nâng cấp lên <strong>Pro</strong> để tạo không giới hạn ví.</span>
+                } else {
+                    <span>Bạn có thể tạo <strong>không giới hạn</strong> ví với gói Pro.</span>
+                }
+            </p>
+
+            <div class="d-flex align-items-center justify-content-between" style="max-width: 300px;">
+                @if(Model.IsPro) {
+                    <span class="small fw-bold">@Model.CurrentWalletCount ví / Không giới hạn</span>
+                    <span class="small text-success">✓ Unlimited</span>
+                } else {
+                    <span class="small fw-bold">@Model.CurrentWalletCount / @Model.MaxWallets ví đã dùng</span>
+                    <span class="small text-muted">@((int)((double)Model.CurrentWalletCount/Model.MaxWallets * 100))%</span>
+                }
+            </div>
+            
+            @if(!Model.IsPro) {
+                <div class="usage-bar-bg">
+                    <div class="usage-bar-fill" style="width: @((int)((double)Model.CurrentWalletCount/Model.MaxWallets * 100))%"></div>
+                </div>
+            } else {
+                <div class="usage-bar-bg">
+                    <div class="usage-bar-fill bg-success" style="width: 100%; opacity: 0.3;"></div>
+                </div>
+            }
+            
+             @if(!Model.CanCreateMore && !Model.IsPro)
+            {
+                <div class="mt-3">
+                    <a href="/ServicePackages" class="text-primary fw-bold text-decoration-none small">
+                        <i class="fas fa-arrow-up me-1"></i> Nâng cấp ngay
+                    </a>
+                </div>
+            }
+        </div>
+        <div class="d-none d-md-block">
+             <i class="fas fa-wallet text-black-50" style="font-size: 4rem; opacity: 0.1;"></i>
+        </div>
+    </div>
+
+    <!-- Wallets Grid -->
+    <div class="wallet-grid">
+        @if (Model.Wallets.Count == 0)
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3>Chưa có ví nào</h3>
+                <p class="text-muted">Hãy tạo ví đầu tiên để bắt đầu quản lý tài chính của bạn.</p>
+                <button type="button" class="btn btn-primary rounded-pill px-4 mt-3" data-bs-toggle="modal" data-bs-target="#createWalletModal">Tạo Ví Ngay</button>
+            </div>
+        }
+        else
+        {
+            @foreach (var wallet in Model.Wallets)
+            {
+                <div class="wallet-card" onclick="window.location.href='/Wallets/Detail/@wallet.Id'">
+                    <div class="wallet-card-header">
+                        <div class="d-flex align-items-center">
+                            <div class="wallet-icon" style="background: @(wallet.Color ?? "var(--primary-gradient)")">
+                                <i class="@(wallet.Icon ?? "fas fa-wallet")"></i>
                             </div>
-                            <div class="account-info">
-                                <h6 class="account-name">@wallet.Name</h6>
-                                <p class="account-type">@wallet.AccountType</p>
-                            </div>
-                            <div class="account-balance">
-                                <span class="balance-label">Số dư</span>
-                                <span class="balance-value">@wallet.CurrentBalance.ToString("N0") VND</span>
-                            </div>
-                            <div class="account-footer">
-                                <span class="account-status active">
-                                    <i class="fas fa-check-circle"></i> Hoạt động
+                            <div>
+                                <span class="wallet-name">@wallet.Name</span>
+                                <span class="wallet-type">
+                                    @if(wallet.AccountType == 0) { <text>Tiền mặt</text> }
+                                    else if(wallet.AccountType == 1) { <text>Tài khoản ngân hàng</text> }
+                                    else if(wallet.AccountType == 2) { <text>Thẻ tín dụng</text> }
+                                    else if(wallet.AccountType == 3) { <text>Ví điện tử</text> }
+                                    else { <text>Khác</text> }
                                 </span>
                             </div>
                         </div>
-                    }
-                }
-                
-                <!-- Add New Account Card -->
-                <div class="account-card add-new" data-bs-toggle="modal" data-bs-target="#addAccountModal">
-                    <div class="add-icon">
-                        <i class="fas fa-plus"></i>
                     </div>
-                    <h6>Thêm tài khoản mới</h6>
-                    <p>Liên kết tài khoản ngân hàng hoặc ví</p>
+                    
+                    <div class="px-2">
+                        <h2 class="wallet-balance">
+                            @wallet.CurrentBalance.ToString("N0") <span class="wallet-currency">@wallet.Currency</span>
+                        </h2>
+                    </div>
+
+                    <div class="wallet-meta px-2">
+                        <span><i class="far fa-calendar-alt me-1"></i> Cập nhật: @(wallet.UpdatedAt?.ToString("dd/MM/yyyy") ?? wallet.CreatedAt?.ToString("dd/MM/yyyy"))</span>
+                        @if(wallet.IncludeInTotal)
+                        {
+                            <span class="text-success" title="Được tính vào tổng tài sản"><i class="fas fa-check-circle"></i> Tính tổng</span>
+                        }
+                        else
+                        {
+                             <span class="text-muted" title="Không tính vào tổng tài sản"><i class="fas fa-eye-slash"></i> Ẩn tổng</span>
+                        }
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Transaction Analysis Cards -->
-        <!-- Transaction Type Breakdown -->
-        <div class="analysis-card bento-col-span-6">
-            <div class="card-header">
-                <h5 class="card-title">
-                    <i class="fas fa-chart-pie"></i> Loại giao dịch
-                </h5>
-                <select class="period-select" id="transactionTypePeriod">
-                    <option value="month">Tháng này</option>
-                    <option value="week">Tuần này</option>
-                    <option value="year">Năm nay</option>
-                </select>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="transactionTypeChart"></canvas>
-            </div>
-            <div class="stats-summary">
-                <div class="stat-item income">
-                    <span class="stat-label">Thu nhập</span>
-                    <span class="stat-value" id="incomeAmount">0</span>
-                </div>
-                <div class="stat-item expense">
-                    <span class="stat-label">Chi tiêu</span>
-                    <span class="stat-value" id="expenseAmount">0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Category Breakdown -->
-        <div class="analysis-card bento-col-span-6">
-            <div class="card-header">
-                <h5 class="card-title">
-                    <i class="fas fa-layer-group"></i> Chi tiêu theo danh mục
-                </h5>
-                <select class="period-select" id="categoryPeriod">
-                    <option value="month">Tháng này</option>
-                    <option value="week">Tuần này</option>
-                    <option value="year">Năm nay</option>
-                </select>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="categoryBreakdownChart"></canvas>
-            </div>
-            <div class="category-list" id="categoryList">
-                <!-- Dynamic category items -->
-            </div>
-        </div>
-
-        <!-- Recent Transactions -->
-        <div class="transactions-section bento-col-span-12">
-            <div class="section-header">
-                <h5 class="section-title">
-                    <i class="fas fa-history"></i> Giao dịch gần đây
-                </h5>
-                <a href="/Transactions" class="btn-view-all">
-                    Xem tất cả <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="transactions-list" id="recentTransactions">
-                <!-- Dynamic transaction items -->
-            </div>
-        </div>
+            }
+        }
     </div>
 </div>
 
-<!-- Modals -->
-@await Html.PartialAsync("_WalletModals")
+<!-- Create Wallet Modal -->
+<div class="modal fade" id="createWalletModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" asp-page-handler="Create">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Tạo Ví Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-4">
+                    <div class="mb-3">
+                        <label asp-for="NewWallet.Name" class="form-label fw-bold small text-muted text-uppercase">Tên Ví</label>
+                        <input asp-for="NewWallet.Name" class="form-control rounded-pill" placeholder="Ví dụ: Tiền tiêu vặt" required />
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="NewWallet.AccountType" class="form-label fw-bold small text-muted text-uppercase">Loại Ví</label>
+                            <select asp-for="NewWallet.AccountType" class="form-select rounded-pill">
+                                <option value="0">Tiền mặt</option>
+                                <option value="1">Tài khoản ngân hàng</option>
+                                <option value="2">Ví điện tử</option>
+                                <option value="3">Thẻ tín dụng</option>
+                                <option value="4">Tiền tiết kiệm</option>
+                                <option value="5">Đầu tư</option>
+                            </select>
+                        </div>
+                         <div class="col-md-6 mb-3">
+                            <label asp-for="NewWallet.Currency" class="form-label fw-bold small text-muted text-uppercase">Đơn vị tiền tệ</label>
+                            <select asp-for="NewWallet.Currency" class="form-select rounded-pill">
+                                <option value="VND">VND</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </div>
+                    </div>
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/wallet-page.css" asp-append-version="true" />
-}
+                    <div class="mb-3">
+                        <label asp-for="NewWallet.InitialBalance" class="form-label fw-bold small text-muted text-uppercase">Số dư ban đầu</label>
+                        <input asp-for="NewWallet.InitialBalance" type="number" class="form-control rounded-pill" placeholder="0" />
+                    </div>
+                    
+                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                             <label asp-for="NewWallet.Color" class="form-label fw-bold small text-muted text-uppercase">Màu sắc</label>
+                             <input asp-for="NewWallet.Color" type="color" class="form-control form-control-color w-100 rounded-pill" style="height:38px;" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="NewWallet.Icon" class="form-label fw-bold small text-muted text-uppercase">Icon (Font Awesome)</label>
+                            <input asp-for="NewWallet.Icon" class="form-control rounded-pill" placeholder="fas fa-wallet" />
+                        </div>
+                    </div>
 
-@section Scripts {
-    <script src="~/js/wallet-page.js" asp-append-version="true"></script>
-}
+                    <div class="form-check form-switch mt-2">
+                        <input asp-for="NewWallet.IncludeInTotal" class="form-check-input" type="checkbox" id="includeInTotalSwitch" checked>
+                        <label class="form-check-label" for="includeInTotalSwitch">Tính vào tổng tài sản</label>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Tạo Ví</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

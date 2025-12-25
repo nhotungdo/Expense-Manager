@@ -1,0 +1,267 @@
+@page
+@model MoneyTrackerApp.Pages.Analysis.IndexModel
+@{
+    ViewData["Title"] = "Phân tích & Dự báo";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold text-primary"><i class="bi bi-graph-up-arrow me-2"></i>Phân tích & Dự báo</h2>
+            <p class="text-muted">Nhìn lại quá khứ, dự đoán tương lai tài chính của bạn.</p>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-pills mb-4" id="analysisTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="health-tab" data-bs-toggle="tab" data-bs-target="#health" type="button" role="tab" aria-selected="true">
+                <i class="bi bi-heart-pulse me-2"></i>Sức khỏe Tài chính
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="forecast-tab" data-bs-toggle="tab" data-bs-target="#forecast" type="button" role="tab" aria-selected="false">
+                <i class="bi bi-calendar-range me-2"></i>Dự báo Dòng tiền
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="analysisTabContent">
+        <!-- Tab 1: Financial Health -->
+        <div class="tab-pane fade show active" id="health" role="tabpanel" aria-labelledby="health-tab">
+            <div class="row">
+                <!-- Score Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100 border-0 bg-gradient-primary text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <h5 class="card-title text-white-50 text-uppercase ls-1">Điểm Sức Khỏe</h5>
+                            <div class="display-1 fw-bold my-3">@Model.HealthScore.TotalScore</div>
+                            <span class="badge bg-white text-primary rounded-pill px-3 py-2 fs-6">@Model.HealthScore.HealthStatus</span>
+                            <p class="mt-3 small text-white-50">Thang điểm 1000</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="col-md-8">
+                    <div class="row g-3">
+                        <!-- Savings Ratio -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Tỷ lệ Tiết kiệm / Thu nhập</h6>
+                                    <div class="d-flex align-items-end justify-content-between">
+                                        <h3 class="mb-0 text-success">@((Model.HealthScore.SavingsIncomeRatio * 100).ToString("N1"))%</h3>
+                                        <i class="bi bi-piggy-bank fs-1 text-success opacity-25"></i>
+                                    </div>
+                                    <div class="progress mt-3" style="height: 6px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: @(Math.Min(100, (double)Model.HealthScore.SavingsIncomeRatio * 100))%"></div>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">Mục tiêu: >20%</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Debt Ratio -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Tỷ lệ Nợ / Tài sản</h6>
+                                    <div class="d-flex align-items-end justify-content-between">
+                                        <h3 class="mb-0 text-danger">@((Model.HealthScore.DebtAssetRatio * 100).ToString("N1"))%</h3>
+                                        <i class="bi bi-bank fs-1 text-danger opacity-25"></i>
+                                    </div>
+                                    <div class="progress mt-3" style="height: 6px;">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: @(Math.Min(100, (double)Model.HealthScore.DebtAssetRatio * 100))%"></div>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">Mục tiêu: 0%</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Budget Compliance -->
+                        <div class="col-12">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Độ tuân thủ Ngân sách</h6>
+                                    <div class="d-flex align-items-end justify-content-between">
+                                        <h3 class="mb-0 text-info">@((Model.HealthScore.BudgetCompliance * 100).ToString("N0"))%</h3>
+                                        <i class="bi bi-clipboard-check fs-1 text-info opacity-25"></i>
+                                    </div>
+                                    <div class="progress mt-3" style="height: 6px;">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: @(Math.Min(100, (double)Model.HealthScore.BudgetCompliance * 100))%"></div>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">Bạn đã tuân thủ @((Model.HealthScore.BudgetCompliance * 100).ToString("N0"))% các ngân sách đề ra.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold"><i class="bi bi-lightbulb text-warning me-2"></i>Lời khuyên cho bạn</h5>
+                            <ul class="list-group list-group-flush bg-transparent">
+                                @if (Model.HealthScore.SavingsIncomeRatio < 0.1m)
+                                {
+                                    <li class="list-group-item bg-transparent"><i class="bi bi-exclamation-circle text-danger me-2"></i>Tỷ lệ tiết kiệm thấp. Hãy thử đặt mục tiêu tiết kiệm ít nhất 10% thu nhập mỗi tháng.</li>
+                                }
+                                @if (Model.HealthScore.DebtAssetRatio > 0.5m)
+                                {
+                                    <li class="list-group-item bg-transparent"><i class="bi bi-exclamation-circle text-danger me-2"></i>Nợ đang chiếm hơn 50% tài sản. Hãy ưu tiên trả các khoản nợ lãi suất cao.</li>
+                                }
+                                else if (Model.HealthScore.TotalScore > 800)
+                                {
+                                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle text-success me-2"></i>Tài chính của bạn rất vững mạnh! Cân nhắc đầu tư để sinh lời thêm.</li>
+                                }
+                                else
+                                {
+                                    <li class="list-group-item bg-transparent"><i class="bi bi-info-circle text-primary me-2"></i>Duy trì thói quen ghi chép chi tiêu đầy đủ để cải thiện điểm số.</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Forecast -->
+        <div class="tab-pane fade" id="forecast" role="tabpanel" aria-labelledby="forecast-tab">
+             @if (Model.Forecast.IsRiskZoneTouched)
+            {
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                    <div>
+                        <strong>Cảnh báo Dòng tiền!</strong>
+                        <br />
+                        Dự báo bạn sẽ hết tiền vào ngày <strong>@Model.RiskDateDisplay</strong> nếu tiếp tục đà chi tiêu này.
+                    </div>
+                </div>
+            }
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Dự đoán Số dư (60 ngày tới)</h5>
+                    <div style="height: 400px; position: relative;">
+                        <canvas id="cashflowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="text-muted">Chi tiêu trung bình/tháng (3 tháng qua)</h6>
+                            <h3 class="fw-bold">@Model.Forecast.CurrentSpendingRate.ToString("N0") <small class="fs-6 text-muted">VND</small></h3>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                         <div class="card-body">
+                             <h6 class="text-muted">Dự báo số dư cuối kỳ</h6>
+                             @{
+                                 var lastPoint = Model.Forecast.ForecastPoints.LastOrDefault();
+                                 var lastBalance = lastPoint?.PredictedBalance ?? 0;
+                                 var colorClass = lastBalance >= 0 ? "text-success" : "text-danger";
+                             }
+                            <h3 class="fw-bold @colorClass">@lastBalance.ToString("N0") <small class="fs-6 text-muted">VND</small></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('cashflowChart').getContext('2d');
+            var rawData = @Html.Raw(Model.ForecastJson);
+            
+            var labels = rawData.map(d => d.date);
+            var dataPoints = rawData.map(d => d.balance);
+
+            // Gradient for line
+            var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(75, 192, 192, 0.2)');
+            gradient.addColorStop(1, 'rgba(75, 192, 192, 0)');
+
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số dư dự kiến (VND)',
+                        data: dataPoints,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Vùng nguy hiểm (0đ)',
+                        data: Array(labels.length).fill(0),
+                        borderColor: 'rgba(255, 99, 132, 0.8)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                         tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                             ticks: {
+                                callback: function(value, index, values) {
+                                    return new Intl.NumberFormat('vi-VN', { notation: "compact", compactDisplay: "short" }).format(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

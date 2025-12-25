@@ -19,19 +19,21 @@ namespace MoneyTrackerApp.Controllers
         private readonly IConfiguration _config;
         private readonly MoneyTrackerApp.Services.JwtTokenService _jwtService;
 
+        private readonly MoneyTrackerApp.Services.IEmailService _emailService;
         private readonly MoneyTrackerApp.Services.ISessionService _sessionService;
         private readonly MoneyTrackerApp.Services.IMultiAccountService _multiAccountService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.ISessionService sessionService, MoneyTrackerApp.Services.IMultiAccountService multiAccountService, ILogger<AuthController> logger)
+        public AuthController(ExpenseManagerContext db, IConfiguration config, MoneyTrackerApp.Services.JwtTokenService jwtService, MoneyTrackerApp.Services.ISessionService sessionService, MoneyTrackerApp.Services.IMultiAccountService multiAccountService, ILogger<AuthController> logger, MoneyTrackerApp.Services.IEmailService emailService)
         {
             _db = db;
             _config = config;
             _jwtService = jwtService;
             _sessionService = sessionService;
-            _sessionService = sessionService;
+            // _sessionService = sessionService; // Duplicate assignment removed
             _multiAccountService = multiAccountService;
             _logger = logger;
+            _emailService = emailService;
         }
 
         public class RegisterRequest
@@ -110,12 +112,41 @@ namespace MoneyTrackerApp.Controllers
                     };
                     _db.Users.Add(user);
                     await _db.SaveChangesAsync();
+
+                    // [Notification] Send Welcome Email
+                    try 
+                    {
+                        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Email", "AccountVerification.html");
+                        if (System.IO.File.Exists(templatePath))
+                        {
+                            var body = await System.IO.File.ReadAllTextAsync(templatePath);
+                            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                            var verifyUrl = $"{baseUrl}/Auth/Login"; 
+
+                            body = body.Replace("{{UserName}}", user.FullName)
+                                       .Replace("{{VerificationLink}}", verifyUrl);
+
+                            await _emailService.SendEmailAsync(user.Email, "Chào mừng đến với Money Tracker", body);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to send welcome email for Google signup");
+                    }
                 }
                 else if (string.IsNullOrEmpty(user.GoogleId))
                 {
                     user.GoogleId = sub;
                     await _db.SaveChangesAsync();
                 }
+
+                // [Notification] Send Account Verification/Welcome Email for New Google Signups
+                // We detect it's a new user if we just added them. The best way is to check if we just created it.
+                // However, I'm outside the "if (user == null)" block now. 
+                // Let's move this logic inside the "if (user == null)" block before the closing brace.
+                
+                // Wait, I can't easily reference "if (user == null)" scope here from outside.
+                // I will rewrite the entire block to include the email logic.
 
                 // [Security] Assign Admin Rights if email matches
                 if (email != null && email.Equals("nhotungdo89@gmail.com", StringComparison.OrdinalIgnoreCase))
@@ -231,9 +262,27 @@ namespace MoneyTrackerApp.Controllers
                     await _db.SaveChangesAsync();
                 }
 
-                // [Notification] Send Welcome Email (Removed)
-                // await _emailService.SendEmailToUserAsync(user.Id, "Chào mừng đến với MoneyTrackerApp!", 
-                //     $"<h3>Xin chào {user.FullName},</h3><p>Cảm ơn bạn đã đăng ký tài khoản tại MoneyTrackerApp. Bắt đầu quản lý tài chính của bạn ngay hôm nay!</p>");
+                // [Notification] Send Account Verification Email
+                try 
+                {
+                    var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Email", "AccountVerification.html");
+                    if (System.IO.File.Exists(templatePath))
+                    {
+                        var body = await System.IO.File.ReadAllTextAsync(templatePath);
+                        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                        var verifyUrl = $"{baseUrl}/Auth/Login"; // Since EmailConfirmed=true, just redirect to login
+
+                        body = body.Replace("{{UserName}}", user.FullName)
+                                   .Replace("{{VerificationLink}}", verifyUrl);
+
+                        await _emailService.SendEmailAsync(user.Email, "Chào mừng đến với Money Tracker - Xác thực tài khoản", body);
+                    }
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(emailEx, "Failed to send welcome email.");
+                    // Don't block registration if email fails, but log it
+                }
             }
             catch (Exception ex)
             {
@@ -595,9 +644,41 @@ namespace MoneyTrackerApp.Controllers
             await _db.SaveChangesAsync();
 
             var subject = "Đặt lại mật khẩu";
-            var content = $"Mã đặt lại mật khẩu của bạn: {resetToken}";
-            _db.Emails.Add(new Email { UserId = user.Id, Subject = subject, Body = content, Status = "Queued" });
-            await _db.SaveChangesAsync();
+            // var content = $"Mã đặt lại mật khẩu của bạn: {resetToken}";
+            
+            try 
+            {
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Email", "PasswordReset.html");
+                var body = "";
+                
+                if (System.IO.File.Exists(templatePath))
+                {
+                     body = await System.IO.File.ReadAllTextAsync(templatePath);
+                     var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                     var resetUrl = $"{baseUrl}/Auth/ResetPassword?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(resetToken)}";
+
+                     body = body.Replace("{{UserName}}", user.FullName ?? user.UserName)
+                                .Replace("{{ResetLink}}", resetUrl);
+                }
+                else
+                {
+                    // Fallback if template missing
+                    body = $"Mã đặt lại mật khẩu của bạn là: {resetToken}";
+                }
+
+                await _emailService.SendEmailAsync(user.Email, subject, body);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send password reset email");
+                // Fallback to simple email if template/service fails? 
+                // Better to throw or let the user know? 
+                // For now, logging and treating as success for security (obscurity) or 500?
+                // The current flow expects Ok() so we return Ok but maybe log error.
+            }
+
+            // _db.Emails.Add(new Email { UserId = user.Id, Subject = subject, Body = content, Status = "Queued" });
+            // await _db.SaveChangesAsync();
 
             return Ok();
         }

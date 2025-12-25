@@ -46,6 +46,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cVXNlcnNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Analysis/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHlzaXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Assets/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXNzZXRzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Auth/ForgotPassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -66,6 +74,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Automation/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0b21hdGlvblxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Automation/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0b21hdGlvblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Budgets/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnVkZ2V0c1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -84,6 +100,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Dev/TransactionsTests.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGV2XFRyYW5zYWN0aW9uc1Rlc3RzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Games/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR2FtZXNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Games/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR2FtZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Groups/Details.cshtml]
@@ -144,14 +168,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Profile/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZVxJbmRleC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Profile/MyWallet.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZVxNeVdhbGxldC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Profile/_WalletTransactions.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZVxfV2FsbGV0VHJhbnNhY3Rpb25zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Reports/Index.cshtml]
@@ -222,6 +238,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9XYWxsZXRTZWxlY3Rvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Shopping/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hvcHBpbmdcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Shopping/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hvcHBpbmdcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Subscription/Checkout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3Vic2NyaXB0aW9uXENoZWNrb3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -244,6 +268,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Subscription/Success.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3Vic2NyaXB0aW9uXFN1Y2Nlc3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Test/EmailTest.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVzdFxFbWFpbFRlc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Trading/Index.cshtml]
@@ -270,20 +298,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/IndexModern.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xJbmRleE1vZGVybi5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/Shared/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xTaGFyZWRcSW5kZXguY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/_WalletModals.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xfV2FsbGV0TW9kYWxzLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/Wallets/_WalletTransactions.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2FsbGV0c1xfV2FsbGV0VHJhbnNhY3Rpb25zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [F:/OJT-Review/MoneyTrackerApp/Expense-Manager/MoneyTrackerApp/MoneyTrackerApp/Pages/_ViewImports.cshtml]

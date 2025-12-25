@@ -24,10 +24,8 @@ public partial class Account
 
     public string? Color { get; set; }
 
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public bool IsActive { get; set; } = true;
 
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public bool IncludeInTotal { get; set; } = true;
 
     public DateTime? CreatedAt { get; set; }

@@ -18,6 +18,9 @@ namespace MoneyTrackerApp.Services
 
         public async Task<CashflowForecastResult> GetCashflowForecastAsync(long userId, int days = 30)
         {
+            var result = new CashflowForecastResult();
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
             // 1. Get current balance
             var currentBalance = await _context.Accounts
                 .Where(a => a.UserId == userId)
@@ -25,14 +28,6 @@ namespace MoneyTrackerApp.Services
 
             // 2. Get average daily spending (last 90 days)
             var threeMonthsAgo = DateTime.UtcNow.AddDays(-90);
-            var recentEspenses = await _context.Transactions
-                .Where(t => t.UserId == userId && t.TransactionDate >= threeMonthsAgo && t.Amount < 0) // Assuming expense is negative
-                .SumAsync(t => t.Amount);
-
-            // Note: If Amount is stored as positive for expense with Type='Expense', logic needs adjustment. 
-            // Checking Transaction model might be needed. Assuming standardize expense handling.
-            // Let's assume Amount is absolute and TransactionType determines sign.
-            // Typically in this app based on other files, Expense is 'Expense'.
             
             var expenseTotal = await _context.Transactions
                 .Where(t => t.UserId == userId && t.TransactionDate >= threeMonthsAgo && t.TransactionType == (int)MoneyTrackerApp.Enums.TransactionType.Expense)
@@ -42,32 +37,67 @@ namespace MoneyTrackerApp.Services
                 .Where(t => t.UserId == userId && t.TransactionDate >= threeMonthsAgo && t.TransactionType == (int)MoneyTrackerApp.Enums.TransactionType.Income)
                 .SumAsync(t => t.Amount);
 
-            var dailyNetChange = (incomeTotal - expenseTotal) / 90; // Simple linear average
+            // Calculate daily drift (Linear Regression Lite)
+            // If user consistently saves, this will be positive. If they overspend, negative.
+            var dailyNetChange = (incomeTotal - expenseTotal) / 90;
 
             // 3. Get Scheduled Transactions
             var scheduled = await _context.ScheduledTransactions
-                .Where(s => s.UserId == userId && s.IsActive == true)
+                .Where(s => s.UserId == userId && s.IsActive)
                 .ToListAsync();
 
-            var result = new CashflowForecastResult();
             var runningBalance = currentBalance;
             var riskTouched = false;
             DateOnly? riskDate = null;
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
             for (int i = 0; i < days; i++)
             {
                 var currentDate = today.AddDays(i);
                 
-                // Add daily average drift
-                runningBalance += dailyNetChange;
+                // Add daily average drift (organic spending/income)
+                // We use 50% of historical drift as 'unexpected' spending/income, 
+                // assuming fixed bills are covered by scheduled transactions if they exist.
+                // If the user has NO scheduled transactions, we lean 100% on historical.
+                decimal dailyDrift = scheduled.Any() ? dailyNetChange * 0.5m : dailyNetChange;
+                runningBalance += dailyDrift;
 
-                // Add specific scheduled items
-                // This is a simplified check. A robust one would handle frequencies correctly.
+                // Add specific scheduled items matching this date
                 foreach (var item in scheduled)
                 {
-                    // Check if item occurs on currentDate
-                    // Simplification: Not implemented fully for all frequencies in this snippet
+                    bool isDue = false;
+                    
+                    // Logic to check if item.NextRunDate matches currentDate
+                    // Since specific logic for NextRunDate update is complex, we simulate it based on Frequency
+                    if (item.NextRunDate == currentDate)
+                    {
+                         isDue = true;
+                    }
+                    else if (item.NextRunDate < currentDate) // Determine if it would recur on this day
+                    {
+                        // Calculate days diff
+                        // This is simplified. Ideally we project specific dates.
+                        // Let's assume strict NextRunDate usage from DB is hard without simulating the update.
+                        // Instead, we check Frequency:
+                        
+                        var daysDiff = currentDate.DayNumber - item.NextRunDate.DayNumber;
+                        if (daysDiff > 0)
+                        {
+                            if (item.Frequency == "Daily" && daysDiff % item.Interval == 0) isDue = true;
+                            if (item.Frequency == "Weekly" && daysDiff % (7 * item.Interval) == 0) isDue = true;
+                            // Monthly is harder with DayNumber, simply checking Day of Month
+                            if (item.Frequency == "Monthly" && currentDate.Day == item.NextRunDate.Day) 
+                            {
+                                int monthDiff = (currentDate.Year - item.NextRunDate.Year) * 12 + currentDate.Month - item.NextRunDate.Month;
+                                if (monthDiff > 0 && monthDiff % item.Interval == 0) isDue = true;
+                            }
+                        }
+                    }
+
+                    if (isDue)
+                    {
+                        if (item.TransactionType == 1) runningBalance += item.Amount; // Income
+                        else runningBalance -= item.Amount; // Expense
+                    }
                 }
 
                 result.ForecastPoints.Add(new ForecastPoint

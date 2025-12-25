@@ -71,6 +71,12 @@ namespace MoneyTrackerApp.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IncludeInTotal")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1762,6 +1768,9 @@ namespace MoneyTrackerApp.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("BillingCycle")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -1783,6 +1792,18 @@ namespace MoneyTrackerApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasAdvancedReports")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasAiAdvisor")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasGroupExpense")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasPrioritySupport")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -1791,6 +1812,15 @@ namespace MoneyTrackerApp.Migrations
                     b.Property<bool>("IsPopular")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MaxAccounts")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxBudgets")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxTransactions")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1798,6 +1828,9 @@ namespace MoneyTrackerApp.Migrations
 
                     b.Property<decimal?>("OriginalPrice")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PackageType")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");

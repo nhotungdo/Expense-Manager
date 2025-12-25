@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Failed</title>
+</head>
+
+<body
+    style="margin: 0; padding: 0; background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td style="padding: 20px 0 30px 0;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="600"
+                    style="border-collapse: collapse; border: 1px solid #e5e7eb; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" bgcolor="#EF4444" style="padding: 30px 0 25px 0;">
+                            <h1
+                                style="color: #ffffff; margin: 0; font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                                ✗ Subscription Failed</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td
+                                        style="color: #1f2937; font-size: 20px; font-weight: 600; padding-bottom: 20px;">
+                                        Xin chào {{UserName}},
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="color: #4b5563; font-size: 16px; line-height: 24px; padding-bottom: 30px;">
+                                        Rất tiếc, việc kích hoạt gói dịch vụ <strong
+                                            style="color: #EF4444;">{{PackageName}}</strong> của bạn đã không thành
+                                        công.
+                                    </td>
+                                </tr>
+                                <!-- Error Details Box -->
+                                <tr>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%"
+                                            style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;">
+                                            <tr>
+                                                <td style="padding: 20px;">
+                                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr>
+                                                            <td
+                                                                style="padding-bottom: 15px; color: #991b1b; font-size: 18px; font-weight: bold;">
+                                                                LÝ DO THẤT BẠI</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 8px 0; color: #7f1d1d; font-size: 14px; line-height: 22px;">
+                                                                {{ErrorMessage}}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="padding: 30px 0 20px 0; color: #1f2937; font-size: 16px; font-weight: 600;">
+                                        Bạn có thể thử lại bằng cách:
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #4b5563; font-size: 15px; line-height: 24px;">
+                                        <ul style="margin: 0; padding-left: 20px;">
+                                            <li style="padding: 5px 0;">Kiểm tra lại thông tin thanh toán</li>
+                                            <li style="padding: 5px 0;">Đảm bảo bạn đã hoàn tất thanh toán</li>
+                                            <li style="padding: 5px 0;">Liên hệ với ngân hàng nếu giao dịch bị từ chối
+                                            </li>
+                                            <li style="padding: 5px 0;">Thử lại sau vài phút</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top: 30px;">
+                                        <table border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="center" bgcolor="#EF4444" style="border-radius: 6px;">
+                                                    <a href="{{RetryLink}}" target="_blank"
+                                                        style="display: inline-block; padding: 14px 30px; font-family: 'Segoe UI', sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">Thử
+                                                        Lại</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="padding: 30px 0 0 0; color: #6b7280; font-size: 14px; line-height: 22px; text-align: center;">
+                                        Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi qua email hoặc hotline.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td bgcolor="#f8fafc" style="padding: 20px 30px 20px 30px; border-top: 1px solid #e2e8f0;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td
+                                        style="color: #94a3b8; font-family: sans-serif; font-size: 12px; text-align: center;">
+                                        Đây là email tự động từ Money Tracker App.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="color: #94a3b8; font-family: sans-serif; font-size: 12px; text-align: center; padding-top: 10px;">
+                                        Vui lòng không trả lời email này.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

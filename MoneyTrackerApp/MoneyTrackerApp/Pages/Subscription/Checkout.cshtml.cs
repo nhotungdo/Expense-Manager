@@ -10,6 +10,14 @@ public class CheckoutModel : PageModel
     public int PackageId { get; set; } = 2;
 
     public long UserId { get; private set; }
+    public string UserEmail { get; private set; } = string.Empty;
+
+    private readonly MoneyTrackerApp.Models.ExpenseManagerContext _context;
+
+    public CheckoutModel(MoneyTrackerApp.Models.ExpenseManagerContext context)
+    {
+        _context = context;
+    }
 
     public void OnGet()
     {
@@ -19,6 +27,11 @@ public class CheckoutModel : PageModel
         if (long.TryParse(claim, out var id))
         {
             UserId = id;
+            var user = _context.Users.Find(UserId);
+            if (user != null)
+            {
+                UserEmail = user.Email ?? "";
+            }
         }
         else
         {
