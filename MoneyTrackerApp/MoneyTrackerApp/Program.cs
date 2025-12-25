@@ -41,6 +41,7 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IFriendshipService, MoneyTra
 // Register Report & Analytics Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IReportService, MoneyTrackerApp.Services.ReportService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTrackerApp.Services.ExportService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IFinancialAnalysisService, MoneyTrackerApp.Services.FinancialAnalysisService>();
 
 // Register System Utility Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();

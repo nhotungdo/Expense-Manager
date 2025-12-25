@@ -1322,3 +1322,206 @@ GO
 CREATE INDEX [IX_UserOtps_UserId] ON [UserOtps] ([UserId]);
 GO
 
+-- =============================================
+-- 33. AUTOMATION RULES TABLE
+-- =============================================
+CREATE TABLE [AutomationRules] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [UserId] bigint NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [TriggerType] nvarchar(50) NOT NULL,
+    [ConditionJson] nvarchar(max) NOT NULL,
+    [ActionType] nvarchar(50) NOT NULL,
+    [ActionJson] nvarchar(max) NOT NULL,
+    [IsActive] bit NOT NULL DEFAULT 1,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [LastExecutedAt] datetime2 NULL,
+    CONSTRAINT [PK_AutomationRules] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_AutomationRules_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_AutomationRules_UserId] ON [AutomationRules] ([UserId]);
+GO
+
+-- =============================================
+-- 34. CHALLENGES TABLE
+-- =============================================
+CREATE TABLE [Challenges] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [Title] nvarchar(200) NOT NULL,
+    [Description] nvarchar(1000) NOT NULL,
+    [Type] nvarchar(50) NOT NULL,
+    [TargetCategoryId] bigint NULL,
+    [TargetAmount] decimal(18,2) NULL,
+    [DurationDays] int NOT NULL,
+    [RewardPoints] int NOT NULL,
+    [BadgeIcon] nvarchar(100) NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT [PK_Challenges] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Challenges_Categories_TargetCategoryId] FOREIGN KEY ([TargetCategoryId]) REFERENCES [Categories] ([Id]) ON DELETE SET NULL
+);
+GO
+
+CREATE INDEX [IX_Challenges_TargetCategoryId] ON [Challenges] ([TargetCategoryId]);
+GO
+
+-- =============================================
+-- 35. USER CHALLENGES TABLE
+-- =============================================
+CREATE TABLE [UserChallenges] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [UserId] bigint NOT NULL,
+    [ChallengeId] bigint NOT NULL,
+    [Status] nvarchar(50) NOT NULL,
+    [Progress] decimal(18,2) NOT NULL DEFAULT 0,
+    [JoinedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [CompletedAt] datetime2 NULL,
+    CONSTRAINT [PK_UserChallenges] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_UserChallenges_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_UserChallenges_Challenges_ChallengeId] FOREIGN KEY ([ChallengeId]) REFERENCES [Challenges] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_UserChallenges_UserId] ON [UserChallenges] ([UserId]);
+CREATE INDEX [IX_UserChallenges_ChallengeId] ON [UserChallenges] ([ChallengeId]);
+GO
+
+-- =============================================
+-- 36. ASSETS TABLE
+-- =============================================
+CREATE TABLE [Assets] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [UserId] bigint NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [Description] nvarchar(500) NULL,
+    [InitialValue] decimal(18,2) NOT NULL,
+    [CurrentValue] decimal(18,2) NOT NULL,
+    [PurchaseDate] datetime2 NOT NULL,
+    [UsefulLifeMonths] int NOT NULL DEFAULT 0,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [UpdatedAt] datetime2 NULL,
+    CONSTRAINT [PK_Assets] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Assets_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_Assets_UserId] ON [Assets] ([UserId]);
+GO
+
+-- =============================================
+-- 37. SHOPPING LISTS TABLE
+-- =============================================
+CREATE TABLE [ShoppingLists] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [UserId] bigint NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT [PK_ShoppingLists] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_ShoppingLists_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_ShoppingLists_UserId] ON [ShoppingLists] ([UserId]);
+GO
+
+-- =============================================
+-- 38. SHOPPING ITEMS TABLE
+-- =============================================
+CREATE TABLE [ShoppingItems] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [ShoppingListId] bigint NOT NULL,
+    [Name] nvarchar(200) NOT NULL,
+    [EstimatedPrice] decimal(18,2) NULL,
+    [IsPurchased] bit NOT NULL DEFAULT 0,
+    CONSTRAINT [PK_ShoppingItems] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_ShoppingItems_ShoppingLists_ShoppingListId] FOREIGN KEY ([ShoppingListId]) REFERENCES [ShoppingLists] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_ShoppingItems_ShoppingListId] ON [ShoppingItems] ([ShoppingListId]);
+GO
+
+-- =============================================
+-- 39. FINANCIAL HEALTH LOGS TABLE
+-- =============================================
+CREATE TABLE [FinancialHealthLogs] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [UserId] bigint NOT NULL,
+    [Score] int NOT NULL,
+    [SavingsIncomeRatio] decimal(18,4) NOT NULL,
+    [DebtAssetRatio] decimal(18,4) NOT NULL,
+    [BudgetCompliance] decimal(18,4) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT [PK_FinancialHealthLogs] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_FinancialHealthLogs_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_FinancialHealthLogs_UserId] ON [FinancialHealthLogs] ([UserId]);
+GO
+
+-- =============================================
+-- 40. KID TASKS TABLE
+-- =============================================
+CREATE TABLE [KidTasks] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [ParentId] bigint NOT NULL,
+    [ChildId] bigint NOT NULL,
+    [Title] nvarchar(200) NOT NULL,
+    [Description] nvarchar(1000) NOT NULL,
+    [RewardAmount] decimal(18,2) NOT NULL,
+    [Status] nvarchar(50) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [CompletedAt] datetime2 NULL,
+    CONSTRAINT [PK_KidTasks] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_KidTasks_Users_ParentId] FOREIGN KEY ([ParentId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
+    CONSTRAINT [FK_KidTasks_Users_ChildId] FOREIGN KEY ([ChildId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION
+);
+GO
+
+CREATE INDEX [IX_KidTasks_ParentId] ON [KidTasks] ([ParentId]);
+CREATE INDEX [IX_KidTasks_ChildId] ON [KidTasks] ([ChildId]);
+GO
+
+-- =============================================
+-- 41. GROUP INVITATIONS TABLE
+-- =============================================
+CREATE TABLE [GroupInvitations] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [GroupId] bigint NOT NULL,
+    [InviterId] bigint NOT NULL,
+    [InviteEmail] nvarchar(256) NOT NULL,
+    [Code] nvarchar(50) NOT NULL,
+    [Status] nvarchar(50) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [ExpiresAt] datetime2 NULL,
+    CONSTRAINT [PK_GroupInvitations] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_GroupInvitations_GroupExpenses_GroupId] FOREIGN KEY ([GroupId]) REFERENCES [GroupExpenses] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_GroupInvitations_Users_InviterId] FOREIGN KEY ([InviterId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION
+);
+GO
+
+CREATE INDEX [IX_GroupInvitations_GroupId] ON [GroupInvitations] ([GroupId]);
+CREATE INDEX [IX_GroupInvitations_InviterId] ON [GroupInvitations] ([InviterId]);
+GO
+
+-- =============================================
+-- 42. OCR TEXTS TABLE
+-- =============================================
+CREATE TABLE [OcrTexts] (
+    [Id] bigint IDENTITY(1,1) NOT NULL,
+    [TransactionId] bigint NOT NULL,
+    [RawText] nvarchar(max) NOT NULL,
+    [MerchantName] nvarchar(256) NULL,
+    [Amount] decimal(18,2) NULL,
+    [Date] datetime2 NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT [PK_OcrTexts] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_OcrTexts_Transactions_TransactionId] FOREIGN KEY ([TransactionId]) REFERENCES [Transactions] ([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_OcrTexts_TransactionId] ON [OcrTexts] ([TransactionId]);
+GO
+

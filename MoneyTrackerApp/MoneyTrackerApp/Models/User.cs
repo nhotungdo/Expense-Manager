@@ -133,5 +133,18 @@ public partial class User
 
     public virtual ICollection<Message> ReceivedMessages { get; set; } = new List<Message>();
 
+    public virtual ICollection<AutomationRule> AutomationRules { get; set; } = new List<AutomationRule>();
+
+    public virtual ICollection<UserChallenge> UserChallenges { get; set; } = new List<UserChallenge>();
+
+    public virtual ICollection<Asset> Assets { get; set; } = new List<Asset>();
+
+    public virtual ICollection<ShoppingList> ShoppingLists { get; set; } = new List<ShoppingList>();
+
+    public virtual ICollection<FinancialHealthLog> FinancialHealthLogs { get; set; } = new List<FinancialHealthLog>();
+
+    public virtual ICollection<KidTask> ParentTasks { get; set; } = new List<KidTask>();
+
+    public virtual ICollection<KidTask> ChildTasks { get; set; } = new List<KidTask>();
 
 }

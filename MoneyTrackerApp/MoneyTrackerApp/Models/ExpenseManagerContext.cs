@@ -99,6 +99,22 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<UserSession> UserSessions { get; set; }
 
+    public virtual DbSet<AutomationRule> AutomationRules { get; set; }
+
+    public virtual DbSet<Challenge> Challenges { get; set; }
+
+    public virtual DbSet<UserChallenge> UserChallenges { get; set; }
+
+    public virtual DbSet<Asset> Assets { get; set; }
+
+    public virtual DbSet<ShoppingList> ShoppingLists { get; set; }
+
+    public virtual DbSet<ShoppingItem> ShoppingItems { get; set; }
+
+    public virtual DbSet<FinancialHealthLog> FinancialHealthLogs { get; set; }
+
+    public virtual DbSet<KidTask> KidTasks { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
@@ -837,6 +853,97 @@ public partial class ExpenseManagerContext : DbContext
             entity.HasOne(d => d.Group).WithMany(p => p.GroupInvitations).HasForeignKey(d => d.GroupId);
 
             entity.HasOne(d => d.Inviter).WithMany().HasForeignKey(d => d.InviterId);
+        });
+
+        modelBuilder.Entity<AutomationRule>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_AutomationRules_UserId");
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.TriggerType).HasMaxLength(50);
+            entity.Property(e => e.ActionType).HasMaxLength(50);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AutomationRules).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<Challenge>(entity =>
+        {
+            entity.HasIndex(e => e.Type, "IX_Challenges_Type");
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.Type).HasMaxLength(50);
+            entity.Property(e => e.TargetAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.BadgeIcon).HasMaxLength(50);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.TargetCategory).WithMany().HasForeignKey(d => d.TargetCategoryId);
+        });
+
+        modelBuilder.Entity<UserChallenge>(entity =>
+        {
+            entity.HasIndex(e => new { e.UserId, e.ChallengeId }, "UK_UserChallenges_UserId_ChallengeId").IsUnique();
+            entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Active");
+            entity.Property(e => e.Progress).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.JoinedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserChallenges).HasForeignKey(d => d.UserId);
+            entity.HasOne(d => d.Challenge).WithMany(p => p.UserChallenges).HasForeignKey(d => d.ChallengeId);
+        });
+
+        modelBuilder.Entity<Asset>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_Assets_UserId");
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.InitialValue).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CurrentValue).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Assets).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<ShoppingList>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_ShoppingLists_UserId");
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ShoppingLists).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<ShoppingItem>(entity =>
+        {
+            entity.HasIndex(e => e.ShoppingListId, "IX_ShoppingItems_ShoppingListId");
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.EstimatedPrice).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.IsPurchased).HasDefaultValue(false);
+
+            entity.HasOne(d => d.ShoppingList).WithMany(p => p.ShoppingItems).HasForeignKey(d => d.ShoppingListId);
+        });
+
+        modelBuilder.Entity<FinancialHealthLog>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_FinancialHealthLogs_UserId");
+            entity.Property(e => e.SavingsIncomeRatio).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.DebtAssetRatio).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.BudgetCompliance).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User).WithMany(p => p.FinancialHealthLogs).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<KidTask>(entity =>
+        {
+            entity.HasIndex(e => e.ParentId, "IX_KidTasks_ParentId");
+            entity.HasIndex(e => e.ChildId, "IX_KidTasks_ChildId");
+            entity.Property(e => e.Title).HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.RewardAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Pending");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Parent).WithMany(p => p.ParentTasks).HasForeignKey(d => d.ParentId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(d => d.Child).WithMany(p => p.ChildTasks).HasForeignKey(d => d.ChildId).OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);
