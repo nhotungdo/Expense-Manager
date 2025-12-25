@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MoneyTrackerApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+653700e8f99388fbecd3a2734d02d7e2204457c8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba8d496208deeeb6c77d84c1035563273138764a")]
 [assembly: System.Reflection.AssemblyProductAttribute("MoneyTrackerApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MoneyTrackerApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -678,17 +678,32 @@ public class TransactionService : ITransactionService
         {
             recipients.Add(account.UserId);
         }
+        
+        // Ensure the actor is in the recipients list (for self-notification)
+        if (!recipients.Contains(actorId))
+        {
+            recipients.Add(actorId);
+        }
 
         var notifications = new List<Notification>();
         foreach (var userId in recipients.Distinct())
         {
-            if (userId == actorId) continue; // Don't notify self
+            // Determine message based on who is receiving it
+            string message;
+            if (userId == actorId)
+            {
+                message = $"Bạn vừa thực hiện {action} với số tiền {amountDisplay}.";
+            }
+            else
+            {
+                message = $"{actorName} vừa thực hiện {action} với số tiền {amountDisplay}.";
+            }
 
             notifications.Add(new Notification
             {
                 UserId = userId,
                 Title = $"Biến động số dư: {accountName}",
-                Message = $"{actorName} vừa thực hiện {action} với số tiền {amountDisplay}.",
+                Message = message,
                 Type = "Transaction",
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow,

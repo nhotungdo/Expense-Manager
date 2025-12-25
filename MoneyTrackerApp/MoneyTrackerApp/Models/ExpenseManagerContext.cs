@@ -49,6 +49,8 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<GroupMember> GroupMembers { get; set; }
 
+    public virtual DbSet<GroupInvitation> GroupInvitations { get; set; }
+
     public virtual DbSet<GroupTransaction> GroupTransactions { get; set; }
 
     public virtual DbSet<GroupTransactionSplit> GroupTransactionSplits { get; set; }
@@ -816,9 +818,25 @@ public partial class ExpenseManagerContext : DbContext
             entity.Property(e => e.Location).HasMaxLength(256);
 
             entity.HasOne(d => d.User)
-                .WithMany(p => p.Sessions)
+                .WithMany() // Removed navigation property p.Sessions
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GroupInvitation>(entity =>
+        {
+            entity.HasIndex(e => e.GroupId, "IX_GroupInvitations_GroupId");
+
+            entity.HasIndex(e => e.InviterId, "IX_GroupInvitations_InviterId");
+
+            entity.Property(e => e.InviteEmail).HasMaxLength(256);
+            entity.Property(e => e.Code).HasMaxLength(100);
+            entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Pending");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Group).WithMany(p => p.GroupInvitations).HasForeignKey(d => d.GroupId);
+
+            entity.HasOne(d => d.Inviter).WithMany().HasForeignKey(d => d.InviterId);
         });
 
         OnModelCreatingPartial(modelBuilder);

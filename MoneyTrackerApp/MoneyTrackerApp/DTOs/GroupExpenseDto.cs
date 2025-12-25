@@ -201,3 +201,8 @@ public class GroupDebtDto
     public string ToUserName { get; set; } = null!;
     public decimal Amount { get; set; }
 }
+
+public class UpdateGroupMemberRoleDto
+{
+    public string Role { get; set; } = "Member";
+}

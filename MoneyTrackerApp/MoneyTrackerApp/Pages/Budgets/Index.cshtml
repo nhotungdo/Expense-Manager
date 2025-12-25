@@ -215,7 +215,7 @@
                             vào cuối tháng này.
                         </p>
                     }
-                    <button class="text-xs font-bold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors border border-white/20">
+                    <button onclick="openAiAnalysisModal()" class="text-xs font-bold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors border border-white/20">
                         Xem chi tiết phân tích
                     </button>
                 </div>
@@ -227,9 +227,44 @@
 
 <!-- Hidden Data for JS -->
 <div id="budgetData" style="display:none;"
-     data-total-budget="@Model.TotalBudget"
+     data-total-budget="@(Model.TotalBudget > 0 ? Model.TotalBudget : 0)"
+     data-total-spent="@Model.TotalSpent"
+     data-projected-spent="@Model.ProjectedSpent"
+     data-percentage="@Model.Percentage"
      data-category-json='@Html.Raw(categoryDataJson)'
      data-daily-json='@Html.Raw(dailyDataJson)'>
+</div>
+
+<!-- AI Analysis Modal -->
+<div class="modal fade" id="aiAnalysisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+            <div class="modal-header bg-gradient-to-br from-indigo-900 to-purple-900 text-white border-0 p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-robot text-2xl"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title font-bold text-xl">Phân tích Chi tiết</h5>
+                        <p class="text-indigo-200 text-sm">AI Advisor Insights</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-6 bg-slate-50">
+                <div class="space-y-4" id="aiAnalysisContent">
+                    <!-- Dynamic Content -->
+                    <div class="text-center py-8">
+                        <i class="fas fa-circle-notch fa-spin text-indigo-600 text-2xl"></i>
+                        <p class="text-slate-500 mt-2">Đang phân tích dữ liệu...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 bg-white">
+                <button type="button" class="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors" data-bs-dismiss="modal">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

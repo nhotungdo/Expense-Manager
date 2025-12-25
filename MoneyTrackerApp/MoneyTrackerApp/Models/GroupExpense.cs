@@ -28,4 +28,6 @@ public partial class GroupExpense
     public virtual ICollection<GroupMember> GroupMembers { get; set; } = new List<GroupMember>();
 
     public virtual ICollection<GroupTransaction> GroupTransactions { get; set; } = new List<GroupTransaction>();
+
+    public virtual ICollection<GroupInvitation> GroupInvitations { get; set; } = new List<GroupInvitation>();
 }

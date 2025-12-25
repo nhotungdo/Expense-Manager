@@ -359,7 +359,8 @@
         const typeMap = {
             'BudgetAlert': 'budget',
             'DebtReminder': 'debt',
-            'ScheduledTransaction': 'transaction'
+            'ScheduledTransaction': 'transaction',
+            'Transaction': 'transaction'
         };
         return typeMap[type] || 'default';
     }
@@ -368,7 +369,8 @@
         const typeMap = {
             'BudgetAlert': 'type-budget',
             'DebtReminder': 'type-debt',
-            'ScheduledTransaction': 'type-transaction'
+            'ScheduledTransaction': 'type-transaction',
+            'Transaction': 'type-transaction'
         };
         return typeMap[type] || 'type-default';
     }
@@ -377,7 +379,8 @@
         const iconMap = {
             'BudgetAlert': '<i class="fas fa-exclamation-triangle"></i>',
             'DebtReminder': '<i class="fas fa-hand-holding-usd"></i>',
-            'ScheduledTransaction': '<i class="fas fa-clock"></i>'
+            'ScheduledTransaction': '<i class="fas fa-clock"></i>',
+            'Transaction': '<i class="fas fa-money-bill-wave"></i>'
         };
         return iconMap[type] || '<i class="fas fa-info-circle"></i>';
     }

@@ -234,6 +234,7 @@ async function handleStandardSubmit(formData, type) {
     if (result.ok) {
         // Success
         modalInstance.hide();
+        cachedAccounts = []; // Clear cache so next open fetches fresh balances
 
         // Show Budget Warning if any
         if (result.data && result.data.warningMessage) {
@@ -279,6 +280,7 @@ async function handleTransferSubmit(formData) {
 
     if (res.ok) {
         modalInstance.hide();
+        cachedAccounts = []; // Clear cache so next open fetches fresh balances
         window.dispatchEvent(new CustomEvent('transaction:saved'));
         if (window.loadPersonalWalletData) window.loadPersonalWalletData();
         if (window.loadRecentTransactions) window.loadRecentTransactions();

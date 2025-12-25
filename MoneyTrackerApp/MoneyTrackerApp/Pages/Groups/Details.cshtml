@@ -1,613 +1,679 @@
-@page "{id:int}"
+@page "{id:long}"
 @model MoneyTrackerApp.Pages.Groups.DetailsModel
 @{
-    ViewData["Title"] = "Chi tiết nhóm";
+    ViewData["Title"] = Model.Group.Name;
+    var primaryColor = !string.IsNullOrEmpty(Model.Group.Color) ? Model.Group.Color : "#3B82F6";
 }
 
-<div id="groupDetailsApp" class="group-details-container" v-cloak>
-    <!-- Header -->
-    <header class="details-header">
-        <div class="header-left">
-            <button class="btn-back" @@click="goBack">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <div class="header-info">
-                <h1 class="group-title">{{ group.name }}</h1>
-                <p class="group-description">{{ group.description }}</p>
-            </div>
-        </div>
-        <div class="header-actions">
-            <button class="btn btn-secondary" @@click="openSettingsModal">
-                <i class="fas fa-cog"></i>
-                <span>Cài đặt</span>
-            </button>
-            <button class="btn btn-primary" @@click="openAddExpenseModal">
-                <i class="fas fa-plus"></i>
-                <span>Thêm chi tiêu</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Stats Overview -->
-    <div class="stats-overview">
-        <div class="stat-card primary">
-            <div class="stat-icon">
-                <i class="fas fa-wallet"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Tổng chi tiêu</div>
-                <div class="stat-value">{{ formatCurrency(statistics.totalExpenses) }}</div>
-                <div class="stat-trend" :class="statistics.expenseTrend > 0 ? 'up' : 'down'">
-                    <i :class="statistics.expenseTrend > 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
-                    {{ Math.abs(statistics.expenseTrend) }}% so với tháng trước
+<div class="min-h-screen pb-20 bg-slate-50 dark:bg-slate-900 transition-colors">
+    
+    @if (Model.IsPendingMember)
+    {
+        <!-- Pending Invitation Overlay -->
+        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8 text-center border border-slate-200 dark:border-slate-700">
+                <div class="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 dark:text-blue-400">
+                    <i class="fas fa-envelope-open-text text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Lời mời tham gia nhóm</h2>
+                <p class="text-slate-600 dark:text-slate-300 mb-8">
+                    Bạn đã được mời tham gia nhóm chi tiêu <span class="font-bold text-slate-900 dark:text-white">@Model.Group.Name</span>.
+                    <br>Vui lòng xác nhận để tham gia.
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <form method="post" asp-page-handler="DeclineInvite" class="w-full">
+                         <button type="submit" class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-bold transition-colors">
+                            Từ chối
+                        </button>
+                    </form>
+                    <form method="post" asp-page-handler="AcceptInvite" class="w-full">
+                        <button type="submit" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-colors">
+                            Tham gia
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-
-        <div class="stat-card success">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Thành viên</div>
-                <div class="stat-value">{{ members.length }}</div>
-                <div class="stat-info">{{ activeMembers }} đang hoạt động</div>
-            </div>
-        </div>
-
-        <div class="stat-card warning">
-            <div class="stat-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Chi tiêu trung bình</div>
-                <div class="stat-value">{{ formatCurrency(statistics.averageExpense) }}</div>
-                <div class="stat-info">Mỗi giao dịch</div>
-            </div>
-        </div>
-
-        <div class="stat-card" :class="budgetStatus">
-            <div class="stat-icon">
-                <i class="fas fa-bullseye"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Ngân sách</div>
-                <div class="stat-value">{{ formatCurrency(budget.limit) }}</div>
-                <div class="stat-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" :style="{ width: budgetPercentage + '%' }"></div>
+    }
+    
+    <!-- Hero Header -->
+    <div class="relative bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700">
+        <!-- Color Banner -->
+        <div class="h-32 w-full opacity-90" style="background: linear-gradient(135deg, @primaryColor, #1e293b);"></div>
+        
+        <div class="container mx-auto px-4">
+            <div class="relative -mt-12 flex flex-col md:flex-row items-end md:items-center justify-between gap-6 pb-6">
+                
+                <!-- Group Identity -->
+                <div class="flex items-center gap-6">
+                    <div class="h-24 w-24 rounded-2xl bg-white dark:bg-slate-800 p-1 shadow-xl ring-1 ring-slate-100 dark:ring-slate-700">
+                        <div class="h-full w-full rounded-xl flex items-center justify-center text-4xl text-white shadow-inner"
+                             style="background-color: @primaryColor;">
+                            @if (!string.IsNullOrEmpty(Model.Group.Icon))
+                            {
+                                <i class="@Model.Group.Icon"></i>
+                            }
+                            else
+                            {
+                                <span class="font-bold">@Model.Group.Name.Substring(0, 1).ToUpper()</span>
+                            }
+                        </div>
                     </div>
-                    <span>{{ budgetPercentage }}% đã sử dụng</span>
+                    
+                    <div class="mb-2">
+                        <h1 class="text-3xl font-bold text-slate-900 dark:text-white drop-shadow-sm">@Model.Group.Name</h1>
+                        <div class="flex items-center text-slate-600 dark:text-slate-300 text-sm mt-1 gap-4">
+                            <span class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full flex items-center gap-1.5">
+                                <i class="fas fa-users text-xs"></i> @Model.Group.GroupMembers.Count thành viên
+                            </span>
+                            @if(!string.IsNullOrEmpty(Model.Group.Description)) {
+                                <span class="max-w-md truncate hidden md:inline-block border-l border-slate-300 dark:border-slate-600 pl-4">
+                                    @Model.Group.Description
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mb-2">
+                    <button onclick="openReportModal()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-600 font-medium shadow-sm transition-colors flex items-center gap-2">
+                        <i class="fas fa-chart-pie"></i> <span class="hidden sm:inline">Báo cáo</span>
+                    </button>
+                    @if (Model.Group.CreatedByUserId.ToString() == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                    {
+                        <button onclick="openSettingsModal()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-600 font-medium shadow-sm transition-colors flex items-center gap-2">
+                            <i class="fas fa-cog"></i> <span class="hidden sm:inline">Cài đặt</span>
+                        </button>
+                    }
+                    <button onclick="openAddExpenseModal()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5 font-medium flex items-center gap-2">
+                        <i class="fas fa-plus"></i> <span>Thêm chi tiêu</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="content-grid">
-        <!-- Left Column -->
-        <div class="left-column">
-            <!-- Tabs -->
-            <div class="tabs-container">
-                <div class="tabs">
-                    <button :class="{ active: activeTab === 'transactions' }" @@click="activeTab = 'transactions'">
-                        <i class="fas fa-receipt"></i> Giao dịch
-                    </button>
-                    <button :class="{ active: activeTab === 'analytics' }" @@click="activeTab = 'analytics'">
-                        <i class="fas fa-chart-bar"></i> Phân tích
-                    </button>
-                    <button :class="{ active: activeTab === 'members' }" @@click="activeTab = 'members'">
-                        <i class="fas fa-users"></i> Thành viên
-                    </button>
-                    <button :class="{ active: activeTab === 'categories' }" @@click="activeTab = 'categories'">
-                        <i class="fas fa-tags"></i> Danh mục
-                    </button>
+    <div class="container mx-auto px-4 mt-8">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="mb-6 p-4 rounded-xl bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 flex items-center justify-between shadow-sm animate-fade-in-down">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center text-green-600 dark:text-green-400">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span class="font-medium">@TempData["SuccessMessage"]</span>
                 </div>
-            </div>
-
-            <!-- Tab Content -->
-            <div class="tab-content">
-                <!-- Transactions Tab -->
-                <div v-if="activeTab === 'transactions'" class="transactions-tab">
-                    <div class="tab-header">
-                        <h3>Danh sách giao dịch</h3>
-                        <div class="tab-actions">
-                            <select v-model="transactionFilter" class="filter-select">
-                                <option value="all">Tất cả</option>
-                                <option value="week">Tuần này</option>
-                                <option value="month">Tháng này</option>
-                                <option value="custom">Tùy chỉnh</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div v-if="loading" class="loading-state">
-                        <div class="spinner"></div>
-                    </div>
-
-                    <div v-else-if="filteredTransactions.length === 0" class="empty-state">
-                        <i class="fas fa-receipt"></i>
-                        <p>Chưa có giao dịch nào</p>
-                    </div>
-
-                    <div v-else class="transactions-list">
-                        <div v-for="transaction in filteredTransactions" 
-                             :key="transaction.id"
-                             class="transaction-item"
-                             @@click="viewTransactionDetail(transaction)">
-                            <div class="transaction-icon" :style="{ background: getCategoryColor(transaction.categoryId) }">
-                                <i :class="getCategoryIcon(transaction.categoryId)"></i>
-                            </div>
-                            <div class="transaction-info">
-                                <div class="transaction-title">{{ transaction.description }}</div>
-                                <div class="transaction-meta">
-                                    <span class="payer">{{ transaction.paidByUserName }}</span>
-                                    <span class="date">{{ formatDate(transaction.transactionDate) }}</span>
-                                </div>
-                            </div>
-                            <div class="transaction-amount">
-                                <div class="amount">{{ formatCurrency(transaction.amount) }}</div>
-                                <div class="split-info" :class="getSplitClass(transaction)">
-                                    {{ getSplitText(transaction) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Analytics Tab -->
-                <div v-if="activeTab === 'analytics'" class="analytics-tab">
-                    <div class="analytics-grid">
-                        <!-- Spending by Category Chart -->
-                        <div class="chart-card">
-                            <h4>Chi tiêu theo danh mục</h4>
-                            <canvas id="categoryChart"></canvas>
-                        </div>
-
-                        <!-- Spending Trend Chart -->
-                        <div class="chart-card">
-                            <h4>Xu hướng chi tiêu</h4>
-                            <canvas id="trendChart"></canvas>
-                        </div>
-
-                        <!-- Member Contribution Chart -->
-                        <div class="chart-card">
-                            <h4>Đóng góp của thành viên</h4>
-                            <canvas id="memberChart"></canvas>
-                        </div>
-
-                        <!-- Top Categories -->
-                        <div class="chart-card">
-                            <h4>Danh mục chi tiêu nhiều nhất</h4>
-                            <div class="top-categories">
-                                <div v-for="(cat, index) in topCategories" :key="cat.id" class="category-item">
-                                    <div class="category-rank">{{ index + 1 }}</div>
-                                    <div class="category-info">
-                                        <div class="category-name">{{ cat.name }}</div>
-                                        <div class="category-progress">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" :style="{ width: cat.percentage + '%', background: cat.color }"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="category-amount">{{ formatCurrency(cat.amount) }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Members Tab -->
-                <div v-if="activeTab === 'members'" class="members-tab">
-                    <div class="tab-header">
-                        <h3>Quản lý thành viên</h3>
-                        <button class="btn btn-primary btn-sm" @@click="openAddMemberModal">
-                            <i class="fas fa-user-plus"></i> Thêm thành viên
-                        </button>
-                    </div>
-
-                    <div class="members-list">
-                        <div v-for="member in members" :key="member.userId" class="member-card">
-                            <div class="member-avatar">
-                                <img v-if="member.avatarUrl" :src="member.avatarUrl" :alt="member.userName">
-                                <span v-else>{{ member.userName.charAt(0).toUpperCase() }}</span>
-                            </div>
-                            <div class="member-info">
-                                <div class="member-name">
-                                    {{ member.userName }}
-                                    <span v-if="member.userId == group.createdByUserId" class="badge badge-owner">Chủ nhóm</span>
-                                    <span v-else-if="member.role === 'admin'" class="badge badge-admin">Quản trị</span>
-                                </div>
-                                <div class="member-stats">
-                                    <span><i class="fas fa-receipt"></i> {{ member.transactionCount }} giao dịch</span>
-                                    <span><i class="fas fa-coins"></i> {{ formatCurrency(member.totalPaid) }}</span>
-                                </div>
-                            </div>
-                            <div class="member-balance" :class="getBalanceClass(member.balance)">
-                                <div class="balance-label">{{ getBalanceLabel(member.balance) }}</div>
-                                <div class="balance-amount">{{ formatCurrency(Math.abs(member.balance)) }}</div>
-                            </div>
-                            <div class="member-actions" v-if="canManageMembers">
-                                <button class="btn-icon" @@click="editMemberRole(member)" title="Chỉnh sửa quyền">
-                                    <i class="fas fa-user-cog"></i>
-                                </button>
-                                <button class="btn-icon danger" @@click="removeMember(member)" title="Xóa khỏi nhóm">
-                                    <i class="fas fa-user-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Categories Tab -->
-                <div v-if="activeTab === 'categories'" class="categories-tab">
-                    <div class="tab-header">
-                        <h3>Quản lý danh mục</h3>
-                        <button class="btn btn-primary btn-sm" @@click="openAddCategoryModal">
-                            <i class="fas fa-plus"></i> Thêm danh mục
-                        </button>
-                    </div>
-
-                    <div class="categories-grid">
-                        <div v-for="category in categories" :key="category.id" class="category-card">
-                            <div class="category-header">
-                                <div class="category-icon" :style="{ background: category.color }">
-                                    <i :class="category.icon"></i>
-                                </div>
-                                <div class="category-info">
-                                    <div class="category-name">{{ category.name }}</div>
-                                    <div class="category-count">{{ category.transactionCount }} giao dịch</div>
-                                </div>
-                                <div class="category-actions">
-                                    <button class="btn-icon" @@click="editCategory(category)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn-icon danger" @@click="deleteCategory(category)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="category-stats">
-                                <div class="stat">
-                                    <span class="label">Tổng chi tiêu</span>
-                                    <span class="value">{{ formatCurrency(category.totalAmount) }}</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="label">Trung bình</span>
-                                    <span class="value">{{ formatCurrency(category.averageAmount) }}</span>
-                                </div>
-                            </div>
-                            <div class="category-budget" v-if="category.budgetLimit">
-                                <div class="budget-header">
-                                    <span>Ngân sách</span>
-                                    <span>{{ formatCurrency(category.budgetLimit) }}</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" 
-                                         :style="{ width: (category.totalAmount / category.budgetLimit * 100) + '%' }"
-                                         :class="{ 'over-budget': category.totalAmount > category.budgetLimit }"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column - Sidebar -->
-        <aside class="right-column">
-            <!-- Balance Summary -->
-            <div class="sidebar-card">
-                <h4>Tổng quan số dư</h4>
-                <div class="balance-summary">
-                    <div class="balance-item positive">
-                        <div class="balance-icon">
-                            <i class="fas fa-arrow-down"></i>
-                        </div>
-                        <div class="balance-info">
-                            <div class="balance-label">Bạn được nhận</div>
-                            <div class="balance-value">{{ formatCurrency(myBalance.receivable) }}</div>
-                        </div>
-                    </div>
-                    <div class="balance-item negative">
-                        <div class="balance-icon">
-                            <i class="fas fa-arrow-up"></i>
-                        </div>
-                        <div class="balance-info">
-                            <div class="balance-label">Bạn cần trả</div>
-                            <div class="balance-value">{{ formatCurrency(myBalance.payable) }}</div>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-success btn-block" @@click="openSettleUpModal">
-                    <i class="fas fa-hand-holding-usd"></i> Thanh toán nợ
+                <button onclick="this.parentElement.remove()" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800 flex items-center justify-between shadow-sm animate-fade-in-down">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <span class="font-medium">@TempData["ErrorMessage"]</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        }
 
-            <!-- Budget Alerts -->
-            <div class="sidebar-card" v-if="budgetAlerts.length > 0">
-                <h4>Cảnh báo ngân sách</h4>
-                <div class="alerts-list">
-                    <div v-for="alert in budgetAlerts" :key="alert.id" class="alert-item" :class="alert.severity">
-                        <div class="alert-icon">
-                            <i :class="alert.icon"></i>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Panel: Stats & Transactions (8 cols) -->
+            <div class="lg:col-span-8 space-y-8">
+                
+                <!-- Personal Summary Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Total Spend Card -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                                <i class="fas fa-receipt text-xs"></i>
+                            </div>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Tổng chi tiêu</span>
                         </div>
-                        <div class="alert-content">
-                            <div class="alert-title">{{ alert.title }}</div>
-                            <div class="alert-message">{{ alert.message }}</div>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white">@Model.TotalGroupSpending.ToString("C0")</p>
+                    </div>
+
+                    <!-- You Paid Card -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                                <i class="fas fa-wallet text-xs"></i>
+                            </div>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Bạn đã trả</span>
                         </div>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white">@Model.CurrentUserPaid.ToString("C0")</p>
+                    </div>
+
+                    <!-- Balance Card -->
+                    @{
+                        var isOwed = Model.CurrentUserBalance >= 0;
+                        var balanceColorClass = isOwed ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400";
+                        var balanceBgClass = isOwed ? "bg-emerald-50 dark:bg-emerald-900/20" : "bg-rose-50 dark:bg-rose-900/20";
+                    }
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 p-3 opacity-5">
+                            <i class="fas fa-scale-balanced text-6xl"></i>
+                        </div>
+                        <div class="flex items-center gap-3 mb-2">
+                             <div class="w-8 h-8 rounded-full @balanceBgClass flex items-center justify-center">
+                                <i class="fas @(isOwed ? "fa-arrow-down" : "fa-arrow-up") text-xs @balanceColorClass"></i>
+                            </div>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Số dư của bạn</span>
+                        </div>
+                        <p class="text-2xl font-bold @balanceColorClass">
+                             @Math.Abs(Model.CurrentUserBalance).ToString("C0")
+                        </p>
+                        <p class="text-xs text-slate-400 mt-1">
+                            @(isOwed ? "Bạn được trả" : "Bạn nợ")
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Transaction List -->
+                <div id="transactions">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Giao dịch gần đây</h2>
+                        <a href="#transactions" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">Xem tất cả</a>
+                    </div>
+                
+                    @if (Model.Transactions.Count == 0)
+                    {
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl p-10 text-center shadow-sm border border-slate-100 dark:border-slate-700">
+                            <div class="inline-flex w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-700 items-center justify-center mb-4 text-slate-400">
+                                <i class="fas fa-file-invoice-dollar text-2xl"></i>
+                            </div>
+                            <p class="text-slate-900 dark:text-white font-medium mb-1">Chưa có chi tiêu nào</p>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Thêm chi tiêu đầu tiên để bắt đầu.</p>
+                            <button onclick="openAddExpenseModal()" class="text-blue-600 font-semibold text-sm">Thêm chi tiêu</button>
+                        </div>
+                    }
+
+                    <div class="space-y-4">
+                        @{ DateTime? lastDate = null; }
+                        @foreach (var transaction in Model.Transactions)
+                        {
+                            bool isNewDate = lastDate != transaction.TransactionDate.Date;
+                            if (isNewDate)
+                            {
+                                <div class="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-sm py-2 px-1">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 animate-fade-in">
+                                        @transaction.TransactionDate.ToString("dd/MM/yyyy")
+                                    </span>
+                                </div>
+                                lastDate = transaction.TransactionDate.Date;
+                            }
+
+                            <!-- Transaction Item -->
+                            <div class="group flex items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer">
+                                
+                                <!-- Category Icon -->
+                                <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 group-hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-shopping-bag text-lg"></i>
+                                </div>
+
+                                <!-- Details -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-start">
+                                        <h3 class="font-semibold text-slate-900 dark:text-white truncate">@transaction.Description</h3>
+                                        <span class="font-bold text-slate-900 dark:text-white">@transaction.Amount.ToString("C0")</span>
+                                    </div>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                            <div class="flex items-center gap-1">
+                                                <div class="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[8px]">
+                                                    @(transaction.PaidByUser.FullName?.Substring(0,1) ?? "?")
+                                                </div>
+                                                <span class="font-medium">@(transaction.PaidByUser.FullName?.Split(' ').FirstOrDefault() ?? "Unknown")</span>
+                                            </div>
+                                            <span>đã trả</span>
+                                        </div>
+                                         <div class="text-xs text-slate-400 flex items-center gap-1">
+                                             @if(!string.IsNullOrEmpty(transaction.Category)) {
+                                                <span class="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide">@transaction.Category</span>
+                                             }
+                                             @if(!string.IsNullOrEmpty(transaction.AttachmentUrl)) {
+                                                 <a href="@transaction.AttachmentUrl" target="_blank" class="ml-2 text-blue-500 hover:text-blue-600 transition-colors" title="Xem hóa đơn">
+                                                     <i class="fas fa-paperclip"></i>
+                                                 </a>
+                                             }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="sidebar-card">
-                <h4>Hành động nhanh</h4>
-                <div class="quick-actions">
-                    <button class="quick-action-btn" @@click="openAddExpenseModal">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Thêm chi tiêu</span>
-                    </button>
-                    <button class="quick-action-btn" @@click="openSettleUpModal">
-                        <i class="fas fa-exchange-alt"></i>
-                        <span>Thanh toán</span>
-                    </button>
-                    <button class="quick-action-btn" @@click="exportData">
-                        <i class="fas fa-download"></i>
-                        <span>Xuất dữ liệu</span>
-                    </button>
-                    <button class="quick-action-btn" @@click="shareGroup">
-                        <i class="fas fa-share-alt"></i>
-                        <span>Chia sẻ</span>
-                    </button>
+            <!-- Right Panel: Members (4 cols) -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 lg:sticky lg:top-8">
+                     <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-slate-900 dark:text-white">Thành viên</h3>
+                         <button onclick="openInviteMemberModal()" class="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
+                             <i class="fas fa-user-plus mr-1"></i> MỜI
+                         </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        @foreach(var member in Model.Group.GroupMembers)
+                        {
+                            <div class="flex items-center justify-between group p-2 hover:bg-slate-50 dark:hover:bg-slate-700/30 rounded-xl transition-colors -mx-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-white dark:ring-slate-800 @(member.JoinedAt == null ? "opacity-50 grayscale" : "")">
+                                        @Model.GetInitials(member.User.FullName)
+                                    </div>
+                                    <div class="@(member.JoinedAt == null ? "opacity-75" : "")">
+                                        <p class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                            @member.User.FullName
+                                            @if(member.UserId == Model.Group.CreatedByUserId) {
+                                                <span class="text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wide">Admin</span>
+                                            }
+                                            @if(member.JoinedAt == null) {
+                                                <span class="text-[10px] bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wide">Đã mời</span>
+                                            }
+                                        </p>
+                                        <p class="text-xs text-slate-500 truncate max-w-[140px]">@member.User.Email</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        
+                        @foreach(var invite in Model.ExternalInvitations)
+                        {
+                            <div class="flex items-center justify-between group p-2 hover:bg-slate-50 dark:hover:bg-slate-700/30 rounded-xl transition-colors -mx-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-white dark:ring-slate-800 opacity-75">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="opacity-75">
+                                        <p class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                            @(invite.InviteEmail.Contains("@") ? invite.InviteEmail.Split('@')[0] : invite.InviteEmail)
+                                            <span class="text-[10px] bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wide">Đang chờ</span>
+                                        </p>
+                                        <p class="text-xs text-slate-500 truncate max-w-[140px]">@invite.InviteEmail</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                    <form method="post" asp-page-handler="Export" class="mt-6">
+                        <button type="submit" class="w-full py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-file-export text-slate-400"></i> Xuất sao kê
+                        </button>
+                    </form>
+                    
+                    <form method="post" asp-page-handler="LeaveGroup" onsubmit="return confirm('Bạn có chắc chắn muốn rời nhóm? Dữ liệu chi tiêu của bạn sẽ vẫn được giữ lại nhưng bạn sẽ không còn quyền truy cập.');" class="mt-3">
+                         <button type="submit" class="w-full py-3 border border-rose-100 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 text-rose-600 dark:text-rose-400 rounded-xl text-sm font-medium hover:bg-rose-100 dark:hover:bg-rose-900/20 transition-colors">
+                            Rời nhóm
+                        </button>
+                    </form>
                 </div>
             </div>
-        </aside>
+        </div>
     </div>
-
-    <!-- Toast Notification -->
-    <transition name="toast">
-        <div v-if="toast.show" class="toast" :class="toast.type">
-            <i class="fas" :class="toast.icon"></i>
-            <span>{{ toast.message }}</span>
-        </div>
-    </transition>
-    
-    <!-- Modals -->
-    <teleport to="body">
-        <!-- Expense Modal -->
-        <div v-if="showExpenseModal" class="modal-overlay" @@click.self="closeExpenseModal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3>{{ currentExpense.id ? 'Chỉnh sửa chi tiêu' : 'Thêm chi tiêu mới' }}</h3>
-                    <button class="btn-close" @@click="closeExpenseModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Mô tả <span class="required">*</span></label>
-                        <input 
-                            type="text" 
-                            v-model="currentExpense.description" 
-                            placeholder="Ví dụ: Ăn trưa, Xăng xe..."
-                            class="form-control"
-                        />
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Số tiền <span class="required">*</span></label>
-                            <input 
-                                type="number" 
-                                v-model="currentExpense.amount" 
-                                placeholder="0"
-                                class="form-control"
-                                min="0"
-                            />
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Danh mục</label>
-                            <select v-model="currentExpense.categoryId" class="form-control">
-                                <option :value="null">Chọn danh mục</option>
-                                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                                    {{ cat.name }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Người trả <span class="required">*</span></label>
-                        <select v-model="currentExpense.paidByUserId" class="form-control">
-                            <option v-for="member in members" :key="member.userId" :value="member.userId">
-                                {{ member.userName }}
-                            </option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Ngày giao dịch</label>
-                        <input 
-                            type="date" 
-                            v-model="currentExpense.transactionDate" 
-                            class="form-control"
-                        />
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @@click="closeExpenseModal">Hủy</button>
-                    <button class="btn btn-primary" @@click="saveExpense" :disabled="!currentExpense.description || !currentExpense.amount">
-                        {{ currentExpense.id ? 'Cập nhật' : 'Thêm' }}
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Add Member Modal -->
-        <div v-if="showAddMemberModal" class="modal-overlay" @@click.self="closeAddMemberModal">
-            <div class="modal-container modal-sm">
-                <div class="modal-header">
-                    <h3>Thêm thành viên</h3>
-                    <button class="btn-close" @@click="closeAddMemberModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Tìm kiếm bạn bè</label>
-                        <input 
-                            type="text" 
-                            v-model="friendSearch" 
-                            placeholder="Nhập tên hoặc email..."
-                            class="form-control"
-                        />
-                    </div>
-                    
-                    <div class="friends-list">
-                        <div 
-                            v-for="friend in filteredFriends" 
-                            :key="friend.id"
-                            class="friend-item"
-                            @@click="selectedFriend = friend"
-                        >
-                            <div class="friend-avatar">
-                                {{ friend.userName.charAt(0).toUpperCase() }}
-                            </div>
-                            <div class="friend-info">
-                                <div class="friend-name">{{ friend.userName }}</div>
-                                <div class="friend-email">{{ friend.email }}</div>
-                            </div>
-                            <i v-if="selectedFriend?.id === friend.id" class="fas fa-check text-success"></i>
-                        </div>
-                        
-                        <div v-if="filteredFriends.length === 0" class="empty-state">
-                            <i class="fas fa-user-friends"></i>
-                            <p>Không tìm thấy bạn bè</p>
-                        </div>
-                    </div>
-                    
-                    <div v-if="selectedFriend" class="form-group">
-                        <label>Vai trò</label>
-                        <select v-model="newMemberRole" class="form-control">
-                            <option value="Member">Thành viên</option>
-                            <option value="Admin">Quản trị viên</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @@click="closeAddMemberModal">Hủy</button>
-                    <button class="btn btn-primary" @@click="addMember" :disabled="!selectedFriend">
-                        Thêm
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Settle Up Modal -->
-        <div v-if="showSettleUpModal" class="modal-overlay" @@click.self="closeSettleUpModal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3>Thanh toán nợ</h3>
-                    <button class="btn-close" @@click="closeSettleUpModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="settlements-list">
-                        <div v-for="settlement in settlements" :key="settlement.id" class="settlement-item">
-                            <div class="settlement-info">
-                                <div class="settlement-from">
-                                    <div class="avatar">{{ settlement.fromUserName.charAt(0) }}</div>
-                                    <span>{{ settlement.fromUserName }}</span>
-                                </div>
-                                <div class="settlement-arrow">
-                                    <i class="fas fa-arrow-right"></i>
-                                    <div class="settlement-amount">{{ formatCurrency(settlement.amount) }}</div>
-                                </div>
-                                <div class="settlement-to">
-                                    <div class="avatar">{{ settlement.toUserName.charAt(0) }}</div>
-                                    <span>{{ settlement.toUserName }}</span>
-                                </div>
-                            </div>
-                            <button 
-                                class="btn btn-sm btn-success"
-                                @@click="settleDebt(settlement)"
-                            >
-                                <i class="fas fa-check"></i> Đã thanh toán
-                            </button>
-                        </div>
-                        
-                        <div v-if="settlements.length === 0" class="empty-state">
-                            <i class="fas fa-check-circle text-success"></i>
-                            <p>Tất cả đã thanh toán!</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @@click="closeSettleUpModal">Đóng</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Settings Modal -->
-        <div v-if="showSettingsModal" class="modal-overlay" @@click.self="closeSettingsModal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3>Cài đặt nhóm</h3>
-                    <button class="btn-close" @@click="closeSettingsModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Tên nhóm</label>
-                        <input 
-                            type="text" 
-                            v-model="groupSettings.name" 
-                            class="form-control"
-                        />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Mô tả</label>
-                        <textarea 
-                            v-model="groupSettings.description" 
-                            class="form-control"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @@click="closeSettingsModal">Hủy</button>
-                    <button class="btn btn-primary" @@click="saveSettings">
-                        Lưu thay đổi
-                    </button>
-                </div>
-            </div>
-        </div>
-    </teleport>
 </div>
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/group-details.css" asp-append-version="true" />
-}
+<!-- Add Expense Modal -->
+<div id="addExpenseModalBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" aria-hidden="true">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 transform scale-95 transition-transform" id="addExpenseModalContent">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Thêm Chi Tiêu Mới</h3>
+            
+            <form method="post" asp-page-handler="AddExpense" enctype="multipart/form-data">
+                <div asp-validation-summary="All" class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm"></div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mô tả</label>
+                        <input type="text" asp-for="ExpenseInput.Description" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required placeholder="Ví dụ: Ăn trưa, Vé xem phim...">
+                        <span asp-validation-for="ExpenseInput.Description" class="text-red-500 text-xs"></span>
+                    </div>
 
-@section Scripts {
-    <script>
-        window.groupId = @Model.GroupId;
-        window.currentUserId = '@Model.CurrentUserId';
-    </script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/group-details.js" asp-append-version="true"></script>
-}
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Số tiền (VND)</label>
+                             <input type="number" id="expenseAmount" asp-for="ExpenseInput.Amount" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required min="1000" step="1000">
+                             <span asp-validation-for="ExpenseInput.Amount" class="text-red-500 text-xs"></span>
+                        </div>
+                        <div>
+                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ngày</label>
+                             <input type="date" asp-for="ExpenseInput.Date" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+                             <span asp-validation-for="ExpenseInput.Date" class="text-red-500 text-xs"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Người trả tiền</label>
+                        <select asp-for="ExpenseInput.PaidByUserId" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                            @foreach(var member in Model.GroupParticipants)
+                            {
+                                <option value="@member.Id">@member.FullName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ExpenseInput.PaidByUserId" class="text-red-500 text-xs"></span>
+                    </div>
+
+                    <div>
+                         <div class="flex justify-between items-center mb-1">
+                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Chia tiền</label>
+                             <div class="flex items-center space-x-2">
+                                 <label class="inline-flex items-center cursor-pointer text-xs text-blue-600 dark:text-blue-400 font-medium">
+                                     <input type="checkbox" id="selectAllSplit" checked class="form-checkbox h-3 w-3 mr-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                     Chọn tất cả
+                                 </label>
+                             </div>
+                         </div>
+                         <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-xl max-h-40 overflow-y-auto space-y-2 border border-slate-200 dark:border-slate-600">
+                             @foreach(var member in Model.GroupParticipants)
+                             {
+                                 <div class="flex items-center justify-between">
+                                     <div class="flex items-center">
+                                         <input type="checkbox" name="ExpenseInput.SplitUserIds" value="@member.Id" id="split_@member.Id" class="split-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" checked>
+                                         <label for="split_@member.Id" class="ml-2 text-sm font-medium text-slate-900 dark:text-gray-300">@member.FullName</label>
+                                     </div>
+                                 </div>
+                             }
+                         </div>
+                         <p class="text-xs text-right mt-1 text-slate-500 dark:text-slate-400 font-medium" id="splitAmountDisplay">Mỗi người: 0đ</p>
+                    </div>
+
+                     <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Danh mục</label>
+                         <select asp-for="ExpenseInput.Category" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Chọn danh mục --</option>
+                            <option value="Eating Out">🍔 Ăn uống</option>
+                            <option value="Groceries">🛒 Mua sắm</option>
+                            <option value="Transport">🚗 Di chuyển</option>
+                            <option value="Utilities">💡 Hóa đơn & Tiện ích</option>
+                            <option value="Entertainment">🎬 Giải trí</option>
+                            <option value="Other">📦 Khác</option>
+                        </select>
+                    </div>
+
+                     <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Hình ảnh / Hóa đơn</label>
+                        <input type="file" asp-for="ExpenseInput.ProofImage" accept="image/*" class="block w-full text-sm text-slate-500
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-blue-50 file:text-blue-700
+                          hover:file:bg-blue-100 dark:file:bg-slate-700 dark:file:text-blue-400
+                        "/>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 justify-end mt-6">
+                    <button type="button" onclick="closeAddExpenseModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md">Thêm chi tiêu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Invite Member Modal -->
+<div id="inviteMemberModalBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" aria-hidden="true">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 transform scale-95 transition-transform" id="inviteMemberModalContent">
+             <div class="text-center mb-6">
+                 <div class="w-16 h-16 bg-blue-50 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400">
+                     <i class="fas fa-user-plus text-2xl"></i>
+                 </div>
+                 <h3 class="text-xl font-bold text-slate-900 dark:text-white">Mời thành viên mới</h3>
+                 <p class="text-sm text-slate-500 dark:text-slate-400">Nhập email của người dùng để mời họ vào nhóm.</p>
+             </div>
+            
+            <form method="post" asp-page-handler="InviteMember">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Địa chỉ Email</label>
+                    <textarea asp-for="InviteInput.Emails" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 h-24" required placeholder="nhap@email.com, khac@email.com..."></textarea>
+                    <p class="text-xs text-slate-500 mt-1">Nhập nhiều email phân cách bởi dấu phẩy.</p>
+                    <span asp-validation-for="InviteInput.Emails" class="text-red-500 text-xs"></span>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeInviteMemberModal()" class="flex-1 px-4 py-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg font-medium">Hủy</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md font-medium">Gửi lời mời</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModalBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" aria-hidden="true">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 transform scale-95 transition-transform" id="settingsModalContent">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Cài đặt nhóm</h3>
+            
+            <form method="post" asp-page-handler="UpdateGroup">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tên nhóm</label>
+                        <input type="text" asp-for="GroupInput.Name" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mô tả</label>
+                        <textarea asp-for="GroupInput.Description" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 h-24"></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 justify-end mt-6">
+                    <button type="button" onclick="closeSettingsModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModalBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" aria-hidden="true">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 transform scale-95 transition-transform" id="reportModalContent">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Biểu đồ chi tiêu</h3>
+            
+            <div class="aspect-video w-full bg-slate-50 dark:bg-slate-700/50 rounded-xl flex items-center justify-center">
+                 @if(Model.Transactions.Count > 0)
+                 {
+                    <canvas id="expenseChart" class="max-w-full max-h-full p-2"></canvas>
+                 }
+                 else
+                 {
+                     <p class="text-slate-500">Chưa có dữ liệu để hiển thị.</p>
+                 }
+            </div>
+            
+            <div class="flex justify-end mt-6">
+                <button type="button" onclick="closeReportModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 font-medium">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Add Expense Modal ---
+    function openAddExpenseModal() {
+        const backdrop = document.getElementById('addExpenseModalBackdrop');
+        const content = document.getElementById('addExpenseModalContent');
+        backdrop.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+    function closeAddExpenseModal() {
+        const backdrop = document.getElementById('addExpenseModalBackdrop');
+        const content = document.getElementById('addExpenseModalContent');
+        backdrop.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
+    }
+
+    // --- Invite Member Modal ---
+    function openInviteMemberModal() {
+        const backdrop = document.getElementById('inviteMemberModalBackdrop');
+        const content = document.getElementById('inviteMemberModalContent');
+        backdrop.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+    function closeInviteMemberModal() {
+        const backdrop = document.getElementById('inviteMemberModalBackdrop');
+        const content = document.getElementById('inviteMemberModalContent');
+        backdrop.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
+    }
+
+    // --- Settings Modal ---
+    function openSettingsModal() {
+        const backdrop = document.getElementById('settingsModalBackdrop');
+        const content = document.getElementById('settingsModalContent');
+        backdrop.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+    function closeSettingsModal() {
+        const backdrop = document.getElementById('settingsModalBackdrop');
+        const content = document.getElementById('settingsModalContent');
+        backdrop.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
+    }
+
+    // --- Report Modal ---
+    function openReportModal() {
+        const backdrop = document.getElementById('reportModalBackdrop');
+        const content = document.getElementById('reportModalContent');
+        backdrop.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+    function closeReportModal() {
+        const backdrop = document.getElementById('reportModalBackdrop');
+        const content = document.getElementById('reportModalContent');
+        backdrop.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const categoryData = @Html.Raw(Model.CategorySpendingJson);
+        const ctx = document.getElementById('expenseChart');
+        if (ctx && categoryData && categoryData.length > 0) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryData.map(d => d.Label),
+                    datasets: [{
+                        label: 'Chi tiêu',
+                        data: categoryData.map(d => d.Value),
+                        backgroundColor: [
+                          '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+        
+        // Auto-Reopen Modals if Validation Failed
+        @if (ViewData["ShowAddExpenseModal"] as bool? == true) {
+            <text>openAddExpenseModal();</text>
+        }
+        @if (ViewData["ShowInviteMemberModal"] as bool? == true) {
+             <text>openInviteMemberModal();</text>
+        }
+         @if (ViewData["ShowSettingsModal"] as bool? == true) {
+             <text>openSettingsModal();</text>
+        }
+
+        // --- Split Calculation Logic ---
+        const amountInput = document.getElementById('expenseAmount');
+        const selectAllCheckbox = document.getElementById('selectAllSplit');
+        const splitCheckboxes = document.querySelectorAll('.split-checkbox');
+        const displayLabel = document.getElementById('splitAmountDisplay');
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function calculateSplit() {
+            const amount = parseFloat(amountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                if(displayLabel) displayLabel.textContent = "Mỗi người: 0đ";
+                return;
+            }
+
+            const checkedCount = Array.from(splitCheckboxes).filter(cb => cb.checked).length;
+            if (checkedCount === 0) {
+                 if(displayLabel) displayLabel.textContent = "Chưa chọn thành viên nào";
+                return;
+            }
+
+            const perPerson = amount / checkedCount;
+             if(displayLabel) displayLabel.textContent = `Mỗi người: ${formatCurrency(perPerson)}`;
+        }
+
+        // Event Listeners
+        if(amountInput) {
+            amountInput.addEventListener('input', calculateSplit);
+        }
+
+        if(selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                splitCheckboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                });
+                calculateSplit();
+            });
+        }
+
+        splitCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (!this.checked) {
+                   if(selectAllCheckbox) selectAllCheckbox.checked = false;
+                } else {
+                    const allChecked = Array.from(splitCheckboxes).every(c => c.checked);
+                    if(allChecked && selectAllCheckbox) selectAllCheckbox.checked = true;
+                }
+                calculateSplit();
+            });
+        });
+    });
+</script>

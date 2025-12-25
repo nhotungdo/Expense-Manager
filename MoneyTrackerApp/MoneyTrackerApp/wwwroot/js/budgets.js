@@ -250,3 +250,112 @@ function resetBtn(btn, html) {
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 }
+
+// -------------------------------------------------------------
+// AI Analysis Modal Logic
+// -------------------------------------------------------------
+function openAiAnalysisModal() {
+    const el = document.getElementById('aiAnalysisModal');
+    if (!el) return;
+
+    const modal = new bootstrap.Modal(el);
+    modal.show();
+
+    // Fetch data
+    const dataContainer = document.getElementById('budgetData');
+    const totalBudget = parseFloat(dataContainer.dataset.totalBudget) || 0;
+    const totalSpent = parseFloat(dataContainer.dataset.totalSpent) || 0;
+    const projectedSpent = parseFloat(dataContainer.dataset.projectedSpent) || 0;
+    const percentage = parseFloat(dataContainer.dataset.percentage) || 0;
+    const categoryData = JSON.parse(dataContainer.dataset.categoryJson || '[]');
+
+    const contentDiv = document.getElementById('aiAnalysisContent');
+
+    // Generate Content
+    let statusHTML = '';
+    let categoryHTML = '';
+    let projectionHTML = '';
+
+    // 1. Status Analysis
+    if (percentage > 100) {
+        statusHTML = `
+            <div class="bg-rose-50 border border-rose-100 rounded-xl p-4 flex gap-4">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h6 class="font-bold text-rose-800">Cảnh báo nghiêm trọng</h6>
+                    <p class="text-sm text-rose-600">Bạn đã vượt quá ngân sách <strong>${(percentage - 100).toFixed(1)}%</strong>.</p>
+                </div>
+            </div>`;
+    } else if (percentage > 85) {
+        statusHTML = `
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 flex gap-4">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div>
+                    <h6 class="font-bold text-amber-800">Cảnh báo hạn mức</h6>
+                    <p class="text-sm text-amber-600">Bạn sắp đạt giới hạn ngân sách. Hãy cẩn trọng.</p>
+                </div>
+            </div>`;
+    } else {
+        statusHTML = `
+            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex gap-4">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h6 class="font-bold text-emerald-800">Trạng thái Tốt</h6>
+                    <p class="text-sm text-emerald-600">Chi tiêu của bạn đang trong tầm kiểm soát.</p>
+                </div>
+            </div>`;
+    }
+
+    // 2. Category Insights
+    if (categoryData.length > 0) {
+        const topCategory = categoryData[0]; // Assumes sorted by amount descending
+        categoryHTML = `
+            <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                <h6 class="font-bold text-slate-700 mb-2 text-sm uppercase tracking-wide">Chi tiêu nhiều nhất</h6>
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background-color: ${topCategory.color}">
+                            <i class="${topCategory.icon || 'fas fa-tag'} text-xs"></i>
+                        </div>
+                        <span class="font-medium text-slate-800">${topCategory.name}</span>
+                    </div>
+                    <span class="font-bold text-slate-900">${formatCurrency(topCategory.amount)}</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">Chiếm <strong>${((topCategory.amount / totalSpent) * 100).toFixed(1)}%</strong> tổng chi tiêu.</p>
+            </div>
+        `;
+    }
+
+    // 3. Projection
+    const remaining = totalBudget - totalSpent;
+    const projectedOver = projectedSpent - totalBudget;
+
+    // Calculate daily average
+    const today = new Date().getDate();
+    const dailyAvg = totalSpent / Math.max(today, 1);
+
+    let adviceText = '';
+    if (projectedOver > 0) {
+        adviceText = `Dựa trên mức chi tiêu trung bình <strong>${formatCurrency(dailyAvg)}/ngày</strong>, bạn dự kiến sẽ vượt ngân sách khoảng <strong>${formatCurrency(projectedOver)}</strong>. Hãy cắt giảm chi tiêu không cần thiết ngay bây giờ.`;
+    } else {
+        adviceText = `Bạn đang duy trì mức chi tiêu tốt (TB <strong>${formatCurrency(dailyAvg)}/ngày</strong>). Dự kiến bạn sẽ dư khoảng <strong>${formatCurrency(totalBudget - projectedSpent)}</strong> vào cuối tháng.`;
+    }
+
+    projectionHTML = `
+        <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4">
+            <h6 class="font-bold text-indigo-900 mb-2 text-sm uppercase tracking-wide">Dự báo & Lời khuyên</h6>
+            <p class="text-sm text-indigo-800 leading-relaxed text-justify">
+                ${adviceText}
+            </p>
+        </div>
+    `;
+
+    // Combine
+    contentDiv.innerHTML = statusHTML + categoryHTML + projectionHTML;
+}

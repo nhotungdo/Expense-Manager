@@ -133,5 +133,5 @@ public partial class User
 
     public virtual ICollection<Message> ReceivedMessages { get; set; } = new List<Message>();
 
-    public virtual ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
+
 }

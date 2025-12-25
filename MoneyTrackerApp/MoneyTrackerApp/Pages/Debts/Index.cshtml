@@ -4,230 +4,213 @@
     ViewData["Title"] = "Quản lý Nợ | Money Tracker";
 }
 
-<div id="debts-app" class="debts-app-container" v-cloak>
+<div id="debts-app" class="debts-container" v-cloak>
     
-    <!-- Main Content Area -->
-    <main class="main-content">
-        
-        <!-- Loading State -->
-        <div v-if="isLoading" class="loading-state">
-            <div class="spinner-grow text-primary mb-3" role="status"></div>
-            <p class="text-muted fw-medium animate-pulse">Đang tải dữ liệu nợ...</p>
+    <!-- Header -->
+    <header class="page-header d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h1 class="text-gradient">Sổ Nợ</h1>
+            <p>Quản lý các khoản vay và cho vay hiệu quả</p>
+        </div>
+        <button class="btn btn-modern btn-modern-primary d-none d-md-flex align-items-center gap-2" @@click="openAddModal">
+            <i class="fas fa-plus"></i>
+            <span>Thêm Khoản Nợ</span>
+        </button>
+    </header>
+
+    <!-- Loading -->
+    <div v-if="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3 text-muted">Đang tải dữ liệu...</p>
+    </div>
+
+    <div v-else class="animate-fade-in">
+        <!-- Stats Grid -->
+        <div class="summary-grid">
+            <!-- Net Position -->
+            <div class="stat-card primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Vị thế ròng</div>
+                        <div class="stat-value">{{ formatCurrency(Math.abs(summary.netDebt)) }}</div>
+                        <div class="badge bg-white bg-opacity-25 rounded-pill fw-normal px-3 py-1">
+                            {{ summary.netDebt >= 0 ? 'Bạn đang dương' : 'Bạn đang âm' }}
+                        </div>
+                    </div>
+                    <i class="fas fa-wallet stat-icon"></i>
+                </div>
+            </div>
+
+            <!-- I Owe (Payable) -->
+            <div class="stat-card danger">
+                 <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Tôi đi vay (Phải trả)</div>
+                        <div class="stat-value">{{ formatCurrency(summary.totalIOwe) }}</div>
+                        <div class="mt-2 text-white text-opacity-75 small">
+                            {{ summary.iOweThem.length }} khoản đang nợ
+                        </div>
+                    </div>
+                    <i class="fas fa-arrow-down stat-icon"></i>
+                </div>
+            </div>
+
+            <!-- They Owe (Receivable) -->
+            <div class="stat-card success">
+                 <div class="d-flex justify-content-between align-items-start">
+                     <div>
+                        <div class="stat-label">Cho vay (Phải thu)</div>
+                        <div class="stat-value">{{ formatCurrency(summary.totalTheyOweMe) }}</div>
+                        <div class="mt-2 text-white text-opacity-75 small">
+                            {{ summary.theyOweMe.length }} khoản cần thu
+                        </div>
+                     </div>
+                     <i class="fas fa-arrow-up stat-icon"></i>
+                 </div>
+            </div>
         </div>
 
-        <!-- VIEW: DASHBOARD -->
-        <div v-else class="dashboard-view fade-in">
-            
-            <!-- Header -->
-            <header class="d-flex justify-content-between align-items-end mb-5">
-                <div>
-                    <h5 class="text-uppercase text-muted fw-bold small mb-1 ls-1">Sổ Nợ Thông Minh</h5>
-                    <h1 class="display-5 fw-bold text-dark mb-0">Quản Lý Nợ</h1>
-                </div>
-                <button class="btn btn-primary btn-lg rounded-pill shadow-lg hover-lift d-flex align-items-center gap-2 px-4" @@click="openAddModal">
-                    <i class="fas fa-plus"></i>
-                    <span>Thêm Khoản Nợ</span>
-                </button>
-            </header>
+        <!-- Filters & Search -->
+        <div class="actions-bar">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <button class="nav-link" :class="{ active: currentTab === 'all' }" @@click="currentTab = 'all'">Tất cả</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" :class="{ active: currentTab === 'borrow' }" @@click="currentTab = 'borrow'">Đi vay</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" :class="{ active: currentTab === 'lend' }" @@click="currentTab = 'lend'">Cho vay</button>
+                </li>
+            </ul>
 
-            <!-- Stats Overview -->
-            <div class="row g-4 mb-5">
-                <!-- Net Position -->
-                <div class="col-md-4">
-                    <div class="stat-card bg-gradient-primary text-white h-100 rounded-5 p-4 position-relative overflow-hidden shadow-lg">
-                        <div class="position-relative z-10">
-                            <p class="mb-1 opacity-75 fw-medium">Vị thế ròng</p>
-                            <h2 class="display-4 fw-bold mb-1">
-                                {{ formatCurrency(Math.abs(summary.netDebt)) }}
-                            </h2>
-                            <div class="badge bg-white bg-opacity-25 backdrop-blur rounded-pill fw-normal px-3 py-1">
-                                {{ summary.netDebt >= 0 ? 'Bạn đang dương' : 'Bạn đang âm' }}
-                            </div>
-                        </div>
-                        <div class="circle-decoration opacity-10 position-absolute top-0 end-0 translate-middle-y me-n5 mt-n5" style="width: 200px; height: 200px; background: white; border-radius: 50%;"></div>
-                    </div>
-                </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" v-model="searchQuery" placeholder="Tìm kiếm khoản nợ...">
+            </div>
+        </div>
 
-                <!-- IOwe and TheyOwe -->
-                <div class="col-md-8">
-                    <div class="row g-4 h-100">
-                        <div class="col-6">
-                            <div class="stat-card bg-white h-100 rounded-5 p-4 shadow-sm border-0 d-flex flex-column justify-content-between">
-                                <div class="icon-box bg-danger-subtle text-danger rounded-circle mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                                    <i class="fas fa-arrow-down"></i>
-                                </div>
-                                <div>
-                                    <p class="text-muted small fw-bold text-uppercase mb-1">Tôi đi vay (Phải trả)</p>
-                                    <h3 class="text-danger fw-bold mb-0">{{ formatCurrency(summary.totalIOwe) }}</h3>
-                                    <p class="text-muted small mt-1 mb-0">{{ summary.iOweThem.length }} khoản</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="stat-card bg-white h-100 rounded-5 p-4 shadow-sm border-0 d-flex flex-column justify-content-between">
-                                <div class="icon-box bg-success-subtle text-success rounded-circle mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                                    <i class="fas fa-arrow-up"></i>
-                                </div>
-                                <div>
-                                    <p class="text-muted small fw-bold text-uppercase mb-1">Cho vay (Phải thu)</p>
-                                    <h3 class="text-success fw-bold mb-0">{{ formatCurrency(summary.totalTheyOweMe) }}</h3>
-                                    <p class="text-muted small mt-1 mb-0">{{ summary.theyOweMe.length }} khoản</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- List -->
+        <div class="debts-list">
+            <div v-if="filteredDebts.length === 0" class="empty-state">
+                <div class="mb-3 text-muted opacity-50">
+                    <i class="fas fa-clipboard-list fa-3x"></i>
                 </div>
+                <h5 class="text-muted">Không tìm thấy dữ liệu</h5>
+                <p class="text-muted small">Hãy thử thay đổi bộ lọc hoặc thêm khoản nợ mới.</p>
             </div>
 
-            <!-- Tabs and Filters -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <ul class="nav nav-pills custom-pills">
-                    <li class="nav-item">
-                        <button class="nav-link rounded-pill px-4" :class="{ active: currentTab === 'all' }" @@click="currentTab = 'all'">Tất cả</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link rounded-pill px-4" :class="{ active: currentTab === 'borrow' }" @@click="currentTab = 'borrow'">Đi vay</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link rounded-pill px-4" :class="{ active: currentTab === 'lend' }" @@click="currentTab = 'lend'">Cho vay</button>
-                    </li>
-                </ul>
-                
-                <div class="search-wrapper position-relative" style="width: 250px;">
-                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                    <input type="text" v-model="searchQuery" class="form-control rounded-pill border-0 bg-white shadow-sm ps-5" placeholder="Tìm kiếm...">
-                </div>
-            </div>
-
-            <!-- Debts List -->
-            <div class="debts-list">
-                <div v-if="filteredDebts.length === 0" class="text-center py-5">
-                    <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
-                        <i class="fas fa-file-invoice-dollar fa-2x text-muted"></i>
-                    </div>
-                    <h5 class="text-muted">Không tìm thấy khoản nợ nào</h5>
+            <div v-for="debt in filteredDebts" :key="debt.id" class="debt-card cursor-pointer" @@click="viewDebtDetails(debt)">
+                <!-- Icon -->
+                <div class="debt-icon" :class="debt.debtType === 1 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
+                    <i class="fas" :class="debt.debtType === 1 ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
                 </div>
 
-                <div v-for="debt in filteredDebts" :key="debt.id" class="card border-0 shadow-sm rounded-4 mb-3 p-3 bg-white hover-card transition-all" @@click="viewDebtDetails(debt)">
-                    <div class="d-flex align-items-center">
-                        <!-- Icon -->
-                        <div class="debt-icon me-3 rounded-circle d-flex align-items-center justify-content-center" 
-                             :class="debt.debtType === 1 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'"
-                             style="width: 56px; height: 56px; min-width: 56px;">
-                            <i class="fas" :class="debt.debtType === 1 ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
-                        </div>
-
-                        <!-- Info -->
-                        <div class="flex-grow-1 min-w-0">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="fw-bold text-dark mb-1 text-truncate">{{ debt.name }}</h5>
-                                    <div class="d-flex align-items-center text-muted small">
-                                        <i class="fas fa-user-circle me-2"></i>
-                                        <span class="fw-medium me-2">{{ debt.personName || 'Không tên' }}</span>
-                                        <span>&bull;</span>
-                                        <span class="ms-2" :class="{'text-danger fw-bold': debt.isOverdue}">
-                                            {{ debt.isOverdue ? 'Quá hạn ' + Math.abs(debt.daysRemaining) + ' ngày' : (debt.daysRemaining != null ? 'Còn ' + debt.daysRemaining + ' ngày' : 'Không có hạn') }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <h5 class="fw-bold mb-1" :class="debt.debtType === 1 ? 'text-danger' : 'text-success'">
-                                        {{ formatCurrency(debt.remainingAmount) }}
-                                    </h5>
-                                    <small class="text-muted">Tổng: {{ formatCurrency(debt.totalWithInterest) }}</small>
-                                </div>
-                            </div>
-                            
-                            <!-- Progress Bar -->
-                            <div class="mt-2">
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar rounded-pill" role="progressbar" 
-                                         :style="{ width: debt.percentagePaid + '%', backgroundColor: debt.debtType === 1 ? '#dc3545' : '#198754' }"></div>
-                                </div>
-                                <div class="d-flex justify-content-between mt-1" style="font-size: 0.75rem;">
-                                    <span class="text-muted">Đã trả: {{ formatCurrency(debt.amountPaid) }}</span>
-                                    <span class="text-muted">{{ debt.percentagePaid.toFixed(1) }}%</span>
-                                </div>
+                <!-- Info -->
+                <div class="debt-info">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="debt-name">{{ debt.name }}</h5>
+                            <div class="debt-meta">
+                                <span><i class="fas fa-user me-1"></i> {{ debt.personName || 'Không tên' }}</span>
+                                <span v-if="debt.dueDate" :class="{'text-danger fw-bold': debt.isOverdue}">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ debt.isOverdue ? 'Quá hạn ' + Math.abs(debt.daysRemaining) + ' ngày' : 'Còn ' + debt.daysRemaining + ' ngày' }}
+                                </span>
                             </div>
                         </div>
-
-                        <!-- Action -->
-                        <div class="ms-3 ps-3 border-start">
-                             <button class="btn btn-light btn-icon rounded-circle text-primary" @@click.stop="openPaymentModal(debt)">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </button>
+                        <div class="debt-amount-box">
+                            <div class="debt-remaining" :class="debt.debtType === 1 ? 'text-danger' : 'text-success'">
+                                {{ formatCurrency(debt.remainingAmount) }}
+                            </div>
+                            <div class="debt-total">Tổng: {{ formatCurrency(debt.totalWithInterest) }}</div>
                         </div>
                     </div>
+
+                    <!-- Progress -->
+                    <div class="progress-thin">
+                        <div class="progress-bar-thin" 
+                             :style="{ width: debt.percentagePaid + '%', backgroundColor: debt.debtType === 1 ? '#ef4444' : '#10b981' }">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1" style="font-size: 0.75rem; color: var(--text-muted);">
+                        <span>Đã trả: {{ formatCurrency(debt.amountPaid) }}</span>
+                        <span>{{ debt.percentagePaid.toFixed(0) }}%</span>
+                    </div>
+                </div>
+
+                <!-- Quick Action -->
+                <div class="ps-3 border-start d-none d-sm-block">
+                     <button class="btn btn-light rounded-circle text-primary" @@click.stop="openPaymentModal(debt)" title="Thanh toán ngay">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- FLOATING MODALS -->
+    <!-- Mobile FAB -->
+    <div class="fab-add d-md-none" @@click="openAddModal">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <!-- MODALS -->
     
-    <!-- Add/Edit Debt Modal -->
-    <div class="modal fade" id="debtModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <!-- Add/Edit Modal (Reusing structure with new classes) -->
+    <div class="modal fade" id="debtModal" tabindex="-1" data-bs-backdrop="static">
          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-5">
-                <div class="modal-header border-0 p-4 pb-0">
+            <div class="modal-content">
+                <div class="modal-header">
                     <h5 class="modal-title fw-bold">{{ isEditing ? 'Cập Nhật Khoản Nợ' : 'Thêm Khoản Nợ Mới' }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <!-- Type Selector -->
-                    <div class="d-flex gap-2 mb-4 p-1 bg-light rounded-pill">
+                <div class="modal-body">
+                    <div class="d-flex gap-2 mb-4 bg-light p-1 rounded-pill">
                         <button class="btn flex-fill rounded-pill fw-bold transition-all" 
-                                :class="debtForm.debtType === 1 ? 'btn-white shadow-sm text-danger' : 'text-muted'"
+                                :class="debtForm.debtType === 1 ? 'bg-white shadow-sm text-danger' : 'text-muted'"
                                 @@click="debtForm.debtType = 1">
-                            <i class="fas fa-arrow-down me-2"></i>Tôi đi vay
+                            Tôi đi vay
                         </button>
                         <button class="btn flex-fill rounded-pill fw-bold transition-all" 
-                                :class="debtForm.debtType === 2 ? 'btn-white shadow-sm text-success' : 'text-muted'"
+                                :class="debtForm.debtType === 2 ? 'bg-white shadow-sm text-success' : 'text-muted'"
                                 @@click="debtForm.debtType = 2">
-                            <i class="fas fa-arrow-up me-2"></i>Tôi cho vay
+                            Tôi cho vay
                         </button>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label text-uppercase text-muted small fw-bold">Tên khoản nợ</label>
-                        <input type="text" v-model="debtForm.name" class="form-control bg-light border-0 fw-bold" placeholder="VD: Vay mua xe, Tiền nhà...">
+                        <label class="form-label small text-muted fw-bold">Tên khoản nợ</label>
+                        <input type="text" v-model="debtForm.name" class="form-control form-control-modern" placeholder="VD: Vay tiền trọ...">
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label text-uppercase text-muted small fw-bold">Người liên quan</label>
-                        <input type="text" v-model="debtForm.personName" class="form-control bg-light border-0" placeholder="Tên người vay hoặc chủ nợ">
+                        <label class="form-label small text-muted fw-bold">Người liên quan</label>
+                        <input type="text" v-model="debtForm.personName" class="form-control form-control-modern" placeholder="Tên người vay/chủ nợ">
                     </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-uppercase text-muted small fw-bold">Số tiền gốc</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-0 fw-bold">₫</span>
-                                <input type="number" v-model.number="debtForm.initialAmount" class="form-control bg-light border-0 fw-bold" :disabled="isEditing">
-                            </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label small text-muted fw-bold">Số tiền gốc</label>
+                            <input type="number" v-model.number="debtForm.initialAmount" class="form-control form-control-modern" :disabled="isEditing">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-uppercase text-muted small fw-bold">Lãi suất (%/năm)</label>
-                            <input type="number" v-model.number="debtForm.interestRate" class="form-control bg-light border-0" placeholder="0">
+                        <div class="col-6">
+                            <label class="form-label small text-muted fw-bold">Lãi suất (%/năm)</label>
+                            <input type="number" v-model.number="debtForm.interestRate" class="form-control form-control-modern">
                         </div>
                     </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-uppercase text-muted small fw-bold">Ngày bắt đầu</label>
-                            <input type="date" v-model="debtForm.startDate" class="form-control bg-light border-0" :disabled="isEditing">
+                    <div class="row g-3 mt-1">
+                        <div class="col-6">
+                            <label class="form-label small text-muted fw-bold">Ngày vay</label>
+                            <input type="date" v-model="debtForm.startDate" class="form-control form-control-modern" :disabled="isEditing">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-uppercase text-muted small fw-bold">Hạn trả</label>
-                            <input type="date" v-model="debtForm.dueDate" class="form-control bg-light border-0">
+                        <div class="col-6">
+                            <label class="form-label small text-muted fw-bold">Hạn trả</label>
+                            <input type="date" v-model="debtForm.dueDate" class="form-control form-control-modern">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary rounded-pill px-4 min-w-100" @@click="saveDebt">
-                        {{ isEditing ? 'Cập Nhật' : 'Lưu' }}
+                    <button type="button" class="btn btn-modern btn-modern-primary rounded-pill px-4 flex-grow-1" @@click="saveDebt">
+                        {{ isEditing ? 'Lưu Thay Đổi' : 'Tạo Khoản Nợ' }}
                     </button>
                 </div>
             </div>
@@ -235,120 +218,105 @@
     </div>
 
     <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="paymentModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-5">
-                <div class="modal-header border-0 p-4 pb-0">
-                    <h5 class="modal-title fw-bold">Ghi Nhận Thanh Toán</h5>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Thanh Toán</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4 p-3 bg-light rounded-3">
-                        <div>
-                            <small class="text-muted d-block">Khoản nợ</small>
-                            <div class="fw-bold text-dark">{{ selectedDebt?.name }}</div>
-                        </div>
-                        <div class="text-end">
-                            <small class="text-muted d-block">Còn lại</small>
-                            <div class="fw-bold text-primary">{{ formatCurrency(selectedDebt?.remainingAmount) }}</div>
-                        </div>
+                <div class="modal-body">
+                    <div class="bg-primary bg-opacity-10 p-4 rounded-3 text-center mb-4">
+                        <small class="text-muted d-block uppercase tracking-wide mb-1">Số tiền còn lại</small>
+                        <h2 class="text-primary fw-bold mb-0">{{ formatCurrency(selectedDebt?.remainingAmount) }}</h2>
+                        <div class="small text-muted mt-1">{{ selectedDebt?.name }}</div>
                     </div>
-
-                    <div class="form-group mb-3">
-                        <label class="form-label text-uppercase text-muted small fw-bold">Số tiền thanh toán</label>
-                        <div class="input-group input-group-lg">
-                            <span class="input-group-text bg-white border-end-0 fw-bold">₫</span>
-                            <input type="number" v-model.number="paymentForm.amount" class="form-control border-start-0 ps-0 fw-bold fs-3 text-success">
-                        </div>
-                        <small class="text-muted d-block mt-2">Thanh toán sẽ được trừ vào tài khoản (ví) mặc định của bạn.</small>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-bold">Nhập số tiền trả</label>
+                        <input type="number" v-model.number="paymentForm.amount" class="form-control form-control-modern fs-4 text-center fw-bold text-success">
                     </div>
-
-                    <div class="form-group mb-3">
-                        <label class="form-label text-uppercase text-muted small fw-bold">Ngày thanh toán</label>
-                        <input type="date" v-model="paymentForm.date" class="form-control bg-light border-0">
+                    <div class="mb-3">
+                         <label class="form-label small text-muted fw-bold">Ngày trả</label>
+                         <input type="date" v-model="paymentForm.date" class="form-control form-control-modern">
                     </div>
-
-                    <div class="form-group mb-3">
-                         <label class="form-label text-uppercase text-muted small fw-bold">Ghi chú</label>
-                         <textarea v-model="paymentForm.note" class="form-control bg-light border-0" rows="2"></textarea>
+                    <div class="mb-3">
+                         <label class="form-label small text-muted fw-bold">Ghi chú</label>
+                         <textarea v-model="paymentForm.note" class="form-control form-control-modern" rows="2"></textarea>
                     </div>
-
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-success rounded-pill px-4 min-w-100 shadow-sm" @@click="confirmPayment">
-                        <i class="fas fa-check me-2"></i>Xác nhận
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success rounded-pill px-4 flex-grow-1" @@click="confirmPayment">
+                         <i class="fas fa-check me-2"></i> Xác Nhận
                     </button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Detail View Modal -->
-    <div class="modal fade" id="debtDetailModal" tabindex="-1" aria-hidden="true">
+    
+    <!-- Detail Modal -->
+    <div class="modal fade" id="debtDetailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-             <div class="modal-content border-0 shadow-lg rounded-5">
-                <div class="modal-header border-0 p-4">
+             <div class="modal-content">
+                <div class="modal-header">
                     <div>
-                        <h5 class="modal-title fw-bold mb-1">{{ selectedDebt?.name }}</h5>
-                         <span class="badge rounded-pill" :class="selectedDebt?.status === 1 ? 'bg-primary' : (selectedDebt?.status === 3 ? 'bg-success' : 'bg-secondary')">
-                            {{ selectedDebt?.statusDisplay }}
+                        <h4 class="modal-title fw-bold mb-0">{{ selectedDebt?.name }}</h4>
+                        <span class="badge rounded-pill mt-2" 
+                              :class="selectedDebt?.status === 1 ? 'bg-primary' : (selectedDebt?.status === 3 ? 'bg-success' : 'bg-secondary')">
+                              {{ selectedDebt?.statusDisplay }}
                         </span>
                     </div>
-                    
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4 pt-0">
-                     <div class="row g-4 mb-4">
-                         <div class="col-md-4">
-                             <div class="p-3 bg-light rounded-4 h-100">
-                                 <small class="text-muted d-block mb-1">Tổng nợ (Gốc + Lãi)</small>
-                                 <h4 class="fw-bold text-dark">{{ formatCurrency(selectedDebt?.totalWithInterest) }}</h4>
-                                 <small class="text-danger" v-if="selectedDebt?.interestAmount > 0">
-                                     (Lãi: {{ formatCurrency(selectedDebt?.interestAmount) }})
-                                 </small>
-                             </div>
-                         </div>
-                          <div class="col-md-4">
-                             <div class="p-3 bg-light rounded-4 h-100">
-                                 <small class="text-muted d-block mb-1">Đã thanh toán</small>
-                                 <h4 class="fw-bold text-success">{{ formatCurrency(selectedDebt?.amountPaid) }}</h4>
-                             </div>
-                         </div>
-                          <div class="col-md-4">
-                             <div class="p-3 bg-light rounded-4 h-100 border border-2" :class="selectedDebt?.remainingAmount > 0 ? 'border-primary-subtle' : 'border-transparent'">
-                                 <small class="text-muted d-block mb-1">Còn lại</small>
-                                 <h4 class="fw-bold text-primary">{{ formatCurrency(selectedDebt?.remainingAmount) }}</h4>
-                             </div>
-                         </div>
-                     </div>
-
-                     <h6 class="fw-bold text-muted text-uppercase small mb-3">Lịch sử thanh toán</h6>
-                     <div class="payment-history">
-                         <div v-if="!selectedDebt?.payments || selectedDebt?.payments.length === 0" class="text-center text-muted py-3">
-                             Chưa có giao dịch thanh toán nào.
-                         </div>
-                         <div v-for="payment in selectedDebt?.payments" :key="payment.id" class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                <div class="modal-body">
+                    <div class="row g-4 mb-4">
+                        <div class="col-sm-4">
+                            <div class="p-3 bg-light rounded-3 h-100 text-center">
+                                <small class="text-muted d-block mb-1">Tổng Gốc + Lãi</small>
+                                <h5 class="fw-bold text-dark mb-0">{{ formatCurrency(selectedDebt?.totalWithInterest) }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="p-3 bg-light rounded-3 h-100 text-center">
+                                <small class="text-muted d-block mb-1">Đã Trả</small>
+                                <h5 class="fw-bold text-success mb-0">{{ formatCurrency(selectedDebt?.amountPaid) }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                             <div class="p-3 bg-light rounded-3 h-100 text-center border border-primary border-opacity-25">
+                                <small class="text-primary d-block mb-1">Còn Lại</small>
+                                <h5 class="fw-bold text-primary mb-0">{{ formatCurrency(selectedDebt?.remainingAmount) }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Lịch sử giao dịch</h6>
+                    <div class="payment-history" style="max-height: 250px; overflow-y: auto;">
+                        <div v-if="!selectedDebt?.payments || selectedDebt?.payments.length === 0" class="text-center text-muted py-4">
+                            Chưa có giao dịch nào.
+                        </div>
+                         <div v-for="payment in selectedDebt?.payments" :key="payment.id" class="d-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded-3">
                              <div>
                                  <div class="fw-bold text-dark">{{ formatCurrency(payment.amount) }}</div>
                                  <small class="text-muted">{{ formatDate(payment.paymentDate) }}</small>
                              </div>
-                             <div class="text-end">
-                                 <small class="text-muted d-block">{{ payment.note || 'Thanh toán' }}</small>
-                             </div>
+                              <div class="text-end small text-muted">
+                                  {{ payment.note || 'Thanh toán đợt' }}
+                              </div>
                          </div>
-                     </div>
-                </div>
-                 <div class="modal-footer border-0 p-4 pt-0 justify-content-between">
-                     <button type="button" class="btn btn-outline-danger rounded-pill px-4" @@click="deleteDebt(selectedDebt?.id)">
-                         <i class="fas fa-trash me-2"></i>Xóa
-                     </button>
-                    <div>
-                         <button type="button" class="btn btn-light rounded-pill px-4 me-2" @@click="openEditModal">Sửa</button>
-                         <button type="button" class="btn btn-primary rounded-pill px-4" @@click="openPaymentModal(selectedDebt)">Thanh toán</button>
                     </div>
                 </div>
-            </div>
+                <div class="modal-footer justify-content-between">
+                    <button class="btn btn-outline-danger rounded-pill" @@click="deleteDebt(selectedDebt?.id)">
+                        <i class="fas fa-trash-alt me-2"></i> Xóa
+                    </button>
+                    <div>
+                        <button class="btn btn-light rounded-pill px-4 me-2" @@click="openEditModal">Sửa</button>
+                        <button class="btn btn-primary rounded-pill px-4" @@click="openPaymentModal(selectedDebt)">Thanh Toán</button>
+                    </div>
+                </div>
+             </div>
         </div>
     </div>
 
@@ -359,10 +327,7 @@
 }
 
 @section Scripts {
-    <script>
-        window.currentUserId = '@Model.CurrentUserId';
-    </script>
+    <script>window.currentUserId = '@Model.CurrentUserId';</script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/debts-vue.js" asp-append-version="true"></script>
+    <script src="~/js/debts.js" asp-append-version="true"></script>
 }

@@ -174,6 +174,10 @@ public class GroupExpenseController : ControllerBase
     /// <summary>
     /// Remove a member from a group
     /// </summary>
+    /// </summary>
+    /// <param name="groupId">Group ID</param>
+    /// <param name="memberId">Member User ID</param>
+    /// <returns></returns>
     [HttpDelete("groups/{groupId}/members/{memberId}")]
     public async Task<ActionResult> RemoveMember(long groupId, long memberId)
     {
@@ -195,6 +199,36 @@ public class GroupExpenseController : ControllerBase
         {
             _logger.LogError(ex, "Error removing member from group");
             return StatusCode(500, new { message = "An error occurred while removing the member" });
+        }
+    }
+
+    /// <summary>
+    /// Update a member's role
+    /// </summary>
+    [HttpPut("groups/{groupId}/members/{memberId}")]
+    public async Task<ActionResult> UpdateMemberRole(long groupId, long memberId, [FromBody] UpdateGroupMemberRoleDto dto)
+    {
+        try
+        {
+            var userId = GetUserId();
+            // We need to implement logic for role update. 
+            // For now, let's assume the Service doesn't have it yet, so we might need to add it to Service too.
+            // Or we can do it here if it's simple, but Service is better.
+            var result = await _groupExpenseService.UpdateMemberRoleAsync(groupId, memberId, dto.Role, userId);
+            
+            if (!result)
+                return NotFound(new { message = "Member not found" });
+
+            return Ok(new { message = "Role updated successfully" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating member role");
+            return StatusCode(500, new { message = "An error occurred while updating the member role" });
         }
     }
 
@@ -297,6 +331,49 @@ public class GroupExpenseController : ControllerBase
             _logger.LogError(ex, "Error getting group transactions");
             return StatusCode(500, new { message = "An error occurred while retrieving transactions" });
         }
+    }
+
+    /// <summary>
+    /// Export group transactions to CSV
+    /// </summary>
+    [HttpGet("{groupId}/export")]
+    public async Task<IActionResult> ExportTransactions(long groupId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var transactions = await _groupExpenseService.GetGroupTransactionsAsync(groupId, userId);
+            var group = await _groupExpenseService.GetGroupByIdAsync(groupId, userId);
+
+            if (group == null) return NotFound("Group not found");
+
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Date,Description,Category,Payer,Amount,Currency,Splits");
+
+            foreach (var t in transactions)
+            {
+                var splitDetails = string.Join("; ", t.Splits.Select(s => $"{s.UserId}:{s.Amount}"));
+                csv.AppendLine($"{t.TransactionDate:yyyy-MM-dd},{EscapeCsv(t.Description)},{t.Category},{EscapeCsv(t.PaidByUserName)},{t.Amount},{t.Currency},{splitDetails}");
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+            return File(bytes, "text/csv", $"Group_{group.Name}_{DateTime.Now:yyyyMMdd}.csv");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting transactions");
+            return StatusCode(500, "Error exporting data");
+        }
+    }
+
+    private string EscapeCsv(string field)
+    {
+        if (string.IsNullOrEmpty(field)) return "";
+        if (field.Contains(",") || field.Contains("\"") || field.Contains("\n"))
+        {
+            return $"\"{field.Replace("\"", "\"\"")}\"";
+        }
+        return field;
     }
 
     /// <summary>

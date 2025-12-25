@@ -24,6 +24,7 @@ public interface IGroupExpenseService
     Task<bool> DeleteGroupTransactionAsync(long transactionId, long userId);
     Task<GroupTransactionResponseDto> UpdateGroupTransactionAsync(long userId, UpdateGroupTransactionDto dto);
     Task<List<GroupMemberDetailDto>> GetGroupMembersWithStatsAsync(long groupId);
+    Task<bool> UpdateMemberRoleAsync(long groupId, long memberId, string newRole, long userId);
 }
 
 public class GroupExpenseService : IGroupExpenseService
@@ -300,6 +301,29 @@ public class GroupExpenseService : IGroupExpenseService
         _context.GroupMembers.Remove(targetMember);
         await _context.SaveChangesAsync();
 
+        return true;
+    }
+
+    public async Task<bool> UpdateMemberRoleAsync(long groupId, long memberId, string newRole, long userId)
+    {
+        var targetMember = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.Id == memberId && gm.GroupId == groupId);
+
+        if (targetMember == null) return false;
+
+        // Check permissions: Requestor must be Owner or Admin
+        var requestor = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
+
+        if (requestor == null || (requestor.Role != "Owner" && requestor.Role != "Admin"))
+            throw new InvalidOperationException("You don't have permission to update roles");
+
+        // Owner role cannot be changed by others easily, simplified logic here:
+        if (targetMember.Role == "Owner" && requestor.Role != "Owner")
+             throw new InvalidOperationException("Only the Owner can change their own role or transfer ownership");
+
+        targetMember.Role = newRole;
+        await _context.SaveChangesAsync();
         return true;
     }
 
