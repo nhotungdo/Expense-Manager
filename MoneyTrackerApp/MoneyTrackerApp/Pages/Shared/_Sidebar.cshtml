@@ -76,11 +76,7 @@
             <span class="text-sm font-medium">Sổ tiết kiệm</span>
         </a>
 
-        <!-- Games -->
-        <a href="/Games/Index" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/games") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">
-            <i class="fas fa-gamepad w-5 text-center @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/games") == true ? "text-slate-900" : "text-slate-400 group-hover:text-slate-900") transition-colors"></i>
-            <span class="text-sm font-medium">Trò chơi</span>
-        </a>
+
 
         <!-- Analysis -->
         <a href="/Analysis" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group @(ViewContext.RouteData.Values["page"]?.ToString().ToLower().Contains("/analysis") == true ? "bg-slate-50 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900")">

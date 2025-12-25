@@ -1,357 +1,199 @@
-# Expense Manager - Personal Finance Application
 
-A comprehensive, production-ready personal finance management application built with ASP.NET Core 8.0 and React 18 with TypeScript.
-
-[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
-[![React](https://img.shields.io/badge/React-18.3-61DAFB)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-## ✨ Features
-
-### Core Features
-
-- ✅ **User Authentication** - JWT-based authentication with refresh tokens
-- ✅ **Account Management** - Multiple accounts (Cash, Bank, E-Wallet, Credit Card, Savings)
-- ✅ **Transaction Tracking** - Income, Expense, and Transfer transactions with automatic balance updates
-- ✅ **Category Management** - Hierarchical categories with default and custom categories
-- ✅ **Budget Tracking** - Set budgets by category or account with real-time progress tracking
-- ✅ **Reports & Analytics** - Visual reports with interactive charts and trends
-- ✅ **Multi-Currency Support** - Support for multiple currencies with exchange rates
-- ✅ **Shared Accounts** - Share accounts with other users with permission levels
-- ✅ **File Attachments** - Attach receipts and documents to transactions
-- ✅ **Responsive Design** - Mobile-first design with Tailwind CSS
-
-### Technical Highlights
-
-- 🏗️ **Clean Architecture** - Separation of concerns with Repository Pattern and Unit of Work
-- 🔐 **Security** - BCrypt password hashing, JWT tokens, input validation
-- 📝 **Logging** - Structured logging with Serilog
-- 🔄 **Background Jobs** - Hangfire for scheduled tasks
-- 📚 **API Documentation** - Swagger/OpenAPI with interactive UI
-- 🐳 **Docker Support** - Complete Docker Compose setup
-- 🚀 **CI/CD Ready** - GitHub Actions workflow included
-
-## 🏗️ Architecture
-
-This application follows **Clean Architecture** (Onion Architecture) principles:
-
-```
-┌─────────────────────────────────────┐
-│         API Layer (Controllers)      │
-├─────────────────────────────────────┤
-│      Application Layer (Services)    │
-│  - DTOs, Validators, Mappings        │
-├─────────────────────────────────────┤
-│   Infrastructure Layer (Data Access) │
-│  - Repositories, External Services   │
-├─────────────────────────────────────┤
-│      Core Layer (Domain)             │
-│  - Entities, Interfaces, Enums       │
-└─────────────────────────────────────┘
-```
-
-## 🛠️ Tech Stack
-
-### Backend
-
-- **Framework**: ASP.NET Core 8.0 (LTS)
-- **ORM**: Entity Framework Core 8.0
-- **Database**: SQL Server
-- **Authentication**: JWT Bearer Tokens
-- **Validation**: FluentValidation 11.11
-- **Mapping**: AutoMapper 13.0
-- **Logging**: Serilog 8.0
-- **Background Jobs**: Hangfire 1.8
-- **API Documentation**: Swagger/OpenAPI
-- **Password Hashing**: BCrypt.Net
-
-### Frontend
-
-- **Framework**: React 18.3
-- **Language**: TypeScript 5.7
-- **Build Tool**: Vite 6.0
-- **Styling**: Tailwind CSS 3.4
-- **Routing**: React Router 6.28
-- **State Management**: Zustand 5.0
-- **Data Fetching**: TanStack Query (React Query) 5.62
-- **HTTP Client**: Axios 1.7
-- **Forms**: React Hook Form 7.54 + Zod 3.23
-- **Charts**: Recharts 2.15
-- **Icons**: Lucide React 0.468
-
-## 📋 Prerequisites
-
-- **.NET 8.0 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/8.0)
-- **Node.js 20+** - [Download](https://nodejs.org/)
-- **SQL Server** - LocalDB, Express, or Docker
-- **Docker** (optional) - For containerized deployment
-
-## 🚀 Quick Start
-
-### Option 1: Docker Compose (Recommended)
-
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd expense-manager
-   ```
-
-2. **Run with Docker Compose**
-
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Access the application**
-
-   - Frontend: http://localhost:3000
-   - Backend API: https://localhost:5000
-   - Swagger UI: https://localhost:5000/swagger
-   - Hangfire Dashboard: https://localhost:5000/hangfire
-
-4. **Initialize the database**
-
-   ```bash
-   # Connect to SQL Server container
-   docker exec -it expense-manager-db /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd'
-
-   # Run schema and seed data scripts
-   # Copy and paste contents of Database_Schema.sql
-   # Copy and paste contents of Database_SeedData.sql
-   ```
-
-### Option 2: Local Development
-
-#### Backend Setup
-
-1. **Navigate to backend directory**
-
-   ```bash
-   cd MoneyTracker/MoneyTracker
-   ```
-
-2. **Update connection string in `appsettings.json`**
-
-   ```json
-   {
-     "ConnectionStrings": {
-       "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=ExpenseManager;Trusted_Connection=True;MultipleActiveResultSets=true"
-     }
-   }
-   ```
-
-3. **Create database**
-
-   - Open SQL Server Management Studio or Azure Data Studio
-   - Run `Database_Schema.sql`
-   - Run `Database_SeedData.sql`
-
-4. **Run the API**
-
-   ```bash
-   dotnet restore
-   dotnet run
-   ```
-
-   API will be available at:
-
-   - HTTPS: https://localhost:5000
-   - Swagger: https://localhost:5000/swagger
-
-#### Frontend Setup
-
-1. **Navigate to frontend directory**
-
-   ```bash
-   cd frontend
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Create `.env` file**
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Edit `.env`:
-
-   ```
-   VITE_API_URL=https://localhost:7000/api
-   ```
-
-4. **Run development server**
-
-   ```bash
-   npm run dev
-   ```
-
-   Frontend will be available at http://localhost:3000
-
-## 📝 API Documentation
-
-### Authentication Endpoints
-
-```
-POST   /api/auth/register          - Register new user
-POST   /api/auth/login             - Login user
-POST   /api/auth/refresh           - Refresh access token
-GET    /api/auth/me                - Get current user
-PUT    /api/auth/me                - Update user profile
-```
-
-### Account Endpoints
-
-```
-GET    /api/accounts               - Get all user accounts
-GET    /api/accounts/{id}          - Get account by ID
-POST   /api/accounts               - Create new account
-PUT    /api/accounts/{id}          - Update account
-DELETE /api/accounts/{id}          - Delete account (soft delete)
-POST   /api/accounts/{id}/share    - Share account with another user
-```
-
-### Transaction Endpoints
-
-```
-GET    /api/transactions           - Get transactions (with filtering & pagination)
-GET    /api/transactions/{id}      - Get transaction by ID
-POST   /api/transactions           - Create new transaction
-PUT    /api/transactions/{id}      - Update transaction
-DELETE /api/transactions/{id}      - Delete transaction
-POST   /api/transactions/{id}/attachment - Upload attachment
-```
-
-### Category Endpoints
-
-```
-GET    /api/categories             - Get all categories (hierarchical)
-POST   /api/categories             - Create new category
-DELETE /api/categories/{id}        - Delete category
-```
-
-### Budget Endpoints
-
-```
-GET    /api/budgets                - Get all budgets
-GET    /api/budgets/summary        - Get current month budget summary
-POST   /api/budgets                - Create new budget
-DELETE /api/budgets/{id}           - Delete budget
-```
-
-### Report Endpoints
-
-```
-GET    /api/reports/summary        - Get financial summary with charts
-```
-
-Full API documentation available at `/swagger` when running the application.
-
-## 🧪 Testing
-
-### Using Postman
-
-1. Import `Expense_Manager_API.postman_collection.json` into Postman
-2. Set the `baseUrl` variable to your API URL
-3. Register a new user
-4. Login and the token will be automatically saved
-5. Test all endpoints
-
-### Manual Testing
-
-See `VERIFICATION_CHECKLIST.md` for comprehensive testing instructions.
-
-## 📊 Database Schema
-
-The application uses a comprehensive database schema with 20+ tables including:
-
-- **Users** - User accounts and profiles
-- **Accounts** - Financial accounts (bank, cash, credit card, etc.)
-- **Transactions** - Income, expense, and transfer records
-- **Categories** - Hierarchical transaction categories
-- **Budgets** - Budget tracking by category/account
-- **SavingsGoals**, **ScheduledTransactions**, **Debts**, **GroupExpenses**, **SharedAccounts**, **BankConnections**, **CurrencyRates**, **Notifications**, **Reports**, **AuditLogs**
-
-See `Database_Schema.sql` for complete schema definition.
-
-## 🔐 Security Features
-
-- **Password Hashing**: BCrypt with salt rounds
-- **JWT Authentication**: Secure token-based authentication
-- **Refresh Tokens**: Long-lived refresh tokens for seamless UX
-- **CORS**: Configured for frontend origin
-- **Input Validation**: FluentValidation on all requests
-- **SQL Injection Protection**: EF Core parameterized queries
-- **XSS Protection**: React's built-in escaping
-
-## 📚 Documentation
-
-- **README.md** - This file (overview and quick start)
-- **DEPLOYMENT_GUIDE.md** - Detailed deployment instructions
-- **PROJECT_SUMMARY.md** - Complete project summary and implementation details
-- **VERIFICATION_CHECKLIST.md** - Step-by-step verification guide
-- **Swagger UI** - Interactive API documentation at `/swagger`
-- **Postman Collection** - Complete API testing collection
-
-## 🚢 Deployment
-
-See `DEPLOYMENT_GUIDE.md` for detailed deployment instructions including:
-
-- Docker Compose deployment
-- Azure App Service deployment
-- Manual deployment
-- Environment configuration
-- Security checklist
-
-## 📁 Project Structure
-
-```
-expense-manager/
-├── MoneyTracker/                    # Backend ASP.NET Core API
-│   ├── MoneyTracker/
-│   │   ├── Core/                    # Domain layer
-│   │   ├── Application/             # Application layer
-│   │   ├── Infrastructure/          # Infrastructure layer
-│   │   ├── Controllers/             # API layer
-│   │   ├── Models/                  # EF Core entities
-│   │   └── Program.cs
-│   └── Dockerfile
-├── frontend/                        # React TypeScript SPA
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── lib/
-│   │   ├── store/
-│   │   └── types/
-│   ├── package.json
-│   └── Dockerfile
-├── Database_Schema.sql              # Database schema
-├── Database_SeedData.sql            # Seed data
-├── docker-compose.yml
-├── .github/workflows/ci-cd.yml      # CI/CD pipeline
-└── README.md
-```
-
-## 🤝 Contributing
-
-This is a demonstration project. For production use, consider:
-
-1. Implementing real bank API integration (Plaid, Yodlee)
-2. Adding comprehensive unit and integration tests
-3. Implementing real email service (SendGrid, AWS SES)
-4. Adding real-time notifications (SignalR)
-5. Implementing advanced security features (2FA, rate limiting)
-
-## 📄 License
-
-This project is for demonstration purposes.
+<div align="center">
+  <a href="https://github.com/github_username/repo_name">
+    <img src="https://cdn-icons-png.flaticon.com/512/2910/2910296.png" alt="Logo" width="100" height="100">
+  </a>
+
+  <h1 align="center">Money Tracker</h1>
+
+  <p align="center">
+    <a href="https://git.io/typing-svg">
+      <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=2ECC71&center=true&vCenter=true&width=435&lines=Smart+Personal+Finance;Track+Expenses+Simply;Achieve+Financial+Freedom;Built+with+.NET+8+%26+React" alt="Typing SVG" />
+    </a>
+  </p>
+
+  <p align="center">
+    <b>A comprehensive, production-ready solution to manage your wealth.</b>
+    <br />
+    <br />
+    <a href="#demo">View Demo</a>
+    ·
+    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
+  </p>
+</div>
+
+<!-- BADGES -->
+<div align="center">
+
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Docker](https://img.shields.io/badge/Docker-24.0-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+
+</div>
+
+<br />
+
+<!-- TECH STACK ANIMATION -->
+<div align="center">
+  <h2>🛠️ Tech Stack</h2>
+  <p>Built with the latest and greatest technologies for top-tier performance.</p>
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=cs,dotnet,react,ts,vite,tailwind,html,css,docker,sqlserver,github&perline=11" />
+  </a>
+</div>
+
+<br />
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#key-features">Key Features</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
 
 ---
 
-**Built with ❤️ using ASP.NET Core 8.0 and React 18**
+## 📖 About The Project
+
+> **Experience the future of personal finance management.**
+
+**Expense Manager** isn't just a tracker; it's your personal financial assistant. Designed with a **Clean Architecture** approach, it ensures scalability, maintainability, and high performance. Whether you're tracking daily coffee expenses or managing complex multi-account budgets, Expense Manager covers it all with a sleek, responsive interface.
+
+### ✨ Key Features
+
+| Feature | Description |
+| :--- | :--- |
+| **🔐 Secure Auth** | JWT-based authentication with auto-refresh mechanisms. |
+| **💰 Smart Accounts** | Manage Cash, Banks, E-Wallets, and Credit Cards in one place. |
+| **💸 Transactions** | Seamlessly log incomes, expenses, and transfers. |
+| **🏷️ Taxonomy** | Hierarchical category system for organized tracking. |
+| **📊 Visual Reports** | Interactive charts that bring your financial data to life. |
+| **🌍 Multi-Currency** | Real-time exchange rates for global travelers. |
+| **📱 Mobile First** | A responsive design that looks great on any device. |
+| **👥 Collaboration** | Share accounts with family or teams securely. |
+
+---
+
+## 🚀 Getting Started
+
+Launch your own instance of Expense Manager in minutes.
+
+### Prerequisites
+
+*   **Runtime**: [.NET 8.0 SDK](https://dotnet.microsoft.com/download) & [Node.js 20+](https://nodejs.org/)
+*   **Database**: SQL Server
+*   **Containers**: Docker (Optional)
+
+### 📦 Installation
+
+#### Method 1: Docker (Fastest) ⚡
+
+```bash
+# 1. Clone the magic
+git clone https://github.com/your_username/expense-manager.git
+
+# 2. Ignite the engines
+docker-compose up -d
+
+# 3. Liftoff! 🚀
+# Frontend: http://localhost:3000
+# Backend: https://localhost:5000
+```
+
+#### Method 2: Manual Setup 🛠️
+
+<details>
+<summary>Click to expand manual instructions</summary>
+
+1.  **Backend Config**
+    ```bash
+    cd MoneyTrackerApp/MoneyTrackerApp
+    # Update appsettings.json with your connection string
+    dotnet run
+    ```
+
+2.  **Frontend Config**
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+</details>
+
+---
+
+## ⚡ Usage & API
+
+The application is powered by a robust RESTful API.
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Swagger-UISupported-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" />
+</div>
+
+Access the interactive API documentation at:
+`https://localhost:5000/swagger`
+
+**Core Endpoints:**
+- `POST /api/auth/*`
+- `GET /api/transactions/*`
+- `GET /api/budgets/*`
+- `GET /api/reports/*`
+
+---
+
+## 🛣️ Roadmap
+
+- [x] 🏗️ **Core Architecture** (Clean Arch, CQRS)
+- [x] 💸 **Transaction Engine** (Multi-currency, Transfers)
+- [x] 📊 **Analytics Dashboard** (Recharts Integration)
+- [ ] 🤖 **AI Insights** (Spending predictions - *Coming Soon*)
+- [ ] 🔔 **Smart Notifications** (Real-time alerts)
+- [ ] 📱 **Native Mobile App** (React Native)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+---
+
+<div align="center">
+  <p>
+    Built with ❤️ using <a href="https://dotnet.microsoft.com/">.NET 8</a> and <a href="https://reactjs.org/">React</a>
+  </p>
+</div>

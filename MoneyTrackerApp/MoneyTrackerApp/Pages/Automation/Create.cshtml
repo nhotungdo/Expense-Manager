@@ -8,7 +8,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
         <div class="flex items-center gap-4">
-            <a asp-page="./Index" class="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-500">
+            <a asp-page="./Index" class="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-500 hover:text-indigo-600">
                 <i class="fas fa-arrow-left text-lg"></i>
             </a>
             <div>
@@ -19,50 +19,96 @@
     </div>
 
     <form method="post" class="space-y-6">
+        <div asp-validation-summary="All" class="rounded-xl bg-red-50 p-4 border border-red-100 text-sm text-red-600 mb-6"></div>
+        <input type="hidden" asp-for="TriggerType" />
+
         <!-- Rule Name -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <label asp-for="Name" class="block text-sm font-medium text-slate-700 mb-2">Tên quy tắc</label>
-            <input asp-for="Name" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 transition-colors" placeholder="Ví dụ: Tự động tiết kiệm khi nhận lương" required />
+            <input asp-for="Name" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 transition-colors" placeholder="Ví dụ: Tự động tiết kiệm khi nhận lương" required />
             <span asp-validation-for="Name" class="text-red-500 text-sm mt-1 block"></span>
         </div>
 
         <!-- Condition Section -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="bg-blue-50/50 p-4 border-b border-slate-100 flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">1</div>
+            <div class="bg-indigo-50/50 p-4 border-b border-indigo-100 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">1</div>
                 <h2 class="font-semibold text-slate-800">KHI (Điều kiện)</h2>
             </div>
             
             <div class="p-6 space-y-6">
+                <!-- Check Type -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Sự kiện kích hoạt</label>
-                    <select asp-for="TriggerType" asp-items="Model.TriggerTypes" class="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50 text-slate-500 pointer-events-none"></select>
-                    <p class="text-xs text-slate-400 mt-2">Hiện tại chỉ hỗ trợ kích hoạt khi có giao dịch mới được tạo.</p>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Loại điều kiện</label>
+                    <div class="grid grid-cols-3 gap-2 p-1 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="cursor-pointer">
+                            <input type="radio" asp-for="ConditionCheckType" value="Transaction" class="peer sr-only" checked name="ConditionCheckType" id="checkType_Transaction">
+                            <div class="py-2 text-center rounded-lg text-sm font-medium text-slate-500 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all hover:bg-slate-100">
+                                <i class="fas fa-exchange-alt mb-1 block text-lg"></i>
+                                Giao dịch
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" asp-for="ConditionCheckType" value="Balance" class="peer sr-only" name="ConditionCheckType" id="checkType_Balance">
+                            <div class="py-2 text-center rounded-lg text-sm font-medium text-slate-500 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all hover:bg-slate-100">
+                                <i class="fas fa-wallet mb-1 block text-lg"></i>
+                                Số dư
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" asp-for="ConditionCheckType" value="SpendingLimit" class="peer sr-only" name="ConditionCheckType" id="checkType_SpendingLimit">
+                            <div class="py-2 text-center rounded-lg text-sm font-medium text-slate-500 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all hover:bg-slate-100">
+                                <i class="fas fa-chart-pie mb-1 block text-lg"></i>
+                                Hạn mức
+                            </div>
+                        </label>
+                    </div>
                 </div>
 
+                <!-- Account Selection (Common) -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Tài khoản / Ví áp dụng</label>
+                    <select asp-for="ConditionAccountId" asp-items="Model.Accounts" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Tất cả tài khoản</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Fields Container -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-50">
-                    <div>
+                    <!-- Transaction Specific -->
+                    <div id="field_TransactionType">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Loại giao dịch</label>
-                        <select asp-for="ConditionTransactionType" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">Tất cả loại giao dịch</option>
+                        <select asp-for="ConditionTransactionType" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">Tất cả loại</option>
                             <option value="1">Thu nhập (Income)</option>
                             <option value="2">Chi tiêu (Expense)</option>
                             <option value="3">Chuyển tiền (Transfer)</option>
                         </select>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Danh mục cụ thể</label>
-                        <select asp-for="ConditionCategoryId" asp-items="Model.Categories" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                    <!-- Category (Transaction & SpendingLimit) -->
+                    <div id="field_Category">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Danh mục</label>
+                        <select asp-for="ConditionCategoryId" asp-items="Model.Categories" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500">
                             <option value="">Tất cả danh mục</option>
+                        </select>
+                    </div>
+
+                    <!-- Period (SpendingLimit Only) -->
+                    <div id="field_Period" class="hidden">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Chu kỳ tính</label>
+                        <select asp-for="ConditionPeriod" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="Monthly">Hàng tháng</option>
+                            <option value="Weekly">Hàng tuần</option>
                         </select>
                     </div>
                 </div>
 
+                <!-- Amount Threshold (Common) -->
                 <div class="pt-4 border-t border-slate-50">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Số tiền giao dịch</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-2" id="amountLabel">Số tiền giao dịch</label>
                     <div class="flex gap-3">
-                        <select asp-for="ConditionOperator" class="w-24 px-3 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 bg-slate-50">
+                        <select asp-for="ConditionOperator" class="w-32 px-3 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 bg-slate-50">
                             <option value=">">Lớn hơn</option>
                             <option value=">=">Lớn hơn hoặc bằng</option>
                             <option value="<">Nhỏ hơn</option>
@@ -70,32 +116,31 @@
                             <option value="==">Bằng</option>
                         </select>
                         <div class="relative flex-1">
-                            <input asp-for="ConditionAmount" type="number" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 pl-12" placeholder="0" />
+                            <input asp-for="ConditionAmount" type="number" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 pl-12" placeholder="0" />
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">VND</div>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2">Để trống nếu không muốn áp dụng điều kiện số tiền.</p>
                 </div>
             </div>
         </div>
 
         <!-- Action Section -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="bg-green-50/50 p-4 border-b border-slate-100 flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-sm">2</div>
+            <div class="bg-indigo-50/50 p-4 border-b border-indigo-100 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">2</div>
                 <h2 class="font-semibold text-slate-800">THÌ (Hành động)</h2>
             </div>
             
             <div class="p-6 space-y-6">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Hành động thực hiện</label>
-                    <select asp-for="ActionType" asp-items="Model.ActionTypes" id="actionTypeSelect" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"></select>
+                    <select asp-for="ActionType" asp-items="Model.ActionTypes" id="actionTypeSelect" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"></select>
                 </div>
 
                 <!-- Notify Actions -->
                 <div id="notifyFields" class="hidden">
                     <label class="block text-sm font-medium text-slate-700 mb-2">Nội dung thông báo</label>
-                    <input asp-for="NoteMessage" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" placeholder="Nhập nội dung thông báo tùy chỉnh..." />
+                    <input asp-for="NoteMessage" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" placeholder="Nhập nội dung thông báo tùy chỉnh..." />
                     <p class="text-xs text-slate-400 mt-2">Nếu để trống, hệ thống sẽ sử dụng tên quy tắc làm nội dung.</p>
                 </div>
 
@@ -109,14 +154,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Đến tài khoản</label>
-                            <select asp-for="ActionDestinationAccountId" asp-items="Model.Accounts" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"></select>
+                            <select asp-for="ActionDestinationAccountId" asp-items="Model.Accounts" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Số tiền chuyển</label>
                             <div class="flex gap-3">
-                                <input asp-for="ActionAmount" type="number" step="0.01" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" required />
+                                <input asp-for="ActionAmount" type="number" step="0.01" class="w-full px-4 py-3 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" />
                                 <div class="flex items-center gap-2 px-3 bg-slate-50 rounded-xl border border-slate-200">
-                                    <input asp-for="ActionIsPercentage" type="checkbox" id="isPercentage" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                    <input asp-for="ActionIsPercentage" type="checkbox" id="isPercentage" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" />
                                     <label for="isPercentage" class="text-sm text-slate-600 whitespace-nowrap">%</label>
                                 </div>
                             </div>
@@ -130,7 +175,7 @@
         <!-- Submit -->
         <div class="flex items-center justify-end gap-4 pt-4">
             <a asp-page="./Index" class="px-6 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors font-medium">Hủy bỏ</a>
-            <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5">
+            <button type="submit" class="px-8 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5">
                 <i class="fas fa-save me-2"></i>Tạo Quy tắc
             </button>
         </div>
@@ -141,11 +186,12 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Action Fields Toggle
             const actionTypeSelect = document.getElementById('actionTypeSelect');
             const transferFields = document.getElementById('transferFields');
             const notifyFields = document.getElementById('notifyFields');
 
-            function updateFields() {
+            function updateActionFields() {
                 const value = actionTypeSelect.value;
                 if (value === 'Transfer') {
                     transferFields.classList.remove('hidden');
@@ -159,8 +205,41 @@
                 }
             }
 
-            actionTypeSelect.addEventListener('change', updateFields);
-            updateFields(); // Run on load
+            actionTypeSelect.addEventListener('change', updateActionFields);
+            updateActionFields();
+
+            // Condition Fields Toggle
+            const checkTypeRadios = document.querySelectorAll('input[name="ConditionCheckType"]');
+            const fieldTransactionType = document.getElementById('field_TransactionType');
+            const fieldCategory = document.getElementById('field_Category');
+            const fieldPeriod = document.getElementById('field_Period');
+            const amountLabel = document.getElementById('amountLabel');
+
+            function updateConditionFields() {
+                let checkType = 'Transaction';
+                checkTypeRadios.forEach(r => { if(r.checked) checkType = r.value; });
+
+                // Reset visibility
+                fieldTransactionType.classList.add('hidden');
+                fieldCategory.classList.add('hidden');
+                fieldPeriod.classList.add('hidden');
+                amountLabel.innerText = 'Số tiền';
+
+                if (checkType === 'Transaction') {
+                    fieldTransactionType.classList.remove('hidden');
+                    fieldCategory.classList.remove('hidden');
+                    amountLabel.innerText = 'Số tiền giao dịch';
+                } else if (checkType === 'SpendingLimit') {
+                    fieldCategory.classList.remove('hidden');
+                    fieldPeriod.classList.remove('hidden');
+                    amountLabel.innerText = 'Giới hạn chi tiêu';
+                } else if (checkType === 'Balance') {
+                    amountLabel.innerText = 'Ngưỡng số dư';
+                }
+            }
+
+            checkTypeRadios.forEach(r => r.addEventListener('change', updateConditionFields));
+            updateConditionFields();
         });
     </script>
 }

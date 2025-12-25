@@ -38,6 +38,15 @@ namespace MoneyTrackerApp.Pages.Automation
         public long? ConditionCategoryId { get; set; }
 
         [BindProperty]
+        public string ConditionCheckType { get; set; } = "Transaction"; // Transaction, SpendingLimit, Balance
+
+        [BindProperty]
+        public long? ConditionAccountId { get; set; } // Source Account
+
+        [BindProperty]
+        public string ConditionPeriod { get; set; } = "Monthly";
+
+        [BindProperty]
         public decimal? ConditionAmount { get; set; }
 
         [BindProperty]
@@ -76,18 +85,45 @@ namespace MoneyTrackerApp.Pages.Automation
                 return RedirectToPage("/Account/Login");
             }
 
+            // Custom Validation Logic
+            if (ActionType == "Notify")
+            {
+                // Remove errors for Transfer-specific fields
+                ModelState.Remove("ActionDestinationAccountId");
+                ModelState.Remove("ActionAmount");
+            }
+            else if (ActionType == "Transfer")
+            {
+                if (!ActionDestinationAccountId.HasValue)
+                {
+                    ModelState.AddModelError("ActionDestinationAccountId", "Vui lòng chọn tài khoản đích.");
+                }
+                if (ActionAmount <= 0)
+                {
+                    ModelState.AddModelError("ActionAmount", "Số tiền chuyển phải lớn hơn 0.");
+                }
+            }
+
             if (!ModelState.IsValid)
             {
+                // Ensure errors are visible
+                if (ModelState.ErrorCount > 0 && !ModelState.ContainsKey(string.Empty))
+                {
+                   // Optional: Aggregate errors if needed, but summary handles it
+                }
                 await LoadOptions();
                 return Page();
             }
 
             var condition = new AutomationConditionDto
             {
+                CheckType = ConditionCheckType,
                 TransactionType = ConditionTransactionType,
                 CategoryId = ConditionCategoryId,
+                AccountId = ConditionAccountId,
                 AmountThreshold = ConditionAmount,
-                Operator = ConditionOperator
+                Operator = ConditionOperator,
+                Period = ConditionPeriod
             };
 
             var action = new AutomationActionDto
@@ -111,10 +147,18 @@ namespace MoneyTrackerApp.Pages.Automation
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.AutomationRules.Add(rule);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage("./Index");
+            try
+            {
+                _context.AutomationRules.Add(rule);
+                await _context.SaveChangesAsync();
+                return RedirectToPage("./Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi khi tạo quy tắc: " + ex.Message);
+                await LoadOptions();
+                return Page();
+            }
         }
 
         private async Task LoadOptions()

@@ -1,159 +1,179 @@
-# Money Tracker App - Email Testing Guide
+<div align="center">
 
-## Tổng quan
+# 📧 Money Tracker App - Email Testing Suite
 
-Repository này chứa các test cases và automated tests để kiểm tra chức năng gửi email của Money Tracker App, đặc biệt tập trung vào việc gửi email đến **donhotung2004@gmail.com**.
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![xUnit](https://img.shields.io/badge/Testing-xUnit-512BD4?logo=xunit)](https://xunit.net/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Cấu trúc Test
+**Comprehensive email testing framework for Money Tracker App**
 
-### 1. Tài liệu Test Cases
-📄 **File:** `EmailSendingTestCases.md`
+[Features](#-features) • [Quick Start](#-quick-start) • [Test Structure](#-test-structure) • [Configuration](#-configuration) • [Troubleshooting](#-troubleshooting)
 
-Tài liệu chi tiết chứa 8 test cases chính:
-- **TC-EMAIL-001**: Gửi email thành công
-- **TC-EMAIL-002**: Nội dung email phức tạp (HTML, ký tự đặc biệt, tiếng Việt)
-- **TC-EMAIL-003**: Tiêu đề dài và ký tự đặc biệt
-- **TC-EMAIL-004**: Validation email không hợp lệ
-- **TC-EMAIL-005**: Hiệu năng - Gửi nhiều email
-- **TC-EMAIL-006**: Xử lý lỗi SMTP
-- **TC-EMAIL-007**: Lên lịch gửi email
-- **TC-EMAIL-008**: Gửi đến nhiều người nhận
+</div>
 
-### 2. Automated Tests
+---
 
-#### Unit Tests
-📄 **File:** `MoneyTrackerApp.Tests/EmailServiceTests.cs`
+## 📋 Overview
 
-Tests cho `EmailService` class:
-- ✅ Tạo email records trong database
-- ✅ Link email với user
-- ✅ Xử lý HTML content
-- ✅ Xử lý ký tự đặc biệt và tiếng Việt
-- ✅ Gửi nhiều email
-- ✅ Performance testing
+This test suite provides comprehensive coverage for the Money Tracker App email functionality, including unit tests, integration tests, and manual tests for real email delivery to **donhotung2004@gmail.com**.
 
-**Chạy unit tests:**
+## ✨ Features
+
+- 🧪 **Unit Tests** - Isolated testing of `EmailService` components
+- 🔗 **Integration Tests** - End-to-end testing of `EmailSenderModel` page logic
+- 📨 **Manual Tests** - Real email delivery verification
+- 🌐 **Multi-language Support** - Vietnamese and special character handling
+- 📊 **Performance Testing** - Bulk email sending capabilities
+- 📝 **Detailed Documentation** - 8 comprehensive test cases
+
+## 🚀 Quick Start
+
+### Prerequisites
+
 ```bash
+# Ensure .NET 8.0 SDK is installed
+dotnet --version
+
+# Restore dependencies
 cd MoneyTrackerApp.Tests
+dotnet restore
+```
+
+### Run All Tests
+
+```bash
+# Run unit and integration tests (excludes manual tests)
+dotnet test --filter "Category!=ManualTest"
+
+# Run with code coverage
+dotnet test --collect:"XPlat Code Coverage"
+
+# Run with detailed output
+dotnet test --logger "console;verbosity=detailed"
+```
+
+## 📁 Test Structure
+
+### 📄 Test Files
+
+| File | Type | Description |
+|------|------|-------------|
+| `EmailServiceTests.cs` | Unit | Tests for `EmailService` class |
+| `EmailSenderModelTests.cs` | Integration | Tests for `EmailSenderModel` page |
+| `EmailManualTests.cs` | Manual | Real email delivery tests |
+| `EmailSendingTestCases.md` | Documentation | Detailed test case specifications |
+
+### 🧪 Unit Tests (`EmailServiceTests.cs`)
+
+Tests the core email service functionality:
+
+- ✅ Email record creation in database
+- ✅ User-email linking
+- ✅ HTML content processing
+- ✅ Special characters and Vietnamese text
+- ✅ Bulk email sending
+- ✅ Performance benchmarks
+
+```bash
+# Run unit tests only
 dotnet test --filter "FullyQualifiedName~EmailServiceTests"
 ```
 
-#### Integration Tests
-📄 **File:** `MoneyTrackerApp.Tests/EmailSenderModelTests.cs`
+### 🔗 Integration Tests (`EmailSenderModelTests.cs`)
 
-Tests cho `EmailSenderModel` (Page Model):
-- ✅ OnPostAsync với input hợp lệ
-- ✅ Validation
-- ✅ Parse nhiều email
-- ✅ Scheduled emails
-- ✅ Load email logs
+Tests the page model integration:
 
-**Chạy integration tests:**
+- ✅ `OnPostAsync` with valid input
+- ✅ Input validation
+- ✅ Multiple email parsing
+- ✅ Scheduled email handling
+- ✅ Email log retrieval
+
 ```bash
-cd MoneyTrackerApp.Tests
+# Run integration tests only
 dotnet test --filter "FullyQualifiedName~EmailSenderModelTests"
 ```
 
-#### Manual Tests
-📄 **File:** `MoneyTrackerApp.Tests/EmailManualTests.cs`
+### 📨 Manual Tests (`EmailManualTests.cs`)
 
-⚠️ **CẢNH BÁO**: Các tests này sẽ GỬI EMAIL THỰC SỰ đến **donhotung2004@gmail.com**!
+> ⚠️ **WARNING**: These tests send REAL emails to **donhotung2004@gmail.com**!
 
-Tests bao gồm:
-- 📧 Gửi email cơ bản
-- 📧 Gửi email HTML phức tạp
-- 📧 Gửi email với tiêu đề dài
-- 📧 Gửi 10 emails liên tiếp (performance)
-- 📧 Gửi đến nhiều người nhận
-- 📧 Tạo email báo cáo test
+Available test cases:
+- 📧 Basic email delivery
+- 📧 Complex HTML content
+- 📧 Long subject lines
+- 📧 Performance test (10 consecutive emails)
+- 📧 Multiple recipients
+- 📧 Test report generation
 
-## Cách chạy Manual Tests
+## ⚙️ Configuration
 
-### Bước 1: Cấu hình SMTP Settings
+### Step 1: Configure SMTP Settings
 
-Mở file `MoneyTrackerApp.Tests/EmailManualTests.cs` và cập nhật:
+Edit `MoneyTrackerApp.Tests/EmailManualTests.cs`:
 
 ```csharp
 var emailSettings = Options.Create(new EmailSettings
 {
     Host = "smtp.gmail.com",
     Port = 587,
-    Username = "YOUR_EMAIL@gmail.com",        // ← Thay đổi
-    Password = "YOUR_APP_PASSWORD",           // ← Thay đổi (App Password)
-    FromEmail = "YOUR_EMAIL@gmail.com",       // ← Thay đổi
+    Username = "YOUR_EMAIL@gmail.com",        // ← Update this
+    Password = "YOUR_APP_PASSWORD",           // ← Update this (App Password)
+    FromEmail = "YOUR_EMAIL@gmail.com",       // ← Update this
     FromName = "Money Tracker App - Test System",
     EnableSsl = true
 });
 ```
 
-### Bước 2: Bỏ Skip attribute
+### Step 2: Enable Manual Tests
 
-Tìm test case bạn muốn chạy và bỏ `Skip = "..."`:
+Remove the `Skip` attribute from tests you want to run:
 
-**Trước:**
-```csharp
-[Fact(DisplayName = "TC-EMAIL-001: ...", Skip = "Manual test - Uncomment để chạy")]
+```diff
+- [Fact(DisplayName = "TC-EMAIL-001: ...", Skip = "Manual test - Uncomment to run")]
++ [Fact(DisplayName = "TC-EMAIL-001: ...")]
 ```
 
-**Sau:**
-```csharp
-[Fact(DisplayName = "TC-EMAIL-001: ...")]
-```
-
-### Bước 3: Chạy test
+### Step 3: Run Specific Tests
 
 ```bash
-cd MoneyTrackerApp.Tests
-
-# Chạy một test cụ thể
+# Run a specific test case
 dotnet test --filter "DisplayName~TC-EMAIL-001"
 
-# Chạy tất cả manual tests (nếu đã bỏ Skip)
+# Run all manual tests (if Skip removed)
 dotnet test --filter "Category=ManualTest"
 
-# Chạy với output chi tiết
+# Run with detailed logging
 dotnet test --filter "DisplayName~TC-EMAIL-001" --logger "console;verbosity=detailed"
 ```
 
-### Bước 4: Kiểm tra kết quả
+### Step 4: Verify Results
 
-1. ✅ Kiểm tra console output
-2. ✅ Kiểm tra hộp thư của **donhotung2004@gmail.com**
-3. ✅ Ghi lại kết quả trong `EmailSendingTestCases.md`
+1. ✅ Check console output
+2. ✅ Verify email in **donhotung2004@gmail.com** inbox
+3. ✅ Document results in `EmailSendingTestCases.md`
 
-## Chạy tất cả tests
+## 🔐 Gmail App Password Setup
 
-```bash
-cd MoneyTrackerApp.Tests
+### Enable 2-Step Verification
 
-# Chạy tất cả unit và integration tests (không bao gồm manual tests)
-dotnet test --filter "Category!=ManualTest"
+1. Visit [Google Account Security](https://myaccount.google.com/security)
+2. Find "2-Step Verification"
+3. Enable the feature
 
-# Chạy tất cả tests với coverage
-dotnet test --collect:"XPlat Code Coverage"
+### Generate App Password
 
-# Chạy với output chi tiết
-dotnet test --logger "console;verbosity=detailed"
-```
-
-## Cấu hình Gmail App Password
-
-Để gửi email qua Gmail SMTP, bạn cần tạo App Password:
-
-### Bước 1: Bật 2-Step Verification
-1. Truy cập https://myaccount.google.com/security
-2. Tìm "2-Step Verification"
-3. Bật tính năng này
-
-### Bước 2: Tạo App Password
-1. Truy cập https://myaccount.google.com/apppasswords
-2. Chọn "Mail" và "Other (Custom name)"
-3. Nhập tên: "Money Tracker App Test"
+1. Visit [App Passwords](https://myaccount.google.com/apppasswords)
+2. Select "Mail" and "Other (Custom name)"
+3. Enter name: "Money Tracker App Test"
 4. Click "Generate"
-5. Copy password 16 ký tự
-6. Sử dụng password này trong SMTP settings
+5. Copy the 16-character password
+6. Use this password in SMTP settings
 
-### Bước 3: Cập nhật appsettings.json
+### Update Configuration
+
+**appsettings.json:**
 
 ```json
 {
@@ -169,66 +189,65 @@ dotnet test --logger "console;verbosity=detailed"
 }
 ```
 
-## Test Checklist
+## ✅ Pre-Test Checklist
 
-Trước khi chạy tests, đảm bảo:
+Before running tests, ensure:
 
-- [ ] SMTP settings đã được cấu hình đúng
-- [ ] Gmail App Password đã được tạo
-- [ ] Database đã được migrate (`dotnet ef database update`)
-- [ ] Application có thể build thành công (`dotnet build`)
-- [ ] Có quyền truy cập email **donhotung2004@gmail.com** để kiểm tra
-- [ ] Đã đọc kỹ test cases trong `EmailSendingTestCases.md`
+- [ ] SMTP settings configured correctly
+- [ ] Gmail App Password generated
+- [ ] Database migrated (`dotnet ef database update`)
+- [ ] Application builds successfully (`dotnet build`)
+- [ ] Access to **donhotung2004@gmail.com** for verification
+- [ ] Test cases reviewed in `EmailSendingTestCases.md`
 
-## Ghi lại kết quả test
+## 🐛 Troubleshooting
 
-Sau khi chạy mỗi test case, cập nhật kết quả trong `EmailSendingTestCases.md`:
+<details>
+<summary><b>Authentication Failed</b></summary>
 
-```markdown
-### Kết quả thực tế
-- Thời gian test: 25/12/2025 18:45:00
-- Status: [X] Pass / [ ] Fail
-- Thời gian nhận email: ~2 giây
-- Screenshot: screenshots/tc-email-001.png
-- Ghi chú: Email được gửi và nhận thành công
-```
+- ✅ Verify Username and Password
+- ✅ Ensure using App Password, not regular password
+- ✅ Confirm 2-Step Verification is enabled
+</details>
 
-## Troubleshooting
+<details>
+<summary><b>Connection Timeout</b></summary>
 
-### Lỗi: "Authentication failed"
-- ✅ Kiểm tra Username và Password
-- ✅ Đảm bảo đang dùng App Password, không phải password thường
-- ✅ Kiểm tra 2-Step Verification đã bật
+- ✅ Check firewall settings
+- ✅ Verify Port (587 or 465)
+- ✅ Ensure `EnableSsl = true`
+</details>
 
-### Lỗi: "Connection timeout"
-- ✅ Kiểm tra firewall
-- ✅ Kiểm tra Port (587 hoặc 465)
-- ✅ Kiểm tra EnableSsl = true
+<details>
+<summary><b>Mailbox Unavailable</b></summary>
 
-### Lỗi: "Mailbox unavailable"
-- ✅ Kiểm tra địa chỉ email người nhận
-- ✅ Kiểm tra FromEmail có hợp lệ
+- ✅ Verify recipient email address
+- ✅ Confirm `FromEmail` is valid
+</details>
 
-### Email không đến hộp thư
-- ✅ Kiểm tra Spam folder
-- ✅ Đợi 1-2 phút
-- ✅ Kiểm tra email logs trong database
+<details>
+<summary><b>Email Not Received</b></summary>
 
-## SQL Queries hữu ích
+- ✅ Check Spam/Junk folder
+- ✅ Wait 1-2 minutes for delivery
+- ✅ Check email logs in database
+</details>
+
+## 📊 Useful SQL Queries
 
 ```sql
--- Xem tất cả emails đã gửi đến donhotung2004@gmail.com
+-- View all emails sent to donhotung2004@gmail.com
 SELECT * FROM Emails 
 WHERE RecipientEmail = 'donhotung2004@gmail.com'
 ORDER BY CreatedAt DESC;
 
--- Đếm số email theo status
+-- Count emails by status
 SELECT Status, COUNT(*) as Count
 FROM Emails
 WHERE RecipientEmail = 'donhotung2004@gmail.com'
 GROUP BY Status;
 
--- Tính success rate
+-- Calculate success rate
 SELECT 
     COUNT(*) as Total,
     SUM(CASE WHEN Status = 'Sent' THEN 1 ELSE 0 END) as Sent,
@@ -237,14 +256,40 @@ SELECT
 FROM Emails
 WHERE RecipientEmail = 'donhotung2004@gmail.com';
 
--- Xóa tất cả test emails
+-- Delete all test emails
 DELETE FROM Emails 
 WHERE Subject LIKE '%[TEST]%';
 ```
 
-## Test Report Template
+## 📝 Test Case Documentation
 
-Sau khi hoàn thành tất cả tests, tạo báo cáo:
+### Available Test Cases
+
+| ID | Description | Type |
+|----|-------------|------|
+| TC-EMAIL-001 | Successful email delivery | Manual |
+| TC-EMAIL-002 | Complex HTML content | Manual |
+| TC-EMAIL-003 | Long subject with special chars | Manual |
+| TC-EMAIL-004 | Invalid email validation | Unit |
+| TC-EMAIL-005 | Performance - Bulk sending | Manual |
+| TC-EMAIL-006 | SMTP error handling | Unit |
+| TC-EMAIL-007 | Scheduled email delivery | Integration |
+| TC-EMAIL-008 | Multiple recipients | Manual |
+
+### Recording Test Results
+
+After running each test, update `EmailSendingTestCases.md`:
+
+```markdown
+### Test Results
+- Test Date: 25/12/2025 18:45:00
+- Status: [X] Pass / [ ] Fail
+- Email Delivery Time: ~2 seconds
+- Screenshot: screenshots/tc-email-001.png
+- Notes: Email sent and received successfully
+```
+
+## 📈 Test Report Template
 
 ```markdown
 # Email Testing Report
@@ -259,7 +304,7 @@ Sau khi hoàn thành tất cả tests, tạo báo cáo:
 - Pass Rate: Z%
 
 ## Test Results
-[Copy từ EmailSendingTestCases.md]
+[Copy from EmailSendingTestCases.md]
 
 ## Issues Found
 1. [Bug description]
@@ -270,12 +315,19 @@ Sau khi hoàn thành tất cả tests, tạo báo cáo:
 2. [Improvement suggestion]
 ```
 
-## Liên hệ
+## 📞 Support
 
-Nếu có vấn đề hoặc câu hỏi về tests:
+Need help or have questions?
+
 - 📧 Email: donhotung2004@gmail.com
-- 📝 Tạo issue trong repository
+- 📝 Create an issue in the repository
 
 ---
 
-**Happy Testing! 🎉**
+<div align="center">
+
+**Made with ❤️ for Money Tracker App**
+
+[⬆ Back to Top](#-money-tracker-app---email-testing-suite)
+
+</div>

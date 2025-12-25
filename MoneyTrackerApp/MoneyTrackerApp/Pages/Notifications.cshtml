@@ -33,6 +33,7 @@
 </div>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 
 <style>
     .notifications-container {
@@ -273,8 +274,29 @@
         loadNotifications();
         loadUnreadCount();
         
-        // Refresh notifications every 30 seconds
-        setInterval(loadUnreadCount, 30000);
+        // Initialize SignalR
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .build();
+
+        connection.on("ReceiveNotification", function (notification) {
+            // Remove empty state if present
+            const container = document.getElementById('notificationsList');
+            const emptyState = container.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            // Render and prepend
+            const html = createNotificationHtml(notification);
+            container.insertAdjacentHTML('afterbegin', html);
+            
+            // Update badge (increment locally or reload)
+            loadUnreadCount();
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        // Refresh count every 60 seconds as backup
+        setInterval(loadUnreadCount, 60000);
     });
 
     async function loadNotifications(unreadOnly = false) {
@@ -332,27 +354,29 @@
             return;
         }
 
-        container.innerHTML = notifications.map(notification => {
-            const iconClass = getNotificationIconClass(notification.type);
-            const typeClass = getNotificationTypeClass(notification.type);
-            const timeAgo = getTimeAgo(new Date(notification.createdAt));
-            
-            return `
-                <div class="notification-item ${notification.isRead ? '' : 'unread'}" onclick="markAsRead(${notification.id})">
-                    <div class="notification-icon ${iconClass}">
-                        ${getNotificationIcon(notification.type)}
-                    </div>
-                    <div class="notification-content">
-                        <div class="notification-header">
-                            <h3 class="notification-title">${escapeHtml(notification.title)}</h3>
-                            <span class="notification-time">${timeAgo}</span>
-                        </div>
-                        <p class="notification-message">${escapeHtml(notification.message)}</p>
-                        <span class="notification-type-badge ${typeClass}">${notification.type}</span>
-                    </div>
+        container.innerHTML = notifications.map(notification => createNotificationHtml(notification)).join('');
+    }
+
+    function createNotificationHtml(notification) {
+        const iconClass = getNotificationIconClass(notification.type);
+        const typeClass = getNotificationTypeClass(notification.type);
+        const timeAgo = getTimeAgo(new Date(notification.createdAt));
+        
+        return `
+            <div class="notification-item ${notification.isRead ? '' : 'unread'}" onclick="markAsRead(${notification.id})">
+                <div class="notification-icon ${iconClass}">
+                    ${getNotificationIcon(notification.type)}
                 </div>
-            `;
-        }).join('');
+                <div class="notification-content">
+                    <div class="notification-header">
+                        <h3 class="notification-title">${escapeHtml(notification.title)}</h3>
+                        <span class="notification-time">${timeAgo}</span>
+                    </div>
+                    <p class="notification-message">${escapeHtml(notification.message)}</p>
+                    <span class="notification-type-badge ${typeClass}">${notification.type}</span>
+                </div>
+            </div>
+        `;
     }
 
     function getNotificationIconClass(type) {

@@ -1,338 +1,976 @@
 @page
 @model MoneyTrackerApp.Pages.IndexModel
 @{
-    ViewData["Title"] = "Trang chủ";
+    ViewData["Title"] = "Quản lý tài chính thông minh";
 }
 
-<!-- Public Landing Page -->
-<section class="hero">
-  <div class="hero-content">
-    <div class="badge">MoneyTrackerApp</div>
-    <h1>Quản lý chi tiêu thông minh cho mọi người</h1>
-    <p class="subtitle">Theo dõi thu chi, lập ngân sách, mục tiêu tiết kiệm và báo cáo trực quan – tất cả trong một nền
-      tảng duy nhất.</p>
-    <div class="cta">
-      <a class="btn btn-primary btn-lg" href="/Auth/Register">Bắt đầu miễn phí</a>
-      <a class="btn btn-outline btn-lg" href="/Auth/Login">Đăng nhập</a>
-    </div>
-    <div class="stats">
-      <div class="stat"><span>50K+</span> giao dịch</div>
-      <div class="stat"><span>1K+</span> người dùng</div>
-      <div class="stat"><span>24/7</span> bảo mật</div>
-    </div>
-  </div>
-  <div class="hero-visual">
-    <div class="card demo-card">
-      <div class="card-header">
-        <div class="dot red"></div>
-        <div class="dot yellow"></div>
-        <div class="dot green"></div>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <div class="metric">
-              <div class="label">Tổng chi tiêu</div>
-              <div class="value">-12.500.000₫</div>
-              <div class="trend down">▼ 8% MoM</div>
+<div class="landing-page">
+    <!-- Navbar -->
+    <nav class="landing-nav">
+        <div class="nav-container">
+            <div class="brand">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span class="brand-text">MoneyTracker</span>
             </div>
-          </div>
-          <div class="col">
-            <div class="metric">
-              <div class="label">Tổng thu nhập</div>
-              <div class="value">+25.000.000₫</div>
-              <div class="trend up">▲ 5% MoM</div>
+            <div class="nav-links">
+                <a href="#features">Tính năng</a>
+                <a href="#how-it-works">Hướng dẫn</a>
+                <a href="#testimonials">Đánh giá</a>
             </div>
-          </div>
+            <div class="nav-actions">
+                <a href="/Auth/Login" class="btn btn-text">Đăng nhập</a>
+                <a href="/Auth/Register" class="btn btn-primary glow-effect">Bắt đầu ngay</a>
+            </div>
         </div>
-        <div class="sparkline">
-          <div class="bar" style="height:30%"></div>
-          <div class="bar" style="height:65%"></div>
-          <div class="bar" style="height:40%"></div>
-          <div class="bar" style="height:80%"></div>
-          <div class="bar" style="height:55%"></div>
-          <div class="bar" style="height:90%"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="bg-shape"></div>
-</section>
+    </nav>
 
-<section class="features">
-  <div class="section-header">
-    <h2>Tính năng chính</h2>
-    <p>Tập trung vào điều quan trọng: kiểm soát tài chính cá nhân.</p>
-  </div>
-  <div class="grid">
-    <div class="feature">
-      <div class="icon gradient-blue"></div>
-      <h3>Theo dõi giao dịch</h3>
-      <p>Ghi chép nhanh, phân loại tự động, đính kèm hoá đơn.</p>
-    </div>
-    <div class="feature">
-      <div class="icon gradient-green"></div>
-      <h3>Ngân sách & cảnh báo</h3>
-      <p>Thiết lập ngân sách, cảnh báo vượt ngưỡng theo thời gian thực.</p>
-    </div>
-    <div class="feature">
-      <div class="icon gradient-purple"></div>
-      <h3>Mục tiêu tiết kiệm</h3>
-      <p>Theo dõi tiến độ, trực quan hoá và nhắc nhở thông minh.</p>
-    </div>
-    <div class="feature">
-      <div class="icon gradient-orange"></div>
-      <h3>Báo cáo nâng cao</h3>
-      <p>Biểu đồ thu/chi, top danh mục, xu hướng theo tháng/quý.</p>
-    </div>
-  </div>
-</section>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-container">
+            <div class="hero-content fade-in-up">
+                <div class="badge-pill">
+                    <span class="dot"></span>
+                    <span>Giải pháp tài chính cá nhân 4.0</span>
+                </div>
+                <h1 class="hero-title">
+                    Làm chủ tài chính,<br />
+                    <span class="text-gradient">Kiến tạo tương lai.</span>
+                </h1>
+                <p class="hero-desc">
+                    Theo dõi thu chi, lập ngân sách thông minh và đạt mục tiêu tiết kiệm dễ dàng hơn bao giờ hết với MoneyTracker.
+                </p>
+                <div class="hero-actions">
+                    <a href="/Auth/Register" class="btn btn-lg btn-primary pulse-on-hover">
+                        <i class="fa-solid fa-rocket"></i> Dùng thử miễn phí
+                    </a>
+                    <a href="#demo" class="btn btn-lg btn-outline">
+                        <i class="fa-regular fa-circle-play"></i> Xem Demo
+                    </a>
+                </div>
+                
+                <div class="trust-badges">
+                    <p>Được tin dùng bởi hơn <strong>5,000+</strong> người dùng</p>
+                    <div class="avatars">
+                        <div class="avatar" style="background-image: url('https://ui-avatars.com/api/?name=John+Doe&background=random')"></div>
+                        <div class="avatar" style="background-image: url('https://ui-avatars.com/api/?name=Jane+Smith&background=random')"></div>
+                        <div class="avatar" style="background-image: url('https://ui-avatars.com/api/?name=Mike+Ross&background=random')"></div>
+                        <div class="avatar-more">+2k</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual fade-in-right">
+                <div class="glass-card main-card float-animation">
+                    <div class="card-header">
+                        <div class="header-info">
+                            <span class="label">Tổng số dư</span>
+                            <span class="value">125,500,000₫</span>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                    </div>
+                    <div class="card-chart">
+                        <!-- Simulated Chart Bars -->
+                        <div class="chart-bar" style="height: 40%"></div>
+                        <div class="chart-bar" style="height: 60%"></div>
+                        <div class="chart-bar active" style="height: 85%"></div>
+                        <div class="chart-bar" style="height: 55%"></div>
+                        <div class="chart-bar" style="height: 70%"></div>
+                        <div class="chart-bar" style="height: 45%"></div>
+                        <div class="chart-bar" style="height: 65%"></div>
+                    </div>
+                    <div class="card-floating-badge badge-income">
+                        <i class="fa-solid fa-arrow-up"></i> +15.2%
+                    </div>
+                    <div class="card-floating-badge badge-expense">
+                        <i class="fa-solid fa-arrow-down"></i> -8.4%
+                    </div>
+                </div>
+                
+                <!-- Decorative Elements -->
+                <div class="decorative-circle circle-1"></div>
+                <div class="decorative-circle circle-2"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="section-header text-center">
+            <h2 class="section-title">Tính năng vượt trội</h2>
+            <p class="section-subtitle">Mọi thứ bạn cần để quản lý tài chính hiệu quả</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon icon-blue">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <h3>Quản lý Giao dịch</h3>
+                <p>Ghi chép thu chi nhanh chóng. Tự động phân loại và gắn thẻ giúp bạn dễ dàng tra cứu.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-purple">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <h3>Đa Ví & Tài khoản</h3>
+                <p>Quản lý tiền mặt, tài khoản ngân hàng, ví điện tử và thẻ tín dụng tại một nơi duy nhất.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-green">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3>Báo cáo Trực quan</h3>
+                <p>Biểu đồ chi tiết giúp bạn hiểu rõ dòng tiền, xu hướng chi tiêu và tìm ra điểm rò rỉ tài chính.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-orange">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <h3>Ngân sách & Mục tiêu</h3>
+                <p>Thiết lập hạn mức chi tiêu cho từng danh mục và theo dõi tiến độ thực hiện mục tiêu tiết kiệm.</p>
+            </div>
+            
+             <div class="feature-card">
+                <div class="feature-icon icon-red">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+                <h3>Quản lý Nợ</h3>
+                <p>Theo dõi các khoản vay và cho vay. Nhắc nhở lịch thanh toán để không bao giờ trễ hạn.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon icon-yellow">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h3>AI Advisor</h3>
+                <p>Trợ lý ảo thông minh phân tích thói quen và đưa ra lời khuyên tài chính cá nhân hóa.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="steps-section">
+        <div class="section-header text-center">
+            <h2 class="section-title">Bắt đầu cực dễ dàng</h2>
+        </div>
+        <div class="steps-container">
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <h4>Đăng ký tài khoản</h4>
+                <p>Chỉ mất 30 giây để tạo tài khoản miễn phí.</p>
+            </div>
+            <div class="step-line"></div>
+             <div class="step-item">
+                <div class="step-number">2</div>
+                <h4>Thêm Ví & Giao dịch</h4>
+                <p>Thiết lập số dư ban đầu và ghi chép chi tiêu.</p>
+            </div>
+            <div class="step-line"></div>
+             <div class="step-item">
+                <div class="step-number">3</div>
+                <h4>Xem Báo cáo</h4>
+                <p>Theo dõi biểu đồ và tối ưu hóa tài chính của bạn.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="testimonials-section">
+         <div class="section-header text-center">
+            <h2 class="section-title">Người dùng nói gì?</h2>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="feedback">"Ứng dụng tuyệt vời! Giao diện đẹp, dễ sử dụng. Từ ngày dùng MoneyTracker, mình đã tiết kiệm được 20% thu nhập mỗi tháng."</p>
+                <div class="user-info">
+                    <strong>Minh Anh</strong>
+                    <span>Freelancer</span>
+                </div>
+            </div>
+             <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="feedback">"Tính năng báo cáo rất chi tiết. Mình thích nhất là AI Advisor, nó giúp mình nhận ra những khoản chi lãng phí không ngờ tới."</p>
+                <div class="user-info">
+                    <strong>Tuấn Hưng</strong>
+                    <span>Nhân viên văn phòng</span>
+                </div>
+            </div>
+             <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="feedback">"Đã thử qua nhiều app nhưng đây là app ưng ý nhất. Đồng bộ dữ liệu nhanh, hỗ trợ đa nền tảng. Rất đáng giới thiệu!"</p>
+                <div class="user-info">
+                    <strong>Lan Chi</strong>
+                    <span>Kinh doanh online</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Footer -->
+    <section class="cta-footer">
+        <div class="cta-content">
+            <h2>Sẵn sàng kiểm soát tài chính của bạn?</h2>
+            <p>Tham gia cùng hàng nghìn người dùng thông minh ngay hôm nay.</p>
+            <a href="/Auth/Register" class="btn btn-xl btn-white">Tạo tài khoản miễn phí</a>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2025 MoneyTrackerApp. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Bảo mật</a>
+                <a href="#">Điều khoản</a>
+                <a href="#">Liên hệ</a>
+            </div>
+        </div>
+    </footer>
+</div>
 
 <style>
-  :root {
-    --bg: #0b1220;
-    --text: #0f172a;
-    --muted: #64748b;
-    --white: #fff;
-    --blue: #0ea5e9;
-    --green: #22c55e;
-    --purple: #22c55e;
-    --orange: #f59e0b;
-  }
-
-  .hero {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    min-height: 60vh;
-    padding: 40px 0
-  }
-
-  .hero-content {
-    flex: 1
-  }
-
-  .badge {
-    display: inline-block;
-    background: linear-gradient(90deg, var(--blue), var(--green));
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 999px;
-    font-weight: 600;
-    margin-bottom: 16px
-  }
-
-  .hero h1 {
-    font-size: 40px;
-    line-height: 1.1;
-    margin: 0 0 16px 0
-  }
-
-  .subtitle {
-    color: #475569;
-    font-size: 16px;
-    margin-bottom: 20px
-  }
-
-  .cta .btn {
-    margin-right: 12px
-  }
-
-  .btn-outline {
-    border: 1px solid #e5e7eb;
-    color: #0f172a;
-    background: #fff
-  }
-
-  .stats {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-    color: #64748b
-  }
-
-  .stats .stat {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 10px 16px
-  }
-
-  .stats .stat span {
-    color: #0f172a;
-    font-weight: 700;
-    margin-right: 6px
-  }
-
-  .hero-visual {
-    flex: 1;
-    display: flex;
-    justify-content: center
-  }
-
-  .demo-card {
-    width: 100%;
-    max-width: 460px;
-    background: #0f172a;
-    border-radius: 16px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, .15);
-    overflow: hidden;
-    color: #fff
-  }
-
-  .card-header {
-    display: flex;
-    gap: 6px;
-    padding: 10px 12px;
-    background: #111827
-  }
-
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%
-  }
-
-  .dot.red {
-    background: #ef4444
-  }
-
-  .dot.yellow {
-    background: #f59e0b
-  }
-
-  .dot.green {
-    background: #22c55e
-  }
-
-  .card-body {
-    padding: 16px
-  }
-
-  .row {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 14px
-  }
-
-  .col {
-    flex: 1
-  }
-
-  .metric .label {
-    color: #9ca3af;
-    font-size: 12px
-  }
-
-  .metric .value {
-    font-size: 22px;
-    font-weight: 700;
-    margin-top: 4px
-  }
-
-  .metric .trend {
-    font-size: 12px;
-    margin-top: 4px
-  }
-
-  .trend.up {
-    color: #22c55e
-  }
-
-  .trend.down {
-    color: #ef4444
-  }
-
-  .sparkline {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    height: 100px
-  }
-
-  .sparkline .bar {
-    width: 10px;
-    background: linear-gradient(180deg, #22c55e, #0ea5e9);
-    border-radius: 10px
-  }
-
-  .bg-shape {
-    position: absolute;
-    right: -120px;
-    top: -60px;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(closest-side, rgba(14, 165, 233, .25), transparent);
-    filter: blur(20px);
-    z-index: -1
-  }
-
-  .features {
-    padding: 36px 0
-  }
-
-  .section-header {
-    text-align: center;
-    margin-bottom: 20px
-  }
-
-  .section-header h2 {
-    font-size: 28px;
-    margin-bottom: 8px
-  }
-
-  .section-header p {
-    color: #64748b
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px
-  }
-
-  .feature {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 18px
-  }
-
-  .icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    margin-bottom: 10px
-  }
-
-  .gradient-blue {
-    background: linear-gradient(135deg, #38bdf8, #0ea5e9)
-  }
-
-  .gradient-green {
-    background: linear-gradient(135deg, #38bdf8c, #22c55e)
-  }
-
-  .gradient-purple {
-    background: linear-gradient(135deg, #c084fc, #22c55e)
-  }
-
-  .gradient-orange {
-    background: linear-gradient(135deg, #fcd34d, #f59e0b)
-  }
-
-  @@media (max-width:992px) {
-    .grid {
-      grid-template-columns: repeat(2, 1fr)
+    /* 
+     * Landing Page Specific Styles 
+     * Scoped mostly to .landing-page to avoid conflicts
+     */
+    :root {
+        --lp-bg: #0f172a;
+        --lp-text: #f8fafc;
+        --lp-primary: #6366f1; /* Indigo 500 */
+        --lp-primary-hover: #4f46e5;
+        --lp-accent: #0ea5e9; /* Sky 500 */
+        --lp-secondary: #1e293b;
+        --lp-glass: rgba(30, 41, 59, 0.7);
+        --lp-border: rgba(148, 163, 184, 0.1);
     }
 
-    .cards {
-      grid-template-columns: repeat(1, 1fr)
+    /* Reset/Base for LP inside Layout */
+    .landing-page {
+        background-color: var(--lp-bg);
+        color: var(--lp-text);
+        font-family: 'Inter', sans-serif;
+        overflow-x: hidden;
+        min-height: 100vh;
     }
 
-    .hero {
-      flex-direction: column
+    a { text-decoration: none; color: inherit; transition: 0.3s; }
+    
+    /* Navbar */
+    .landing-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        backdrop-filter: blur(12px);
+        background: rgba(15, 23, 42, 0.8);
+        border-bottom: 1px solid var(--lp-border);
+        padding: 1rem 0;
     }
-  }
+
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: white;
+    }
+    
+    .logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--lp-primary), var(--lp-accent));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .nav-links a {
+        color: #94a3b8;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .nav-links a:hover {
+        color: white;
+    }
+
+    .nav-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    @@media (max-width: 768px) {
+        .nav-links { display: none; }
+    }
+
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 1.25rem;
+        border-radius: 99px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--lp-primary), var(--lp-primary-hover));
+        color: white;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-text {
+        color: white;
+    }
+
+    .btn-text:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .btn-outline {
+        border: 2px solid rgba(255,255,255,0.2);
+        color: white;
+    }
+    
+    .btn-outline:hover {
+        border-color: white;
+        background: rgba(255,255,255,0.05);
+    }
+
+    .btn-lg {
+        padding: 0.85rem 1.8rem;
+        font-size: 1.1rem;
+    }
+    
+    .btn-white {
+        background: white;
+        color: var(--lp-primary);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    
+    .btn-white:hover {
+        background: #f1f5f9;
+        transform: translateY(-2px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        padding-top: 140px;
+        padding-bottom: 80px;
+        overflow: hidden;
+    }
+
+    .hero-bg-glow {
+        position: absolute;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120%;
+        height: 800px;
+        background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .hero-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-content {
+        max-width: 600px;
+    }
+
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(14, 165, 233, 0.1);
+        border: 1px solid rgba(14, 165, 233, 0.2);
+        color: #38bdf8;
+        padding: 0.35rem 0.85rem;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+
+    .badge-pill .dot {
+        width: 6px;
+        height: 6px;
+        background: #38bdf8;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #38bdf8;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        line-height: 1.1;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        color: white;
+    }
+
+    .text-gradient {
+        background: linear-gradient(to right, #818cf8, #22d3ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+        font-size: 1.15rem;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .trust-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .trust-badges p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .avatars {
+        display: flex;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid var(--lp-bg);
+        background-size: cover;
+        margin-right: -8px;
+    }
+
+    .avatar-more {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid var(--lp-bg);
+        background: #334155;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-right: -8px;
+        z-index: 10;
+    }
+
+    /* Hero Visual / Glass Card */
+    .hero-visual {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .glass-card {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 2rem;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 2;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+    .header-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .header-info .label {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .header-info .value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .icon-circle {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--lp-primary);
+        font-size: 1.25rem;
+    }
+
+    .card-chart {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        height: 120px;
+        margin-bottom: 1rem;
+    }
+
+    .chart-bar {
+        width: 12%;
+        background: #334155;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .chart-bar.active {
+        background: var(--lp-primary);
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .chart-bar.active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+    }
+
+    .card-floating-badge {
+        position: absolute;
+        padding: 0.5rem 0.85rem;
+        border-radius: 12px;
+        background: #1e293b;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+    }
+
+    .badge-income {
+        top: -15px;
+        right: -15px;
+        color: #22c55e;
+    }
+
+    .badge-expense {
+        bottom: -15px;
+        left: -15px;
+        color: #ef4444;
+    }
+
+    .decorative-circle {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.5;
+        z-index: 1;
+    }
+
+    .circle-1 {
+        width: 300px;
+        height: 300px;
+        background: var(--lp-primary);
+        top: -20px;
+        right: -50px;
+    }
+
+    .circle-2 {
+        width: 250px;
+        height: 250px;
+        background: var(--lp-accent);
+        bottom: -40px;
+        left: -40px;
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 80px 0;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .section-header {
+        margin-bottom: 4rem;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: white;
+    }
+
+    .section-subtitle {
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .feature-card {
+        background: var(--lp-secondary);
+        border: 1px solid var(--lp-border);
+        padding: 2rem;
+        border-radius: 20px;
+        transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--lp-primary);
+        background: linear-gradient(145deg, #1e293b, #243045);
+    }
+
+    .feature-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .icon-blue { background: rgba(56, 189, 248, 0.1); color: #38bdf8; }
+    .icon-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+    .icon-green { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .icon-orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+    .icon-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .icon-yellow { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+
+    .feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: white;
+    }
+
+    .feature-card p {
+        color: #94a3b8;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    /* Steps Section */
+    .steps-section {
+        padding: 80px 0;
+        background: #111e36;
+    }
+    
+    .steps-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 0 1.5rem;
+    }
+
+    .step-item {
+        text-align: center;
+        flex: 1;
+        position: relative;
+    }
+
+    .step-number {
+        width: 48px;
+        height: 48px;
+        background: var(--lp-primary);
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.15);
+    }
+
+    .step-item h4 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .step-item p {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+
+    .step-line {
+        flex: 1;
+        height: 2px;
+        background: #334155;
+        margin-top: 24px; /* Align with center of step-number (48/2 = 24) */
+        margin-left: -20px;
+        margin-right: -20px;
+        position: relative;
+        z-index: 0;
+    }
+
+    /* Testimonials */
+    .testimonials-section {
+        padding: 100px 0;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .testimonial-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
+        padding: 2rem;
+        border-radius: 20px;
+    }
+
+    .stars {
+        color: #eab308;
+        letter-spacing: 2px;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .feedback {
+        color: #cbd5e1;
+        font-style: italic;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        min-height: 80px;
+    }
+
+    .user-info strong {
+        display: block;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .user-info span {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    /* CTA Footer */
+    .cta-footer {
+        padding: 5rem 1.5rem;
+        background: linear-gradient(135deg, var(--lp-primary), var(--lp-accent));
+        text-align: center;
+        color: white;
+    }
+
+    .cta-content h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-content p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .main-footer {
+        padding: 2rem 1.5rem;
+        border-top: 1px solid var(--lp-border);
+        text-align: center;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .footer-links a:hover {
+        color: var(--lp-primary);
+    }
+    
+    /* Animations */
+    .float-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @@keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .fade-in-right {
+        animation: fadeInRight 1s ease-out;
+    }
+    
+    @@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @@keyframes fadeInRight {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .glow-effect {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .glow-effect::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+        transform: scale(0);
+        opacity: 0;
+        transition: transform 0.5s, opacity 0.5s;
+    }
+    
+    .glow-effect:hover::after {
+        transform: scale(1);
+        opacity: 1;
+        transition: 0s;
+    }
+
+    /* Responsive */
+    @@media (max-width: 900px) {
+        .hero-container {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 3rem;
+        }
+
+        .hero-actions {
+            justify-content: center;
+        }
+        
+        .hero-bg-glow {
+            top: 0;
+            height: 100%;
+        }
+        
+        .trust-badges {
+            align-items: center;
+        }
+
+        .steps-container {
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .step-line {
+            display: none;
+        }
+        
+        .step-item {
+            width: 100%;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+        }
+    }
 </style>

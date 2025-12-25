@@ -1,12 +1,17 @@
 namespace MoneyTrackerApp.DTOs;
 
-public class AutomationConditionDto
-{
-    public int? TransactionType { get; set; }
-    public long? CategoryId { get; set; }
-    public decimal? AmountThreshold { get; set; }
-    public string? Operator { get; set; } // >, <, ==
-}
+    public class AutomationConditionDto
+    {
+        public int? TransactionType { get; set; }
+        public long? CategoryId { get; set; }
+        public long? AccountId { get; set; } // Source Account
+        public decimal? AmountThreshold { get; set; }
+        public string? Operator { get; set; } // >, <, ==, >=, <=
+
+        // Advanced Logic
+        public string? CheckType { get; set; } // "Transaction", "SpendingLimit", "Balance"
+        public string? Period { get; set; } // "Monthly", "Weekly"
+    }
 
 public class AutomationActionDto
 {

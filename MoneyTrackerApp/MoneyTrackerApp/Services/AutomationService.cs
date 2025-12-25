@@ -38,7 +38,7 @@ public class AutomationService : IAutomationService
         {
             try
             {
-                if (EvaluateCondition(rule, transaction))
+                if (await EvaluateConditionAsync(rule, transaction))
                 {
                     await ExecuteActionAsync(rule, transaction);
                     
@@ -63,7 +63,7 @@ public class AutomationService : IAutomationService
         await Task.CompletedTask;
     }
 
-    private bool EvaluateCondition(AutomationRule rule, Transaction transaction)
+    private async Task<bool> EvaluateConditionAsync(AutomationRule rule, Transaction transaction)
     {
         try
         {
@@ -73,30 +73,87 @@ public class AutomationService : IAutomationService
             // Only "TransactionCreated" trigger supported for now
             if (rule.TriggerType != "TransactionCreated") return false;
 
-            // Check Transaction Type
-            if (condition.TransactionType.HasValue && condition.TransactionType != transaction.TransactionType)
+            // Common Check: Account Source
+            if (condition.AccountId.HasValue && condition.AccountId != transaction.AccountId)
                 return false;
 
-            // Check Category
-            if (condition.CategoryId.HasValue && condition.CategoryId != transaction.CategoryId)
-                return false;
-
-            // Check Amount
-            if (condition.AmountThreshold.HasValue)
+            if (condition.CheckType == "SpendingLimit")
             {
-                if (condition.Operator == ">" && transaction.Amount <= condition.AmountThreshold) return false;
-                if (condition.Operator == "<" && transaction.Amount >= condition.AmountThreshold) return false;
-                if (condition.Operator == ">=" && transaction.Amount < condition.AmountThreshold) return false;
-                if (condition.Operator == "<=" && transaction.Amount > condition.AmountThreshold) return false;
-                if (condition.Operator == "==" && transaction.Amount != condition.AmountThreshold) return false;
-            }
+                // Calculate total spending in period
+                if (!condition.AmountThreshold.HasValue) return false;
+                if (!condition.CategoryId.HasValue) return false; // Must specify category for spending limit usually
 
-            return true;
+                // Limit query to this user
+                var query = _context.Transactions
+                    .Where(t => t.UserId == transaction.UserId 
+                             && t.TransactionType == 2); // Expense
+
+                if (condition.CategoryId.HasValue)
+                    query = query.Where(t => t.CategoryId == condition.CategoryId.Value);
+                if (condition.AccountId.HasValue)
+                    query = query.Where(t => t.AccountId == condition.AccountId.Value);
+
+                // Date Range
+                DateTime startDate = DateTime.UtcNow;
+                if (condition.Period == "Weekly")
+                    startDate = DateTime.UtcNow.AddDays(-7);
+                else // Monthly default
+                    startDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+
+                query = query.Where(t => t.TransactionDate >= startDate);
+
+                var totalSpending = await query.SumAsync(t => t.Amount);
+
+                // Check Threshold
+                // "Exceeds" -> Total > Threshold
+                return totalSpending > condition.AmountThreshold.Value;
+            }
+            else if (condition.CheckType == "Balance")
+            {
+                if (!condition.AmountThreshold.HasValue) return false;
+                
+                // Reload Balance to be sure
+                var account = await _context.Accounts
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.Id == transaction.AccountId);
+                
+                if (account == null) return false;
+
+                return CompareAmount(account.CurrentBalance, condition.AmountThreshold.Value, condition.Operator ?? "<");
+            }
+            else // Default: Transaction Properties Check
+            {
+                // Check Transaction Type
+                if (condition.TransactionType.HasValue && condition.TransactionType != transaction.TransactionType)
+                    return false;
+
+                // Check Category
+                if (condition.CategoryId.HasValue && condition.CategoryId != transaction.CategoryId)
+                    return false;
+
+                // Check Amount
+                if (condition.AmountThreshold.HasValue)
+                {
+                    return CompareAmount(transaction.Amount, condition.AmountThreshold.Value, condition.Operator);
+                }
+
+                return true;
+            }
         }
         catch
         {
             return false;
         }
+    }
+
+    private bool CompareAmount(decimal value, decimal threshold, string? op)
+    {
+        if (op == ">") return value > threshold;
+        if (op == "<") return value < threshold;
+        if (op == ">=") return value >= threshold;
+        if (op == "<=") return value <= threshold;
+        if (op == "==") return value == threshold;
+        return false;
     }
 
     private async Task ExecuteActionAsync(AutomationRule rule, Transaction transaction)

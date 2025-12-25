@@ -197,5 +197,6 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapHub<MoneyTrackerApp.Hubs.ChatHub>("/chatHub");
 app.MapHub<MoneyTrackerApp.Hubs.WalletHub>("/walletHub");
+app.MapHub<MoneyTrackerApp.Hubs.NotificationHub>("/notificationHub");
 
 app.Run();

@@ -1,6 +1,8 @@
 using MoneyTrackerApp.Models;
 using MoneyTrackerApp.DTOs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
+using MoneyTrackerApp.Hubs;
 
 namespace MoneyTrackerApp.Services;
 
@@ -24,10 +26,12 @@ public interface INotificationService
 public class NotificationService : INotificationService
 {
     private readonly ExpenseManagerContext _context;
+    private readonly IHubContext<NotificationHub> _hubContext;
 
-    public NotificationService(ExpenseManagerContext context)
+    public NotificationService(ExpenseManagerContext context, IHubContext<NotificationHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     public async Task<List<NotificationResponseDto>> GetUserNotificationsAsync(long userId, bool unreadOnly = false)
@@ -74,7 +78,7 @@ public class NotificationService : INotificationService
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync();
 
-        return new NotificationResponseDto
+        var response = new NotificationResponseDto
         {
             Id = notification.Id,
             UserId = notification.UserId,
@@ -86,6 +90,10 @@ public class NotificationService : INotificationService
             IsImportant = notification.IsImportant,
             CreatedAt = notification.CreatedAt ?? DateTime.UtcNow
         };
+
+        await _hubContext.Clients.Group($"User-{dto.UserId}").SendAsync("ReceiveNotification", response);
+
+        return response;
     }
 
     public async Task<bool> MarkAsReadAsync(long notificationId, long userId)
