@@ -1,0 +1,157 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.Monitoring.AuditLogs.IndexModel
+@{
+    ViewData["Title"] = "Audit Logs";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1 text-primary-emphasis fw-bold">Nhật ký hoạt động</h4>
+            <p class="text-muted small mb-0">Theo dõi các hoạt động quan trọng trong hệ thống</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt me-1"></i> Làm mới
+            </button>
+            <button class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-download me-1"></i> Xuất báo cáo
+            </button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 border-bottom border-light">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <div class="position-relative">
+                        <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <input type="text" class="form-control form-control-sm ps-5 rounded-pill bg-light border-0" placeholder="Tìm kiếm nhật ký...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select form-select-sm border-0 bg-light rounded-pill custom-select">
+                        <option value="">Tất cả hành động</option>
+                        <option value="Create">Tạo mới</option>
+                        <option value="Update">Cập nhật</option>
+                        <option value="Delete">Xóa</option>
+                        <option value="Login">Đăng nhập</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control form-control-sm border-0 bg-light rounded-pill">
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4" style="width: 5%;">#</th>
+                        <th style="width: 15%;">Người dùng</th>
+                        <th style="width: 10%;">Hành động</th>
+                        <th style="width: 15%;">Đối tượng</th>
+                        <th style="width: 25%;">Chi tiết</th>
+                        <th style="width: 15%;">IP Address</th>
+                        <th style="width: 15%;">Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    @if (Model.Logs != null && Model.Logs.Any())
+                    {
+                        @foreach (var log in Model.Logs)
+                        {
+                            <tr>
+                                <td class="ps-4 text-muted small">@log.Id</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-xs bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                            @log.UserEmail.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium small text-dark">@log.UserEmail</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if(log.Action == "Create") { <span class="badge bg-success-subtle text-success rounded-pill px-3">Create</span> }
+                                    else if(log.Action == "Update") { <span class="badge bg-warning-subtle text-warning rounded-pill px-3">Update</span> }
+                                    else if(log.Action == "Delete") { <span class="badge bg-danger-subtle text-danger rounded-pill px-3">Delete</span> }
+                                    else { <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">@log.Action</span> }
+                                </td>
+                                <td>
+                                    <span class="d-block small fw-medium text-dark">@log.EntityName</span>
+                                    <span class="d-block x-small text-muted">ID: @log.EntityId</span>
+                                </td>
+                                <td>
+                                    <div class="text-truncate small text-secondary" style="max-width: 250px;" title="@log.Details">
+                                        @log.Details
+                                    </div>
+                                </td>
+                                <td class="small text-muted font-monospace">@log.IpAddress</td>
+                                <td class="small text-muted">
+                                    <i class="far fa-clock me-1"></i> @(log.CreatedAt.HasValue ? log.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                         <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted d-flex flex-column align-items-center">
+                                    <i class="fas fa-clipboard-list fa-3x mb-3 text-secondary opacity-50"></i>
+                                    <p class="mb-0 fw-medium">Không tìm thấy nhật ký nào</p>
+                                    <small>Hãy thử thay đổi bộ lọc tìm kiếm</small>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="card-footer bg-white border-top border-light py-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0 pagination-sm">
+                    <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle mx-1 d-flex align-items-center justify-content-center" href="?page=@(Model.PageNumber - 1)" style="width: 32px; height: 32px;">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item active">
+                        <span class="page-link border-0 rounded-circle mx-1 d-flex align-items-center justify-content-center bg-primary text-white shadow-sm" style="width: 32px; height: 32px;">@Model.PageNumber</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link border-0 rounded-circle mx-1 d-flex align-items-center justify-content-center" href="?page=@(Model.PageNumber + 1)" style="width: 32px; height: 32px;">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Scrollbar for table */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background-color: #e9ecef;
+        border-radius: 4px;
+    }
+    .avatar-xs {
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .form-control:focus, .form-select:focus {
+        box-shadow: none;
+        background-color: #fff;
+        border-color: var(--bs-primary);
+    }
+</style>

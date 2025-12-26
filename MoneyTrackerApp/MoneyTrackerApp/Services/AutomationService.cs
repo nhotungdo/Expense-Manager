@@ -15,15 +15,18 @@ public class AutomationService : IAutomationService
 {
     private readonly ExpenseManagerContext _context;
     private readonly INotificationService _notificationService;
+    private readonly IEmailService _emailService;
     private readonly IServiceProvider _serviceProvider; // To resolve TransactionService/AccountService dynamically to avoid circular dependency
 
     public AutomationService(
         ExpenseManagerContext context, 
         INotificationService notificationService,
+        IEmailService emailService,
         IServiceProvider serviceProvider)
     {
         _context = context;
         _notificationService = notificationService;
+        _emailService = emailService;
         _serviceProvider = serviceProvider;
     }
 
@@ -161,6 +164,8 @@ public class AutomationService : IAutomationService
         var action = JsonSerializer.Deserialize<AutomationActionDto>(rule.ActionJson);
         if (action == null) return;
 
+        bool success = false;
+
         if (action.Type == "Notify")
         {
             await _notificationService.CreateNotificationAsync(new CreateNotificationDto
@@ -171,6 +176,7 @@ public class AutomationService : IAutomationService
                 Type = "Automation",
                 ActionUrl = "/Transactions"
             });
+            success = true;
         }
         else if (action.Type == "Transfer")
         {
@@ -198,6 +204,7 @@ public class AutomationService : IAutomationService
                             TransactionDate = DateTime.UtcNow,
                             Note = $"Auto-transfer: {rule.Name}"
                         });
+                        success = true;
                     }
                     catch (Exception ex)
                     {
@@ -209,8 +216,44 @@ public class AutomationService : IAutomationService
                             Type = "System",
                             IsImportant = true
                         });
+                        success = false;
                     }
                 }
+            }
+        }
+
+        if (success)
+        {
+            // 1. Send Email Notification
+            var user = await _context.Users.FindAsync(rule.UserId);
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                try 
+                {
+                    await _emailService.SendEmailAsync(user.Email, 
+                        $"[MoneyTracker] Quy tắc tự động '{rule.Name}' đã được thực thi", 
+                        $"<p>Xin chào {user.UserName},</p><p>Quy tắc tự động <strong>{rule.Name}</strong> của bạn vừa được thực thi thành công.</p>");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send automation email: {ex.Message}");
+                }
+            }
+
+            // 2. Display Notification (Only if the action wasn't already a Notify, to avoid Double Notification)
+            // But user said: "Send email AND Show Notification". 
+            // If action was Notify, we showed a notification (custom message). That counts.
+            // If action wasn't Notify, we haven't shown a success notification yet. So show it.
+            if (action.Type != "Notify")
+            {
+                await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+                {
+                    UserId = rule.UserId,
+                    Title = $"Automation Executed: {rule.Name}",
+                    Message = "Quy tắc tự động đã chạy thành công.",
+                    Type = "Automation",
+                    ActionUrl = "/Automation"
+                });
             }
         }
     }

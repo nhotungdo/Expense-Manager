@@ -162,6 +162,9 @@ public class AccountService : IAccountService
         if (dto.IsActive.HasValue)
             account.IsActive = dto.IsActive.Value;
 
+        if (dto.AccountType.HasValue)
+            account.AccountType = dto.AccountType.Value;
+
         if (dto.IncludeInTotal.HasValue)
             account.IncludeInTotal = dto.IncludeInTotal.Value;
 

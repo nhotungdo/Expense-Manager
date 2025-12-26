@@ -1,0 +1,114 @@
+@page
+@model MoneyTrackerApp.Pages.Admin.Monitoring.Logs.IndexModel
+@{
+    ViewData["Title"] = "System Logs";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="row g-4 mb-4">
+        <!-- System Info Cards -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4 bg-primary text-white position-relative overflow-hidden">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2 me-2">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h6 class="card-title mb-0">Server Info</h6>
+                    </div>
+                    <h5 class="mb-1">@Model.Info.MachineName</h5>
+                    <small class="text-white-50">@Model.Info.OSDescription</small>
+                </div>
+                <i class="fas fa-microchip position-absolute bottom-0 end-0 opacity-10 fa-5x me-n2 mb-n2"></i>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body">
+                     <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success-subtle text-success rounded-circle p-2 me-2">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h6 class="card-title mb-0 text-muted">System Uptime</h6>
+                    </div>
+                    <h4 class="fw-bold mb-1">@Model.Info.Uptime</h4>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2">Operational</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body">
+                     <div class="d-flex align-items-center mb-3">
+                        <div class="bg-info-subtle text-info rounded-circle p-2 me-2">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h6 class="card-title mb-0 text-muted">Environment</h6>
+                    </div>
+                    <div class="mb-1 fw-medium text-dark text-truncate" title="@Model.Info.FrameworkDescription">@Model.Info.FrameworkDescription</div>
+                    <small class="text-muted">@Model.Info.ProcessArchitecture architecture</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+             <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body">
+                     <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning-subtle text-warning rounded-circle p-2 me-2">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                        <h6 class="card-title mb-0 text-muted">Processors</h6>
+                    </div>
+                    <h4 class="fw-bold mb-1">@Model.Info.ProcessorCount <small class="fs-6 text-muted fw-normal">Core(s)</small></h4>
+                    <small class="text-muted">Available for processing</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal / Logs Section -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-terminal text-success"></i>
+                <span class="fw-mono">system_console.log</span>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 fw-normal">Live</span>
+                <button class="btn btn-sm btn-link text-white-50 p-0 text-decoration-none hover-white">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+        <div class="bg-black p-4 font-monospace" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+            @foreach (var log in Model.SystemLogs)
+            {
+                var colorClass = "text-white";
+                if (log.Level == "INFO") colorClass = "text-info";
+                if (log.Level == "WARN") colorClass = "text-warning";
+                if (log.Level == "ERROR") colorClass = "text-danger";
+
+                <div class="mb-1">
+                    <span class="text-secondary select-none">[@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")]</span>
+                    <span class="@colorClass fw-bold mx-2">@log.Level</span>
+                    <span class="text-white-50">@log.Message</span>
+                </div>
+            }
+            <div class="d-flex align-items-center mt-2 typing-effect">
+                <span class="text-success me-2">➜</span>
+                <span class="text-white">monitoring_agent --watch</span>
+                <span class="cursor-blink bg-white ms-1" style="width: 8px; height: 16px; display: inline-block;"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-mono { font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; }
+    .bg-black { background-color: #0f172a !important; }
+    .cursor-blink { animation: blink 1s step-end infinite; }
+    @@keyframes blink { 50% { opacity: 0; } }
+    .hover-white:hover { color: #fff !important; }
+    .select-none { user-select: none; }
+</style>

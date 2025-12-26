@@ -41,6 +41,7 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IFriendshipService, MoneyTra
 // Register Report & Analytics Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IReportService, MoneyTrackerApp.Services.ReportService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IExportService, MoneyTrackerApp.Services.ExportService>();
+builder.Services.AddScoped<MoneyTrackerApp.Services.IAnalysisService, MoneyTrackerApp.Services.AnalysisService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IFinancialAnalysisService, MoneyTrackerApp.Services.FinancialAnalysisService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IAutomationService, MoneyTrackerApp.Services.AutomationService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IChallengeService, MoneyTrackerApp.Services.ChallengeService>();
@@ -51,6 +52,7 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.IShoppingService, MoneyTrack
 builder.Services.AddScoped<MoneyTrackerApp.Services.INotificationService, MoneyTrackerApp.Services.NotificationService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.ICurrencyService, MoneyTrackerApp.Services.CurrencyService>();
 builder.Services.AddHttpClient();
+
 
 // Register AI Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IGeminiAnalysisService, MoneyTrackerApp.Services.GeminiAnalysisService>();

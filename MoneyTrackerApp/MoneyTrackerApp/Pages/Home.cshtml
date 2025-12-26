@@ -24,6 +24,79 @@
         </div>
     </div>
 
+    <!-- Global Search Bar -->
+    <div class="relative">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all" id="searchContainer">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <i class="fas fa-search text-slate-400"></i>
+                <input 
+                    type="text" 
+                    id="globalSearch" 
+                    placeholder="Tìm kiếm giao dịch, danh mục, tài khoản... (Ctrl+K)" 
+                    class="flex-1 outline-none text-sm text-slate-700 placeholder-slate-400 bg-transparent"
+                    autocomplete="off"
+                />
+                <div class="flex items-center gap-2">
+                    <!-- Filter Buttons -->
+                    <button 
+                        class="search-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-600 hover:bg-slate-200" 
+                        data-filter="all"
+                        onclick="setSearchFilter('all')"
+                    >
+                        <i class="fas fa-globe mr-1"></i> Tất cả
+                    </button>
+                    <button 
+                        class="search-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:bg-slate-100" 
+                        data-filter="transaction"
+                        onclick="setSearchFilter('transaction')"
+                    >
+                        <i class="fas fa-exchange-alt mr-1"></i> Giao dịch
+                    </button>
+                    <button 
+                        class="search-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:bg-slate-100" 
+                        data-filter="category"
+                        onclick="setSearchFilter('category')"
+                    >
+                        <i class="fas fa-tags mr-1"></i> Danh mục
+                    </button>
+                    <button 
+                        class="search-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:bg-slate-100" 
+                        data-filter="account"
+                        onclick="setSearchFilter('account')"
+                    >
+                        <i class="fas fa-wallet mr-1"></i> Tài khoản
+                    </button>
+                    <button 
+                        class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 transition-all" 
+                        onclick="clearSearch()"
+                        id="clearSearchBtn"
+                        style="display: none;"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search Results Dropdown -->
+            <div id="searchResults" class="hidden border-t border-slate-100 max-h-96 overflow-y-auto">
+                <!-- Loading State -->
+                <div id="searchLoading" class="hidden p-6 text-center">
+                    <i class="fas fa-circle-notch fa-spin text-2xl text-slate-400 mb-2"></i>
+                    <p class="text-sm text-slate-500">Đang tìm kiếm...</p>
+                </div>
+                
+                <!-- Empty State -->
+                <div id="searchEmpty" class="hidden p-6 text-center">
+                    <i class="fas fa-search text-3xl text-slate-300 mb-2"></i>
+                    <p class="text-sm text-slate-500">Không tìm thấy kết quả</p>
+                </div>
+                
+                <!-- Results Container -->
+                <div id="searchResultsContent" class="p-4 space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Total Assets -->
@@ -89,7 +162,89 @@
         </div>
     </div>
 
-    <!-- Main Content Area -->
+    <!-- Modern AI Financial Assistant (Trading Analysis Style) -->
+    <div class="mb-6">
+        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 rounded-2xl shadow-xl relative overflow-hidden border border-slate-700/50">
+            <!-- Background Decoration -->
+            <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                <i class="fas fa-chart-line text-[120px] text-white"></i>
+            </div>
+            
+            <div class="relative z-10">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                            <i class="fas fa-brain text-xl text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                                Phân tích & Dự báo AI
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase tracking-wide">Beta</span>
+                            </h3>
+                            <p class="text-slate-400 text-sm">Phân tích hành vi tiêu dùng thời gian thực</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="loadAiAnalysis()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Spending Trend -->
+                    <div class="bg-white/5 rounded-xl p-5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Xu hướng chi tiêu</h4>
+                            <i class="fas fa-chart-bar text-indigo-400 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-2xl font-bold text-white" id="aiTrendValue">--</span>
+                            <span class="text-sm font-medium" id="aiTrendBadge"></span>
+                        </div>
+                        <p class="text-slate-400 text-xs leading-relaxed" id="aiTrendText">Đang tải dữ liệu...</p>
+                    </div>
+
+                    <!-- Prediction -->
+                    <div class="bg-white/5 rounded-xl p-5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Dự báo cuối tháng</h4>
+                            <i class="fas fa-crystal-ball text-purple-400 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-2xl font-bold text-white" id="aiPredictionValue">--</span>
+                            <span class="text-slate-400 text-xs ml-1">VND</span>
+                        </div>
+                        <div class="w-full bg-slate-700/50 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000" style="width: 0%" id="aiPredictionBar"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-[10px] text-slate-500">
+                            <span>Hiện tại</span>
+                            <span>Dự kiến</span>
+                        </div>
+                    </div>
+
+                    <!-- Anomalies -->
+                    <div class="bg-white/5 rounded-xl p-5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Cảnh báo & Insights</h4>
+                            <i class="fas fa-bell text-rose-400 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <div id="aiInsightsList" class="space-y-3 max-h-[100px] overflow-y-auto custom-scrollbar">
+                            <div class="flex items-start gap-3 animate-pulse">
+                                <div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5"></div>
+                                <div class="h-2 bg-slate-700 rounded w-3/4"></div>
+                            </div>
+                            <div class="flex items-start gap-3 animate-pulse">
+                                <div class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5"></div>
+                                <div class="h-2 bg-slate-700 rounded w-1/2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    <!-- Main Content Area -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Chart Section (2 cols) -->
         <div class="lg:col-span-2 space-y-6">
@@ -130,42 +285,9 @@
             </div>
         </div>
 
+
         <!-- Right Column (1 col) -->
         <div class="space-y-6">
-            <!-- AI Advisor Card -->
-            <div class="group relative overflow-hidden rounded-2xl bg-slate-900 p-6 shadow-xl transition-all hover:shadow-2xl hover:shadow-indigo-500/20">
-                <!-- Decorative Background -->
-                <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-indigo-500/30 blur-3xl transition-all group-hover:bg-indigo-500/40"></div>
-                <div class="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-violet-500/30 blur-3xl transition-all group-hover:bg-violet-500/40"></div>
-                
-                <div class="relative z-10 flex flex-col h-full">
-                    <div class="mb-4 flex items-center gap-3">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30">
-                            <i class="fas fa-sparkles text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-white">Trợ lý AI</h3>
-                            <p class="text-xs font-medium text-slate-400">Được hỗ trợ bởi Gemini</p>
-                        </div>
-                    </div>
-
-                    <div class="mb-6 flex-1">
-                        <div id="aiSuggestionText" class="relative overflow-hidden rounded-xl bg-white/5 p-4 text-sm leading-relaxed text-slate-300 backdrop-blur-sm transition-colors hover:bg-white/10">
-                            <div class="flex flex-col gap-2">
-                                <div class="h-2 w-3/4 animate-pulse rounded bg-white/10"></div>
-                                <div class="h-2 w-1/2 animate-pulse rounded bg-white/10"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button onclick="openAiModal()" class="group/btn relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-white py-3 text-sm font-bold text-slate-900 transition-all hover:bg-indigo-50 active:scale-95">
-                        <span class="relative z-10">Xem chi tiết phân tích</span>
-                        <i class="fas fa-arrow-right z-10 -ml-1 opacity-0 transition-all group-hover/btn:ml-0 group-hover/btn:opacity-100"></i>
-                        <div class="absolute inset-0 z-0 bg-gradient-to-r from-indigo-50 to-violet-50 opacity-0 transition-opacity group-hover/btn:opacity-100"></div>
-                    </button>
-                </div>
-            </div>
-
             <!-- Quick Actions -->
             <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                 <h3 class="font-bold text-slate-900 mb-4">Thao tác nhanh</h3>
@@ -201,9 +323,8 @@
 
     <!-- Recent Transactions -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm">
-        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+        <div class="p-6 border-b border-slate-100">
             <h3 class="text-lg font-bold text-slate-900">Giao dịch gần đây</h3>
-            <a href="/Trading/Index" class="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline">Xem phân tích</a>
         </div>
         <div class="p-0" id="transactionList">
             <div class="p-8 text-center text-slate-400">
@@ -214,48 +335,7 @@
     </div>
 </div>
 
-<!-- AI Details Modal -->
-<div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content overflow-hidden rounded-3xl border-0 shadow-2xl">
-            <!-- Modal Header with gradient -->
-            <div class="bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-8 text-white">
-                <div class="flex items-start justify-between">
-                    <div class="flex items-center gap-5">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md shadow-inner border border-white/20">
-                            <i class="fas fa-brain text-3xl text-indigo-300"></i>
-                        </div>
-                        <div>
-                            <h5 class="text-2xl font-bold tracking-tight">Phân tích Tài chính AI</h5>
-                            <p class="mt-1 text-slate-400">Thông tin chi tiết được cá nhân hóa cho bạn</p>
-                        </div>
-                    </div>
-                    <button type="button" class="rounded-full bg-white/10 p-2 text-white/70 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white" data-bs-dismiss="modal">
-                        <i class="fas fa-times text-lg w-5 h-5 flex items-center justify-center"></i>
-                    </button>
-                </div>
-            </div>
 
-            <!-- Modal Body -->
-            <div class="modal-body bg-slate-50 p-8" id="aiModalContent">
-                <!-- Content will be loaded dynamically -->
-                <div class="flex flex-col items-center justify-center py-12">
-                     <div class="relative mb-4">
-                        <div class="absolute inset-0 animate-ping rounded-full bg-indigo-500 opacity-20"></div>
-                        <i class="fas fa-circle-notch fa-spin text-4xl text-indigo-600"></i>
-                    </div>
-                    <p class="font-medium text-slate-500">Đang tổng hợp dữ liệu...</p>
-                </div>
-            </div>
-            
-            <div class="bg-slate-50 px-8 pb-8 pt-0 text-center">
-                 <p class="text-xs text-slate-400">
-                    * Các phân tích được tạo tự động và chỉ mang tính chất tham khảo.
-                 </p>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Modals removed - Use Global Transaction Modal -->
 
@@ -312,19 +392,21 @@
     <!-- Chart Configuration -->
     <script src="/js/charts-config.js"></script>
     
+
     <!-- Home Page Logic with Pie Charts -->
     <script src="/js/home.js"></script>
     
+    <!-- Global Search Functionality -->
+    <script src="/js/search.js"></script>
+    
     <script type="module">
         // AI and Export logic remain here
-        window.openAiModal = openAiModal;
 
-        let aiSuggestionsDetails = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             loadPersonalWalletData();
             loadAccounts();
-            loadAiSuggestions();
+            loadAiAnalysis(); // AI Analysis
             
             // Cleaned up Transaction Form listeners as they are now global
             document.getElementById('exportForm').addEventListener('submit', handleExport);
@@ -336,6 +418,93 @@
             if(exportStart) exportStart.valueAsDate = firstDay;
             if(exportEnd) exportEnd.valueAsDate = today;
         });
+
+        window.loadAiAnalysis = async function() {
+            try {
+                const trendVal = document.getElementById('aiTrendValue');
+                const trendText = document.getElementById('aiTrendText');
+                const trendBadge = document.getElementById('aiTrendBadge');
+                
+                const predVal = document.getElementById('aiPredictionValue');
+                const predBar = document.getElementById('aiPredictionBar');
+                
+                const insightsList = document.getElementById('aiInsightsList');
+
+                // Loading State
+                if(trendText) trendText.innerText = "Đang phân tích...";
+                if(insightsList) insightsList.innerHTML = `<div class="flex items-center gap-2 text-sm text-slate-300"><i class="fas fa-circle-notch fa-spin text-purple-400"></i><span>Đang xử lý...</span></div>`;
+
+                const res = await fetch('/api/Analysis?t=' + Date.now(), { credentials: 'include' });
+                if(!res.ok) throw new Error("Failed to fetch analysis");
+                
+                const data = await res.json();
+                
+                // Trend
+                if(trendVal) trendVal.innerText = data.trendPercentage.toFixed(1) + '%';
+                if(trendBadge && trendText) {
+                    if(data.trend == 'Increasing') {
+                        trendBadge.innerHTML = '<i class="fas fa-arrow-up text-rose-400"></i>';
+                        trendBadge.className = 'text-sm font-medium text-rose-400';
+                        trendText.innerText = 'Chi tiêu tăng so với tháng trước';
+                    } else if(data.trend == 'Decreasing') {
+                        trendBadge.innerHTML = '<i class="fas fa-arrow-down text-emerald-400"></i>';
+                        trendBadge.className = 'text-sm font-medium text-emerald-400';
+                        trendText.innerText = 'Chi tiêu giảm so với tháng trước';
+                    } else {
+                        trendBadge.innerHTML = '<i class="fas fa-minus text-slate-400"></i>';
+                        trendBadge.className = 'text-sm font-medium text-slate-400';
+                        trendText.innerText = 'Chi tiêu ổn định';
+                    }
+                }
+
+                // Prediction
+                if(predVal) predVal.innerText = new Intl.NumberFormat('vi-VN').format(data.predictedSpendingThisMonth);
+                if(predBar) {
+                    let pct = 0;
+                     if(data.predictedSpendingThisMonth > 0)
+                        pct = (data.totalSpendingThisMonth / data.predictedSpendingThisMonth) * 100;
+                    if(pct > 100) pct = 100;
+                    predBar.style.width = pct + '%';
+                }
+
+                // Insights & Anomalies
+                let html = '';
+                if(insightsList) {
+                    // Anomalies first
+                    if(data.anomalies) {
+                        data.anomalies.forEach(a => {
+                            html += `
+                            <div class="flex items-start gap-3 p-2 rounded bg-white/5 border border-white/5">
+                                <div class="mt-1"><i class="fas fa-exclamation-triangle text-rose-400 text-xs"></i></div>
+                                <div>
+                                    <p class="text-xs text-white font-medium">${a.note || a.categoryName}</p>
+                                    <p class="text-[10px] text-slate-400">${new Intl.NumberFormat('vi-VN').format(a.amount)} VND - ${new Date(a.date).toLocaleDateString('vi-VN')}</p>
+                                </div>
+                            </div>`;
+                        });
+                    }
+
+                    // General Insights
+                    if(data.insights) {
+                        data.insights.forEach(i => {
+                             html += `
+                            <div class="flex items-start gap-3">
+                                <div class="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0"></div>
+                                <p class="text-xs text-slate-300 leading-relaxed">${i}</p>
+                            </div>`;
+                        });
+                    }
+                    
+                    if(html === '') html = '<p class="text-xs text-slate-400">Chưa có dữ liệu phân tích.</p>';
+                    insightsList.innerHTML = html;
+                }
+
+            } catch(e) {
+                console.error(e);
+                const trendText = document.getElementById('aiTrendText');
+                if(trendText) trendText.innerText = "Không thể tải dữ liệu";
+            }
+        };
 
         window.openExportModal = function() {
             const modal = new bootstrap.Modal(document.getElementById('exportModal'));
@@ -395,103 +564,7 @@
             }
         }
         
-        // AI Logic
-        async function loadAiSuggestions() {
-            try {
-                const textEl = document.getElementById('aiSuggestionText');
-                const response = await fetch('/api/AiAdvisor/suggestions', { credentials: 'include' });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    aiSuggestionsDetails = data;
-                    
-                    if (data && data.length > 0) {
-                        // Display the first suggestion or a summary
-                        const latest = data.find(x => x.suggestionType.includes("Gemini")) || data[0];
-                        const displayContent = latest.suggestion;
-                        
-                        textEl.innerHTML = `<p class="line-clamp-3">${displayContent}</p>`;
-                    } else {
-                        textEl.innerHTML = "<p>Hiện chưa có lời khuyên nào. Hãy thêm giao dịch để AI có thể phân tích!</p>";
-                    }
-                } else {
-                    textEl.innerHTML = "<p>Không thể tải lời khuyên lúc này.</p>";
-                }
-            } catch (err) { 
-                console.error("AI fetch error:", err);
-                const textEl = document.getElementById('aiSuggestionText');
-                if(textEl) textEl.innerHTML = "<p>Đã xảy ra lỗi khi tải dữ liệu AI.</p>";
-            }
-        }
 
-        function openAiModal() {
-            const modal = new bootstrap.Modal(document.getElementById('aiModal'));
-            const contentDiv = document.getElementById('aiModalContent');
-            
-            if (!aiSuggestionsDetails || aiSuggestionsDetails.length === 0) {
-                 contentDiv.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-12 text-center">
-                        <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
-                            <i class="fas fa-inbox text-3xl text-slate-300"></i>
-                        </div>
-                        <h6 class="text-lg font-bold text-slate-700">Chưa có dữ liệu</h6>
-                        <p class="text-slate-500">Hãy thực hiện thêm giao dịch để hệ thống có thể phân tích.</p>
-                    </div>
-                 `;
-            } else {
-                let html = '<div class="space-y-6">';
-                aiSuggestionsDetails.forEach((s, index) => {
-                    let icon = 'fa-lightbulb';
-                    let colorClass = 'text-yellow-500 bg-yellow-50 border-yellow-100';
-                    let titleColor = 'text-yellow-700';
-                    
-                    if (s.suggestionType) {
-                        const type = s.suggestionType.toLowerCase();
-                         if (type.includes('cảnh báo') || type.includes('warning')) {
-                            icon = 'fa-exclamation-triangle';
-                            colorClass = 'text-rose-500 bg-rose-50 border-rose-100';
-                            titleColor = 'text-rose-700';
-                        } else if (type.includes('tốt') || type.includes('success')) {
-                            icon = 'fa-check-circle';
-                            colorClass = 'text-emerald-500 bg-emerald-50 border-emerald-100';
-                            titleColor = 'text-emerald-700';
-                        } else if (type.includes('gemini') || type.includes('tiên tiến')) {
-                            icon = 'fa-sparkles';
-                            colorClass = 'text-indigo-500 bg-indigo-50 border-indigo-100';
-                            titleColor = 'text-indigo-700';
-                        }
-                    }
-
-                    // Format MD-like newlines to breaks if needed, though usually Gemini returns plain text or paragraphs
-                    const content = s.suggestion.replace(/\n/g, '<br>');
-
-                    html += `
-                    <div class="group relative overflow-hidden rounded-2xl border ${colorClass} bg-white p-6 shadow-sm transition-all hover:shadow-md animate-fade-in-up" style="animation-delay: ${index * 100}ms">
-                        <div class="flex gap-5">
-                            <div class="shrink-0">
-                                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-inset ring-black/5 ${colorClass.split(' ')[0]}">
-                                    <i class="fas ${icon} text-xl"></i>
-                                </div>
-                            </div>
-                            <div class="grow">
-                                <div class="mb-2 flex items-center justify-between">
-                                    <h6 class="font-bold ${titleColor} uppercase tracking-wide text-xs">${s.suggestionType || 'Lời khuyên'}</h6>
-                                    <span class="text-xs font-medium text-slate-400">${new Date(s.createdAt).toLocaleDateString('vi-VN')}</span>
-                                </div>
-                                <div class="prose prose-sm max-w-none text-slate-600">
-                                    <p>${content}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-                });
-                html += '</div>';
-                contentDiv.innerHTML = html;
-            }
-            
-            modal.show();
-        }
 
         // --- Helper Logic (Charts, Timeline) ---
         // (Existing Chart Rendering logic kept in home.js or here?) 

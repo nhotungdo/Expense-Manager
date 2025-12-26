@@ -1,6 +1,7 @@
 using MoneyTrackerApp.Models;
 using MoneyTrackerApp.DTOs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace MoneyTrackerApp.Services;
 
@@ -25,17 +26,29 @@ public interface IGroupExpenseService
     Task<GroupTransactionResponseDto> UpdateGroupTransactionAsync(long userId, UpdateGroupTransactionDto dto);
     Task<List<GroupMemberDetailDto>> GetGroupMembersWithStatsAsync(long groupId);
     Task<bool> UpdateMemberRoleAsync(long groupId, long memberId, string newRole, long userId);
+    Task<List<string>> InviteMembersAsync(long userId, InviteGroupMemberDto dto);
 }
 
 public class GroupExpenseService : IGroupExpenseService
 {
     private readonly ExpenseManagerContext _context;
     private readonly ITransactionService _transactionService;
+    private readonly IEmailService _emailService;
+    private readonly IHostEnvironment _environment;
+    private readonly IFriendshipService _friendshipService;
 
-    public GroupExpenseService(ExpenseManagerContext context, ITransactionService transactionService)
+    public GroupExpenseService(
+        ExpenseManagerContext context, 
+        ITransactionService transactionService,
+        IEmailService emailService,
+        IHostEnvironment environment,
+        IFriendshipService friendshipService)
     {
         _context = context;
         _transactionService = transactionService;
+        _emailService = emailService;
+        _environment = environment;
+        _friendshipService = friendshipService;
     }
 
     /// <summary>
@@ -783,5 +796,128 @@ public class GroupExpenseService : IGroupExpenseService
         }
 
         return memberDetails;
+    }
+    public async Task<List<string>> InviteMembersAsync(long userId, InviteGroupMemberDto dto)
+    {
+        var group = await _context.GroupExpenses
+            .Include(g => g.GroupMembers)
+                .ThenInclude(gm => gm.User)
+            .Include(g => g.GroupInvitations)
+            .FirstOrDefaultAsync(g => g.Id == dto.GroupId);
+
+        if (group == null)
+            throw new InvalidOperationException("Group not found");
+
+        var inviter = await _context.Users.FindAsync(userId);
+        if (inviter == null)
+            throw new InvalidOperationException("User not found");
+
+        // Verify permissions
+        var userMember = group.GroupMembers.FirstOrDefault(gm => gm.UserId == userId);
+        if (userMember == null && group.CreatedByUserId != userId)
+            throw new InvalidOperationException("You don't have permission to invite members");
+
+        // Check max members
+        int currentMemberCount = group.GroupMembers.Count + group.GroupInvitations.Count(i => i.Status == "Pending");
+        if (currentMemberCount + dto.Emails.Count > 50)
+            throw new InvalidOperationException("Group has reached member limit (50).");
+
+        var templatePath = Path.Combine(_environment.ContentRootPath, "Templates", "Email", "GroupInvitation.html");
+        string templateData = "";
+        if (File.Exists(templatePath))
+        {
+            templateData = await File.ReadAllTextAsync(templatePath);
+        }
+
+        var sentEmails = new List<string>();
+
+        foreach (var email in dto.Emails)
+        {
+            // Trim and validation
+            var targetEmail = email.Trim();
+            if (string.IsNullOrEmpty(targetEmail)) continue;
+
+            // Check if already in group
+            if (group.GroupMembers.Any(gm => gm.User?.Email == targetEmail)) continue;
+
+            // Check if user exists
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == targetEmail);
+            string actionLink;
+
+            if (user != null)
+            {
+                // Existing user - Add as Pending Member directly
+                var member = new GroupMember
+                {
+                    GroupId = group.Id,
+                    UserId = user.Id,
+                    Role = "Member",
+                    JoinedAt = null // Pending
+                };
+                _context.GroupMembers.Add(member);
+                
+                // Add Notification
+                 var notif = new Notification
+                 {
+                     UserId = user.Id,
+                     Title = "Lời mời tham gia nhóm",
+                     Message = $"{inviter.FullName ?? inviter.UserName} mời bạn vào nhóm {group.Name}",
+                     Type = "GroupInvite",
+                     IsRead = false,
+                     CreatedAt = DateTime.UtcNow
+                 };
+                 _context.Notifications.Add(notif);
+
+                 // Auto-friend request
+                 await _friendshipService.SendFriendRequestAsync(userId, user.Id);
+
+                // Link to group details
+                actionLink = $"https://localhost:5000/Groups/Details/{group.Id}";
+            }
+            else
+            {
+                // Non-existing user: Create Invitation if not exists
+                var existingInvite = await _context.GroupInvitations
+                        .FirstOrDefaultAsync(i => i.GroupId == group.Id && i.InviteEmail == targetEmail && i.Status == "Pending");
+
+                if (existingInvite == null)
+                {
+                    var invitation = new GroupInvitation
+                    {
+                        GroupId = group.Id,
+                        InviterId = userId,
+                        InviteEmail = targetEmail,
+                        Code = Guid.NewGuid().ToString("N"),
+                        Status = "Pending",
+                        CreatedAt = DateTime.UtcNow,
+                        ExpiresAt = DateTime.UtcNow.AddDays(7)
+                    };
+                    _context.GroupInvitations.Add(invitation);
+                }
+                
+                // Link to register
+                actionLink = "https://localhost:5000/Identity/Account/Register";
+            }
+
+            // Send Email
+            string emailBody;
+            if (!string.IsNullOrEmpty(templateData))
+            {
+                emailBody = templateData
+                .Replace("{{InviterName}}", inviter.FullName ?? inviter.UserName)
+                .Replace("{{GroupName}}", group.Name)
+                .Replace("{{ActionLink}}", actionLink);
+            }
+            else 
+            {
+                 emailBody = $"User {inviter.UserName} invited you to join group {group.Name}. <a href='{actionLink}'>Join Group</a>";
+            }
+
+            await _emailService.SendEmailAsync(targetEmail, "Lời mời tham gia nhóm: " + group.Name, emailBody);
+            sentEmails.Add(targetEmail);
+        }
+
+        await _context.SaveChangesAsync();
+        return sentEmails;
     }
 }

@@ -100,6 +100,19 @@ public class AddGroupMemberDto
 }
 
 /// <summary>
+/// DTO for inviting members to group via email
+/// </summary>
+public class InviteGroupMemberDto
+{
+    [Required(ErrorMessage = "Group ID is required")]
+    public long GroupId { get; set; }
+
+    [Required(ErrorMessage = "Emails are required")]
+    [MinLength(1, ErrorMessage = "At least one email is required")]
+    public List<string> Emails { get; set; } = new();
+}
+
+/// <summary>
 /// DTO for creating group transaction
 /// </summary>
 public class CreateGroupTransactionDto

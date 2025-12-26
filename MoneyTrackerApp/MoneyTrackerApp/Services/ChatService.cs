@@ -106,6 +106,23 @@ public class ChatService : IChatService
     {
         try
         {
+            if (senderId == receiverId)
+            {
+                throw new InvalidOperationException("Cannot send message to yourself");
+            }
+
+            var senderExists = await _context.Users.AnyAsync(u => u.Id == senderId);
+            if (!senderExists)
+            {
+                 throw new InvalidOperationException("Sender does not exist");
+            }
+
+            var receiverExists = await _context.Users.AnyAsync(u => u.Id == receiverId);
+            if (!receiverExists)
+            {
+                 throw new InvalidOperationException("Receiver does not exist");
+            }
+
             var message = new Message
             {
                 SenderId = senderId,

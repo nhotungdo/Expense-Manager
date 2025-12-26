@@ -11,6 +11,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using MoneyTrackerApp.DTOs;
+
 
 namespace MoneyTrackerApp.Pages.Groups
 {
@@ -21,18 +23,30 @@ namespace MoneyTrackerApp.Pages.Groups
         private readonly ExpenseManagerContext _context;
         private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IFriendshipService _friendshipService;
+        private readonly IGroupExpenseService _groupExpenseService;
 
-        public DetailsModel(ExpenseManagerContext context, IEmailService emailService, IWebHostEnvironment environment)
+        public DetailsModel(
+            ExpenseManagerContext context, 
+            IEmailService emailService, 
+            IWebHostEnvironment environment, 
+            IFriendshipService friendshipService,
+            IGroupExpenseService groupExpenseService)
         {
             _context = context;
             _emailService = emailService;
             _environment = environment;
+            _friendshipService = friendshipService;
+            _groupExpenseService = groupExpenseService;
         }
+
 
         public GroupExpense Group { get; set; } = default!;
         public List<GroupTransaction> Transactions { get; set; } = new List<GroupTransaction>();
         public List<GroupInvitation> ExternalInvitations { get; set; } = new List<GroupInvitation>();
         public List<User> GroupParticipants { get; set; } = new List<User>();
+        public List<FriendshipDto> FriendsList { get; set; } = new List<FriendshipDto>();
+
 
         // Financial Summaries
         public decimal TotalGroupSpending { get; set; }
@@ -73,8 +87,11 @@ namespace MoneyTrackerApp.Pages.Groups
 
         public class InviteMemberInput
         {
-            [Required(ErrorMessage = "Vui lòng nhập địa chỉ email hoặc số điện thoại")]
-            public string Emails { get; set; }
+            [Display(Name = "Địa chỉ Email")]
+            public string? Emails { get; set; }
+            
+            public List<long> UserIds { get; set; } = new List<long>();
+
         }
 
         [BindProperty]
@@ -151,7 +168,14 @@ namespace MoneyTrackerApp.Pages.Groups
             if (Group.CreatedByUser != null && !GroupParticipants.Any(u => u.Id == Group.CreatedByUserId))
             {
                 GroupParticipants.Add(Group.CreatedByUser);
+                GroupParticipants.Add(Group.CreatedByUser);
             }
+
+            // Get Friends but exclude those already in the group
+            var allFriends = await _friendshipService.GetFriendsAsync(userId);
+            var groupMemberIds = GroupParticipants.Select(u => u.Id).ToHashSet();
+            FriendsList = allFriends.Where(f => !groupMemberIds.Contains(f.FriendId)).ToList();
+
 
             CalculateFinancials(userId);
             
@@ -183,6 +207,27 @@ namespace MoneyTrackerApp.Pages.Groups
 
             return Page();
         }
+
+        public async Task<IActionResult> OnGetSearchPeopleAsync(string query)
+        {
+            var userIdS = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdS) || !long.TryParse(userIdS, out long userId)) return Unauthorized();
+
+            var users = await _friendshipService.SearchUsersAsync(query, userId);
+            
+            // Filter out users already in group? 
+            // The frontend might need all results, but better to filter if we have the group ID in context.
+            // Since this is a simple search, we will return list and let frontend handle visual disabling if needed, 
+            // or just rely on the backend validation on Post.
+            
+            return new JsonResult(users.Select(u => new { 
+                id = u.Id, 
+                name = u.FullName, 
+                avatar = u.ProfilePictureUrl, 
+                email = u.UserName 
+            })); 
+        }
+
 
         public async Task<IActionResult> OnPostAddExpenseAsync(long id)
         {
@@ -300,9 +345,9 @@ namespace MoneyTrackerApp.Pages.Groups
 
         public async Task<IActionResult> OnPostInviteMemberAsync(long id)
         {
-            if (string.IsNullOrEmpty(InviteInput?.Emails))
+            if (string.IsNullOrEmpty(InviteInput?.Emails) && (InviteInput?.UserIds == null || !InviteInput.UserIds.Any()))
             {
-                ModelState.AddModelError("InviteInput.Emails", "Vui lòng nhập ít nhất một email.");
+                ModelState.AddModelError("InviteInput.Emails", "Vui lòng chọn bạn bè hoặc nhập email.");
                 ViewData["ShowInviteMemberModal"] = true;
                 return await OnGetAsync(id);
             }
@@ -313,114 +358,69 @@ namespace MoneyTrackerApp.Pages.Groups
                 return RedirectToPage("/Auth/Login");
             }
 
-            // Verify group and permissions
-            var group = await _context.GroupExpenses
-                .Include(g => g.GroupMembers).ThenInclude(gm => gm.User)
-                .Include(g => g.GroupInvitations)
-                .FirstOrDefaultAsync(g => g.Id == id);
-            
-            if (group == null) return NotFound();
-            
-            // Security: Limit access to existing members or creator
-            if (!group.GroupMembers.Any(m => m.UserId == userId) && group.CreatedByUserId != userId) 
-                return Forbid();
+            // 1. Process Direct User Adds (From Friends/Search)
+            if (InviteInput.UserIds != null && InviteInput.UserIds.Any())
+            {
+                foreach (var targetUserId in InviteInput.UserIds)
+                {
+                     try 
+                     {
+                        await _groupExpenseService.AddMemberAsync(userId, new AddGroupMemberDto 
+                        { 
+                            GroupId = id, 
+                            UserId = targetUserId,
+                            Role = "Member"
+                        });
+                        // Auto-link friend request
+                        await _friendshipService.SendFriendRequestAsync(userId, targetUserId);
+                     }
+                     catch (Exception)
+                     {
+                         // Ignore if already member or error
+                     }
+                }
+            }
 
-            var inputs = InviteInput.Emails.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+            // 2. Process Email Invites via Service
+            if (!string.IsNullOrEmpty(InviteInput.Emails))
+            {
+                var inputEmails = InviteInput.Emails.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
                                            .Select(e => e.Trim())
                                            .Distinct()
                                            .ToList();
-
-            var currentUser = await _context.Users.FindAsync(userId);
-            int successCount = 0;
-            var sentInvites = new List<string>();
-
-            // Maximum members check (Security requirement)
-            int currentMemberCount = group.GroupMembers.Count + group.GroupInvitations.Count(i => i.Status == "Pending");
-            if (currentMemberCount + inputs.Count > 50) // Limit to 50 for example
-            {
-                ModelState.AddModelError("InviteInput.Emails", "Nhóm đã đạt giới hạn thành viên (50).");
-                ViewData["ShowInviteMemberModal"] = true;
-                return await OnGetAsync(id);
-            }
-
-            foreach (var input in inputs)
-            {
-                // Basic validation (Email)
-                bool isEmail = new EmailAddressAttribute().IsValid(input);
-                if (!isEmail) continue; 
-
-                // CHECK 1: Is already a member?
-                var existingMember = group.GroupMembers.FirstOrDefault(m => m.User.Email == input);
-                if (existingMember != null) continue; 
-
-                // CHECK 2: Is User Exists?
-                var userToInvite = await _context.Users.FirstOrDefaultAsync(u => u.Email == input);
                 
-                if (userToInvite != null)
+                if (inputEmails.Any())
                 {
-                    // Current Flow: Add as Pending GroupMember
-                    var newMember = new GroupMember
+                    try
                     {
-                        GroupId = id,
-                        UserId = userToInvite.Id,
-                        Role = "Member",
-                        JoinedAt = null // Indicates Pending
-                    };
-                    _context.GroupMembers.Add(newMember);
-                }
-                else
-                {
-                    // New Flow: Create External Invitation
-                    // Check if invitation already pending
-                    var existingInvite = await _context.GroupInvitations
-                        .FirstOrDefaultAsync(i => i.GroupId == id && i.InviteEmail == input && i.Status == "Pending");
-
-                    if (existingInvite == null)
-                    {
-                        var invitation = new GroupInvitation
-                        {
-                            GroupId = id,
-                            InviterId = userId,
-                            InviteEmail = input,
-                            Code = Guid.NewGuid().ToString("N"),
-                            Status = "Pending",
-                            CreatedAt = DateTime.Now,
-                            ExpiresAt = DateTime.Now.AddDays(7)
+                        var dto = new InviteGroupMemberDto 
+                        { 
+                            GroupId = id, 
+                            Emails = inputEmails 
                         };
-                        _context.GroupInvitations.Add(invitation);
+                        var sentEmails = await _groupExpenseService.InviteMembersAsync(userId, dto);
+                        
+                        if (sentEmails.Count > 0)
+                        {
+                            TempData["SuccessMessage"] = $"Đã xử lý {sentEmails.Count} lời mời.";
+                        }
+                        else
+                        {
+                             // If no emails sent, maybe they were duplicates. Better than "Error".
+                             TempData["SuccessMessage"] = "Đã cập nhật lời mời (không có lời mời mới nào được gửi).";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        TempData["ErrorMessage"] = ex.Message;
+                        ViewData["ShowInviteMemberModal"] = true;
+                        return await OnGetAsync(id);
                     }
                 }
-                
-                sentInvites.Add(input);
-                successCount++;
             }
-
-            if (successCount > 0)
+            else if (InviteInput.UserIds != null && InviteInput.UserIds.Any())
             {
-                await _context.SaveChangesAsync();
-
-                if (sentInvites.Any())
-                {
-                    var subject = $"Lời mời tham gia nhóm: {group.Name}";
-                    var groupLink = Url.Page("/Groups/Details", null, new { id = id }, Request.Scheme);
-                    
-                    var body = $@"
-                        <h3>Xin chào,</h3>
-                        <p>{currentUser?.FullName ?? "Một người bạn"} đã mời bạn tham gia nhóm chi tiêu <strong>{group.Name}</strong>.</p>
-                        <p>Hãy tham gia ngay để quản lý chi tiêu dễ dàng!</p>
-                        <p><a href='{groupLink}' style='padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;'>Tham gia ngay</a></p>
-                    ";
-
-                    await _emailService.SendEmailAsync(sentInvites, subject, body);
-                }
-
-                TempData["SuccessMessage"] = $"Đã gửi lời mời tới {successCount} người.";
-            }
-            else
-            {
-                 TempData["ErrorMessage"] = "Không gửi được lời mời nào. Vui lòng kiểm tra lại email.";
-                 ViewData["ShowInviteMemberModal"] = true;
-                 return await OnGetAsync(id);
+                 TempData["SuccessMessage"] = "Đã thêm thành viên thành công.";
             }
 
             return RedirectToPage("./Details", new { id = id });

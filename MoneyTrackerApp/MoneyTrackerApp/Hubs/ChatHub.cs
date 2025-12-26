@@ -54,6 +54,11 @@ public class ChatHub : Hub
                 }
             }
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Validation error in SendMessage");
+            await Clients.Caller.SendAsync("Error", ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error in SendMessage");

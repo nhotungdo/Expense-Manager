@@ -424,31 +424,74 @@
 <!-- Invite Member Modal -->
 <div id="inviteMemberModalBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" aria-hidden="true">
     <div class="flex min-h-screen items-center justify-center p-4">
-        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 transform scale-95 transition-transform" id="inviteMemberModalContent">
-             <div class="text-center mb-6">
-                 <div class="w-16 h-16 bg-blue-50 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400">
-                     <i class="fas fa-user-plus text-2xl"></i>
-                 </div>
-                 <h3 class="text-xl font-bold text-slate-900 dark:text-white">Mời thành viên mới</h3>
-                 <p class="text-sm text-slate-500 dark:text-slate-400">Nhập email của người dùng để mời họ vào nhóm.</p>
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 transform scale-95 transition-transform" id="inviteMemberModalContent">
+             <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Thêm thành viên</h3>
+                <button type="button" onclick="closeInviteMemberModal()" class="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
              </div>
-            
-            <form method="post" asp-page-handler="InviteMember">
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Địa chỉ Email</label>
-                    <textarea asp-for="InviteInput.Emails" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 h-24" required placeholder="nhap@email.com, khac@email.com..."></textarea>
-                    <p class="text-xs text-slate-500 mt-1">Nhập nhiều email phân cách bởi dấu phẩy.</p>
-                    <span asp-validation-for="InviteInput.Emails" class="text-red-500 text-xs"></span>
-                </div>
+
+             <!-- Tabs -->
+             <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6">
+                 <button type="button" class="tab-btn w-1/2 pb-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 transition-all" onclick="switchInviteTab('friends', this)">
+                     <i class="fas fa-users mr-1"></i> Tìm kiếm & Bạn bè
+                 </button>
+                 <button type="button" class="tab-btn w-1/2 pb-3 text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 border-b-2 border-transparent hover:border-slate-300 transition-all" onclick="switchInviteTab('email', this)">
+                     <i class="fas fa-envelope mr-1"></i> Mời qua Email
+                 </button>
+             </div>
+
+             <form method="post" asp-page-handler="InviteMember" id="inviteForm">
+                 <!-- Hidden input for selected User IDs -->
+                 <div id="selectedUsersContainer"></div>
                 
-                <div class="flex gap-3">
-                    <button type="button" onclick="closeInviteMemberModal()" class="flex-1 px-4 py-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg font-medium">Hủy</button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md font-medium">Gửi lời mời</button>
+                 <!-- Tab Content: Friends/Search -->
+                 <div id="friendsTab" class="tab-content block pb-2">
+                     <!-- Search Bar -->
+                     <div class="relative mb-4">
+                         <i class="fas fa-search absolute left-3 top-3.5 text-slate-400"></i>
+                         <input type="text" id="userSearchInput" class="w-full pl-10 pr-4 py-3 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Tìm theo tên, email, tin nhắn...">
+                     </div>
+                     
+                     <!-- Selected Preview -->
+                     <div id="selectedUsersPreview" class="flex flex-wrap gap-2 mb-4 hidden"></div>
+
+                     <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2" id="listTitle">Gợi ý từ danh bạ</h4>
+
+                     <!-- List -->
+                     <div class="h-60 overflow-y-auto custom-scrollbar space-y-2 pr-1" id="usersList">
+                         <!-- Dynamically populated -->
+                         <div class="flex flex-col items-center justify-center h-full text-slate-500">
+                             <i class="fas fa-spinner fa-spin text-2xl mb-2"></i> 
+                             <span>Đang tải...</span>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Tab Content: Email -->
+                 <div id="emailTab" class="tab-content hidden pb-2">
+                     <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl mb-4 flex gap-3">
+                         <div class="text-blue-600 dark:text-blue-400 text-xl"><i class="fas fa-info-circle"></i></div>
+                         <p class="text-sm text-blue-800 dark:text-blue-200">Sử dụng tính năng này để mời những người chưa có tài khoản hoặc không có trong danh sách bạn bè của bạn.</p>
+                     </div>
+                     <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Địa chỉ Email</label>
+                        <textarea asp-for="InviteInput.Emails" class="w-full rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32 p-3 font-mono text-sm" placeholder="nhap@email.com, khac@email.com..."></textarea>
+                        <p class="text-xs text-slate-500 mt-2 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> Nhập nhiều email phân cách bởi dấu phẩy.</p>
+                        <span asp-validation-for="InviteInput.Emails" class="text-red-500 text-xs mt-1 block"></span>
+                    </div>
+                 </div>
+
+                 <div class="flex gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                    <button type="button" onclick="closeInviteMemberModal()" class="flex-1 px-4 py-3 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-xl font-bold transition-colors">Hủy</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 font-bold transition-colors">Gửi lời mời</button>
                 </div>
-            </form>
+             </form>
         </div>
     </div>
 </div>
+
 
 <!-- Settings Modal -->
 <div id="settingsModalBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" aria-hidden="true">
@@ -586,29 +629,35 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const categoryData = @Html.Raw(Model.CategorySpendingJson);
-        const ctx = document.getElementById('expenseChart');
-        if (ctx && categoryData && categoryData.length > 0) {
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: categoryData.map(d => d.Label),
-                    datasets: [{
-                        label: 'Chi tiêu',
-                        data: categoryData.map(d => d.Value),
-                        backgroundColor: [
-                          '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
+        // Chart Initialization
+        try {
+            const categoryData = @Html.Raw(Model.CategorySpendingJson ?? "[]");
+            const ctx = document.getElementById('expenseChart');
+            
+            if (ctx && typeof Chart !== 'undefined' && categoryData && categoryData.length > 0) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categoryData.map(d => d.Label),
+                        datasets: [{
+                            label: 'Chi tiêu',
+                            data: categoryData.map(d => d.Value),
+                            backgroundColor: [
+                                '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
                     }
-                }
-            });
+                });
+            }
+        } catch (e) {
+            console.warn("Chart initialization failed:", e);
         }
         
         // Auto-Reopen Modals if Validation Failed
@@ -675,5 +724,188 @@
                 calculateSplit();
             });
         });
+
+        // --- Invite Logic ---
+        const myFriendsRaw = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.FriendsList ?? new List<MoneyTrackerApp.DTOs.FriendshipDto>()));
+        const currentGroupMembers = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GroupParticipants.Select(p => p.Id)));
+        
+        let selectedUserIds = new Set();
+        let searchTimeout;
+
+        function initInviteModal() {
+            renderUserList(myFriendsRaw);
+            updateSelectedPreview();
+        }
+
+        // Render User List Item
+        function renderUserList(users, isSearchResult = false) {
+             const listContainer = document.getElementById('usersList');
+             const title = document.getElementById('listTitle');
+             listContainer.innerHTML = '';
+
+             if(isSearchResult) {
+                 title.textContent = `Kết quả tìm kiếm (${users.length})`;
+             } else {
+                 title.textContent = 'Gợi ý từ danh bạ';
+             }
+
+             if (users.length === 0) {
+                 listContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 py-8">
+                        <i class="fas fa-search-minus text-3xl mb-2"></i>
+                        <p class="text-sm">Không tìm thấy người dùng nào.</p>
+                    </div>`;
+                 return;
+             }
+
+             users.forEach(user => {
+                 // Map DTO fields correctly (DetailsModel uses FriendshipDto for Friends, but Search might return simple object)
+                 // Priority: FriendId (DTO) -> id (Search)
+                 const uid = user.FriendId || user.friendId || user.id || user.Id; 
+                 const name = user.FriendName || user.friendName || user.name || user.fullName;
+                 const avatar = user.FriendAvatar || user.friendAvatar || user.avatar || user.profilePictureUrl; // May be null
+                 const subtext = user.UserName || user.userName || user.email || "";
+
+                 // Check if already in group
+                 const isMember = currentGroupMembers.includes(uid);
+                 
+                 const startInitial = name ? name.charAt(0).toUpperCase() : "?";
+                 const avatarHtml = avatar 
+                    ? `<img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-slate-200">`
+                    : `<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white flex items-center justify-center font-bold shadow-sm">${startInitial}</div>`;
+
+                 const isSelected = selectedUserIds.has(uid);
+                 const btnClass = isSelected 
+                    ? "bg-green-500 hover:bg-green-600 text-white border-transparent"
+                    : "bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-600";
+                 const btnIcon = isSelected ? "fa-check" : "fa-plus";
+                 const btnText = isSelected ? "Đã chọn" : "Thêm";
+
+                 const div = document.createElement('div');
+                 div.className = `flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border border-transparent ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`;
+                 
+                 if (isMember) {
+                     div.classList.add('opacity-60', 'grayscale');
+                     div.title = "Đã là thành viên";
+                 }
+
+                 div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        ${avatarHtml}
+                        <div>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white leading-tight">${name}</p>
+                            <p class="text-xs text-slate-500">${subtext}</p>
+                        </div>
+                    </div>
+                    <button type="button" 
+                        onclick="${!isMember ? `toggleUserSelection(${uid}, '${name.replace(/'/g, "\\'")}', this)` : ''}"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all shadow-sm flex items-center gap-1.5 ${isMember ? 'cursor-not-allowed bg-slate-100 text-slate-400' : btnClass}">
+                        <i class="fas ${isMember ? 'fa-check' : btnIcon}"></i> ${isMember ? 'Đã tham gia' : btnText}
+                    </button>
+                 `;
+                 listContainer.appendChild(div);
+             });
+        }
+
+        window.toggleUserSelection = function(uid, name, btn) {
+            if (selectedUserIds.has(uid)) {
+                selectedUserIds.delete(uid);
+                // Update Button State
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all shadow-sm flex items-center gap-1.5 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-600";
+                btn.innerHTML = `<i class="fas fa-plus"></i> Thêm`;
+                btn.parentElement.classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10');
+            } else {
+                selectedUserIds.add(uid);
+                // Update Button State
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all shadow-sm flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white border-transparent";
+                btn.innerHTML = `<i class="fas fa-check"></i> Đã chọn`;
+                btn.parentElement.classList.add('bg-blue-50/50', 'dark:bg-blue-900/10');
+            }
+            updateSelectedPreview();
+        };
+
+        function updateSelectedPreview() {
+            const container = document.getElementById('selectedUsersContainer');
+            const preview = document.getElementById('selectedUsersPreview');
+            
+            // Update hidden inputs
+            container.innerHTML = '';
+            selectedUserIds.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'InviteInput.UserIds';
+                input.value = id;
+                container.appendChild(input);
+            });
+
+            // Update UI Preview (Optional, shows chips of selected users)
+            if (selectedUserIds.size > 0) {
+                preview.innerHTML = `
+                    <div class="text-xs text-slate-500 w-full mb-1">Đã chọn ${selectedUserIds.size} người:</div>
+                `;
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+            }
+        }
+
+        // Search Logic
+        const searchInput = document.getElementById('userSearchInput');
+        if(searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                clearTimeout(searchTimeout);
+
+                if (query.length === 0) {
+                    renderUserList(myFriendsRaw); // Reset to friends
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    // Show Loading
+                    document.getElementById('usersList').innerHTML = `
+                         <div class="flex flex-col items-center justify-center h-full text-slate-500 py-4">
+                             <i class="fas fa-spinner fa-spin text-xl mb-2"></i> 
+                             <span>Đang tìm kiếm...</span>
+                         </div>
+                    `;
+
+                    fetch(`?handler=SearchPeople&query=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            renderUserList(data, true);
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            document.getElementById('usersList').innerHTML = `<p class="text-center text-red-500 py-4">Lỗi tìm kiếm.</p>`;
+                        });
+                }, 400); // Debounce
+            });
+        }
+
+        window.switchInviteTab = function(tabName, btn) {
+            // UI Update
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('text-blue-600', 'border-blue-600');
+                b.classList.add('text-slate-500', 'border-transparent');
+            });
+            btn.classList.add('text-blue-600', 'border-blue-600');
+            btn.classList.remove('text-slate-500', 'border-transparent');
+
+            // Content Update
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            if(tabName === 'friends') {
+                document.getElementById('friendsTab').classList.remove('hidden');
+                document.getElementById('friendsTab').classList.add('block');
+            } else {
+                document.getElementById('emailTab').classList.remove('hidden');
+                document.getElementById('emailTab').classList.add('block');
+            }
+        };
+
+        // Initialize
+        initInviteModal();
+
     });
 </script>
+

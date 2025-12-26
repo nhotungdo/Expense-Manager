@@ -24,6 +24,8 @@ public class UpdateAccountDto
     [RegularExpression("^#[0-9A-Fa-f]{6}$", ErrorMessage = "Color must be a valid hex code")]
     public string? Color { get; set; }
 
+    public int? AccountType { get; set; }
+
     public bool? IsActive { get; set; }
 
     public bool? IncludeInTotal { get; set; }

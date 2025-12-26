@@ -1,20 +1,23 @@
 @page
 @model MoneyTrackerApp.Pages.Shopping.IndexModel
 @{
-    ViewData["Title"] = "Danh sách Mua sắm";
+    ViewData["Title"] = "Mua sắm";
 }
 
-<div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2 class="fw-bold"><i class="fas fa-shopping-basket text-success me-2"></i>Danh sách Mua sắm</h2>
-            <p class="text-muted">Lên kế hoạch mua sắm thông minh.</p>
+<link rel="stylesheet" href="~/css/shopping.css" />
+
+<div class="container shopping-container">
+    <div class="shopping-header">
+        <div class="shopping-title-wrapper">
+            <h1 class="shopping-title">
+                <i class="fas fa-shopping-basket"></i>
+                Danh sách Mua sắm
+            </h1>
+            <p class="shopping-subtitle">Quản lý việc mua sắm của bạn một cách thông minh và dễ dàng.</p>
         </div>
-        <div class="col-md-4 text-end">
-            <button class="btn btn-success rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createListModal">
-                <i class="fas fa-plus me-2"></i>Tạo danh sách
-            </button>
-        </div>
+        <button class="btn-shopping-add" data-bs-toggle="modal" data-bs-target="#createListModal">
+            <i class="fas fa-plus"></i> Tạo danh sách
+        </button>
     </div>
 
     <div class="row g-4">
@@ -24,59 +27,67 @@
             var purchasedItems = list.ShoppingItems.Count(i => i.IsPurchased);
             var progress = totalItems > 0 ? (int)((double)purchasedItems / totalItems * 100) : 0;
 
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0 hover:shadow-md transition-all">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="card-title fw-bold">
-                                <a href="/Shopping/Details?id=@list.Id" class="text-decoration-none text-dark stretched-link">@list.Name</a>
-                            </h5>
-                            <form method="post" asp-page-handler="Delete" asp-route-id="@list.Id" onsubmit="return confirm('Xóa danh sách này?');" style="z-index: 10; position: relative;">
-                                <button class="btn btn-link text-muted p-0 hover:text-danger"><i class="fas fa-trash"></i></button>
-                            </form>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between text-xs text-muted mb-1">
-                            <span>Đã mua: @purchasedItems/@totalItems</span>
-                            <span>@progress%</span>
-                        </div>
-                        <div class="progress h-1.5 bg-slate-100 rounded-full">
-                            <div class="progress-bar bg-success" style="width: @progress%"></div>
-                        </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="shopping-card">
+                   <form method="post" asp-page-handler="Delete" asp-route-id="@list.Id" onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh sách này?');">
+                        <button type="submit" class="shopping-delete-btn" title="Xóa danh sách">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
 
-                        <div class="mt-3 text-end">
-                             <small class="text-muted">@list.CreatedAt.ToString("dd/MM/yyyy")</small>
+                    <a href="/Shopping/Details?id=@list.Id" class="shopping-card-link text-decoration-none">
+                        <div class="shopping-card-body">
+                             <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="shopping-card-title m-0">@list.Name</h3>
+                             </div>
+
+                             <div class="shopping-stats">
+                                <span>Tiến độ</span>
+                                <span>@purchasedItems/@totalItems món</span>
+                             </div>
+                             
+                             <div class="shopping-progress">
+                                <div class="shopping-progress-bar" style="width: @progress%"></div>
+                             </div>
+
+                             <div class="shopping-card-meta">
+                                <i class="far fa-clock me-1"></i> @list.CreatedAt.ToString("dd/MM/yyyy")
+                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         }
-        
-        @if (!Model.Lists.Any())
-        {
-             <div class="col-12 text-center py-5 text-muted">
-                <i class="fas fa-clipboard-list text-4xl mb-3 opacity-25"></i>
-                <p>Chưa có danh sách nào. Hãy tạo mới!</p>
-            </div>
-        }
     </div>
+
+    @if (!Model.Lists.Any())
+    {
+        <div class="shopping-empty mt-4">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>Chưa có danh sách nào</h3>
+            <p>Bắt đầu bằng cách tạo danh sách mua sắm đầu tiên của bạn!</p>
+            <button class="btn-shopping-add mt-3" data-bs-toggle="modal" data-bs-target="#createListModal">
+                <i class="fas fa-plus"></i> Tạo ngay
+            </button>
+        </div>
+    }
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="createListModal" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade modal-custom" id="createListModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <form method="post" class="modal-content">
-            <div class="modal-header border-0">
+            <div class="modal-header">
                 <h5 class="modal-title fw-bold">Tạo Danh sách Mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <label class="form-label">Tên danh sách</label>
-                <input asp-for="NewListName" class="form-control" placeholder="Ví dụ: Siêu thị cuối tuần" required />
+                <label class="form-label fw-medium">Tên danh sách</label>
+                <input asp-for="NewListName" class="form-control shopping-input" placeholder="Ví dụ: Đồ dùng nhà bếp, Tiệc sinh nhật..." required />
             </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                <button type="submit" class="btn btn-success">Tạo</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4 bg-emerald-500 border-0 hover:bg-emerald-600">Tạo mới</button>
             </div>
         </form>
     </div>

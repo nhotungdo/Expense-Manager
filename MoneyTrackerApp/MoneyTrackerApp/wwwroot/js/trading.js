@@ -22,6 +22,7 @@ let currentData = {
 function initializeTradingPage() {
     setupEventListeners();
     loadDashboardData();
+    loadSmartRecommendations();
     renderEmptyChart();
 }
 
@@ -32,8 +33,109 @@ function setupEventListeners() {
         input.addEventListener('change', (e) => {
             currentPeriod = e.target.value;
             loadDashboardData();
+            loadSmartRecommendations();
         });
     });
+}
+
+// Load Smart AI Recommendations
+async function loadSmartRecommendations() {
+    const container = document.getElementById('smartBudgetContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div class="d-flex justify-content-center py-4"><div class="spinner-border text-info" role="status"></div></div>';
+
+    try {
+        const response = await fetchSafe(`/api/Analysis/smart-recommendations?period=${currentPeriod}`);
+
+        if (!response || !response.recommendations) {
+            container.innerHTML = '<p class="text-muted text-center py-3">Không có đề xuất nào.</p>';
+            return;
+        }
+
+        let html = '';
+
+        // Display Advanced Recommendations
+        if (response.recommendations && response.recommendations.length > 0) {
+            html += '<div class="mb-4">';
+            html += '<h6 class="text-muted mb-3"><i class="fas fa-chart-line me-2"></i>Phân tích chi tiết</h6>';
+
+            response.recommendations.forEach(rec => {
+                const typeClass = rec.type === 'alert' ? 'danger' : rec.type === 'warning' ? 'warning' : rec.type === 'info' ? 'info' : 'success';
+                const icon = rec.type === 'alert' ? 'fa-exclamation-triangle' : rec.type === 'warning' ? 'fa-exclamation-circle' : rec.type === 'info' ? 'fa-info-circle' : 'fa-lightbulb';
+
+                html += `
+                    <div class="alert alert-${typeClass} alert-dismissible fade show mb-3" role="alert">
+                        <div class="d-flex align-items-start">
+                            <i class="fas ${icon} me-3 mt-1"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="alert-heading mb-1">${rec.title}</h6>
+                                <p class="mb-2 small">${rec.description}</p>
+                                ${rec.potentialSavings ? `<div class="small"><strong>Tiết kiệm tiềm năng:</strong> ${formatCurrency(rec.potentialSavings)}</div>` : ''}
+                                ${rec.suggestedBudget ? `<div class="small"><strong>Ngân sách đề xuất:</strong> ${formatCurrency(rec.suggestedBudget)}</div>` : ''}
+                                ${rec.recommendedDaily ? `<div class="small"><strong>Chi tiêu hàng ngày nên:</strong> ${formatCurrency(rec.recommendedDaily)}</div>` : ''}
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Display Budget Suggestions Table
+        if (response.budgetSuggestions && response.budgetSuggestions.length > 0) {
+            html += '<div class="mb-3">';
+            html += '<h6 class="text-muted mb-3"><i class="fas fa-calculator me-2"></i>Ngân sách đề xuất theo danh mục</h6>';
+            html += '<div class="table-responsive">';
+            html += '<table class="table table-sm table-hover align-middle">';
+            html += '<thead class="table-light"><tr><th>Danh mục</th><th class="text-end">Chi hiện tại</th><th class="text-end">Đề xuất</th><th class="text-center">Độ tin cậy</th></tr></thead>';
+            html += '<tbody>';
+
+            response.budgetSuggestions.forEach(sug => {
+                const confidenceBadge = sug.confidence === 'high' ? 'success' : sug.confidence === 'medium' ? 'warning' : 'secondary';
+                const confidenceText = sug.confidence === 'high' ? 'Cao' : sug.confidence === 'medium' ? 'TB' : 'Thấp';
+
+                html += `
+                    <tr>
+                        <td><strong>${sug.category}</strong><br><small class="text-muted">${sug.transactionCount} giao dịch</small></td>
+                        <td class="text-end">${formatCurrency(sug.currentSpending)}</td>
+                        <td class="text-end text-primary"><strong>${formatCurrency(sug.suggestedMonthlyBudget)}</strong></td>
+                        <td class="text-center"><span class="badge bg-${confidenceBadge}">${confidenceText}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table></div></div>';
+        }
+
+        // Display Analysis Summary
+        if (response.analysis) {
+            const savingsClass = response.analysis.savingsRate > 20 ? 'success' : response.analysis.savingsRate > 10 ? 'warning' : 'danger';
+            html += `
+                <div class="row g-2 mt-3">
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded text-center">
+                            <small class="text-muted d-block">Tỷ lệ tiết kiệm</small>
+                            <h5 class="mb-0 text-${savingsClass}">${response.analysis.savingsRate.toFixed(1)}%</h5>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded text-center">
+                            <small class="text-muted d-block">Chi TB/ngày</small>
+                            <h5 class="mb-0">${formatCurrency(response.analysis.dailyAverage)}</h5>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html || '<p class="text-muted text-center py-3">Chưa có dữ liệu phân tích.</p>';
+
+    } catch (error) {
+        console.error('Error loading smart recommendations:', error);
+        container.innerHTML = '<p class="text-danger text-center py-3">Không thể tải đề xuất AI.</p>';
+    }
 }
 
 // Data Loading
@@ -207,6 +309,7 @@ function updateStats(insights, comparisonData) {
     }
 }
 
+
 function updateAiInsightText(insights) {
     const textField = document.getElementById('aiAnalysisText');
     const box = document.getElementById('aiInsightBox');
@@ -217,20 +320,41 @@ function updateAiInsightText(insights) {
         return;
     }
 
-    textField.textContent = "Hoàn tất phân tích dựa trên hoạt động gần đây của bạn.";
+    // Check if we have real AI content
+    if (insights.content && insights.content.length > 50 && !insights.content.startsWith("Lỗi")) {
+        // Use Gemini Content
+        let cleanText = insights.content;
+        cleanText = cleanText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        cleanText = cleanText.replace(/\n\n/g, '<br><br>');
+        cleanText = cleanText.replace(/\n/g, '<br>'); // Simple newlines
 
-    let message = "Chi tiêu của bạn nằm trong giới hạn bình thường.";
-    let icon = "fa-check-circle text-success";
+        textField.innerHTML = cleanText;
 
-    if (insights.totalExpense > insights.totalIncome && insights.totalIncome > 0) {
-        message = "⚠️ Cảnh báo: Chi tiêu đang vượt quá thu nhập trong kỳ này.";
-        icon = "fa-exclamation-triangle text-warning";
-    } else if (insights.savingsRate > 20) {
-        message = "🎉 Tuyệt vời! Bạn đang duy trì tỷ lệ tiết kiệm rất tốt.";
-        icon = "fa-star text-warning";
+        // Hide the box or use it for specific metrics
+        box.innerHTML = '';
+        if (insights.savingsRate > 20) {
+            box.innerHTML = `<div class="mt-3 p-2 bg-success bg-opacity-10 rounded text-success"><i class="fas fa-check-circle me-1"></i> Tỷ lệ tiết kiệm tốt: ${insights.savingsRate.toFixed(1)}%</div>`;
+        } else if (insights.totalExpense > insights.totalIncome && insights.totalIncome > 0) {
+            box.innerHTML = `<div class="mt-3 p-2 bg-danger bg-opacity-10 rounded text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Bội chi</div>`;
+        }
+
+    } else {
+        // Fallback Logic
+        textField.textContent = "Hoàn tất phân tích dựa trên hoạt động gần đây của bạn.";
+
+        let message = "Chi tiêu của bạn nằm trong giới hạn bình thường.";
+        let icon = "fa-check-circle text-success";
+
+        if (insights.totalExpense > insights.totalIncome && insights.totalIncome > 0) {
+            message = "⚠️ Cảnh báo: Chi tiêu đang vượt quá thu nhập trong kỳ này.";
+            icon = "fa-exclamation-triangle text-warning";
+        } else if (insights.savingsRate > 20) {
+            message = "🎉 Tuyệt vời! Bạn đang duy trì tỷ lệ tiết kiệm rất tốt.";
+            icon = "fa-star text-warning";
+        }
+
+        box.innerHTML = `<p class="mb-0"><i class="fas ${icon} me-2"></i>${message}</p>`;
     }
-
-    box.innerHTML = `<p class="mb-0"><i class="fas ${icon} me-2"></i>${message}</p>`;
 }
 
 // Charting
@@ -352,62 +476,128 @@ function renderEmptyChart() {
     renderPredictionChart(null, [], null);
 }
 
-// Recommendations
+// Recommendations - Enhanced AI-Powered Analysis
 function renderRecommendations(insights, anomalies) {
     const container = document.getElementById('savingsRecommendations');
     container.innerHTML = '';
 
     const recs = [];
 
-    // 1. Check Anomalies
-    if (anomalies && Array.isArray(anomalies)) {
-        anomalies.forEach(a => {
-            recs.push({
-                type: 'high',
-                title: 'Chi tiêu bất thường',
-                desc: `${a.description || 'Không xác định'} (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(a.amount || 0)})`
-            });
+    // 1. Critical Anomalies - High Priority
+    if (anomalies && Array.isArray(anomalies) && anomalies.length > 0) {
+        const totalAnomalous = anomalies.reduce((sum, a) => sum + (a.amount || 0), 0);
+        recs.push({
+            type: 'high',
+            title: '🚨 Phát hiện giao dịch bất thường',
+            desc: `${anomalies.length} giao dịch vượt ngưỡng bình thường (${formatCurrency(totalAnomalous)}). Hãy kiểm tra kỹ để tránh chi tiêu lãng phí.`,
+            icon: 'fa-exclamation-triangle',
+            action: 'Xem chi tiết'
         });
     }
 
-    // 2. High Expense Ratio
+    // 2. Budget Crisis - Overspending Alert
     if (insights && insights.totalExpense > 0 && insights.totalIncome > 0) {
-        if (insights.totalExpense > insights.totalIncome * 0.9) {
+        const spendingRatio = (insights.totalExpense / insights.totalIncome) * 100;
+
+        if (spendingRatio > 100) {
             recs.push({
                 type: 'high',
-                title: 'Ngân sách nguy cấp',
-                desc: 'Bạn đã sử dụng hơn 90% thu nhập trong kỳ này.'
+                title: '⚠️ Bội chi nghiêm trọng',
+                desc: `Chi tiêu vượt thu nhập ${(spendingRatio - 100).toFixed(1)}%. Cần cắt giảm chi tiêu ngay để tránh nợ nần.`,
+                icon: 'fa-chart-line-down'
+            });
+        } else if (spendingRatio > 90) {
+            recs.push({
+                type: 'high',
+                title: '⚡ Ngân sách căng thẳng',
+                desc: `Bạn đã chi ${spendingRatio.toFixed(1)}% thu nhập. Chỉ còn ${formatCurrency(insights.totalIncome - insights.totalExpense)} để tiết kiệm.`,
+                icon: 'fa-battery-quarter'
+            });
+        } else if (spendingRatio > 70) {
+            recs.push({
+                type: 'medium',
+                title: '💡 Cân nhắc tiết kiệm',
+                desc: `Tỷ lệ chi tiêu ${spendingRatio.toFixed(1)}% là hợp lý, nhưng có thể tối ưu hơn để tăng tiết kiệm.`,
+                icon: 'fa-piggy-bank'
             });
         }
     }
 
-    // 3. Category Optimization
+    // 3. Savings Performance
+    if (insights && insights.savingsRate !== undefined) {
+        if (insights.savingsRate > 30) {
+            recs.push({
+                type: 'low',
+                title: '🎉 Tiết kiệm xuất sắc!',
+                desc: `Tỷ lệ tiết kiệm ${insights.savingsRate.toFixed(1)}% vượt trội. Bạn đang trên đà đạt mục tiêu tài chính!`,
+                icon: 'fa-trophy'
+            });
+        } else if (insights.savingsRate < 10 && insights.savingsRate > 0) {
+            recs.push({
+                type: 'medium',
+                title: '📊 Tiết kiệm thấp',
+                desc: `Chỉ tiết kiệm được ${insights.savingsRate.toFixed(1)}%. Mục tiêu lý tưởng là 20-30% thu nhập.`,
+                icon: 'fa-chart-pie'
+            });
+        }
+    }
+
+    // 4. Category Spending Intelligence
     if (insights && insights.topCategory) {
         recs.push({
             type: 'medium',
-            title: 'Xu hướng chi tiêu',
-            desc: `Danh mục '${insights.topCategory}' đang chiếm tỷ trọng lớn nhất. Hãy cân nhắc điều chỉnh.`
+            title: '🔍 Phân tích danh mục',
+            desc: `"${insights.topCategory}" chiếm tỷ trọng lớn nhất. AI khuyến nghị: Xem xét các khoản chi trong danh mục này để tìm cơ hội tiết kiệm.`,
+            icon: 'fa-layer-group'
         });
     }
 
-    // Fallback
+    // 5. Spending Velocity Warning (if daily average is high)
+    if (insights && currentData.dailyAverage > 0) {
+        const projectedMonthly = currentData.dailyAverage * 30;
+        if (insights.totalIncome > 0 && projectedMonthly > insights.totalIncome * 0.8) {
+            recs.push({
+                type: 'high',
+                title: '⏱️ Tốc độ chi tiêu cao',
+                desc: `Với mức chi trung bình ${formatCurrency(currentData.dailyAverage)}/ngày, bạn có thể chi hết ${formatCurrency(projectedMonthly)} trong tháng.`,
+                icon: 'fa-tachometer-alt'
+            });
+        }
+    }
+
+    // 6. AI Trend Prediction
+    if (insights && insights.expenseTrend !== undefined && insights.expenseTrend !== 0) {
+        const trendDirection = insights.expenseTrend > 0 ? 'tăng' : 'giảm';
+        const trendType = insights.expenseTrend > 0 ? 'medium' : 'low';
+        recs.push({
+            type: trendType,
+            title: `📈 Xu hướng ${trendDirection}`,
+            desc: `Chi tiêu ${trendDirection} ${Math.abs(insights.expenseTrend)}% so với kỳ trước. ${insights.expenseTrend > 0 ? 'Cần kiểm soát chặt chẽ hơn.' : 'Đang cải thiện tốt!'}`,
+            icon: insights.expenseTrend > 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'
+        });
+    }
+
+    // Fallback - Positive Reinforcement
     if (recs.length === 0) {
         recs.push({
             type: 'low',
-            title: 'Tài chính lành mạnh',
-            desc: 'Thói quen chi tiêu của bạn đang được kiểm soát tốt.'
+            title: '✅ Tài chính ổn định',
+            desc: 'Thói quen chi tiêu của bạn đang được kiểm soát tốt. Tiếp tục duy trì!',
+            icon: 'fa-check-circle'
         });
     }
 
+    // Render with enhanced UI
     recs.forEach(rec => {
         const div = document.createElement('div');
-        div.className = `recommendation-item rec-${rec.type}`;
+        div.className = `recommendation-item rec-${rec.type} fade-in-up`;
         div.innerHTML = `
             <div class="rec-header">
                 <span class="rec-title">${rec.title}</span>
                 ${getPriorityIcon(rec.type)}
             </div>
             <div class="rec-desc">${rec.desc}</div>
+            ${rec.action ? `<div class="rec-action mt-2"><small class="text-primary"><i class="fas fa-arrow-right me-1"></i>${rec.action}</small></div>` : ''}
         `;
         container.appendChild(div);
     });
@@ -420,6 +610,10 @@ function getPriorityIcon(type) {
         case 'low': return '<i class="fas fa-check-circle text-success"></i>';
         default: return '';
     }
+}
+
+function formatCurrency(val) {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
 }
 
 // Transactions Table

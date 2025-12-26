@@ -80,6 +80,50 @@ namespace MoneyTrackerApp.Pages.Wallets
             }
         }
 
+        [BindProperty]
+        public UpdateAccountDto UpdateWallet { get; set; } = new();
+
+        public async Task<IActionResult> OnPostEditAsync()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user == null) return RedirectToPage("/Auth/Login");
+            
+            // Note: ModelState validation for UpdateWallet might involve fields not in the form if we reuse classes recklessly, 
+            // but UpdateAccountDto usually has optional fields. 
+            // We should ensure Id is bound.
+
+            try 
+            {
+                 await _accountService.UpdateAccountAsync(user.Id, UpdateWallet);
+                 TempData["SuccessMessage"] = "Cập nhật ví thành công!";
+            }
+            catch(Exception ex)
+            {
+                 TempData["ErrorMessage"] = "Lỗi cập nhật: " + ex.Message;
+            }
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(long id)
+        {
+            var user = await GetCurrentUserAsync();
+            if (user == null) return RedirectToPage("/Auth/Login");
+
+            try
+            {
+                await _accountService.DeleteAccountAsync(id, user.Id);
+                TempData["SuccessMessage"] = "Đã xóa ví thành công!";
+            }
+            catch (Exception ex)
+            {
+                // Typically invalid operation if transactions exist
+                TempData["ErrorMessage"] = "Không thể xóa ví: " + ex.Message;
+            }
+
+            return RedirectToPage();
+        }
+
         private async Task LoadWalletData(long userId)
         {
             // Get Subscription

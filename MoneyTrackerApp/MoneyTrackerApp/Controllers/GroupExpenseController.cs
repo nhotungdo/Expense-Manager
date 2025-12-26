@@ -157,6 +157,32 @@ public class GroupExpenseController : ControllerBase
     }
 
     /// <summary>
+    /// Invite members to a group via email
+    /// </summary>
+    [HttpPost("invite")]
+    public async Task<ActionResult> InviteMembers([FromBody] InviteGroupMemberDto dto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = GetUserId();
+            var result = await _groupExpenseService.InviteMembersAsync(userId, dto);
+            return Ok(new { message = $"Invitations sent to {result.Count} emails", emails = result });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error inviting members");
+            return StatusCode(500, new { message = "An error occurred while sending invitations" });
+        }
+    }
+
+    /// <summary>
     /// Add a member to a group
     /// </summary>
     [HttpPost("members")]

@@ -48,6 +48,12 @@
              <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
         </div>
     }
+    @if(TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger mb-4 rounded-3 border-0 shadow-sm">
+             <i class="fas fa-times-circle me-2"></i> @TempData["ErrorMessage"]
+        </div>
+    }
 
     <!-- Usage Stats / Limit Info -->
     <div class="usage-stats">
@@ -122,7 +128,7 @@
             @foreach (var wallet in Model.Wallets)
             {
                 <div class="wallet-card" onclick="window.location.href='/Wallets/Detail/@wallet.Id'">
-                    <div class="wallet-card-header">
+                    <div class="wallet-card-header d-flex justify-content-between align-items-start">
                         <div class="d-flex align-items-center">
                             <div class="wallet-icon" style="background: @(wallet.Color ?? "var(--primary-gradient)")">
                                 <i class="@(wallet.Icon ?? "fas fa-wallet")"></i>
@@ -137,6 +143,29 @@
                                     else { <text>Khác</text> }
                                 </span>
                             </div>
+                        </div>
+                        <div class="dropdown" onclick="event.stopPropagation()">
+                            <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                                <li>
+                                    <h6 class="dropdown-header text-uppercase small fw-bold">Thao tác</h6>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item small" href="#" 
+                                       onclick="openEditModal(@wallet.Id, '@wallet.Name', '@wallet.Color', '@wallet.Icon', @wallet.AccountType, @(wallet.IncludeInTotal.ToString().ToLower()))">
+                                        <i class="fas fa-edit me-2 text-primary"></i> Sửa ví
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item small text-danger" href="#" 
+                                       onclick="openDeleteModal(@wallet.Id, '@wallet.Name')">
+                                        <i class="fas fa-trash-alt me-2"></i> Xóa ví
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     
@@ -229,3 +258,118 @@
         </form>
     </div>
 </div>
+
+<!-- Edit Wallet Modal -->
+<div class="modal fade" id="editWalletModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" asp-page-handler="Edit">
+            <input type="hidden" id="editWalletId" asp-for="UpdateWallet.Id" />
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Chỉnh sửa Ví</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-4">
+                    <div class="mb-3">
+                        <label asp-for="UpdateWallet.Name" class="form-label fw-bold small text-muted text-uppercase">Tên Ví</label>
+                        <input id="editWalletName" asp-for="UpdateWallet.Name" class="form-control rounded-pill" required />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="UpdateWallet.AccountType" class="form-label fw-bold small text-muted text-uppercase">Loại Ví</label>
+                         <select id="editWalletType" asp-for="UpdateWallet.AccountType" class="form-select rounded-pill">
+                            <option value="0">Tiền mặt</option>
+                            <option value="1">Tài khoản ngân hàng</option>
+                            <option value="2">Ví điện tử</option>
+                            <option value="3">Thẻ tín dụng</option>
+                            <option value="4">Tiền tiết kiệm</option>
+                            <option value="5">Đầu tư</option>
+                        </select>
+                        <div class="form-text text-xs">Lưu ý: Thay đổi loại ví không làm thay đổi lịch sử giao dịch.</div>
+                    </div>
+ 
+                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                             <label asp-for="UpdateWallet.Color" class="form-label fw-bold small text-muted text-uppercase">Màu sắc</label>
+                             <input id="editWalletColor" asp-for="UpdateWallet.Color" type="color" class="form-control form-control-color w-100 rounded-pill" style="height:38px;" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="UpdateWallet.Icon" class="form-label fw-bold small text-muted text-uppercase">Icon (Font Awesome)</label>
+                            <input id="editWalletIcon" asp-for="UpdateWallet.Icon" class="form-control rounded-pill" />
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mt-2">
+                        <input id="editWalletInclude" name="UpdateWallet.IncludeInTotal" class="form-check-input" type="checkbox" value="true">
+                        <input type="hidden" name="UpdateWallet.IncludeInTotal" value="false" />
+                        <label class="form-check-label" for="editWalletInclude">Tính vào tổng tài sản</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu thay đổi</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteWalletModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" asp-page-handler="Delete">
+            <!-- Ensure name matches handler parameter if not using UpdateWallet binding -->
+            <input type="hidden" name="id" id="deleteWalletId" />
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">Xóa Ví</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-4">
+                    <div class="text-center mb-4">
+                         <div class="width-80 height-80 bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-exclamation-triangle text-danger display-4"></i>
+                        </div>
+                        <h4>Bạn có chắc chắn?</h4>
+                        <p class="text-muted">Bạn đang sắp xóa ví: <strong id="deleteWalletNameDisplay" class="text-dark"></strong></p>
+                    </div>
+                    
+                    <div class="alert alert-warning border-0 rounded-3 small">
+                        <i class="fas fa-info-circle me-1"></i> 
+                        Hành động này <strong>không thể hoàn tác</strong> nếu ví này chưa có giao dịch. 
+                        Nếu ví đã có giao dịch, bạn sẽ không thể xóa nó (theo chính sách bảo toàn dữ liệu).
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Không, giữ lại</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Có, Xóa ngay</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openEditModal(id, name, color, icon, type, include) {
+            document.getElementById('editWalletId').value = id;
+            document.getElementById('editWalletName').value = name;
+            document.getElementById('editWalletColor').value = color;
+            document.getElementById('editWalletIcon').value = icon;
+             // Select logic for type if needed, or simple value assignment
+            document.getElementById('editWalletType').value = type;
+            document.getElementById('editWalletInclude').checked = include;
+            
+            var myModal = new bootstrap.Modal(document.getElementById('editWalletModal'));
+            myModal.show();
+        }
+
+        function openDeleteModal(id, name) {
+            document.getElementById('deleteWalletId').value = id;
+            document.getElementById('deleteWalletNameDisplay').innerText = name;
+            
+            var myModal = new bootstrap.Modal(document.getElementById('deleteWalletModal'));
+            myModal.show();
+        }
+    </script>
+}

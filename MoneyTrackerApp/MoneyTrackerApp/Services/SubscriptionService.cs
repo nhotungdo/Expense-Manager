@@ -58,12 +58,19 @@ public class SubscriptionService : ISubscriptionService
             Price = p.Price,
             OriginalPrice = p.OriginalPrice,
             DurationDays = p.DurationDays,
+            BillingCycleName = GetBillingCycleName(p.BillingCycle),
             Features = string.IsNullOrEmpty(p.Features) 
                 ? new List<string>() 
                 : JsonSerializer.Deserialize<List<string>>(p.Features) ?? new List<string>(),
             IsPopular = p.IsPopular,
             BadgeText = p.BadgeText,
-            BadgeColor = p.BadgeColor
+            BadgeColor = p.BadgeColor,
+            MaxTransactions = p.MaxTransactions,
+            MaxAccounts = p.MaxAccounts,
+            HasAdvancedReports = p.HasAdvancedReports,
+            HasAiAdvisor = p.HasAiAdvisor,
+            HasGroupExpense = p.HasGroupExpense,
+            HasPrioritySupport = p.HasPrioritySupport
         }).ToList();
     }
 
@@ -82,12 +89,19 @@ public class SubscriptionService : ISubscriptionService
             Price = package.Price,
             OriginalPrice = package.OriginalPrice,
             DurationDays = package.DurationDays,
+            BillingCycleName = GetBillingCycleName(package.BillingCycle),
             Features = string.IsNullOrEmpty(package.Features)
                 ? new List<string>()
                 : JsonSerializer.Deserialize<List<string>>(package.Features) ?? new List<string>(),
             IsPopular = package.IsPopular,
             BadgeText = package.BadgeText,
-            BadgeColor = package.BadgeColor
+            BadgeColor = package.BadgeColor,
+            MaxTransactions = package.MaxTransactions,
+            MaxAccounts = package.MaxAccounts,
+            HasAdvancedReports = package.HasAdvancedReports,
+            HasAiAdvisor = package.HasAiAdvisor,
+            HasGroupExpense = package.HasGroupExpense,
+            HasPrioritySupport = package.HasPrioritySupport
         };
     }
 
@@ -295,6 +309,18 @@ public class SubscriptionService : ISubscriptionService
         var subscription = payment.Subscription;
         subscription.Status = (int)SubscriptionStatus.Active;
         subscription.UpdatedAt = DateTime.UtcNow;
+
+        // Add Notification
+        var notification = new Notification
+        {
+            UserId = subscription.UserId,
+            Title = "Đăng ký thành công",
+            Message = $"Bạn đã đăng ký thành công gói {subscription.Package?.Name ?? "dịch vụ"}. Cảm ơn bạn đã tin tưởng sử dụng dịch vụ.",
+            Type = "System", // Or "Subscription"
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.Notifications.Add(notification);
         
         await _context.SaveChangesAsync();
         

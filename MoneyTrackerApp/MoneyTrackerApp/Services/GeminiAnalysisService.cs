@@ -1,77 +1,82 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using MoneyTrackerApp.DTOs;
 
 namespace MoneyTrackerApp.Services
 {
     public class GeminiAnalysisService : IGeminiAnalysisService
     {
-        private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
 
-        public GeminiAnalysisService(IConfiguration configuration, HttpClient httpClient)
+        public GeminiAnalysisService(HttpClient httpClient, IConfiguration configuration)
         {
-            _configuration = configuration;
             _httpClient = httpClient;
+            _configuration = configuration;
         }
 
         public async Task<string> AnalyzeTransactionsAsync(List<TransactionAnalysisDto> transactions)
         {
             var apiKey = _configuration["GeminiAI:ApiKey"];
-            var model = _configuration["GeminiAI:Model"] ?? "gemini-1.5-flash"; 
-            var baseUrl = _configuration["GeminiAI:BaseUrl"] ?? "https://generativelanguage.googleapis.com/v1beta"; // Not strictly needed if hardcoded but good for future.
+            var model = _configuration["GeminiAI:Model"] ?? "gemini-1.5-flash";
+            var baseUrl = _configuration["GeminiAI:BaseUrl"] ?? "https://generativelanguage.googleapis.com/v1beta";
 
-            if (string.IsNullOrEmpty(apiKey))
+            if (string.IsNullOrEmpty(apiKey)) return "⚠️ Chưa cấu hình API Key cho Gemini AI.";
+
+            // Optimize payload size
+            var summaryData = transactions.Take(50).Select(t => new {
+                d = t.Date,
+                a = t.Amount,
+                c = t.Category,
+                t = t.Type,
+                n = t.Note
+            });
+
+            var prompt = "Bạn là chuyên gia tài chính cá nhân. Hãy phân tích danh sách giao dịch (d:date, a:amount, c:category, t:type, n:note) dưới đây:\n" +
+                         "1. Đưa ra nhận xét tổng quan về tình hình thu chi.\n" +
+                         "2. Chỉ ra 1 điểm cần cải thiện hoặc rủi ro tiềm ẩn.\n" +
+                         "3. Đưa ra 1 lời khuyên ngắn gọn, thiết thực.\n" +
+                         "Trả lời bằng Tiếng Việt, sử dụng Markdown (bold các ý chính), giọng văn chuyên nghiệp nhưng thân thiện.\n" +
+                         $"Dữ liệu: {JsonSerializer.Serialize(summaryData)}";
+
+            var requestBody = new
             {
-                return "API Key is missing. Please configure GeminiAI:ApiKey.";
-            }
+                contents = new[]
+                {
+                    new { parts = new[] { new { text = prompt } } }
+                }
+            };
 
             try
             {
-                var dataJson = JsonSerializer.Serialize(transactions);
-                var prompt = $"Bạn là một chuyên gia tài chính cá nhân. Dưới đây là lịch sử giao dịch của tôi trong tháng qua dưới dạng JSON. Hãy phân tích và đưa ra:\n1. Nhận xét ngắn gọn về tình hình tài chính (Cân đối thu chi).\n2. Chỉ ra 1 thói quen chi tiêu cần điều chỉnh (nếu có).\n3. Một lời khuyên cụ thể để tiết kiệm tốt hơn.\n\nTrả lời bằng tiếng Việt, giọng văn thân thiện, ngắn gọn dưới 100 từ.\nDữ liệu: {dataJson}";
-
-                var requestBody = new
-                {
-                    contents = new[]
-                    {
-                        new { parts = new[] { new { text = prompt } } }
-                    }
-                };
-
-                var jsonContent = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
                 
-                // Using configured model or default
-                var response = await _httpClient.PostAsync($"{baseUrl}/models/{model}:generateContent?key={apiKey}", jsonContent);
+                // Add explicit timeout
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                
+                var response = await _httpClient.PostAsync($"{baseUrl}/models/{model}:generateContent?key={apiKey}", content, cts.Token);
 
-                if (!response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    return $"AI Service Error: {response.StatusCode} - {errorContent}";
+                    var json = await response.Content.ReadAsStringAsync(cts.Token);
+                    using var doc = JsonDocument.Parse(json);
+                    try {
+                        var text = doc.RootElement.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").GetString();
+                        return text ?? "AI không trả về kết quả.";
+                    } catch { return "Không thể đọc phản hồi từ AI."; }
                 }
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(responseString);
-                
-                if (doc.RootElement.TryGetProperty("candidates", out var candidates) && candidates.GetArrayLength() > 0)
+                else
                 {
-                     var text = candidates[0]
-                         .GetProperty("content")
-                         .GetProperty("parts")[0]
-                         .GetProperty("text").GetString();
-                     return text;
+                    return $"Lỗi kết nối AI: {response.StatusCode}. Vui lòng thử lại sau.";
                 }
-                
-                return "No analysis returned from AI.";
+            }
+            catch (TaskCanceledException)
+            {
+                return "Hệ thống AI đang bận, vui lòng thử lại sau giây lát.";
             }
             catch (Exception ex)
             {
-                return $"Error: {ex.Message}";
+                return $"Lỗi hệ thống: {ex.Message}";
             }
         }
     }

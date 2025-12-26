@@ -1,10 +1,24 @@
-// Home Page - Dashboard with Pie Charts
-// Handles transaction visualization and analytics
+/**
+ * Home Dashboard - Financial Overview
+ * 
+ * This module handles the main dashboard functionality including:
+ * - Personal wallet data visualization
+ * - Expense and income breakdown charts (pie/doughnut charts)
+ * - Recent transaction display
+ * - Account management
+ * 
+ * @module home
+ */
 
+// Chart instances for cleanup and updates
 let expenseChartInstance = null;
 let incomeChartInstance = null;
 
-// Format currency
+/**
+ * Format amount as Vietnamese currency
+ * @param {number} amount - The amount to format
+ * @returns {string} Formatted currency string
+ */
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -13,7 +27,11 @@ function formatCurrency(amount) {
     }).format(amount);
 }
 
-// Load personal wallet data (summary cards)
+/**
+ * Load and display personal wallet summary data
+ * Updates the total assets, monthly income, and monthly expense cards
+ * @async
+ */
 async function loadPersonalWalletData() {
     try {
         const response = await fetch(`/api/Dashboard/personal-wallet?t=${Date.now()}`, {
@@ -39,7 +57,11 @@ async function loadPersonalWalletData() {
     }
 }
 
-// Load expense breakdown by category
+/**
+ * Load expense breakdown data by category for a given period
+ * @async
+ * @param {string} period - Time period ('month', 'week', or 'year')
+ */
 async function loadExpenseBreakdown(period = 'month') {
     try {
         const response = await fetch(`/api/Dashboard/expense-breakdown?period=${period}&t=${Date.now()}`, {
@@ -59,7 +81,11 @@ async function loadExpenseBreakdown(period = 'month') {
     }
 }
 
-// Load income breakdown by category
+/**
+ * Load income breakdown data by category for a given period
+ * @async
+ * @param {string} period - Time period ('month', 'week', or 'year')
+ */
 async function loadIncomeBreakdown(period = 'month') {
     try {
         const response = await fetch(`/api/Dashboard/income-breakdown?period=${period}&t=${Date.now()}`, {
@@ -79,7 +105,10 @@ async function loadIncomeBreakdown(period = 'month') {
     }
 }
 
-// Render expense pie chart
+/**
+ * Render expense breakdown as a doughnut chart
+ * @param {Array} data - Array of expense data by category
+ */
 function renderExpenseChart(data) {
     const canvas = document.getElementById('expenseChart');
     const ctx = canvas.getContext('2d');
@@ -202,7 +231,10 @@ function renderExpenseChart(data) {
     });
 }
 
-// Render income pie chart
+/**
+ * Render income breakdown as a doughnut chart
+ * @param {Array} data - Array of income data by category
+ */
 function renderIncomeChart(data) {
     const canvas = document.getElementById('incomeChart');
     const ctx = canvas.getContext('2d');
@@ -325,7 +357,10 @@ function renderIncomeChart(data) {
     });
 }
 
-// Load recent transactions
+/**
+ * Load and display recent transactions
+ * @async
+ */
 async function loadRecentTransactions() {
     try {
         const response = await fetch(`/api/Transactions/recent?limit=5&t=${Date.now()}`, {
@@ -350,7 +385,10 @@ async function loadRecentTransactions() {
     }
 }
 
-// Render transaction list
+/**
+ * Render transaction list in the UI
+ * @param {Array} transactions - Array of transaction objects
+ */
 function renderTransactionList(transactions) {
     const container = document.getElementById('transactionList');
 
@@ -394,7 +432,11 @@ function renderTransactionList(transactions) {
     container.innerHTML = html;
 }
 
-// Load accounts for dropdowns
+/**
+ * Load user accounts for dropdown population
+ * Populates account dropdowns in transaction and transfer modals
+ * @async
+ */
 async function loadAccounts() {
     try {
         const response = await fetch(`/api/Accounts?t=${Date.now()}`, {
@@ -433,7 +475,10 @@ async function loadAccounts() {
     }
 }
 
-// Initialize page
+/**
+ * Initialize dashboard on page load
+ * Sets up event listeners and loads initial data
+ */
 document.addEventListener('DOMContentLoaded', function () {
     // Load initial data
     loadPersonalWalletData();
@@ -441,6 +486,8 @@ document.addEventListener('DOMContentLoaded', function () {
     loadIncomeBreakdown('month');
     loadRecentTransactions();
     loadAccounts();
+
+
 
     // Setup period change listeners
     document.getElementById('expenseChartPeriod')?.addEventListener('change', function (e) {
@@ -462,6 +509,8 @@ document.addEventListener('DOMContentLoaded', function () {
         loadExpenseBreakdown('month');
         loadIncomeBreakdown('month');
         loadRecentTransactions();
+
+
     });
 });
 

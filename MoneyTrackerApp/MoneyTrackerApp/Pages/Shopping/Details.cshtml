@@ -4,55 +4,84 @@
     ViewData["Title"] = Model.ShoppingList?.Name;
 }
 
-<div class="container py-4">
-    <div class="mb-4">
-        <a href="/Shopping/Index" class="text-decoration-none text-muted mb-2 d-inline-block"><i class="fas fa-arrow-left me-1"></i> Trở về</a>
-        <h2 class="fw-bold">@Model.ShoppingList?.Name</h2>
-        <p class="text-muted small">@Model.ShoppingList?.CreatedAt.ToString("D")</p>
-    </div>
+<link rel="stylesheet" href="~/css/shopping.css" />
 
-    <!-- Items -->
-    <div class="card border-0 shadow-sm rounded-3xl mb-4">
-        <div class="card-body p-0">
-            <div class="list-group list-group-flush">
-                @foreach (var item in Model.ShoppingList.ShoppingItems)
-                {
-                    <div class="list-group-item px-4 py-3 d-flex align-items-center justify-content-between hover:bg-slate-50">
-                        <div class="d-flex align-items-center">
-                            <form method="post" asp-page-handler="Toggle" asp-route-id="@Model.ShoppingList.Id" asp-route-itemId="@item.Id" class="me-3">
-                                <button class="btn p-0 @(item.IsPurchased ? "text-success" : "text-slate-300 hover:text-success")">
-                                    <i class="fas @(item.IsPurchased ? "fa-check-circle" : "fa-circle") fa-lg"></i>
-                                </button>
-                            </form>
-                            <div>
-                                <span class="@(item.IsPurchased ? "text-decoration-line-through text-muted" : "fw-medium")">@item.Name</span>
-                                @if (item.EstimatedPrice.HasValue)
-                                {
-                                    <small class="text-muted d-block text-xs">@item.EstimatedPrice.Value.ToString("N0") ₫</small>
-                                }
-                            </div>
-                        </div>
-                        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ShoppingList.Id" asp-route-itemId="@item.Id">
-                             <button class="btn btn-sm text-slate-400 hover:text-danger"><i class="fas fa-times"></i></button>
-                        </form>
-                    </div>
-                }
-                
-                <!-- Add Item Form inside List -->
-                <div class="list-group-item px-4 py-3 bg-slate-50">
-                    <form method="post" asp-page-handler="Add" asp-route-id="@Model.ShoppingList.Id" class="row g-2 align-items-center">
-                        <div class="col-6">
-                            <input asp-for="ItemName" class="form-control form-control-sm border-0 shadow-none bg-white" placeholder="+ Thêm món đồ..." required />
-                        </div>
-                        <div class="col-3">
-                            <input asp-for="ItemPrice" type="number" class="form-control form-control-sm border-0 shadow-none bg-white" placeholder="Giá (tùy chọn)" />
-                        </div>
-                        <div class="col-3 text-end">
-                            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3">Thêm</button>
-                        </div>
-                    </form>
+<div class="container shopping-container">
+    <div class="shopping-detail-header">
+        <a href="/Shopping/Index" class="shopping-back-link">
+            <i class="fas fa-arrow-left me-2"></i> Trở về danh sách
+        </a>
+        <div class="mt-2 d-flex justify-content-between align-items-center">
+             <div>
+                <h2 class="fw-bold mb-1 display-6">@Model.ShoppingList?.Name</h2>
+                <div class="text-muted">
+                    <i class="far fa-calendar-alt me-1"></i> @Model.ShoppingList?.CreatedAt.ToString("D")
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="shopping-list-container">
+        <!-- Add Item Form -->
+        <div class="shopping-add-form">
+            <form method="post" asp-page-handler="Add" asp-route-id="@Model.ShoppingList.Id" class="w-100 d-flex gap-2">
+                 <div class="flex-grow-1">
+                    <input asp-for="ItemName" class="shopping-input w-100" placeholder="+ Thêm món đồ mới..." required autofocus autocomplete="off" />
+                </div>
+                <div style="width: 150px;">
+                    <input asp-for="ItemPrice" type="number" class="shopping-input w-100" placeholder="Giá (đ)" />
+                </div>
+                <button type="submit" class="btn btn-primary bg-emerald-500 hover:bg-emerald-600 border-0 rounded-3 px-4">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Items List -->
+        <div>
+            @if (Model.ShoppingList != null && Model.ShoppingList.ShoppingItems.Any())
+            {
+                foreach (var item in Model.ShoppingList.ShoppingItems.OrderBy(i => i.IsPurchased).ThenByDescending(i => i.Id))
+                {
+                    <div class="shopping-item">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <form method="post" asp-page-handler="Toggle" asp-route-id="@Model.ShoppingList.Id" asp-route-itemId="@item.Id">
+                                <button class="shopping-check-btn @(item.IsPurchased ? "checked" : "")">
+                                    <i class="fas @(item.IsPurchased ? "fa-check-circle" : "fa-circle") fa-2x"></i>
+                                </button>
+                            </form>
+                            
+                            <div class="shopping-item-content ms-2">
+                                <span class="shopping-item-name @(item.IsPurchased ? "checked" : "")">@item.Name</span>
+                                @if (item.EstimatedPrice.HasValue)
+                                {
+                                    <span class="shopping-item-price">@item.EstimatedPrice.Value.ToString("N0") ₫</span>
+                                }
+                            </div>
+                        </div>
+
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ShoppingList.Id" asp-route-itemId="@item.Id" onsubmit="return confirm('Xóa món này?');">
+                            <button class="shopping-item-delete">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <p class="text-muted">Danh sách trống. Hãy thêm món đồ đầu tiên!</p>
+                </div>
+            }
+        </div>
+        
+        @if (Model.ShoppingList != null && Model.ShoppingList.ShoppingItems.Any())
+        {
+             <div class="bg-gray-50 p-3 text-end text-muted small border-top">
+                Tổng cộng: @Model.ShoppingList.ShoppingItems.Sum(x => x.EstimatedPrice ?? 0).ToString("N0") ₫
+                (@Model.ShoppingList.ShoppingItems.Count(x => x.IsPurchased) / @Model.ShoppingList.ShoppingItems.Count đã mua)
+            </div>
+        }
     </div>
 </div>

@@ -835,66 +835,24 @@
     ]
   },
   {
-    "ContainingType": "MoneyTrackerApp.Controllers.AiAdvisorController",
-    "Method": "GetSuggestions",
-    "RelativePath": "api/AiAdvisor/suggestions",
+    "ContainingType": "MoneyTrackerApp.Controllers.AnalysisController",
+    "Method": "GetAnalysis",
+    "RelativePath": "api/Analysis",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "MoneyTrackerApp.Controllers.AnalysisController",
-    "Method": "GetAnomalies",
-    "RelativePath": "api/Analysis/anomalies",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "MoneyTrackerApp.Controllers.AnalysisController",
-    "Method": "GetBudgetStatus",
-    "RelativePath": "api/Analysis/budget-status",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "MoneyTrackerApp.Controllers.AnalysisController",
-    "Method": "GetAIInsights",
-    "RelativePath": "api/Analysis/insights",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
+    "ReturnTypes": [
       {
-        "Name": "days",
-        "Type": "System.Int32",
-        "IsRequired": false
+        "Type": "MoneyTrackerApp.DTOs.AnalysisResultDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
       }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "MoneyTrackerApp.Controllers.AnalysisController",
-    "Method": "GetPredictions",
-    "RelativePath": "api/Analysis/predictions",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "days",
-        "Type": "System.Int32",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
+    ]
   },
   {
     "ContainingType": "MoneyTrackerApp.Controllers.AuthController",
@@ -2198,6 +2156,22 @@
   },
   {
     "ContainingType": "MoneyTrackerApp.Controllers.GroupExpenseController",
+    "Method": "InviteMembers",
+    "RelativePath": "api/GroupExpense/invite",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MoneyTrackerApp.DTOs.InviteGroupMemberDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.GroupExpenseController",
     "Method": "AddMember",
     "RelativePath": "api/GroupExpense/members",
     "HttpMethod": "POST",
@@ -2991,6 +2965,43 @@
       {
         "Name": "accountId",
         "Type": "System.Nullable\u00601[[System.Int64, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SearchController",
+    "Method": "Search",
+    "RelativePath": "api/Search",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "query",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "type",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MoneyTrackerApp.Controllers.SearchController",
+    "Method": "GetSuggestions",
+    "RelativePath": "api/Search/suggestions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "query",
+        "Type": "System.String",
         "IsRequired": false
       }
     ],
