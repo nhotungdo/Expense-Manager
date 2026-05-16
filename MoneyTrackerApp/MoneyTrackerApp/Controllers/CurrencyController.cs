@@ -5,104 +5,67 @@ using MoneyTrackerApp.Services;
 
 namespace MoneyTrackerApp.Controllers;
 
-/// <summary>
-/// API Controller for Currency Exchange Rate management
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class CurrencyController : ControllerBase
 {
     private readonly ICurrencyService _currencyService;
-    private readonly ILogger<CurrencyController> _logger;
 
-    public CurrencyController(ICurrencyService currencyService, ILogger<CurrencyController> logger)
+    public CurrencyController(ICurrencyService currencyService)
     {
         _currencyService = currencyService;
-        _logger = logger;
     }
 
-    /// <summary>
-    /// Get all available currency exchange rates
-    /// </summary>
-    [HttpGet("rates")]
-    public async Task<ActionResult<List<CurrencyRateDto>>> GetAllRates()
+    [HttpGet]
+    public async Task<ActionResult<List<CurrencyResponseDto>>> GetCurrencies([FromQuery] bool includeInactive = false)
     {
-        try
-        {
-            var rates = await _currencyService.GetAllRatesAsync();
-            return Ok(rates);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting currency rates");
-            return StatusCode(500, new { message = "An error occurred while retrieving currency rates" });
-        }
+        return Ok(await _currencyService.GetAllCurrenciesAsync(includeInactive));
     }
 
-    /// <summary>
-    /// Get exchange rate between two currencies
-    /// </summary>
-    [HttpGet("rates/{fromCurrency}/{toCurrency}")]
-    public async Task<ActionResult<CurrencyRateDto>> GetExchangeRate(string fromCurrency, string toCurrency)
-    {
-        try
-        {
-            var rate = await _currencyService.GetExchangeRateAsync(fromCurrency, toCurrency);
-            
-            if (rate == null)
-                return NotFound(new { message = $"Exchange rate not found for {fromCurrency} to {toCurrency}" });
-
-            return Ok(rate);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting exchange rate");
-            return StatusCode(500, new { message = "An error occurred while retrieving the exchange rate" });
-        }
-    }
-
-    /// <summary>
-    /// Convert currency amount
-    /// </summary>
-    [HttpPost("convert")]
-    public async Task<ActionResult<CurrencyConversionResultDto>> ConvertCurrency([FromBody] CurrencyConversionDto dto)
-    {
-        try
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _currencyService.ConvertCurrencyAsync(dto);
-            return Ok(result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error converting currency");
-            return StatusCode(500, new { message = "An error occurred while converting currency" });
-        }
-    }
-
-    /// <summary>
-    /// Update exchange rates (Admin only)
-    /// </summary>
-    [HttpPost("rates/update")]
+    [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> UpdateExchangeRates()
+    public async Task<ActionResult<CurrencyResponseDto>> CreateCurrency([FromBody] CreateCurrencyDto dto)
     {
-        try
-        {
-            await _currencyService.UpdateExchangeRatesAsync();
-            return Ok(new { message = "Exchange rates updated successfully" });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating exchange rates");
-            return StatusCode(500, new { message = "An error occurred while updating exchange rates" });
-        }
+        return Ok(await _currencyService.CreateCurrencyAsync(dto));
+    }
+
+    [HttpPut]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<CurrencyResponseDto>> UpdateCurrency([FromBody] UpdateCurrencyDto dto)
+    {
+        return Ok(await _currencyService.UpdateCurrencyAsync(dto));
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> DeleteCurrency(int id)
+    {
+        var result = await _currencyService.DeleteCurrencyAsync(id);
+        if (!result) return BadRequest("Could not delete currency");
+        return NoContent();
+    }
+
+    [HttpPost("{id}/set-default")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> SetDefault(int id)
+    {
+        var result = await _currencyService.SetDefaultCurrencyAsync(id);
+        if (!result) return BadRequest("Could not set default currency");
+        return NoContent();
+    }
+
+    [HttpPost("convert")]
+    public async Task<ActionResult<CurrencyConversionResponseDto>> Convert([FromBody] CurrencyConversionRequestDto dto)
+    {
+        return Ok(await _currencyService.ConvertAsync(dto));
+    }
+
+    [HttpPost("sync")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> Sync()
+    {
+        await _currencyService.SyncRatesAsync();
+        return NoContent();
     }
 }

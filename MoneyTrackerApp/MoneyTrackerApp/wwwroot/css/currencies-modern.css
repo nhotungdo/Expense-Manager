@@ -1,194 +1,145 @@
-/* Modern Currency Interface Styling */
 :root {
-    --currency-primary: #4f46e5;
-    --currency-secondary: #06b6d4;
-    --currency-accent: #f59e0b;
-    --currency-success: #10b981;
-    --currency-danger: #ef4444;
-    --currency-surface: #ffffff;
-    --currency-bg: #f3f4f6;
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --shadow-soft: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-    --shadow-glow: 0 0 15px rgba(79, 70, 229, 0.2);
+    --currency-primary: #6366f1;
+    --currency-secondary: #f43f5e;
+    --currency-glass: rgba(255, 255, 255, 0.7);
+    --currency-glass-border: rgba(255, 255, 255, 0.3);
 }
 
 .currency-page-wrapper {
-    font-family: 'Inter', sans-serif;
-    color: #1f2937;
-    background-color: #f8fafc;
+    background: radial-gradient(circle at top right, #eef2ff 0%, #f8fafc 100%);
     min-height: 100vh;
-    padding-bottom: 2rem;
-}
-
-/* Glassmorphism Cards */
-.glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    box-shadow: var(--shadow-soft);
-    padding: 1.5rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
 .glass-header {
-    background: linear-gradient(135deg, var(--currency-primary) 0%, var(--currency-secondary) 100%);
+    background: linear-gradient(135deg, var(--currency-primary) 0%, #4f46e5 100%);
+    padding: 3rem 2rem;
+    border-radius: 2rem;
     color: white;
-    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+    background: var(--currency-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--currency-glass-border);
+    border-radius: 1.5rem;
     padding: 2rem;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-    animation: rotate 20s linear infinite;
-    z-index: 1;
-}
-
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.glass-header-content {
-    position: relative;
-    z-index: 2;
-}
-
-/* Custom Form Elements */
-.currency-select {
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    font-weight: 600;
-    transition: all 0.2s;
-    background-image: none;
-    /* Custom arrow later if needed, mostly handled by BS5 */
-}
-
-.currency-select:focus {
-    border-color: var(--currency-primary);
-    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
 .amount-input {
+    font-size: 2.5rem;
+    font-weight: 700;
     border: none;
     background: transparent;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #111827;
     width: 100%;
+    color: var(--currency-primary);
+}
+
+.amount-input:focus {
     outline: none;
 }
 
-.amount-input::placeholder {
-    color: #d1d5db;
+.flag-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .swap-btn {
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: white;
-    border: 2px solid #e5e7eb;
+    border: 1px solid #e2e8f0;
     color: var(--currency-primary);
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.25rem;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-soft);
+    transition: all 0.2s;
 }
 
 .swap-btn:hover {
-    transform: rotate(180deg) scale(1.1);
-    border-color: var(--currency-primary);
     background: var(--currency-primary);
     color: white;
+    transform: rotate(180deg);
 }
 
-/* Rate Cards */
 .rate-item {
     padding: 1rem;
-    border-radius: 16px;
-    background: white;
+    border-radius: 1rem;
     margin-bottom: 0.75rem;
-    transition: all 0.2s;
-    border: 1px solid transparent;
+    transition: background 0.2s;
 }
 
 .rate-item:hover {
-    background: #f9fafb;
-    border-color: #e5e7eb;
-    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .change-badge {
     padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
+    border-radius: 0.5rem;
     font-size: 0.75rem;
     font-weight: 600;
 }
 
 .change-up {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: var(--currency-success);
+    background: #dcfce7;
+    color: #15803d;
 }
 
 .change-down {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: var(--currency-danger);
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
-/* Chart Container */
-.chart-container {
-    min-height: 300px;
-    position: relative;
+.currency-table {
+    width: 100%;
 }
 
-/* Flag Icon Helper */
-.flag-icon {
-    width: 28px;
-    height: 28px;
+.currency-table th {
+    padding: 1rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.currency-table td {
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    margin-right: 0.5rem;
 }
 
-/* Responsive adjustments */
+.status-active { background: #22c55e; }
+.status-inactive { background: #94a3b8; }
+
 @media (max-width: 768px) {
-    .amount-input {
-        font-size: 1.5rem;
-    }
-
-    .swap-btn {
-        margin: 1rem auto;
-        transform: rotate(90deg);
-    }
-
-    .swap-btn:hover {
-        transform: rotate(270deg) scale(1.1);
+    .glass-header {
+        padding: 2rem 1rem;
+        border-radius: 1rem;
     }
 }

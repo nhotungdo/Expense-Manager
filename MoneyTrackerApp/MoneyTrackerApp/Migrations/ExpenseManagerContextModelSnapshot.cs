@@ -1143,67 +1143,6 @@ namespace MoneyTrackerApp.Migrations
                     b.ToTable("GroupTransactionSplits");
                 });
 
-            modelBuilder.Entity("MoneyTrackerApp.Models.Investment", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long?>("AccountId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("AssetType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(getutcdate())");
-
-                    b.Property<decimal?>("CurrentValue")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateOnly>("PurchaseDate")
-                        .HasColumnType("date");
-
-                    b.Property<decimal>("PurchasePrice")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18, 8)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.HasIndex(new[] { "UserId" }, "IX_Investments_UserId");
-
-                    b.ToTable("Investments", t =>
-                        {
-                            t.HasTrigger("tr_Investments_UpdatedAt");
-                        });
-
-                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
-                });
-
             modelBuilder.Entity("MoneyTrackerApp.Models.KidTask", b =>
                 {
                     b.Property<long>("Id")
@@ -2875,23 +2814,6 @@ namespace MoneyTrackerApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MoneyTrackerApp.Models.Investment", b =>
-                {
-                    b.HasOne("MoneyTrackerApp.Models.Account", "Account")
-                        .WithMany("Investments")
-                        .HasForeignKey("AccountId");
-
-                    b.HasOne("MoneyTrackerApp.Models.User", "User")
-                        .WithMany("Investments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MoneyTrackerApp.Models.KidTask", b =>
                 {
                     b.HasOne("MoneyTrackerApp.Models.User", "Child")
@@ -3182,8 +3104,6 @@ namespace MoneyTrackerApp.Migrations
 
                     b.Navigation("Budgets");
 
-                    b.Navigation("Investments");
-
                     b.Navigation("ScheduledTransactions");
 
                     b.Navigation("SharedAccounts");
@@ -3305,8 +3225,6 @@ namespace MoneyTrackerApp.Migrations
                     b.Navigation("GroupTransactionSplits");
 
                     b.Navigation("GroupTransactions");
-
-                    b.Navigation("Investments");
 
                     b.Navigation("Notifications");
 

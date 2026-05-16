@@ -162,7 +162,7 @@ public class NetWorthService : INetWorthService
             2 => "eWallet",
             3 => "Credit Card",
             4 => "Savings Account",
-            5 => "Investment",
+
             _ => "Unknown"
         };
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MoneyTrackerApp.Models;
@@ -105,7 +105,7 @@ public partial class User
 
     public virtual ICollection<GroupTransaction> GroupTransactions { get; set; } = new List<GroupTransaction>();
 
-    public virtual ICollection<Investment> Investments { get; set; } = new List<Investment>();
+
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 

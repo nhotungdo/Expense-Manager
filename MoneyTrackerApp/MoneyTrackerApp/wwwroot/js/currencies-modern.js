@@ -1,279 +1,250 @@
-// Modern Currency Page Logic
+// Fintech Currency Management 2026 Logic
+(function () {
+    'use strict';
 
-// Mock Exchange Rates (Base: USD)
-const exchangeRates = {
-    USD: { rate: 1, name: "US Dollar", flag: "us" },
-    VND: { rate: 25480, name: "Vietnamese Dong", flag: "vn" },
-    EUR: { rate: 0.92, name: "Euro", flag: "eu" },
-    JPY: { rate: 151.4, name: "Japanese Yen", flag: "jp" },
-    GBP: { rate: 0.79, name: "British Pound", flag: "gb" },
-    AUD: { rate: 1.53, name: "Australian Dollar", flag: "au" },
-    CAD: { rate: 1.36, name: "Canadian Dollar", flag: "ca" },
-    CHF: { rate: 0.90, name: "Swiss Franc", flag: "ch" },
-    CNY: { rate: 7.23, name: "Chinese Yuan", flag: "cn" },
-    SGD: { rate: 1.35, name: "Singapore Dollar", flag: "sg" }
-};
+    let currencies = [];
+    let fromCurrency = 'USD';
+    let toCurrency = 'VND';
+    const modal = new bootstrap.Modal(document.getElementById('currencyModal'));
 
-// State
-let fromCurrency = 'USD';
-let toCurrency = 'VND';
-let chartInstance = null;
-
-document.addEventListener('DOMContentLoaded', function () {
-    initializeControls();
-    updateConversion();
-    renderChart();
-    renderLiveRates();
-
-    // Add animate class to elements on load
-    const elements = document.querySelectorAll('.glass-card');
-    elements.forEach((el, index) => {
-        el.style.opacity = '0';
-        el.style.animation = `fadeInUp 0.5s ease forwards ${index * 0.1}s`;
-    });
-});
-
-// Add keyframes for animation via JS or use CSS
-const styleSheet = document.createElement("style");
-styleSheet.innerText = `
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}`;
-document.head.appendChild(styleSheet);
-
-
-function initializeControls() {
-    const amountInput = document.getElementById('amountInput');
-    const fromSelect = document.getElementById('fromCurrency');
-    const toSelect = document.getElementById('toCurrency');
-    const swapBtn = document.getElementById('swapBtn');
-
-    // Populate selects
-    [fromSelect, toSelect].forEach(select => {
-        Object.keys(exchangeRates).forEach(code => {
-            const option = document.createElement('option');
-            option.value = code;
-            option.text = `${code} - ${exchangeRates[code].name}`;
-            select.appendChild(option);
-        });
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCurrencies();
+        initializeEventListeners();
     });
 
-    fromSelect.value = fromCurrency;
-    toSelect.value = toCurrency;
+    async function loadCurrencies() {
+        try {
+            const response = await fetch('/api/currency?includeInactive=true');
+            if (!response.ok) throw new Error('Failed to fetch');
+            currencies = await response.json();
+            
+            renderCurrencyTable();
+            renderMarketOverview();
+            populateSelectors();
+            updateLastUpdated();
+            updateConversion();
+        } catch (error) {
+            console.error('Error loading currencies:', error);
+            showNotification('error', 'Không thể tải danh sách tiền tệ');
+        }
+    }
 
-    // Event Listeners
-    amountInput.addEventListener('input', updateConversion);
-    fromSelect.addEventListener('change', (e) => {
-        fromCurrency = e.target.value;
-        updateFlag('from', fromCurrency);
-        updateConversion();
-        refreshChart();
-    });
-    toSelect.addEventListener('change', (e) => {
-        toCurrency = e.target.value;
-        updateFlag('to', toCurrency);
-        updateConversion();
-        refreshChart();
-    });
+    function renderCurrencyTable() {
+        const tbody = document.getElementById('currencyTableBody');
+        tbody.innerHTML = currencies.map(c => `
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <img src="https://flagcdn.com/w40/${c.flagUrl || 'un'}.png" class="flag-icon me-3">
+                        <span class="fw-semibold">${c.name}</span>
+                    </div>
+                </td>
+                <td><span class="badge bg-light text-dark font-monospace">${c.code}</span></td>
+                <td>
+                    <div class="fw-bold">${c.symbol} ${formatNumber(c.exchangeRate)}</div>
+                    <small class="text-muted">${c.timeAgo}</small>
+                </td>
+                <td>
+                    <span class="status-indicator ${c.isActive ? 'status-active' : 'status-inactive'}"></span>
+                    <small>${c.isActive ? 'Hoạt động' : 'Tạm dừng'}</small>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-light" onclick="editCurrency(${c.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-light text-danger" onclick="deleteCurrency(${c.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-    swapBtn.addEventListener('click', () => {
-        // Visualize swap
-        const temp = fromCurrency;
-        fromCurrency = toCurrency;
-        toCurrency = temp;
+    function renderMarketOverview() {
+        const container = document.getElementById('marketRatesList');
+        const popular = ['USD', 'EUR', 'JPY', 'GBP', 'BTC', 'ETH'];
+        const displayList = currencies.filter(c => popular.includes(c.code));
+
+        container.innerHTML = displayList.map(c => {
+            const isUp = Math.random() > 0.5; // Mocking trend for UI
+            return `
+                <div class="rate-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="https://flagcdn.com/w40/${c.flagUrl || 'un'}.png" class="flag-icon me-3">
+                        <div>
+                            <div class="fw-bold">${c.code}/USD</div>
+                            <small class="text-muted">${c.name}</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold">${formatNumber(c.exchangeRate)}</div>
+                        <span class="change-badge ${isUp ? 'change-up' : 'change-down'}">
+                            <i class="fas fa-arrow-${isUp ? 'up' : 'down'} me-1"></i>${(Math.random() * 2).toFixed(2)}%
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function populateSelectors() {
+        const fromSelect = document.getElementById('fromCurrency');
+        const toSelect = document.getElementById('toCurrency');
+        
+        const options = currencies.filter(c => c.isActive).map(c => 
+            `<option value="${c.code}">${c.code} - ${c.name}</option>`
+        ).join('');
+
+        fromSelect.innerHTML = options;
+        toSelect.innerHTML = options;
 
         fromSelect.value = fromCurrency;
         toSelect.value = toCurrency;
-
-        updateFlag('from', fromCurrency);
-        updateFlag('to', toCurrency);
-        updateConversion();
-        refreshChart();
-    });
-
-    // Initial flags
-    updateFlag('from', fromCurrency);
-    updateFlag('to', toCurrency);
-}
-
-function updateFlag(type, currencyCode) {
-    const imgId = type === 'from' ? 'fromFlag' : 'toFlag';
-    const img = document.getElementById(imgId);
-    if (img && exchangeRates[currencyCode]) {
-        img.src = `https://flagcdn.com/w40/${exchangeRates[currencyCode].flag}.png`;
+        
+        updateFlags();
     }
-}
 
-function updateConversion() {
-    const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-    const rateFrom = exchangeRates[fromCurrency].rate;
-    const rateTo = exchangeRates[toCurrency].rate;
+    function initializeEventListeners() {
+        document.getElementById('amountInput').addEventListener('input', updateConversion);
+        document.getElementById('fromCurrency').addEventListener('change', (e) => {
+            fromCurrency = e.target.value;
+            updateFlags();
+            updateConversion();
+        });
+        document.getElementById('toCurrency').addEventListener('change', (e) => {
+            toCurrency = e.target.value;
+            updateFlags();
+            updateConversion();
+        });
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            const temp = fromCurrency;
+            fromCurrency = toCurrency;
+            toCurrency = temp;
+            document.getElementById('fromCurrency').value = fromCurrency;
+            document.getElementById('toCurrency').value = toCurrency;
+            updateFlags();
+            updateConversion();
+        });
+    }
 
-    // Calculate Cross Rate: (Amount / RateFromBase) * RateToBase
-    const result = (amount / rateFrom) * rateTo;
+    function updateFlags() {
+        const from = currencies.find(c => c.code === fromCurrency);
+        const to = currencies.find(c => c.code === toCurrency);
+        if (from) document.getElementById('fromFlag').src = `https://flagcdn.com/w40/${from.flagUrl || 'un'}.png`;
+        if (to) document.getElementById('toFlag').src = `https://flagcdn.com/w40/${to.flagUrl || 'un'}.png`;
+    }
 
-    // Determine decimals based on result size
-    let decimals = 2;
-    if (result > 0 && result < 0.01) decimals = 6;
-    else if (result > 0 && result < 1) decimals = 4;
+    function updateConversion() {
+        const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+        const from = currencies.find(c => c.code === fromCurrency);
+        const to = currencies.find(c => c.code === toCurrency);
 
-    document.getElementById('resultAmount').textContent = formatCurrency(result, toCurrency, decimals);
+        if (!from || !to) return;
 
-    // For single unit rate display
-    const singleUnitRate = rateTo / rateFrom;
-    let rateDecimals = 4;
-    if (singleUnitRate > 0 && singleUnitRate < 0.0001) rateDecimals = 8;
-    else if (singleUnitRate > 0 && singleUnitRate < 0.01) rateDecimals = 6;
+        const rate = to.exchangeRate / from.exchangeRate;
+        const result = amount * rate;
 
-    document.getElementById('exchangeRateDisplay').textContent =
-        `1 ${fromCurrency} ≈ ${formatCurrency(singleUnitRate, toCurrency, rateDecimals)}`;
-}
+        document.getElementById('resultAmount').textContent = formatNumber(result, to.symbol);
+        document.getElementById('exchangeRateDisplay').innerHTML = 
+            `1 ${from.code} = <strong>${formatNumber(rate, to.symbol)}</strong> ${to.code}`;
+    }
 
-function formatCurrency(value, currency, decimals = 2) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'decimal',
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-    }).format(value);
-}
+    async function syncRates() {
+        const icon = document.getElementById('syncIcon');
+        icon.classList.add('fa-spin');
+        try {
+            const response = await fetch('/api/currency/sync', { method: 'POST' });
+            if (!response.ok) throw new Error('Sync failed');
+            await loadCurrencies();
+            showNotification('success', 'Đồng bộ tỷ giá thành công');
+        } catch (error) {
+            showNotification('error', 'Lỗi đồng bộ: ' + error.message);
+        } finally {
+            icon.classList.remove('fa-spin');
+        }
+    }
 
-function renderLiveRates() {
-    const container = document.getElementById('liveRatesList');
-    const base = 'VN'; // User's likely locale or preference
+    window.showAddModal = () => {
+        document.getElementById('modalTitle').textContent = 'Thêm tiền tệ mới';
+        document.getElementById('currencyForm').reset();
+        document.getElementById('currencyId').value = '';
+        modal.show();
+    };
 
-    // Mock data for some popular pairs against VND
-    const pairs = [
-        { code: 'USD', change: 0.15 },
-        { code: 'EUR', change: -0.05 },
-        { code: 'JPY', change: 0.22 },
-        { code: 'GBP', change: 0.08 },
-        { code: 'AUD', change: -0.12 }
-    ];
+    window.editCurrency = (id) => {
+        const c = currencies.find(x => x.id === id);
+        if (!c) return;
+        document.getElementById('modalTitle').textContent = 'Chỉnh sửa ' + c.code;
+        document.getElementById('currencyId').value = c.id;
+        document.getElementById('name').value = c.name;
+        document.getElementById('code').value = c.code;
+        document.getElementById('symbol').value = c.symbol;
+        document.getElementById('rate').value = c.exchangeRate;
+        document.getElementById('flag').value = c.flagUrl;
+        modal.show();
+    };
 
-    container.innerHTML = '';
-    pairs.forEach(pair => {
-        const rate = exchangeRates['VND'].rate / exchangeRates[pair.code].rate;
-        const isUp = pair.change >= 0;
+    window.saveCurrency = async () => {
+        const id = document.getElementById('currencyId').value;
+        const data = {
+            id: id ? parseInt(id) : 0,
+            name: document.getElementById('name').value,
+            code: document.getElementById('code').value,
+            symbol: document.getElementById('symbol').value,
+            exchangeRate: parseFloat(document.getElementById('rate').value),
+            flagUrl: document.getElementById('flag').value,
+            country: document.getElementById('name').value // Simplification
+        };
 
-        const html = `
-            <div class="rate-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <img src="https://flagcdn.com/w40/${exchangeRates[pair.code].flag}.png" class="flag-icon me-3">
-                    <div>
-                        <div class="fw-bold text-dark">${pair.code}/VND</div>
-                        <small class="text-muted">${exchangeRates[pair.code].name}</small>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <div class="fw-bold text-dark">${formatCurrency(rate, 'VND', 0)}</div>
-                    <small class="change-badge ${isUp ? 'change-up' : 'change-down'}">
-                        <i class="fas fa-arrow-${isUp ? 'up' : 'down'} me-1"></i>${Math.abs(pair.change)}%
-                    </small>
-                </div>
-            </div>
-        `;
-        container.innerHTML += html;
-    });
-}
-
-function renderChart() {
-    const options = {
-        series: [{
-            name: `${fromCurrency}/${toCurrency}`,
-            data: generateMockHistoryData(14)
-        }],
-        chart: {
-            type: 'area',
-            height: 350,
-            toolbar: { show: false },
-            fontFamily: 'Inter, sans-serif'
-        },
-        colors: ['#4f46e5'],
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.7,
-                opacityTo: 0.2,
-                stops: [0, 90, 100]
-            }
-        },
-        dataLabels: { enabled: false },
-        stroke: {
-            curve: 'smooth',
-            width: 3
-        },
-        xaxis: {
-            type: 'datetime',
-            categories: getLast7Days(),
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-        },
-        yaxis: {
-            show: true,
-            labels: {
-                formatter: (val) => {
-                    if (val < 1) return val.toFixed(6);
-                    return val.toFixed(2);
-                }
-            }
-        },
-        grid: {
-            borderColor: '#f1f1f1',
-            strokeDashArray: 4
-        },
-        tooltip: {
-            theme: 'light',
-            y: {
-                formatter: function (val) {
-                    return val + " " + toCurrency
-                }
-            }
+        try {
+            const method = id ? 'PUT' : 'POST';
+            const response = await fetch('/api/currency', {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) throw new Error('Save failed');
+            modal.hide();
+            await loadCurrencies();
+            showNotification('success', 'Đã lưu thay đổi');
+        } catch (error) {
+            showNotification('error', 'Lỗi khi lưu: ' + error.message);
         }
     };
 
-    const chartEl = document.querySelector("#currencyChart");
-    if (chartEl) {
-        chartInstance = new ApexCharts(chartEl, options);
-        chartInstance.render();
+    window.deleteCurrency = async (id) => {
+        if (!confirm('Bạn có chắc muốn xóa tiền tệ này?')) return;
+        try {
+            const response = await fetch(`/api/currency/${id}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Delete failed');
+            await loadCurrencies();
+            showNotification('success', 'Đã xóa tiền tệ');
+        } catch (error) {
+            showNotification('error', 'Lỗi khi xóa: ' + error.message);
+        }
+    };
+
+    window.syncRates = syncRates;
+
+    function updateLastUpdated() {
+        const now = new Date();
+        document.getElementById('lastUpdated').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-}
 
-function refreshChart() {
-    if (!chartInstance) return;
-
-    // Simulate fetching new data
-    const newData = generateMockHistoryData(14);
-    chartInstance.updateSeries([{
-        name: `${fromCurrency}/${toCurrency}`,
-        data: newData
-    }]);
-}
-
-function generateMockHistoryData(days) {
-    const rateFrom = exchangeRates[fromCurrency].rate;
-    const rateTo = exchangeRates[toCurrency].rate;
-    const baseRate = (1 / rateFrom) * rateTo;
-
-    const data = [];
-    let current = baseRate;
-
-    for (let i = 0; i < days; i++) {
-        // Random fluctuation +/- 1%
-        const change = current * (Math.random() * 0.02 - 0.01);
-        current += change;
-        data.push(current);
+    function formatNumber(num, symbol = '') {
+        let decimals = 2;
+        if (num < 0.1) decimals = 6;
+        else if (num < 1) decimals = 4;
+        
+        const formatted = new Intl.NumberFormat('vi-VN', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        }).format(num);
+        
+        return symbol ? `${symbol} ${formatted}` : formatted;
     }
-    return data;
-}
 
-function getLast7Days() {
-    const dates = [];
-    for (let i = 13; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        dates.push(d.toISOString());
+    function showNotification(type, message) {
+        // Placeholder for toast notification
+        alert(message);
     }
-    return dates;
-}
+
+})();

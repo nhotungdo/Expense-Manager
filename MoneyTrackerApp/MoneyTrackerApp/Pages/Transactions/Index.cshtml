@@ -30,7 +30,7 @@
                         <div>
                             <span class="text-uppercase text-xs fw-bold text-muted spacing-1">Tổng Số Dư Hiện Tại</span>
                             <h2 class="mb-0 fw-bold text-dark display-6">
-                                @Model.TotalBalance.ToString("N0") <small class="fs-6 text-muted">@Model.Currency</small>
+                                @CurrencyHelper.FormatCurrency(Model.TotalBalance) <small class="fs-6 text-muted">@Model.Currency</small>
                             </h2>
                         </div>
                     </div>
@@ -93,7 +93,7 @@
                                     </td>
                                     <td class="pe-4 text-end border-bottom-0">
                                         <span class="fw-bold @colorClass fs-6">
-                                            @sign@t.Amount.ToString("N0")
+                                            @sign@CurrencyHelper.FormatCurrency(t.Amount)
                                         </span>
                                     </td>
                                 </tr>

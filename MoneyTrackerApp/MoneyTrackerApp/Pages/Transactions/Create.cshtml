@@ -26,7 +26,7 @@
             <div class="py-12 text-center">
                 <label class="block text-sm font-semibold text-gray-500 uppercase tracking-widest mb-4">Số tiền @(Model.Transaction.Currency ?? "VND")</label>
                 <div class="relative inline-block w-full max-w-lg group">
-                    <input asp-for="Transaction.Amount" type="number" step="0.01" class="block w-full text-center text-6xl font-black text-gray-900 dark:text-white border-0 focus:ring-0 p-0 placeholder-gray-200 dark:placeholder-gray-700 bg-transparent tracking-tight transition-transform group-hover:scale-105" placeholder="0" />
+                    <input asp-for="Transaction.Amount" type="text" inputmode="numeric" class="money-input block w-full text-center text-6xl font-black text-gray-900 dark:text-white border-0 focus:ring-0 p-0 placeholder-gray-200 dark:placeholder-gray-700 bg-transparent tracking-tight transition-transform group-hover:scale-105" placeholder="0" value="@Model.Transaction.Amount.ToString("N0")" />
                     <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                 </div>
                 <input type="hidden" asp-for="Transaction.Currency" value="VND" />

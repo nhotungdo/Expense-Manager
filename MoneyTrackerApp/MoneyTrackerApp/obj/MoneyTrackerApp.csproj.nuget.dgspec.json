@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj": {}
+    "F:\\OJT-Review\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj": {}
   },
   "projects": {
-    "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj": {
+    "F:\\OJT-Review\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj",
+        "projectUniqueName": "F:\\OJT-Review\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj",
         "projectName": "MoneyTrackerApp",
-        "projectPath": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj",
+        "projectPath": "F:\\OJT-Review\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj",
         "packagesPath": "C:\\Users\\MY PC\\.nuget\\packages\\",
-        "outputPath": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\obj\\",
+        "outputPath": "F:\\OJT-Review\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -44,7 +44,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -130,7 +131,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.311/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

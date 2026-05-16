@@ -360,7 +360,7 @@
     function createNotificationHtml(notification) {
         const iconClass = getNotificationIconClass(notification.type);
         const typeClass = getNotificationTypeClass(notification.type);
-        const timeAgo = getTimeAgo(new Date(notification.createdAt));
+        const timeAgo = notification.timeAgo;
         
         return `
             <div class="notification-item ${notification.isRead ? '' : 'unread'}" onclick="markAsRead(${notification.id})">
@@ -460,36 +460,7 @@
         loadNotifications(filter === 'unread');
     }
 
-    function getTimeAgo(date) {
-        const seconds = Math.floor((new Date() - date) / 1000);
-        
-        const intervals = {
-            year: 31536000,
-            month: 2592000,
-            week: 604800,
-            day: 86400,
-            hour: 3600,
-            minute: 60
-        };
-        
-        for (const [unit, secondsInUnit] of Object.entries(intervals)) {
-            const interval = Math.floor(seconds / secondsInUnit);
-            if (interval >= 1) {
-                // Vietnamese translation for time units
-                const unitVi = {
-                    year: 'năm',
-                    month: 'tháng',
-                    week: 'tuần',
-                    day: 'ngày',
-                    hour: 'giờ',
-                    minute: 'phút'
-                }[unit];
-                return `${interval} ${unitVi} trước`;
-            }
-        }
-        
-        return 'Vừa xong';
-    }
+
 
     // Utility functions
     function getCookie(name) {

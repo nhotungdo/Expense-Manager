@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "24xwY/3nLDw=",
+  "dgSpecHash": "f465wjzVbEk=",
   "success": true,
-  "projectFilePath": "F:\\OJT-Review\\MoneyTrackerApp\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj",
+  "projectFilePath": "F:\\OJT-Review\\Expense-Manager\\MoneyTrackerApp\\MoneyTrackerApp\\MoneyTrackerApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",

@@ -82,6 +82,7 @@ public class SharedAccountService : ISharedAccountService
             .ToListAsync();
 
         return sharedAccounts.Select(MapToSharedAccountResponseDto).ToList();
+        
     }
 
     /// <summary>

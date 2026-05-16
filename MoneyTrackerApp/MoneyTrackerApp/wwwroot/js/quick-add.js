@@ -115,7 +115,7 @@
         if (!btn) return;
 
         // Basic Validation
-        const amount = parseFloat(document.getElementById('globalTransAmount').value);
+        const amount = window.unformatCurrency(document.getElementById('globalTransAmount').value);
         const accountId = document.getElementById('globalTransAccount').value;
         const categoryId = document.getElementById('globalTransCategory').value;
         const date = document.getElementById('globalTransDate').value;
@@ -254,7 +254,7 @@
     }
 
     function formatCurrencySimple(val) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+        return window.formatCurrencyVND(val);
     }
 
     // Global function to open transaction modal

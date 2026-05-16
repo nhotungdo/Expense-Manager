@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Reports v2.0 Logic
  * Modern, clean, and efficient data handling.
  */
@@ -310,7 +310,7 @@ const ReportsApp = {
     },
 
     formatCurrency(val) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+        return window.formatCurrencyVND(val);
     },
 
     formatCurrencyCompact(val) {

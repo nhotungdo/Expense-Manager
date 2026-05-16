@@ -14,26 +14,66 @@
 let expenseChartInstance = null;
 let incomeChartInstance = null;
 
+let exchangeRates = {};
+
 /**
- * Format amount as Vietnamese currency
- * @param {number} amount - The amount to format
- * @returns {string} Formatted currency string
+ * Get current global currency code
+ */
+function getTargetCurrency() {
+    return localStorage.getItem('globalCurrency') || 'VND';
+}
+
+/**
+ * Format amount with target currency
  */
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        minimumFractionDigits: 0
-    }).format(amount);
+    const targetCode = getTargetCurrency();
+    const convertedAmount = convertAmount(amount, 'VND', targetCode);
+    return window.formatCurrency(convertedAmount, targetCode);
+}
+
+/**
+ * Convert amount between currencies using base USD
+ */
+function convertAmount(amount, fromCode, toCode) {
+    if (fromCode === toCode) return amount;
+    if (!exchangeRates[fromCode] || !exchangeRates[toCode]) return amount;
+
+    // Convert from source to USD first (base)
+    // In our DB, exchangeRate is amount of Currency per 1 USD
+    // So USD -> VND is 25680. 1 USD = 25680 VND.
+    // To get USD: amount / rate.
+    // To get target: USD * targetRate.
+    const amountInUsd = amount / exchangeRates[fromCode];
+    return amountInUsd * exchangeRates[toCode];
+}
+
+/**
+ * Load exchange rates from API
+ */
+async function loadExchangeRates() {
+    try {
+        const response = await fetch('/api/currency');
+        if (response.ok) {
+            const data = await response.json();
+            data.forEach(c => {
+                exchangeRates[c.code] = c.exchangeRate;
+            });
+        }
+    } catch (e) {
+        console.error('Failed to load rates', e);
+    }
 }
 
 /**
  * Load and display personal wallet summary data
- * Updates the total assets, monthly income, and monthly expense cards
- * @async
  */
 async function loadPersonalWalletData() {
     try {
+        if (Object.keys(exchangeRates).length === 0) {
+            await loadExchangeRates();
+        }
+
         const response = await fetch(`/api/Dashboard/personal-wallet?t=${Date.now()}`, {
             credentials: 'include'
         });
@@ -509,8 +549,14 @@ document.addEventListener('DOMContentLoaded', function () {
         loadExpenseBreakdown('month');
         loadIncomeBreakdown('month');
         loadRecentTransactions();
+    });
 
-
+    // Listen for global currency change event
+    window.addEventListener('currency:changed', () => {
+        loadPersonalWalletData();
+        loadExpenseBreakdown('month');
+        loadIncomeBreakdown('month');
+        loadRecentTransactions();
     });
 });
 

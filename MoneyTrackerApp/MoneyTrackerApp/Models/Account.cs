@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MoneyTrackerApp.Models;
@@ -36,7 +36,7 @@ public partial class Account
 
     public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
 
-    public virtual ICollection<Investment> Investments { get; set; } = new List<Investment>();
+
 
     public virtual ICollection<ScheduledTransaction> ScheduledTransactions { get; set; } = new List<ScheduledTransaction>();
 

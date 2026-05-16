@@ -55,7 +55,7 @@
             <div class="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
             <div class="relative z-10">
                 <p class="text-green-600 dark:text-green-400 text-sm font-medium mb-1">Tổng thu nhập</p>
-                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">@Model.TotalIncome.ToString("N0")₫</h3>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">@CurrencyHelper.FormatCurrency(Model.TotalIncome)₫</h3>
                 <div class="mt-4 flex items-center text-xs text-green-700 dark:text-green-300">
                     <i class="fa-solid fa-arrow-trend-up mr-1"></i> Thu nhập thực tế
                 </div>
@@ -67,7 +67,7 @@
             <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
             <div class="relative z-10">
                 <p class="text-red-600 dark:text-red-400 text-sm font-medium mb-1">Tổng chi tiêu</p>
-                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">@Model.TotalExpense.ToString("N0")₫</h3>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">@CurrencyHelper.FormatCurrency(Model.TotalExpense)₫</h3>
                 <div class="mt-4 flex items-center text-xs text-red-700 dark:text-red-300">
                     <i class="fa-solid fa-arrow-trend-down mr-1"></i> Chi tiêu thực tế
                 </div>
@@ -80,7 +80,7 @@
             <div class="relative z-10">
                 <p class="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1">Số dư ròng</p>
                 <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                    @Model.NetIncome.ToString("N0")₫
+                    @CurrencyHelper.FormatCurrency(Model.NetIncome)₫
                 </h3>
                 <div class="mt-4 flex items-center text-xs text-blue-700 dark:text-blue-300">
                     <i class="fa-solid fa-wallet mr-1"></i> Thu - Chi
@@ -164,7 +164,7 @@
                                 @t.Note
                             </td>
                             <td class="px-4 py-3 text-right font-bold @(t.TransactionType == 1 ? "text-green-600" : "text-red-600")">
-                                @(t.TransactionType == 1 ? "+" : "-")@t.Amount.ToString("N0")₫
+                                @(t.TransactionType == 1 ? "+" : "-")@CurrencyHelper.FormatCurrency(t.Amount)₫
                             </td>
                             <td class="px-4 py-3 text-center">
                                 @if(t.TransactionType == 1) { <span class="text-xs text-green-500">Thu</span> }

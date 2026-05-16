@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +37,8 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<CurrencyRate> CurrencyRates { get; set; }
 
+    public virtual DbSet<Currency> Currencies { get; set; }
+
     public virtual DbSet<Debt> Debts { get; set; }
 
     public virtual DbSet<DebtPayment> DebtPayments { get; set; }
@@ -55,7 +57,7 @@ public partial class ExpenseManagerContext : DbContext
 
     public virtual DbSet<GroupTransactionSplit> GroupTransactionSplits { get; set; }
 
-    public virtual DbSet<Investment> Investments { get; set; }
+
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
@@ -116,8 +118,11 @@ public partial class ExpenseManagerContext : DbContext
     public virtual DbSet<KidTask> KidTasks { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;");
+        => optionsBuilder.UseSqlServer("Data Source=NHOTUNG\\SQLEXPRESS;Database=ExpenseManager;User Id=sa;Password=123;TrustServerCertificate=true;Trusted_Connection=SSPI;Encrypt=false;", 
+            sqlServerOptionsAction: sqlOptions => 
+            {
+                sqlOptions.EnableRetryOnFailure();
+            });
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -272,6 +277,19 @@ public partial class ExpenseManagerContext : DbContext
             entity.Property(e => e.ToCurrency).HasMaxLength(3);
         });
 
+        modelBuilder.Entity<Currency>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Code).HasMaxLength(10).IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Symbol).HasMaxLength(10).IsRequired();
+            entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 9)");
+            entity.Property(e => e.Country).HasMaxLength(100);
+            entity.Property(e => e.FlagUrl).HasMaxLength(500);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
+        });
+
         modelBuilder.Entity<Debt>(entity =>
         {
             entity.ToTable(tb => tb.HasTrigger("tr_Debts_UpdatedAt"));
@@ -402,23 +420,7 @@ public partial class ExpenseManagerContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
-        modelBuilder.Entity<Investment>(entity =>
-        {
-            entity.ToTable(tb => tb.HasTrigger("tr_Investments_UpdatedAt"));
 
-            entity.HasIndex(e => e.UserId, "IX_Investments_UserId");
-
-            entity.Property(e => e.AssetType).HasMaxLength(50);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CurrentValue).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.PurchasePrice).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.Quantity).HasColumnType("decimal(18, 8)");
-
-            entity.HasOne(d => d.Account).WithMany(p => p.Investments).HasForeignKey(d => d.AccountId);
-
-            entity.HasOne(d => d.User).WithMany(p => p.Investments).HasForeignKey(d => d.UserId);
-        });
 
         modelBuilder.Entity<Notification>(entity =>
         {

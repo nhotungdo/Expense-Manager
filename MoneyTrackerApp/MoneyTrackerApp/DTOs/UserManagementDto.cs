@@ -135,7 +135,7 @@ public class UpdateLanguageDto
     public string Language { get; set; } = null!; // en, vi
 }
 
-public class UpdateCurrencyDto
+public class UpdateUserCurrencyDto
 {
     [Required]
     [StringLength(3)]

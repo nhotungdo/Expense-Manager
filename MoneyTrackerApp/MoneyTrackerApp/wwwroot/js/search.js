@@ -182,7 +182,7 @@ function renderTransactionResult(transaction) {
     const color = typeColors[transaction.type] || 'slate';
     const icon = transaction.categoryIcon || 'fa-circle';
     const date = new Date(transaction.date).toLocaleDateString('vi-VN');
-    const amount = new Intl.NumberFormat('vi-VN').format(transaction.amount);
+    const amount = window.formatCurrency(transaction.amount);
 
     return `
         <div class="search-result-item p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-all border border-transparent hover:border-slate-200"
@@ -254,7 +254,7 @@ function renderCategoryResult(category) {
  */
 function renderAccountResult(account) {
     const icon = account.icon || 'fa-wallet';
-    const balance = new Intl.NumberFormat('vi-VN').format(account.balance);
+    const balance = window.formatCurrency(account.balance);
     const currency = account.currency || 'VND';
 
     return `

@@ -21,13 +21,13 @@
             
             <!-- Dropdown Menu -->
             <div id="quickAddMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
-                <a href="javascript:void(0)" onclick="openTransactionModal('Income')" class="flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 transition-colors">
+                <a href="javascript:void(0)" onclick="openTransactionModal(1)" class="flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 transition-colors">
                     <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
                         <i class="fas fa-arrow-down text-emerald-600"></i>
                     </div>
                     <span class="font-medium text-slate-700">Thêm thu nhập</span>
                 </a>
-                <a href="javascript:void(0)" onclick="openTransactionModal('Expense')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors">
+                <a href="javascript:void(0)" onclick="openTransactionModal(2)" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors">
                     <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
                         <i class="fas fa-arrow-up text-red-600"></i>
                     </div>
@@ -39,6 +39,41 @@
                         <i class="fas fa-chart-pie text-slate-600"></i>
                     </div>
                     <span class="font-medium text-slate-700">Xem phân tích</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Currency Selector -->
+        <div class="relative currency-selector me-2">
+            <button 
+                type="button" 
+                onclick="toggleCurrencyMenu()"
+                class="flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all border border-slate-100">
+                <span id="currentCurrencyFlag" class="text-lg">🇻🇳</span>
+                <span id="currentCurrencyCode" class="font-bold text-slate-700 text-sm">VND</span>
+                <i class="fas fa-chevron-down text-slate-400 text-[10px]"></i>
+            </button>
+            <div id="currencyMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
+                <a href="javascript:void(0)" onclick="setGlobalCurrency('VND', '🇻🇳')" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors">
+                    <span class="text-lg">🇻🇳</span>
+                    <span class="font-medium text-slate-700">VNĐ (Việt Nam)</span>
+                </a>
+                <a href="javascript:void(0)" onclick="setGlobalCurrency('USD', '🇺🇸')" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors">
+                    <span class="text-lg">🇺🇸</span>
+                    <span class="font-medium text-slate-700">USD (Mỹ)</span>
+                </a>
+                <a href="javascript:void(0)" onclick="setGlobalCurrency('EUR', '🇪🇺')" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors">
+                    <span class="text-lg">🇪🇺</span>
+                    <span class="font-medium text-slate-700">EUR (Châu Âu)</span>
+                </a>
+                <a href="javascript:void(0)" onclick="setGlobalCurrency('JPY', '🇯🇵')" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors">
+                    <span class="text-lg">🇯🇵</span>
+                    <span class="font-medium text-slate-700">JPY (Nhật Bản)</span>
+                </a>
+                <div class="border-t border-slate-100 my-1"></div>
+                <a href="/Settings/Currencies" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-blue-600">
+                    <i class="fas fa-cog text-xs"></i>
+                    <span class="font-medium text-sm">Thêm tiền tệ...</span>
                 </a>
             </div>
         </div>
@@ -215,6 +250,44 @@
         }
     }
     
+    function toggleCurrencyMenu() {
+        const menu = document.getElementById('currencyMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    function setGlobalCurrency(code, flag) {
+        localStorage.setItem('globalCurrency', code);
+        localStorage.setItem('globalCurrencyFlag', flag);
+        
+        document.getElementById('currentCurrencyCode').innerText = code;
+        document.getElementById('currentCurrencyFlag').innerText = flag;
+        document.getElementById('currencyMenu').classList.add('hidden');
+        
+        // Trigger global event for components to refresh
+        window.dispatchEvent(new CustomEvent('currency:changed', { detail: { code, flag } }));
+        
+        // If on home or report page, reload data might be needed
+        // For simplicity, we can reload or just let components handle it
+        if (typeof window.loadPersonalWalletData === 'function') {
+            window.loadPersonalWalletData();
+        }
+        if (typeof window.loadRecentTransactions === 'function') {
+            window.loadRecentTransactions();
+        }
+    }
+
+    // Initialize currency selector from localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const code = localStorage.getItem('globalCurrency') || 'VND';
+        const flag = localStorage.getItem('globalCurrencyFlag') || '🇻🇳';
+        
+        const codeEl = document.getElementById('currentCurrencyCode');
+        const flagEl = document.getElementById('currentCurrencyFlag');
+        
+        if (codeEl) codeEl.innerText = code;
+        if (flagEl) flagEl.innerText = flag;
+    });
+
     // Close dropdowns when clicking outside
     document.addEventListener('click', function(event) {
         if (!event.target.closest('.quick-add-dropdown')) {
@@ -222,6 +295,9 @@
         }
         if (!event.target.closest('.user-dropdown')) {
             document.getElementById('userMenu')?.classList.add('hidden');
+        }
+        if (!event.target.closest('.currency-selector')) {
+            document.getElementById('currencyMenu')?.classList.add('hidden');
         }
     });
 </script>

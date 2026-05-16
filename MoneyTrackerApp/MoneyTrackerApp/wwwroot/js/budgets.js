@@ -193,7 +193,7 @@ async function updateBudget() {
 
     if (!budgetInput || !btn) return;
 
-    const newAmount = parseFloat(budgetInput.value);
+    const newAmount = window.unformatCurrency(budgetInput.value);
     if (isNaN(newAmount) || newAmount < 0) {
         alert("Vui lòng nhập số tiền hợp lệ");
         return;
@@ -248,7 +248,7 @@ function resetBtn(btn, html) {
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    return window.formatCurrencyVND(amount);
 }
 
 // -------------------------------------------------------------

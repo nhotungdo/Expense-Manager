@@ -128,6 +128,7 @@ public class OnboardingService
                 case OnboardingStep.SavingsGoal:
                     status.GoalsJson = stepData;
                     break;
+                
             }
         }
 
@@ -142,133 +143,138 @@ public class OnboardingService
     /// </summary>
     public async Task<(bool Success, string Message)> CompleteOnboardingAsync(long userId, CompleteOnboardingDto dto)
     {
-        using var transaction = await _context.Database.BeginTransactionAsync();
+        var strategy = _context.Database.CreateExecutionStrategy();
 
-        try
+        return await strategy.ExecuteAsync(async () =>
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                return (false, "User not found");
-            }
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return (false, "User not found");
+                }
 
-            // Update user settings
-            user.DefaultCurrency = dto.Profile.Currency;
-            user.Language = dto.Profile.Language;
-            user.Timezone = dto.Profile.Timezone ?? "UTC";
-            user.Theme = dto.Profile.Theme ?? "light";
-            user.OnboardingCompleted = true;
-            user.UpdatedAt = DateTime.UtcNow;
+                // Update user settings
+                user.DefaultCurrency = dto.Profile.Currency;
+                user.Language = dto.Profile.Language;
+                user.Timezone = dto.Profile.Timezone ?? "UTC";
+                user.Theme = dto.Profile.Theme ?? "light";
+                user.OnboardingCompleted = true;
+                user.UpdatedAt = DateTime.UtcNow;
 
-            // Create first wallet/account
-            var account = new Account
-            {
-                UserId = userId,
-                Name = dto.Wallet.Name,
-                AccountType = dto.Wallet.AccountType,
-                InitialBalance = 0, // Set to 0 because we create a transaction for this, and the trigger sums them
-                CurrentBalance = dto.Wallet.InitialBalance, // Set directly to ensure Total Assets is correct logic
-                Currency = dto.Profile.Currency,
-                Icon = dto.Wallet.Icon ?? "💰",
-                Color = dto.Wallet.Color ?? "#4CAF50",
-                IsActive = true,
-                IncludeInTotal = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _context.Accounts.Add(account);
-            await _context.SaveChangesAsync(); // Save to get account ID
-
-            // Create initial balance transaction if balance > 0
-            if (dto.Wallet.InitialBalance > 0)
-            {
-                var initialTransaction = new Transaction
+                // Create first wallet/account
+                var account = new Account
                 {
                     UserId = userId,
-                    Account = account,
-                    TransactionType = (int)TransactionType.Income,
-                    Amount = dto.Wallet.InitialBalance,
+                    Name = dto.Wallet.Name,
+                    AccountType = dto.Wallet.AccountType,
+                    InitialBalance = 0, // Set to 0 because we create a transaction for this, and the trigger sums them
+                    CurrentBalance = dto.Wallet.InitialBalance, // Set directly to ensure Total Assets is correct logic
                     Currency = dto.Profile.Currency,
-                    Note = "Initial Balance",
-                    TransactionDate = DateTime.UtcNow,
+                    Icon = dto.Wallet.Icon ?? "💰",
+                    Color = dto.Wallet.Color ?? "#4CAF50",
+                    IsActive = true,
+                    IncludeInTotal = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
 
-                _context.Transactions.Add(initialTransaction);
-            }
+                _context.Accounts.Add(account);
+                await _context.SaveChangesAsync(); // Save to get account ID
 
-            // Create categories based on template
-            var categories = GetCategoriesByTemplate(dto.CategorySetup.Template, userId);
-            _context.Categories.AddRange(categories);
-
-            // Add custom categories if any
-            if (dto.CategorySetup.CustomCategories != null && dto.CategorySetup.CustomCategories.Any())
-            {
-                foreach (var customCat in dto.CategorySetup.CustomCategories)
+                // Create initial balance transaction if balance > 0
+                if (dto.Wallet.InitialBalance > 0)
                 {
-                    var category = new Category
+                    var initialTransaction = new Transaction
                     {
                         UserId = userId,
-                        Name = customCat.Name,
-                        Type = customCat.Type,
-                        Icon = customCat.Icon,
-                        Color = customCat.Color,
-                        Description = customCat.Description,
-                        IsDefault = false,
-                        IsActive = true,
+                        Account = account,
+                        TransactionType = (int)TransactionType.Income,
+                        Amount = dto.Wallet.InitialBalance,
+                        Currency = dto.Profile.Currency,
+                        Note = "Initial Balance",
+                        TransactionDate = DateTime.UtcNow,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
-                    _context.Categories.Add(category);
+
+                    _context.Transactions.Add(initialTransaction);
                 }
-            }
 
-            // Create savings goal if provided
-            if (dto.SavingsGoal != null && !string.IsNullOrEmpty(dto.SavingsGoal.Name))
-            {
-                var savingsGoal = new SavingsGoal
+                // Create categories based on template
+                var categories = GetCategoriesByTemplate(dto.CategorySetup.Template, userId);
+                _context.Categories.AddRange(categories);
+
+                // Add custom categories if any
+                if (dto.CategorySetup.CustomCategories != null && dto.CategorySetup.CustomCategories.Any())
                 {
-                    UserId = userId,
-                    Name = dto.SavingsGoal.Name,
-                    TargetAmount = dto.SavingsGoal.TargetAmount ?? 0,
-                    CurrentAmount = 0,
-                    TargetDate = dto.SavingsGoal.TargetDate.HasValue ? DateOnly.FromDateTime(dto.SavingsGoal.TargetDate.Value) : null,
-                    Icon = dto.SavingsGoal.Icon ?? "🎯",
-                    Color = dto.SavingsGoal.Color ?? "#2196F3",
-                    Status = 0, // Active
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
+                    foreach (var customCat in dto.CategorySetup.CustomCategories)
+                    {
+                        var category = new Category
+                        {
+                            UserId = userId,
+                            Name = customCat.Name,
+                            Type = customCat.Type,
+                            Icon = customCat.Icon,
+                            Color = customCat.Color,
+                            Description = customCat.Description,
+                            IsDefault = false,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow
+                        };
+                        _context.Categories.Add(category);
+                    }
+                }
 
-                _context.SavingsGoals.Add(savingsGoal);
+                // Create savings goal if provided
+                if (dto.SavingsGoal != null && !string.IsNullOrEmpty(dto.SavingsGoal.Name))
+                {
+                    var savingsGoal = new SavingsGoal
+                    {
+                        UserId = userId,
+                        Name = dto.SavingsGoal.Name,
+                        TargetAmount = dto.SavingsGoal.TargetAmount ?? 0,
+                        CurrentAmount = 0,
+                        TargetDate = dto.SavingsGoal.TargetDate.HasValue ? DateOnly.FromDateTime(dto.SavingsGoal.TargetDate.Value) : null,
+                        Icon = dto.SavingsGoal.Icon ?? "🎯",
+                        Color = dto.SavingsGoal.Color ?? "#2196F3",
+                        Status = 0, // Active
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    _context.SavingsGoals.Add(savingsGoal);
+                }
+
+                // Update onboarding status
+                var status = await _context.OnboardingStatuses
+                    .FirstOrDefaultAsync(o => o.UserId == userId);
+
+                if (status != null)
+                {
+                    status.CurrentStep = (int)OnboardingStep.Completed;
+                    status.IsCompleted = true;
+                    status.CompletedAt = DateTime.UtcNow;
+                    status.UpdatedAt = DateTime.UtcNow;
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                _logger.LogInformation($"Completed onboarding for user {userId}");
+                return (true, "Success");
             }
-
-            // Update onboarding status
-            var status = await _context.OnboardingStatuses
-                .FirstOrDefaultAsync(o => o.UserId == userId);
-
-            if (status != null)
+            catch (Exception ex)
             {
-                status.CurrentStep = (int)OnboardingStep.Completed;
-                status.IsCompleted = true;
-                status.CompletedAt = DateTime.UtcNow;
-                status.UpdatedAt = DateTime.UtcNow;
+                await transaction.RollbackAsync();
+                _logger.LogError($"Error completing onboarding for user {userId}: {ex.Message}");
+                return (false, ex.Message); // Return actual error message
             }
-
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            _logger.LogInformation($"Completed onboarding for user {userId}");
-            return (true, "Success");
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-            _logger.LogError($"Error completing onboarding for user {userId}: {ex.Message}");
-            return (false, ex.Message); // Return actual error message
-        }
+        });
     }
 
     /// <summary>

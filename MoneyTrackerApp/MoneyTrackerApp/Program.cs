@@ -8,9 +8,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContext<MoneyTrackerApp.Models.ExpenseManagerContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBDefault"))
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DBDefault"), 
+        sqlServerOptionsAction: sqlOptions => 
+        {
+            sqlOptions.EnableRetryOnFailure();
+        })
 );
 builder.Services.AddScoped<MoneyTrackerApp.Services.JwtTokenService>();
 
@@ -32,11 +37,18 @@ builder.Services.AddScoped<MoneyTrackerApp.Services.ISavingsGoalService, MoneyTr
 
 // Register Debt & Investment Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IDebtService, MoneyTrackerApp.Services.DebtService>();
-builder.Services.AddScoped<MoneyTrackerApp.Services.IInvestmentService, MoneyTrackerApp.Services.InvestmentService>();
+
+
+// Register HttpClient for Currency Service
+builder.Services.AddHttpClient<MoneyTrackerApp.Services.ICurrencyService, MoneyTrackerApp.Services.CurrencyService>();
 
 // Register Group & Split Bill Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IGroupExpenseService, MoneyTrackerApp.Services.GroupExpenseService>();
 builder.Services.AddScoped<MoneyTrackerApp.Services.IFriendshipService, MoneyTrackerApp.Services.FriendshipService>();
+
+// Register Hosted Services (Background Jobs)
+builder.Services.AddHostedService<MoneyTrackerApp.Services.Background.EmailBackgroundService>();
+builder.Services.AddHostedService<MoneyTrackerApp.Services.Background.CurrencySyncService>();
 
 // Register Report & Analytics Services
 builder.Services.AddScoped<MoneyTrackerApp.Services.IReportService, MoneyTrackerApp.Services.ReportService>();

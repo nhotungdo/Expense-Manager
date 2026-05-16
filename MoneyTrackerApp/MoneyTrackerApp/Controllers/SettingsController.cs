@@ -145,7 +145,7 @@ public class SettingsController : ControllerBase
     /// Update default currency
     /// </summary>
     [HttpPut("currency")]
-    public async Task<ActionResult> UpdateCurrency([FromBody] UpdateCurrencyDto dto)
+    public async Task<ActionResult> UpdateCurrency([FromBody] UpdateUserCurrencyDto dto)
     {
         var userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var user = await _context.Users.FindAsync(userId);

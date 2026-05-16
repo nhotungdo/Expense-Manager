@@ -171,7 +171,7 @@
                     
                     <div class="px-2">
                         <h2 class="wallet-balance">
-                            @wallet.CurrentBalance.ToString("N0") <span class="wallet-currency">@wallet.Currency</span>
+                            @wallet.CurrentBalance.ToString("#,##0") <span class="wallet-currency">@wallet.Currency</span>
                         </h2>
                     </div>
 
@@ -216,7 +216,7 @@
                                 <option value="2">Ví điện tử</option>
                                 <option value="3">Thẻ tín dụng</option>
                                 <option value="4">Tiền tiết kiệm</option>
-                                <option value="5">Đầu tư</option>
+
                             </select>
                         </div>
                          <div class="col-md-6 mb-3">
@@ -230,7 +230,7 @@
 
                     <div class="mb-3">
                         <label asp-for="NewWallet.InitialBalance" class="form-label fw-bold small text-muted text-uppercase">Số dư ban đầu</label>
-                        <input asp-for="NewWallet.InitialBalance" type="number" class="form-control rounded-pill" placeholder="0" />
+                        <input asp-for="NewWallet.InitialBalance" type="text" inputmode="numeric" class="money-input form-control rounded-pill" placeholder="0" value="@Model.NewWallet.InitialBalance.ToString("#,##0")" />
                     </div>
                     
                      <div class="row">
@@ -283,7 +283,7 @@
                             <option value="2">Ví điện tử</option>
                             <option value="3">Thẻ tín dụng</option>
                             <option value="4">Tiền tiết kiệm</option>
-                            <option value="5">Đầu tư</option>
+
                         </select>
                         <div class="form-text text-xs">Lưu ý: Thay đổi loại ví không làm thay đổi lịch sử giao dịch.</div>
                     </div>

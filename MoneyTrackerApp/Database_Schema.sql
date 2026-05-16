@@ -1,4 +1,4 @@
-﻿-- Create Database
+-- Create Database
 CREATE DATABASE ExpenseManager;
 GO
 
@@ -436,14 +436,16 @@ GO
 -- =============================================
 CREATE TABLE [Emails] (
     [Id] bigint IDENTITY(1,1) NOT NULL,
-    [UserId] bigint NOT NULL,
+    [UserId] bigint NULL,
+    [RecipientEmail] nvarchar(max) NOT NULL,
     [Subject] nvarchar(256) NOT NULL,
     [Body] nvarchar(max) NOT NULL,
     [Status] nvarchar(20) NOT NULL, -- 'pending', 'sent', 'failed'
     [SentAt] datetime2 NULL,
+    [ScheduledAt] datetime2 NULL,
     [CreatedAt] datetime2 NULL DEFAULT GETUTCDATE(),
     CONSTRAINT [PK_Emails] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_Emails_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+    CONSTRAINT [FK_Emails_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION
 );
 GO
 

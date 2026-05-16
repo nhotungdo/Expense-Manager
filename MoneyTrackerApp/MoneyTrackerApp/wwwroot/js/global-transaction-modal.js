@@ -77,6 +77,11 @@ async function openTransactionModal(type = 2) { // Default Expense
     if (!modalInstance) initModal();
     if (!modalInstance) return;
 
+    // Handle string types
+    if (type === 'Income') type = 1;
+    if (type === 'Expense') type = 2;
+    if (type === 'Transfer') type = 3;
+
     // 1. Reset Form
     const form = document.getElementById('globalTransactionForm');
     form.reset();
@@ -175,7 +180,7 @@ async function updateCategories(type) {
 }
 
 function formatMoney(amount) {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    return window.formatCurrency(amount);
 }
 
 // ---------------------------------------------------------
@@ -214,7 +219,7 @@ async function handleFormSubmit(e) {
 async function handleStandardSubmit(formData, type) {
     const raw = {
         type: type,
-        amount: parseFloat(formData.get('Amount').toString().replace(/,/g, '')),
+        amount: window.unformatCurrency(formData.get('Amount')),
         accountId: formData.get('AccountId'),
         categoryId: formData.get('CategoryId'),
         date: formData.get('TransactionDate'),
@@ -262,7 +267,7 @@ async function handleTransferSubmit(formData) {
     const payload = {
         SourceAccountId: parseInt(formData.get('AccountId')),
         TargetAccountId: parseInt(formData.get('TargetAccountId')),
-        Amount: parseFloat(formData.get('Amount').toString().replace(/,/g, '')),
+        Amount: window.unformatCurrency(formData.get('Amount')),
         Note: formData.get('Note'),
         TransactionDate: formData.get('TransactionDate')
     };

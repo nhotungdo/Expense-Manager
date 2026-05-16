@@ -88,6 +88,7 @@ public class ExportService : IExportService
                 worksheet.Cell(row, 3).Value = t.Category?.Name ?? "N/A";
                 worksheet.Cell(row, 4).Value = t.Account?.Name ?? "N/A";
                 worksheet.Cell(row, 5).Value = t.Amount;
+                worksheet.Cell(row, 5).Style.NumberFormat.Format = "#,##0";
                 worksheet.Cell(row, 6).Value = t.Currency;
                 worksheet.Cell(row, 7).Value = t.Note;
                 row++;
@@ -169,7 +170,7 @@ public class ExportService : IExportService
             sb.Append($"<td>{(t.TransactionType == 1 ? "Income" : "Expense")}</td>");
             sb.Append($"<td>{t.Category?.Name ?? "-"}</td>");
             sb.Append($"<td>{t.Account?.Name ?? "-"}</td>");
-            sb.Append($"<td class='amount {typeClass}'>{sign}{t.Amount:N0} {t.Currency}</td>");
+            sb.Append($"<td class='amount {typeClass}'>{sign}{t.Amount.ToString("#,##0")} {t.Currency}</td>");
             sb.Append($"<td>{t.Note}</td>");
             sb.Append("</tr>");
         }
@@ -180,9 +181,9 @@ public class ExportService : IExportService
         var totalExpense = transactions.Where(t => t.TransactionType == 2).Sum(t => t.Amount);
         
         sb.Append("<div class='total-box'>");
-        sb.Append($"<p>Total Income: <span class='amount income'>+{totalIncome:N0}</span></p>");
-        sb.Append($"<p>Total Expense: <span class='amount expense'>-{totalExpense:N0}</span></p>");
-        sb.Append($"<h3>Net: <span class='amount'>{(totalIncome - totalExpense):N0}</span></h3>");
+        sb.Append($"<p>Total Income: <span class='amount income'>+{totalIncome.ToString("#,##0")}</span></p>");
+        sb.Append($"<p>Total Expense: <span class='amount expense'>-{totalExpense.ToString("#,##0")}</span></p>");
+        sb.Append($"<h3>Net: <span class='amount'>{(totalIncome - totalExpense).ToString("#,##0")}</span></h3>");
         sb.Append("</div>");
         
         sb.Append("</body></html>");
@@ -324,9 +325,9 @@ public class ExportService : IExportService
         
         html.Append("<div class='summary'>");
         html.Append($"<h3>Tổng quan</h3>");
-        html.Append($"<p>Tổng thu nhập: <span class='income'>{data.Income:N2}</span></p>");
-        html.Append($"<p>Tổng chi tiêu: <span class='expense'>{data.Expense:N2}</span></p>");
-        html.Append($"<p>Dòng tiền ròng: <strong>{data.NetCashFlow:N2}</strong></p>");
+        html.Append($"<p>Tổng thu nhập: <span class='income'>{data.Income.ToString("#,##0")}</span></p>");
+        html.Append($"<p>Tổng chi tiêu: <span class='expense'>{data.Expense.ToString("#,##0")}</span></p>");
+        html.Append($"<p>Dòng tiền ròng: <strong>{(data.Income - data.Expense).ToString("#,##0")}</strong></p>");
         html.Append("</div>");
 
         html.Append("<h3>Chi tiết danh mục</h3>");
@@ -338,7 +339,7 @@ public class ExportService : IExportService
             html.Append("<tr>");
             html.Append($"<td>{group.Category}</td>");
             html.Append($"<td>{group.Type}</td>");
-            html.Append($"<td>{group.Amount:N2}</td>");
+            html.Append($"<td>{group.Amount.ToString("#,##0")}</td>");
             html.Append("</tr>");
         }
         

@@ -458,7 +458,7 @@
                 }
 
                 // Prediction
-                if(predVal) predVal.innerText = new Intl.NumberFormat('vi-VN').format(data.predictedSpendingThisMonth);
+                if(predVal) predVal.innerText = window.formatCurrency(data.predictedSpendingThisMonth);
                 if(predBar) {
                     let pct = 0;
                      if(data.predictedSpendingThisMonth > 0)
@@ -478,7 +478,7 @@
                                 <div class="mt-1"><i class="fas fa-exclamation-triangle text-rose-400 text-xs"></i></div>
                                 <div>
                                     <p class="text-xs text-white font-medium">${a.note || a.categoryName}</p>
-                                    <p class="text-[10px] text-slate-400">${new Intl.NumberFormat('vi-VN').format(a.amount)} VND - ${new Date(a.date).toLocaleDateString('vi-VN')}</p>
+                                    <p class="text-[10px] text-slate-400">${window.formatCurrencyVND(a.amount)} - ${new Date(a.date).toLocaleDateString('vi-VN')}</p>
                                 </div>
                             </div>`;
                         });
@@ -581,7 +581,7 @@
         }
 
         function formatCurrencySimple(val) {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+            return window.formatCurrencyVND(val);
         }
     </script>
 }

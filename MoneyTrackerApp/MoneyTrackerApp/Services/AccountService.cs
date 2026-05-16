@@ -353,7 +353,7 @@ public class AccountService : IAccountService
             2 => "Ví điện tử",
             3 => "Thẻ tín dụng",
             4 => "Tài khoản tiết kiệm",
-            5 => "Đầu tư",
+
             _ => "Không xác định"
         };
     }

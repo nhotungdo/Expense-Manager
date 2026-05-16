@@ -39,10 +39,10 @@
                 <div class="wallet-title-block">
                     <h1>@Model.Workspace?.Name</h1>
                     <h2 class="wallet-balance-large">
-                        @Model.Workspace?.CurrentBalance.ToString("N0") <small style="font-size:1rem; color:var(--text-secondary);">@Model.Workspace?.Currency</small>
+                        @CurrencyHelper.FormatCurrency(Model.Workspace?.CurrentBalance) <small style="font-size:1rem; color:var(--text-secondary);">@Model.Workspace?.Currency</small>
                     </h2>
                     <p class="text-muted mb-0">
-                        <i class="fas fa-chart-line me-1"></i> Chi tiêu tháng này: <strong>@Model.MonthSpending.ToString("N0") @Model.Workspace?.Currency</strong>
+                        <i class="fas fa-chart-line me-1"></i> Chi tiêu tháng này: <strong>@CurrencyHelper.FormatCurrency(Model.MonthSpending) @Model.Workspace?.Currency</strong>
                     </p>
                 </div>
             </div>
