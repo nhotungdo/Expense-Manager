@@ -82,6 +82,7 @@ public class TransactionResponseDto
     public string? CategoryColor { get; set; }
     public int TransactionType { get; set; }
     public string TransactionTypeDisplay { get; set; } = null!;
+    public string Type => TransactionType == 1 ? "income" : (TransactionType == 2 ? "expense" : "transfer");
     public decimal Amount { get; set; }
     public string Currency { get; set; } = null!;
     public string? Note { get; set; }

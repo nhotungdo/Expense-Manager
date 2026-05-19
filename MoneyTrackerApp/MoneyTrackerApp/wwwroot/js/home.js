@@ -20,17 +20,18 @@ let exchangeRates = {};
  * Get current global currency code
  */
 function getTargetCurrency() {
-    return localStorage.getItem('globalCurrency') || 'VND';
+    localStorage.setItem('globalCurrency', 'VND');
+    return 'VND';
 }
 
 /**
  * Format amount with target currency
  */
-function formatCurrency(amount) {
+const formatCurrency = function(amount) {
     const targetCode = getTargetCurrency();
     const convertedAmount = convertAmount(amount, 'VND', targetCode);
     return window.formatCurrency(convertedAmount, targetCode);
-}
+};
 
 /**
  * Convert amount between currencies using base USD
@@ -85,13 +86,45 @@ async function loadPersonalWalletData() {
         const data = await response.json();
 
         // Update summary cards
-        document.getElementById('cardTotalAssets').textContent = formatCurrency(data.totalBalance || 0);
         document.getElementById('monthlyIncome').textContent = formatCurrency(data.monthlyIncome || 0);
         document.getElementById('monthlyExpense').textContent = formatCurrency(data.monthlyExpense || 0);
 
+        // Render wallets list (up to 3 wallets)
+        const walletsContainer = document.getElementById('walletsContainer');
+        if (walletsContainer) {
+            if (!data.accounts || data.accounts.length === 0) {
+                walletsContainer.innerHTML = '<div class="text-sm text-slate-400">Chưa có ví nào</div>';
+            } else {
+                walletsContainer.innerHTML = data.accounts.map(acc => `
+                    <div class="flex items-center justify-between py-1 border-b border-slate-50 last:border-0 hover:bg-slate-50 rounded px-1 transition-colors">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded flex items-center justify-center text-white" style="background: ${acc.color || '#3b82f6'}">
+                                <i class="${acc.icon || 'fas fa-wallet'} text-[10px]"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-700 truncate max-w-[120px]">${acc.name}</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-900">${formatCurrency(acc.currentBalance)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Toggle view all wallets button
+        const viewAllContainer = document.getElementById('viewAllWalletsBtnContainer');
+        if (viewAllContainer) {
+            if (data.accountCount > 3) {
+                viewAllContainer.style.display = 'block';
+            } else {
+                viewAllContainer.style.display = 'none';
+            }
+        }
+
     } catch (error) {
         console.error('Error loading wallet data:', error);
-        document.getElementById('cardTotalAssets').textContent = 'Lỗi tải dữ liệu';
+        const walletsContainer = document.getElementById('walletsContainer');
+        if (walletsContainer) {
+            walletsContainer.innerHTML = '<div class="text-xs text-rose-500">Lỗi tải dữ liệu</div>';
+        }
         document.getElementById('monthlyIncome').textContent = 'N/A';
         document.getElementById('monthlyExpense').textContent = 'N/A';
     }
@@ -443,10 +476,10 @@ function renderTransactionList(transactions) {
     }
 
     const html = transactions.map(trans => {
-        const isIncome = trans.type === 1 || trans.type === 'Income';
+        const isIncome = trans.type === "income";
         const icon = isIncome ? 'fa-arrow-down' : 'fa-arrow-up';
-        const colorClass = isIncome ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50';
-        const amountColor = isIncome ? 'text-emerald-600' : 'text-rose-600';
+        const colorClass = isIncome ? 'text-green-500 bg-emerald-50' : 'text-red-500 bg-rose-50';
+        const amountColor = isIncome ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold';
         const sign = isIncome ? '+' : '-';
 
         return `
@@ -458,11 +491,11 @@ function renderTransactionList(transactions) {
                     <div>
                         <p class="font-semibold text-slate-800">${trans.categoryName || 'Khác'}</p>
                         <p class="text-sm text-slate-500">${trans.note || 'Không có ghi chú'}</p>
-                        <p class="text-xs text-slate-400 mt-0.5">${new Date(trans.transactionDate).toLocaleDateString('vi-VN')}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">${new Date(trans.transactionDate || trans.date).toLocaleDateString('vi-VN')}</p>
                     </div>
                 </div>
                 <div class="text-right">
-                    <p class="font-bold ${amountColor}">${sign}${formatCurrency(Math.abs(trans.amount))}</p>
+                    <p class="${amountColor}">${sign}${formatCurrency(Math.abs(trans.amount))}</p>
                     <p class="text-xs text-slate-400">${trans.accountName || 'N/A'}</p>
                 </div>
             </div>

@@ -99,25 +99,27 @@
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Total Assets -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group">
+        <!-- Wallet Accounts -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group flex flex-col justify-between min-h-[160px]">
             <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <i class="fas fa-wallet text-6xl text-blue-600"></i>
             </div>
-            <div class="relative z-10">
-                <div class="flex items-center gap-3 mb-2">
+            <div class="relative z-10 w-full">
+                <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
                         <i class="fas fa-wallet text-lg"></i>
                     </div>
-                    <h3 class="text-slate-500 font-medium text-sm">Tổng tài sản</h3>
+                    <h3 class="text-slate-500 font-medium text-sm">Ví tài khoản</h3>
                 </div>
-                <div class="text-2xl font-bold text-slate-900 mt-2" id="cardTotalAssets">Đang tải...</div>
-                <div class="flex items-center gap-2 mt-2 text-sm">
-                    <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg font-medium text-xs flex items-center gap-1">
-                        <i class="fas fa-arrow-up"></i> +12.5%
-                    </span>
-                    <span class="text-slate-400">so với tháng trước</span>
+                <div class="space-y-2.5" id="walletsContainer">
+                    <div class="text-sm text-slate-400">Đang tải...</div>
                 </div>
+            </div>
+            <div id="viewAllWalletsBtnContainer" class="relative z-10 mt-3 pt-2.5 border-t border-slate-50" style="display: none;">
+                <a href="/Wallets" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                    <span>Xem tất cả ví</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
         </div>
 
@@ -394,7 +396,7 @@
     
 
     <!-- Home Page Logic with Pie Charts -->
-    <script src="/js/home.js"></script>
+    <script src="/js/home.js" asp-append-version="true"></script>
     
     <!-- Global Search Functionality -->
     <script src="/js/search.js"></script>

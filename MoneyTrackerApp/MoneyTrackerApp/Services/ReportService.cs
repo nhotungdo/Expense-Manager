@@ -288,7 +288,7 @@ public class ReportService : IReportService
                 Id = t.Id,
                 Description = t.Note ?? "Transaction",
                 Amount = t.Amount,
-                Type = t.TransactionTypeDisplay,
+                Type = t.TransactionType == 1 ? "income" : (t.TransactionType == 2 ? "expense" : "transfer"),
                 Date = t.TransactionDate,
                 CategoryIcon = t.CategoryIcon,
                 CategoryColor = t.CategoryColor,
@@ -436,12 +436,27 @@ public class ReportService : IReportService
     public async Task<object> GetPersonalWalletSummaryAsync(long userId)
     {
         // Get all accounts for user
-        var accounts = await _context.Accounts
+        var allAccounts = await _context.Accounts
             .AsNoTracking()
-            .Where(a => a.UserId == userId)
+            .Where(a => a.UserId == userId && a.IsActive)
             .ToListAsync();
 
-        var totalBalance = accounts.Sum(a => a.CurrentBalance);
+        var totalAccountsCount = allAccounts.Count;
+
+        // Take up to 3 most recent wallets
+        var recentAccounts = allAccounts
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(3)
+            .Select(a => new
+            {
+                Id = a.Id,
+                Name = a.Name,
+                CurrentBalance = a.CurrentBalance,
+                Currency = a.Currency,
+                Icon = a.Icon,
+                Color = a.Color
+            })
+            .ToList();
 
         // Get current month transactions
         var now = DateTime.Now;
@@ -465,10 +480,10 @@ public class ReportService : IReportService
 
         return new
         {
-            totalBalance = totalBalance,
+            accounts = recentAccounts,
             monthlyIncome = monthlyIncome,
             monthlyExpense = monthlyExpense,
-            accountCount = accounts.Count
+            accountCount = totalAccountsCount
         };
     }
 

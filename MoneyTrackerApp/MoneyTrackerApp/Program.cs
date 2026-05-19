@@ -213,4 +213,48 @@ app.MapHub<MoneyTrackerApp.Hubs.ChatHub>("/chatHub");
 app.MapHub<MoneyTrackerApp.Hubs.WalletHub>("/walletHub");
 app.MapHub<MoneyTrackerApp.Hubs.NotificationHub>("/notificationHub");
 
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<MoneyTrackerApp.Models.ExpenseManagerContext>();
+        
+        // 1. Convert all users to VND default currency
+        var usersToUpdate = context.Users.Where(u => u.DefaultCurrency != "VND").ToList();
+        if (usersToUpdate.Any())
+        {
+            foreach (var u in usersToUpdate)
+            {
+                u.DefaultCurrency = "VND";
+            }
+        }
+
+        // 2. Convert all accounts to VND currency
+        var accountsToUpdate = context.Accounts.Where(a => a.Currency != "VND").ToList();
+        if (accountsToUpdate.Any())
+        {
+            foreach (var a in accountsToUpdate)
+            {
+                a.Currency = "VND";
+            }
+        }
+        
+        // 3. Convert all transactions to VND currency
+        var transactionsToUpdate = context.Transactions.Where(t => t.Currency != "VND").ToList();
+        if (transactionsToUpdate.Any())
+        {
+            foreach (var t in transactionsToUpdate)
+            {
+                t.Currency = "VND";
+            }
+        }
+
+        context.SaveChanges();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error migrating currencies to VND: {ex.Message}");
+    }
+}
+
 app.Run();

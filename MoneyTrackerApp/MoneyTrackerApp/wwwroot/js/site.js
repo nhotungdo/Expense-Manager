@@ -4,6 +4,7 @@
 
 // Format number to string with local currency rules (e.g., 1.500.000 ₫, $1,500.00)
 window.formatCurrency = function(amount, currencyCode = 'VND') {
+    currencyCode = 'VND'; // Force all formatting to use Vietnamese Dong (VND)
     if (amount === null || amount === undefined || isNaN(amount)) return '0';
     
     const locales = {

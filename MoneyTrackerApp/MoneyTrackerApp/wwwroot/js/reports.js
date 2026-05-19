@@ -249,7 +249,7 @@ const ReportsApp = {
         }
 
         container.innerHTML = txns.slice(0, 5).map(t => {
-            const isInc = t.Type === 'Income';
+            const isInc = t.Type === 'Income' || t.Type === 'Thu nhập' || t.Type === 'Thu';
             const sign = isInc ? '+' : '-';
             const colorClass = isInc ? 'text-green-600' : 'text-red-500';
 

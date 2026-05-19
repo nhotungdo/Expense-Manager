@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoneyTrackerApp.Models;
 
@@ -11,9 +12,11 @@ using MoneyTrackerApp.Models;
 namespace MoneyTrackerApp.Migrations
 {
     [DbContext(typeof(ExpenseManagerContext))]
-    partial class ExpenseManagerContextModelSnapshot : ModelSnapshot
+    [Migration("20260519021518_AddCurrencies")]
+    partial class AddCurrencies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
